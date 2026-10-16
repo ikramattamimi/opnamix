@@ -19,7 +19,7 @@ export const DocSection: React.FC<DocSectionProps> = ({
 }) => (
   <section
     id={id}
-    className="scroll-mt-24 rounded-[20px] bg-card-light p-6 shadow-soft dark:bg-card-dark"
+    className="scroll-mt-36 rounded-[20px] bg-card-light p-6 shadow-soft dark:bg-card-dark"
   >
     <h2 className="text-lg font-bold text-text-primary-light dark:text-white">{title}</h2>
     <p className="mt-1 text-sm text-text-secondary-light">{description}</p>
