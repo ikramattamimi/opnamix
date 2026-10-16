@@ -14,14 +14,14 @@ import {
   OpnameStatus,
   OpnameItem,
   PengulanganOpname,
-} from '../types';
+} from '@/types';
 import type { Json, Tables } from './database.types';
 import {
   getDisplayNameFromMasterObat,
   getProductDisplayName,
   getProductDisplayNameFromDb,
-} from './productDisplay';
-import { getLowStockItems } from './lowStock';
+} from '@/features/products/productDisplay';
+import { getLowStockItems } from '@/features/dashboard/lowStock';
 import { toDate } from './utils';
 
 // Nama lengkap user per id dari profiles. Id null/duplikat diabaikan.
