@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { stockOutApi, RecentStockOut } from './api';
 import { transactionsApi } from '@/features/transactions/api';
 import { StockOutRequest, StockOutManual, RequestedDrug } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import {
   useStockOutRequests,
+  useRecentStockOuts,
   useStockOutRealtime,
   useCreateStockOutRequest,
   useProcessStockOutRequest,
@@ -77,23 +77,9 @@ const StockOutManagement: React.FC = () => {
   const [requestToProcess, setRequestToProcess] = useState<StockOutRequest | null>(null);
 
   // Timeline Real Data
-  const [timelineData, setTimelineData] = useState<RecentStockOut[]>([]);
+  // Ter-update otomatis lewat invalidasi stockOutKeys.all (realtime dan mutasi)
+  const { data: timelineData = [], refetch: refreshTimeline } = useRecentStockOuts(10);
   const [showTimeline, setShowTimeline] = useState(true);
-
-  const fetchTimeline = async () => {
-    try {
-      const data = await stockOutApi.getRecentStockOuts(10);
-      setTimelineData(data);
-    } catch (err) {
-      console.error('Failed to fetch timeline', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchTimeline();
-  }, []);
-
-  const refreshTimeline = () => fetchTimeline();
 
   useEffect(() => {
     if (!selectedRequest) {
@@ -158,8 +144,6 @@ const StockOutManagement: React.FC = () => {
         requestedBy: isAdmin ? 'Admin' : 'Farmasi',
       });
 
-      // Refresh timeline after manual add
-      fetchTimeline();
       setIsManualModalOpen(false);
 
       const itemCount = record.items.length;
@@ -236,7 +220,6 @@ const StockOutManagement: React.FC = () => {
         total: Math.max(0, subtot + processServiceFee - processDiscount),
       });
       showToast('Permintaan berhasil diproses. Stok telah dikurangi secara otomatis.', 'success');
-      refreshTimeline(); // Update history
       setRequestToProcess(null); // Close modal
     } catch (error) {
       console.error('Error processing request:', error);
@@ -580,7 +563,7 @@ const StockOutManagement: React.FC = () => {
                 {showTimeline ? 'Sembunyikan' : 'Tampilkan'}
               </Button>
               <button
-                onClick={() => refreshTimeline()}
+                onClick={() => void refreshTimeline()}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors text-primary"
                 title="Refresh Timeline"
               >

@@ -17,6 +17,13 @@ export function useStockOutRequests(params?: PaginationParams) {
   });
 }
 
+export function useRecentStockOuts(limit: number) {
+  return useQuery({
+    queryKey: stockOutKeys.recent(limit),
+    queryFn: () => stockOutApi.getRecentStockOuts(limit),
+  });
+}
+
 /**
  * Subscribe ke Supabase Realtime pada tabel `transaksi`.
  * Ketika ada INSERT atau UPDATE, invalidate query stockOut
