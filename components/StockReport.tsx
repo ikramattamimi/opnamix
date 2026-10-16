@@ -124,7 +124,6 @@ const StockReport: React.FC<StockReportProps> = () => {
     if (range) {
       setTxStartDate(range.start);
       setTxEndDate(range.end);
-      setTxPage(1);
     }
   };
 
@@ -135,7 +134,6 @@ const StockReport: React.FC<StockReportProps> = () => {
     if (range) {
       setMutationStartDate(range.start);
       setMutationEndDate(range.end);
-      setMutationPage(1);
     }
   };
 

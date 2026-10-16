@@ -34,3 +34,7 @@ export const getProductDisplayNameFromDb = (product?: {
     composition: product.kandungan || '',
   });
 };
+
+export const getDisplayNameFromMasterObat = (
+  item?: Parameters<typeof getProductDisplayNameFromDb>[0],
+): string => getProductDisplayNameFromDb(item) || 'Unknown';

@@ -19,6 +19,7 @@ import { createStockOutColumns } from "./StockOutColumns";
 import { useToast } from "./ui/toast";
 import { withErrorDetail } from "../lib/utils";
 import { exportStockOutToExcel } from "../lib/exportUtils";
+import { calculateRequestTotals } from "../lib/stockOutTotals";
 
 import { useAuth } from "@/hooks/useAuth"
 
@@ -251,26 +252,11 @@ const StockOutManagement: React.FC = () => {
     }
   };
 
-  const getRequestTotals = (req: StockOutRequest, discountOverride?: number) => {
-    const totalDrugs = req.drugs.reduce(
-      (sum, d) => sum + (d.price || 0) * d.quantity,
-      0,
-    );
-    const totalServices = req.services.reduce(
-      (sum, s) => sum + (s.price || 0),
-      0,
-    );
-    const usedDiscount = discountOverride ?? req.discount ?? 0;
-    const usedServiceFee = isProcessMode ? processServiceFee : req.serviceFee ?? 0;
-
-    return {
-      totalDrugs,
-      totalServices,
-      serviceFee: usedServiceFee,
-      discount: usedDiscount,
-      grandTotal: Math.max(0, totalDrugs + totalServices + usedServiceFee - usedDiscount),
-    };
-  };
+  const getRequestTotals = (req: StockOutRequest, discountOverride?: number) =>
+    calculateRequestTotals(req, {
+      discount: discountOverride,
+      serviceFee: isProcessMode ? processServiceFee : undefined,
+    });
 
   // Helper to calculate totals for display in Detail Modal
   const getDetailTotals = (req: StockOutRequest) => {
