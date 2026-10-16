@@ -1,6 +1,6 @@
 # Spesifikasi Modul Stock Opname
 
-> Single source of truth untuk modul Stok Opname aplikasi PMB Anita.  
+> Single source of truth untuk modul Stok Opname aplikasi Opnamix.  
 > Terakhir diperbarui: 2026-03-15
 
 ---

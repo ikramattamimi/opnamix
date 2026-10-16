@@ -60,59 +60,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           <div className="text-center mb-10 group-hover:transform group-hover:scale-105 transition-transform duration-500">
             <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center p-2">
               <img
-                src="/image.png"
-                alt="Logo TPMB Anita Wahyu Ningsih"
+                src="/logo.svg"
+                alt="Logo Opnamix"
                 className="h-full w-full rounded-2xl object-contain"
                 decoding="async"
               />
             </div>
 
             <h1 className="text-4xl font-black text-slate-800 dark:text-white mb-3 tracking-tight">
-              TPMB Anita
+              Opnamix
             </h1>
             <p className="text-slate-500 dark:text-slate-400 font-medium">
               Sistem Manajemen Inventory Terintegrasi
             </p>
           </div>
-
-          {/* Quick Demo Login Buttons */}
-          {/* <div className="grid grid-cols-3 gap-2 mb-8">
-            <Button
-              variant="outline"
-              onClick={() => { setEmail('admin@test.com'); setPassword('password123'); }}
-              className="h-auto flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 hover:bg-primary/10 hover:border-primary/20 hover:text-primary transition-all group/btn"
-              type="button"
-            >
-              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-1 group-hover/btn:scale-110 transition-transform">
-                <span className="material-icons-round text-lg">admin_panel_settings</span>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-hover/btn:text-primary">Admin</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => { setEmail('admin@uniera.ac.id'); setPassword('password123'); }}
-              className="h-auto flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 hover:bg-blue-500/10 hover:border-blue-500/20 hover:text-blue-500 transition-all group/btn"
-              type="button"
-            >
-              <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-1 group-hover/btn:scale-110 transition-transform">
-                <span className="material-icons-round text-lg">medication</span>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-hover/btn:text-blue-500">Farmasi</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => { setEmail('nakes@uniera.ac.id'); setPassword('password123'); }}
-              className="h-auto flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 hover:bg-green-500/10 hover:border-green-500/20 hover:text-green-500 transition-all group/btn"
-              type="button"
-            >
-              <div className="w-8 h-8 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mb-1 group-hover/btn:scale-110 transition-transform">
-                <span className="material-icons-round text-lg">medical_services</span>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-hover/btn:text-green-500">Nakes</span>
-            </Button>
-          </div> */}
 
           <div className="space-y-8">
             <div className="relative flex items-center justify-center">
@@ -232,7 +193,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         {/* Footer Credit */}
         <p className="text-center text-slate-400 text-xs mt-8 font-medium">
-          &copy; {new Date().getFullYear()} TPMB Anita. Hak cipta dilindungi.
+          &copy; {new Date().getFullYear()} Opnamix. Hak cipta dilindungi.
         </p>
 
 

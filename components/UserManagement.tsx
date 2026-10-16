@@ -584,7 +584,7 @@ const UserManagement: React.FC = () => {
                   type="email"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
-                  placeholder="contoh@pmbanita.com"
+                  placeholder="nama@contoh.com"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
               </div>

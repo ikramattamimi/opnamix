@@ -242,7 +242,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
         </div>
 
         <footer className="mt-auto py-6 px-8 text-sm text-text-secondary-light flex flex-col md:flex-row justify-between items-center bg-transparent">
-          <p>© {new Date().getFullYear()} TPMB ANITA. Hak Cipta Dilindungi.</p>
+          <p>© {new Date().getFullYear()} Opnamix. Hak Cipta Dilindungi.</p>
         </footer>
       </main>
     </div>

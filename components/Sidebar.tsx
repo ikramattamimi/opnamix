@@ -90,8 +90,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
             effectiveCollapsed ? 'justify-center' : 'gap-3'
           )}>
             <img
-              src="/image.png"
-              alt="Logo TPMB Anita Wahyu Ningsih"
+              src="/logo.svg"
+              alt="Logo Opnamix"
               className={cn(
                 'object-contain rounded-xl transition-all duration-300',
                 effectiveCollapsed ? 'h-10 w-10' : 'h-12 w-12'
@@ -99,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
             />
             {!effectiveCollapsed && (
               <div className="text-xl font-bold uppercase tracking-wide text-text-primary-light dark:text-white whitespace-nowrap">
-                TPMB <span className="text-primary font-bold">ANITA</span>
+                Opna<span className="text-primary font-bold">mix</span>
               </div>
             )}
           </div>

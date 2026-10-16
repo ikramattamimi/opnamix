@@ -77,7 +77,7 @@ const AppContentWrapper: React.FC = () => {
       case ROUTES.USER_MANAGEMENT: return 'Manajemen Pengguna';
       case ROUTES.PROFIL: return 'Profil Saya';
       case ROUTES.NOTIFICATIONS: return 'Notifikasi';
-      default: return 'TPMB Anita';
+      default: return 'Opnamix';
     }
   };
 

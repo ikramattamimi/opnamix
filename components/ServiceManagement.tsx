@@ -291,7 +291,7 @@ const ServiceManagement: React.FC = () => {
                 </label>
                 <input 
                   className={getInputClassName('name', "w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white px-4 py-3 text-sm focus:border-primary focus:ring-primary")} 
-                  placeholder="contoh: Konsultasi Bidan Anita" 
+                  placeholder="contoh: Konsultasi Umum" 
                   type="text"
                   value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
