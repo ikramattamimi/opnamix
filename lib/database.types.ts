@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -728,17 +728,69 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assert_no_active_opname: { Args: never; Returns: undefined }
+      backward_opname_to_step_one: {
+        Args: { p_opname_id: number; p_schedule_obat_ids: Json }
+        Returns: undefined
+      }
       can_edit_transaksi: { Args: { p_transaksi_id: number }; Returns: boolean }
+      complete_opname_step_one: {
+        Args: { p_opname_id: number; p_selected_obat_ids: Json }
+        Returns: undefined
+      }
+      create_transaction: { Args: { p_payload: Json }; Returns: Json }
       decrement_obat_qty: {
         Args: { obat_id: number; qty_change: number }
         Returns: undefined
       }
+      finish_opname: { Args: { p_opname_id: number }; Returns: undefined }
       has_any_role: { Args: { p_roles: string[] }; Returns: boolean }
       increment_obat_qty: {
         Args: { obat_id: number; qty_change: number }
         Returns: undefined
       }
+      insert_transaksi_items: {
+        Args: {
+          p_items: Json
+          p_nomor: string
+          p_services: Json
+          p_transaksi_id: number
+        }
+        Returns: undefined
+      }
       is_staff: { Args: never; Returns: boolean }
+      lock_editable_opname: { Args: { p_opname_id: number }; Returns: string }
+      next_transaction_number: { Args: { p_tipe: string }; Returns: string }
+      opname_stock_lock_key: { Args: never; Returns: number }
+      process_stock_out_request: {
+        Args: {
+          p_biaya_layanan?: number
+          p_diskon?: number
+          p_nomor: string
+          p_total?: number
+        }
+        Returns: undefined
+      }
+      replace_opname_details: {
+        Args: { p_obat_ids: Json; p_opname_id: number }
+        Returns: undefined
+      }
+      resolve_opname_difference: {
+        Args: { p_detail_id: number; p_reason: string }
+        Returns: undefined
+      }
+      save_opname_details: {
+        Args: { p_opname_id: number; p_step: number; p_updates: Json }
+        Returns: undefined
+      }
+      update_opname_selection: {
+        Args: { p_opname_id: number; p_selected_obat_ids: Json }
+        Returns: undefined
+      }
+      update_pending_stock_out_request: {
+        Args: { p_nomor: string; p_payload: Json }
+        Returns: undefined
+      }
       update_stock_atomic: {
         Args: { p_items: Json; p_tipe: string }
         Returns: undefined
