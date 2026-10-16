@@ -9,7 +9,7 @@ We use `@tanstack/react-table` with a custom `DataTable` component.
 **Usage:**
 
 ```tsx
-import { DataTable } from './ui/data-table';
+import { DataTable } from '@/components/ui/data-table';
 import { createPageColumns } from './PageColumns';
 
 // ...

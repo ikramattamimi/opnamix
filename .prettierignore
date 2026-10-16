@@ -1,5 +1,5 @@
 pnpm-lock.yaml
-lib/database.types.ts
+src/lib/database.types.ts
 supabase/functions
 .ai
 docs
