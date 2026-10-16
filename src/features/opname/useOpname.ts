@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { opnameApi } from './api';
 import { opnameKeys } from './keys';
 import { invalidateOpnameChange } from '@/lib/invalidate';
+import { createNotification } from '@/features/notifications/api';
 
 type OpnameDetailUpdates = NonNullable<Parameters<typeof opnameApi.saveDraft>[2]>;
 
@@ -32,6 +33,20 @@ export function useOpnameDetailView(id: string | undefined) {
   });
 }
 
+const OPNAME_NOTIFICATION_ROLES = ['admin', 'apoteker', 'farmasi'];
+
+// Notifikasi perubahan langkah opname untuk role yang mengelola opname.
+// Gagal mengirim notifikasi tidak menggagalkan mutasi yang sudah berhasil.
+const notifyOpname = async (
+  notification: Omit<Parameters<typeof createNotification>[0], 'target_roles'>,
+) => {
+  try {
+    await createNotification({ ...notification, target_roles: OPNAME_NOTIFICATION_ROLES });
+  } catch (error) {
+    console.error('Failed to create opname notification:', error);
+  }
+};
+
 // Semua mutasi yang mengubah status/langkah opname atau stok memakai
 // invalidateOpnameChange. onSuccess mengembalikan promise, jadi mutateAsync
 // baru selesai setelah query aktif ter-refresh.
@@ -59,13 +74,33 @@ export function useCompleteOpnameStepOne() {
 export function useBackwardOpnameToStepOne() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ opnameId, scheduleObatIds }: { opnameId: string; scheduleObatIds: string[] }) =>
-      opnameApi.backwardToStepOne(opnameId, scheduleObatIds),
-    onSuccess: () => invalidateOpnameChange(queryClient),
+    mutationFn: ({
+      opnameId,
+      scheduleObatIds,
+    }: {
+      opnameId: string;
+      scheduleObatIds: string[];
+      opnameNumber?: string;
+    }) => opnameApi.backwardToStepOne(opnameId, scheduleObatIds),
+    onSuccess: async (_data, { opnameId, opnameNumber }) => {
+      await invalidateOpnameChange(queryClient);
+      await notifyOpname({
+        type: 'OPNAME_STEP_CHANGED',
+        title: 'Opname Kembali ke Tahap 1',
+        message: `Opname ${opnameNumber} kembali ke tahap 1: Pemilihan Obat. Progress tahap 2 telah dihapus.`,
+        data: {
+          opname_id: parseInt(opnameId),
+          opname_number: opnameNumber,
+          step: 1,
+          action: 'backward',
+        },
+      });
+    },
   });
 }
 
-// Simpan detail sekaligus pindah ke langkah `step`
+// Simpan detail sekaligus pindah ke langkah `step`. Masuk langkah 3 dikabarkan
+// lewat notifikasi.
 export function useMoveOpnameStep() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -77,8 +112,18 @@ export function useMoveOpnameStep() {
       opnameId: string;
       step: number;
       updates: OpnameDetailUpdates;
+      opnameNumber?: string;
     }) => opnameApi.saveDraft(opnameId, step, updates),
-    onSuccess: () => invalidateOpnameChange(queryClient),
+    onSuccess: async (_data, { opnameId, step, opnameNumber }) => {
+      await invalidateOpnameChange(queryClient);
+      if (step !== 3) return;
+      await notifyOpname({
+        type: 'OPNAME_STEP_CHANGED',
+        title: 'Opname Memasuki Tahap 3',
+        message: `Opname ${opnameNumber} telah memasuki tahap 3: Penyesuaian Stok.`,
+        data: { opname_id: parseInt(opnameId), opname_number: opnameNumber, step: 3 },
+      });
+    },
   });
 }
 
@@ -117,11 +162,20 @@ export function useFinishOpname() {
     }: {
       opnameId: string;
       updates: OpnameDetailUpdates;
+      opnameNumber?: string;
     }) => {
       await opnameApi.saveDraft(opnameId, 3, updates);
       await opnameApi.finishOpname(opnameId);
     },
-    onSuccess: () => invalidateOpnameChange(queryClient),
+    onSuccess: async (_data, { opnameId, opnameNumber }) => {
+      await invalidateOpnameChange(queryClient);
+      await notifyOpname({
+        type: 'OPNAME_COMPLETED',
+        title: 'Opname Selesai',
+        message: `Opname ${opnameNumber} telah selesai. Stok telah diperbarui sesuai hasil opname.`,
+        data: { opname_id: parseInt(opnameId), opname_number: opnameNumber },
+      });
+    },
   });
 }
 

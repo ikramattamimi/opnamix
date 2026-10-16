@@ -10,7 +10,6 @@ import {
   useSaveOpnameDraft,
 } from './useOpname';
 import { useFetchOpnameProducts, useOpnameProducts } from './useOpnameProducts';
-import { createNotification } from '@/features/notifications/api';
 import { OpnameItem } from './types';
 import { Product } from '@/features/products/types';
 import { Button } from '@/components/ui/button';
@@ -192,17 +191,14 @@ const PelaksanaanOpnamePage: React.FC = () => {
           detailId: item.id,
           physicalStock: physicalCounts[item.id] || 0,
         }));
-      await moveStep.mutateAsync({ opnameId: opnameId!, step: 3, updates: detailUpdates });
-      setCurrentStep(3);
-
-      // Create notification for step 2→3 transition
-      await createNotification({
-        type: 'OPNAME_STEP_CHANGED',
-        title: 'Opname Memasuki Tahap 3',
-        message: `Opname ${opnameData?.opnameNumber} telah memasuki tahap 3: Penyesuaian Stok.`,
-        data: { opname_id: parseInt(opnameId!), opname_number: opnameData?.opnameNumber, step: 3 },
-        target_roles: ['admin', 'apoteker', 'farmasi'],
+      // Notifikasi masuk tahap 3 dikirim oleh hook
+      await moveStep.mutateAsync({
+        opnameId: opnameId!,
+        step: 3,
+        updates: detailUpdates,
+        opnameNumber: opnameData?.opnameNumber,
       });
+      setCurrentStep(3);
 
       // Pre-fill final stocks with physical counts
       const preFills: Record<string, number> = {};
@@ -228,7 +224,12 @@ const PelaksanaanOpnamePage: React.FC = () => {
     try {
       // Going back from step 2 to step 1:
       // Delete all detail rows and reset to step 1
-      await backwardToStepOne.mutateAsync({ opnameId: opnameId!, scheduleObatIds });
+      // Notifikasi kembali ke tahap 1 dikirim oleh hook
+      await backwardToStepOne.mutateAsync({
+        opnameId: opnameId!,
+        scheduleObatIds,
+        opnameNumber: opnameData?.opnameNumber,
+      });
 
       // Data opname terbaru (sudah di-refresh oleh mutasi)
       const data = await fetchOpname(opnameId!);
@@ -250,20 +251,6 @@ const PelaksanaanOpnamePage: React.FC = () => {
       }
 
       setCurrentStep(1);
-
-      // Notify: backward 2→1
-      await createNotification({
-        type: 'OPNAME_STEP_CHANGED',
-        title: 'Opname Kembali ke Tahap 1',
-        message: `Opname ${opnameData?.opnameNumber} kembali ke tahap 1: Pemilihan Obat. Progress tahap 2 telah dihapus.`,
-        data: {
-          opname_id: parseInt(opnameId!),
-          opname_number: opnameData?.opnameNumber,
-          step: 1,
-          action: 'backward',
-        },
-        target_roles: ['admin', 'apoteker', 'farmasi'],
-      });
     } catch (error) {
       console.error('Failed to go backward:', error);
       showToast('Gagal kembali ke tahap sebelumnya.', 'error');
@@ -313,15 +300,11 @@ const PelaksanaanOpnamePage: React.FC = () => {
         reason: reasons[item.id] || '',
       }));
 
-      await finishOpname.mutateAsync({ opnameId, updates: detailUpdates });
-
-      // Create notification for opname completed
-      await createNotification({
-        type: 'OPNAME_COMPLETED',
-        title: 'Opname Selesai',
-        message: `Opname ${opnameData?.opnameNumber} telah selesai. Stok telah diperbarui sesuai hasil opname.`,
-        data: { opname_id: parseInt(opnameId!), opname_number: opnameData?.opnameNumber },
-        target_roles: ['admin', 'apoteker', 'farmasi'],
+      // Notifikasi opname selesai dikirim oleh hook
+      await finishOpname.mutateAsync({
+        opnameId,
+        updates: detailUpdates,
+        opnameNumber: opnameData?.opnameNumber,
       });
 
       navigate('/audit/stok-opname/riwayat');
