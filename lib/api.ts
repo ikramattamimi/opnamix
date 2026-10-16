@@ -633,85 +633,31 @@ export const api = {
       price: number;
     }[];
   }) => {
-    const { data: existingTransaction, error: fetchError } = await supabase
-      .from('transaksi')
-      .select('id, status, keterangan')
-      .eq('nomor', nomor)
-      .single();
+    // Header diganti dan item/jasa di-replace dalam satu transaksi;
+    // ditolak di database kalau permintaan sudah bukan 'diajukan'.
+    const { error } = await supabase.rpc('update_pending_stock_out_request', {
+      p_nomor: nomor,
+      p_payload: {
+        tanggal: payload.tanggal ?? null,
+        nama_pasien: payload.nama_pasien,
+        tanggal_lahir_pasien: payload.tanggal_lahir_pasien || null,
+        nama_nakes: payload.nama_nakes || null,
+        total: payload.total,
+        diskon: payload.diskon ?? 0,
+        biaya_layanan: payload.serviceFee ?? 0,
+        items: payload.items.map((item) => ({
+          product_id: parseInt(item.productId),
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        services: payload.services.map((svc) => ({
+          service_id: parseInt(svc.serviceId),
+          price: svc.price,
+        })),
+      }
+    });
 
-    if (fetchError) throw fetchError;
-    if (!existingTransaction) throw new Error('Permintaan tidak ditemukan.');
-    if (existingTransaction.status !== 'diajukan') {
-      throw new Error('Permintaan yang sudah diproses tidak dapat diedit.');
-    }
-
-    const updatePayload = {
-      tanggal: payload.tanggal,
-      nama_pasien: payload.nama_pasien,
-      tanggal_lahir_pasien: payload.tanggal_lahir_pasien || null,
-      nama_nakes: payload.nama_nakes || null,
-      total: payload.total,
-      diskon: payload.diskon ?? 0,
-      biaya_layanan: payload.serviceFee ?? 0,
-      updated_at: new Date().toISOString(),
-    };
-
-    const { error: updateHeaderError } = await supabase
-      .from('transaksi')
-      .update(updatePayload)
-      .eq('id', existingTransaction.id);
-
-    if (updateHeaderError) throw updateHeaderError;
-
-    const { error: deleteDetailError } = await supabase
-      .from('transaksi_detail')
-      .delete()
-      .eq('transaksi_id', existingTransaction.id);
-
-    if (deleteDetailError) throw deleteDetailError;
-
-    const { error: deleteServiceError } = await supabase
-      .from('transaksi_jasa')
-      .delete()
-      .eq('transaksi_id', existingTransaction.id);
-
-    if (deleteServiceError) throw deleteServiceError;
-
-    if (payload.items.length > 0) {
-      const details = payload.items.map((item) => ({
-        transaksi_id: existingTransaction.id,
-        transaksi_nomor: nomor,
-        obat_id: parseInt(item.productId),
-        qty: item.quantity,
-        harga: item.price,
-        subtotal: item.quantity * item.price,
-        batch: '-',
-        expire_date: null,
-      }));
-
-      const { error: insertDetailError } = await supabase
-        .from('transaksi_detail')
-        .insert(details);
-
-      if (insertDetailError) throw insertDetailError;
-    }
-
-    if (payload.services.length > 0) {
-      const services = payload.services.map((svc) => ({
-        transaksi_id: existingTransaction.id,
-        transaksi_nomor: nomor,
-        jasa_id: parseInt(svc.serviceId),
-        qty: 1,
-        harga_jasa: svc.price,
-        subtotal: svc.price,
-      }));
-
-      const { error: insertServiceError } = await supabase
-        .from('transaksi_jasa')
-        .insert(services);
-
-      if (insertServiceError) throw insertServiceError;
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
