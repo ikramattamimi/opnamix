@@ -273,7 +273,7 @@ export const exportProductsToExcel = async (data: any[]) => {
     const excelData = data.map((row) => ({
       Kode: row.code || '-',
       'Nama Obat': row.name,
-      Jenis: row.type,
+      Jenis: row.category,
       Stok: row.stock,
       Satuan: row.unit,
       'Harga Jual': row.sellingPrice,
@@ -304,7 +304,7 @@ export const exportServicesToExcel = async (data: any[]) => {
     const excelData = data.map((row) => ({
       'Kode Jasa': row.code,
       'Nama Jasa': row.name,
-      Kategori: row.category,
+      Kategori: row.categoryName,
       Harga: row.price,
       Deskripsi: row.description || '-',
     }));
