@@ -17,6 +17,20 @@ export function useStockOutRequests(params?: PaginationParams) {
   });
 }
 
+export function useRecentStockOuts(limit: number) {
+  return useQuery({
+    queryKey: stockOutKeys.recent(limit),
+    queryFn: () => stockOutApi.getRecentStockOuts(limit),
+  });
+}
+
+export function useNakesProfiles() {
+  return useQuery({
+    queryKey: stockOutKeys.nakesProfiles(),
+    queryFn: () => stockOutApi.getNakesProfiles(),
+  });
+}
+
 /**
  * Subscribe ke Supabase Realtime pada tabel `transaksi`.
  * Ketika ada INSERT atau UPDATE, invalidate query stockOut
@@ -45,7 +59,11 @@ export function useStockOutRealtime() {
 export function useCreateStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateTransactionPayload) => transactionsApi.createTransaction(payload),
+    // Nomor transaksi dibuat di sini, tepat sebelum transaksi disimpan
+    mutationFn: async (payload: Omit<CreateTransactionPayload, 'nomor'>) => {
+      const nomor = await transactionsApi.generateTransactionNumber('keluar');
+      return transactionsApi.createTransaction({ ...payload, nomor });
+    },
     onSuccess: (_data, payload) => {
       // Stok keluar manual langsung selesai (stok berubah); permintaan nakes
       // masih diajukan (hanya daftar dan hitungan tertunda di dashboard).
