@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Service } from './types';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
 
@@ -102,16 +103,23 @@ export const createServiceColumns = ({
 
       return (
         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(service)}>
-            <span className="material-icons-round text-base">edit</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 [&_svg]:size-5"
+            onClick={() => onEdit(service)}
+            aria-label="Edit jasa"
+          >
+            <Pencil aria-hidden />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/20 dark:hover:text-red-400"
+            className="h-8 w-8 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/20 dark:hover:text-red-400 [&_svg]:size-5"
             onClick={() => onDelete(service.id)}
+            aria-label="Hapus jasa"
           >
-            <span className="material-icons-round text-base">delete</span>
+            <Trash2 aria-hidden />
           </Button>
         </div>
       );

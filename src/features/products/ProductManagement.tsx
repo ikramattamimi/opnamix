@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Product, Category } from './types';
 import StatCard from '@/components/common/StatCard';
-import { Archive, CircleDollarSign, TriangleAlert } from 'lucide-react';
+import {
+  Archive,
+  CircleDollarSign,
+  Download,
+  FunnelX,
+  Plus,
+  Search,
+  SearchX,
+  TriangleAlert,
+} from 'lucide-react';
 import ProductForm from './ProductForm';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from './useProducts';
 import PaginationControls from '@/components/common/PaginationControls';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import { DataTable } from '@/components/ui/data-table';
 import { createProductColumns } from './ProductColumns';
 import { useToast } from '@/components/ui/toast';
@@ -31,7 +49,13 @@ const ProductManagement: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState<string>('Semua');
 
   // Use hooks with filters
-  const { data: paginatedData, isPlaceholderData } = useProducts({
+  const {
+    data: paginatedData,
+    isPlaceholderData,
+    isPending,
+    isError,
+    refetch,
+  } = useProducts({
     page,
     perPage,
     search: searchTerm,
@@ -135,18 +159,18 @@ const ProductManagement: React.FC = () => {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className="shadow-md flex items-center gap-2"
+              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
               onClick={() => void exportProductsToExcel(products)}
               disabled={products.length === 0}
             >
-              <span className="material-icons-round">file_download</span>
+              <Download aria-hidden />
               Ekspor Excel
             </Button>
             <Button
               onClick={() => setIsModalOpen(true)}
-              className="shadow-md flex items-center gap-2"
+              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
             >
-              <span className="material-icons-round">add</span>
+              <Plus aria-hidden />
               Tambah Produk Baru
             </Button>
           </div>
@@ -155,13 +179,15 @@ const ProductManagement: React.FC = () => {
         {/* Filter Bar */}
         <div className="bg-card-light dark:bg-card-dark rounded-3xl p-4 shadow-soft flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px] relative">
-            <span className="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary-light text-xl">
-              search
-            </span>
-            <input
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-text-secondary-light pointer-events-none"
+              aria-hidden
+            />
+            <Input
               type="text"
               placeholder="Cari produk atau SKU..."
-              className="w-full pl-12 pr-4 py-3 bg-background-light dark:bg-background-dark border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-primary/20"
+              aria-label="Cari produk"
+              className="h-auto w-full pl-12 pr-4 py-3 bg-background-light dark:bg-background-dark border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -174,21 +200,28 @@ const ProductManagement: React.FC = () => {
             <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">
               Kategori:
             </span>
-            <select
-              className="bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
+            <Select
               value={filterCategory}
-              onChange={(e) => {
-                setFilterCategory(e.target.value);
+              onValueChange={(value) => {
+                setFilterCategory(value);
                 setPage(1);
               }}
             >
-              <option value="Semua">Semua</option>
-              {Object.values(Category).map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger
+                aria-label="Filter kategori"
+                className="h-auto w-auto gap-2 bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Semua">Semua</SelectItem>
+                {Object.values(Category).map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <Button
@@ -199,21 +232,37 @@ const ProductManagement: React.FC = () => {
               setFilterCategory('Semua');
               setPage(1);
             }}
-            className="p-3 text-text-secondary-light hover:text-red-500 transition-colors h-auto w-auto"
+            className="p-3 text-text-secondary-light hover:text-red-500 transition-colors h-auto w-auto [&_svg]:size-6"
             title="Reset Filter"
+            aria-label="Reset Filter"
           >
-            <span className="material-icons-round">filter_alt_off</span>
+            <FunnelX aria-hidden />
           </Button>
         </div>
 
         {/* Table */}
         <div className="w-full">
           <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
-            <DataTable
-              columns={createProductColumns({ onEdit: handleEdit, onDelete: handleDelete })}
-              data={products}
-              searchable={false}
-            />
+            {isPending ? (
+              <LoadingState label="Memuat produk..." />
+            ) : isError ? (
+              <ErrorState onRetry={() => void refetch()} />
+            ) : products.length === 0 ? (
+              <EmptyState
+                icon={searchTerm || filterCategory !== 'Semua' ? SearchX : Archive}
+                title={
+                  searchTerm || filterCategory !== 'Semua'
+                    ? 'Tidak ada produk ditemukan.'
+                    : 'Belum ada produk.'
+                }
+              />
+            ) : (
+              <DataTable
+                columns={createProductColumns({ onEdit: handleEdit, onDelete: handleDelete })}
+                data={products}
+                searchable={false}
+              />
+            )}
           </div>
           <PaginationControls
             currentPage={page}
