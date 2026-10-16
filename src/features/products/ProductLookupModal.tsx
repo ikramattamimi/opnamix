@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { Ban, Pill, Plus, Search, SearchX, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { EmptyState, LoadingState } from '@/components/common/QueryState';
 import { Product } from './types';
 import ProductForm from './ProductForm';
 import { useCreateProduct } from './useProducts';
@@ -10,6 +13,8 @@ interface ProductLookupModalProps {
   onSelect: (product: Product) => void;
   onClose: () => void;
   allowAddProduct?: boolean;
+  // Daftar produk masih dimuat oleh pemanggil
+  isLoading?: boolean;
 }
 
 const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
@@ -17,6 +22,7 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
   onSelect,
   onClose,
   allowAddProduct = false,
+  isLoading = false,
 }) => {
   const [search, setSearch] = useState('');
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -56,9 +62,10 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
+            aria-label="Tutup"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors [&_svg]:size-6"
           >
-            <span className="material-icons-round">close</span>
+            <X aria-hidden />
           </Button>
         </div>
 
@@ -71,13 +78,15 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
             {/* Search */}
             <div className="p-4 border-b border-gray-100 dark:border-white/10 bg-gray-50/50 dark:bg-white/5 flex gap-3">
               <div className="relative flex-1">
-                <span className="material-icons-round absolute left-4 top-3 text-text-secondary-light">
-                  search
-                </span>
-                <input
+                <Search
+                  className="absolute left-4 top-3 size-6 text-text-secondary-light pointer-events-none"
+                  aria-hidden
+                />
+                <Input
                   type="text"
                   placeholder="Cari nama obat atau kode..."
-                  className="w-full pl-12 pr-4 py-3 rounded-xl border-none bg-white dark:bg-black/20 focus:ring-2 focus:ring-primary text-text-primary-light dark:text-white"
+                  aria-label="Cari produk"
+                  className="h-auto w-full pl-12 pr-4 py-3 rounded-xl border-none bg-white dark:bg-black/20 focus:ring-2 focus:ring-primary focus-visible:ring-2 focus-visible:ring-primary text-base text-text-primary-light dark:text-white"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   autoFocus
@@ -87,9 +96,9 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
                 <Button
                   variant="ghost"
                   onClick={() => setIsAddingNew(true)}
-                  className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl font-bold text-sm transition-colors whitespace-nowrap flex items-center gap-2 h-auto"
+                  className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl font-bold text-sm transition-colors whitespace-nowrap flex items-center gap-2 h-auto [&_svg]:size-6"
                 >
-                  <span className="material-icons-round">add</span>
+                  <Plus aria-hidden />
                   Baru
                 </Button>
               )}
@@ -97,10 +106,13 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
 
             {/* List */}
             <div className="flex-1 overflow-y-auto p-2">
-              {filteredProducts.length > 0 ? (
+              {isLoading ? (
+                <LoadingState label="Memuat produk..." />
+              ) : filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 gap-2">
                   {filteredProducts.map((product) => (
                     <button
+                      type="button"
                       key={product.id}
                       onClick={() => onSelect(product)}
                       className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all group text-left"
@@ -109,9 +121,11 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
                         <div
                           className={`w-10 h-10 rounded-lg flex items-center justify-center ${product.stock > 0 ? 'bg-blue-50 text-primary dark:bg-blue-500/20 dark:text-blue-300' : 'bg-red-50 text-red-500 dark:bg-red-500/20'}`}
                         >
-                          <span className="material-icons-round">
-                            {product.stock > 0 ? 'medication' : 'block'}
-                          </span>
+                          {product.stock > 0 ? (
+                            <Pill className="size-6" aria-hidden />
+                          ) : (
+                            <Ban className="size-6" aria-hidden />
+                          )}
                         </div>
                         <div>
                           <p className="font-bold text-text-primary-light dark:text-white">
@@ -136,18 +150,18 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-10 text-text-secondary-light">
-                  <span className="material-icons-round text-4xl mb-2">search_off</span>
-                  <p className="mb-4">Tidak ada produk ditemukan.</p>
-                  {allowAddProduct && (
-                    <button
-                      onClick={() => setIsAddingNew(true)}
-                      className="px-6 py-2 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/30 hover:bg-blue-700 transition-colors"
-                    >
-                      Tambah Produk Baru
-                    </button>
-                  )}
-                </div>
+                <EmptyState
+                  icon={SearchX}
+                  title="Tidak ada produk ditemukan."
+                  className="py-10"
+                  action={
+                    allowAddProduct && (
+                      <Button type="button" onClick={() => setIsAddingNew(true)}>
+                        Tambah Produk Baru
+                      </Button>
+                    )
+                  }
+                />
               )}
             </div>
           </>

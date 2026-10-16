@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Product } from './types';
+import { Pencil, Trash2, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ProductColumnsProps {
@@ -86,7 +87,7 @@ export const createProductColumns = ({
                 : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
             }`}
           >
-            {isLowStock && <span className="material-icons-round text-xs">warning</span>}
+            {isLowStock && <TriangleAlert className="size-3" aria-hidden />}
             {stock}
           </span>
         </div>
@@ -106,20 +107,22 @@ export const createProductColumns = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 [&_svg]:size-5"
             onClick={() => onEdit(product)}
             title="Edit produk"
+            aria-label="Edit produk"
           >
-            <span className="material-icons-round text-base">edit</span>
+            <Pencil aria-hidden />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/20 dark:hover:text-red-400"
+            className="h-8 w-8 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/20 dark:hover:text-red-400 [&_svg]:size-5"
             onClick={() => onDelete(product.id)}
             title="Hapus produk"
+            aria-label="Hapus produk"
           >
-            <span className="material-icons-round text-base">delete</span>
+            <Trash2 aria-hidden />
           </Button>
         </div>
       );

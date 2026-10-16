@@ -32,7 +32,7 @@ interface StockInFormProps {
 const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = false }) => {
   const { showToast } = useToast();
   const { userProfile } = useAuth();
-  const { data: productData } = useProducts({
+  const { data: productData, isPending: isProductsPending } = useProducts({
     page: 1,
     perPage: 1000,
   });
@@ -214,6 +214,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
         {activeIndex !== null && (
           <ProductLookupModal
             products={products}
+            isLoading={isProductsPending}
             onClose={() => setActiveIndex(null)}
             onSelect={handleProductSelected}
             allowAddProduct={true}
