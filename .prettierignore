@@ -4,3 +4,4 @@ supabase/functions
 .ai
 docs
 dist
+.claude
