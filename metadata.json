@@ -1,0 +1,8 @@
+
+{
+  "name": "PMB ANITA Inventory Management",
+  "description": "A sophisticated product master data management system with AI-powered features for a pharmaceutical or healthcare inventory context.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

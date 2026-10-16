@@ -1,0 +1,156 @@
+Table master_jasa {
+  id bigint [pk, not null]
+  kode text [not null]
+  nama text [not null]
+  harga numeric [default: 0]
+  is_active boolean [default: true]
+  created_at timestamptz [default: `now()`]
+  created_by uuid
+  updated_at timestamptz [default: `now()`]
+  updated_by uuid
+  deleted_at timestamptz
+}
+
+Table master_obat {
+  id bigint [pk, not null]
+  kode text [not null]
+  nama text [not null]
+  jenis text
+  satuan text
+  buffer_stok integer [default: 0]
+  harga numeric [default: 0]
+  qty integer [default: 0]
+  is_active boolean [default: true]
+  created_at timestamptz [default: `now()`]
+  created_by uuid
+  updated_at timestamptz [default: `now()`]
+  updated_by uuid
+  deleted_at timestamptz
+  jenis_obat_id bigint [note: 'FK to master_jenis_obat (optional lookup table)']
+  satuan_id bigint [note: 'FK to master_satuan (optional lookup table)']
+}
+
+Table opname {
+  id bigint [pk, not null]
+  schedule_id bigint
+  tanggal_jadwal date [note: 'Tanggal seharusnya opname (dari opname_schedule)']
+  tanggal timestamptz [default: `now()`, note: 'Actual execution timestamp']
+  status text [default: 'proses', note: 'proses | selesai']
+  created_at timestamptz [default: `now()`]
+  created_by uuid
+  updated_at timestamptz [default: `now()`]
+  updated_by uuid
+  deleted_at timestamptz
+}
+
+Table opname_detail {
+  id bigint [pk, not null]
+  opname_id bigint
+  obat_id bigint
+  stok_fisik integer
+  stok_sistem integer
+  selisih integer
+  status text [default: 'pending', note: 'pending | sesuai | disesuaikan']
+  alasan text
+  created_at timestamptz [default: `now()`]
+  created_by uuid
+  updated_at timestamptz [default: `now()`]
+  updated_by uuid
+  deleted_at timestamptz
+}
+
+Table opname_schedule {
+  id bigint [pk, not null]
+  nama text [not null]
+  tanggal_audit integer [note: 'Tanggal pelaksanaan (1-28)']
+  waktu_jam smallint [note: 'Jam pelaksanaan (0-23)']
+  waktu_menit smallint [note: 'Menit pelaksanaan (0-59)']
+  pengulangan text [note: 'BULANAN | TRIWULAN | TAHUNAN']
+  obat_ids jsonb [note: 'null = semua obat, [1,2,3] = pilihan']
+  is_active boolean [default: true]
+  created_at timestamptz [default: `now()`]
+  created_by uuid
+  updated_at timestamptz [default: `now()`]
+  updated_by uuid
+  deleted_at timestamptz
+}
+
+Table transaksi {
+  nomor text [not null, note: 'Text identifier for transaction']
+  id bigint [pk, not null, note: 'Numeric primary key']
+  tanggal timestamptz [default: `now()`]
+  tipe text [note: 'masuk | keluar']
+  tipe_sumber text [note: 'PENGAJUAN_NAKES | KASIR_LANGSUNG | PEMBELIAN']
+  bukti text
+  nama_pasien text
+  keterangan text
+  status text [default: 'diajukan', note: 'diajukan | selesai']
+  total numeric [default: 0]
+  processed_by uuid
+  processed_at timestamptz
+  created_at timestamptz [default: `now()`]
+  created_by uuid
+  updated_at timestamptz [default: `now()`]
+  updated_by uuid
+  deleted_at timestamptz
+}
+
+Table transaksi_detail {
+  id bigint [pk, not null]
+  transaksi_id bigint [not null, note: 'FK to transaksi.id (bigint)']
+  transaksi_nomor text [note: 'FK to transaksi.nomor (text) - used by application']
+  obat_id bigint
+  qty integer [not null]
+  expire_date date
+  batch text
+  harga numeric
+  subtotal numeric
+}
+
+Table transaksi_jasa {
+  id bigint [pk, not null]
+  transaksi_id bigint [not null, note: 'FK to transaksi.id (bigint)']
+  transaksi_nomor text [note: 'FK to transaksi.nomor (text) - used by application']
+  jasa_id bigint [not null]
+  qty integer [default: 1]
+  harga_jasa numeric [note: 'Snapshot harga jasa saat transaksi']
+  subtotal numeric
+  created_at timestamptz [default: `now()`]
+  created_by uuid
+  updated_at timestamptz [default: `now()`]
+  updated_by uuid
+  deleted_at timestamptz
+}
+
+Table users {
+  id uuid [pk, not null]
+  email text [not null]
+  full_name text
+  role text [note: 'admin | nakes | farmasi']
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+// ==================== REFERENCES ====================
+
+// Transaksi -> Jasa (Many-to-Many via transaksi_jasa)
+Ref: transaksi_jasa.transaksi_id > transaksi.id
+Ref: transaksi_jasa.transaksi_nomor > transaksi.nomor
+Ref: transaksi_jasa.jasa_id > master_jasa.id
+
+// Opname
+Ref: opname.schedule_id > opname_schedule.id
+Ref: opname_detail.opname_id > opname.id
+Ref: opname_detail.obat_id > master_obat.id
+
+// Transaksi Detail
+Ref: transaksi_detail.transaksi_id > transaksi.id
+Ref: transaksi_detail.transaksi_nomor > transaksi.nomor
+Ref: transaksi_detail.obat_id > master_obat.id
+
+// Users audit trail
+Ref: master_jasa.created_by > users.id
+Ref: master_obat.created_by > users.id
+Ref: transaksi.created_by > users.id
+Ref: transaksi.processed_by > users.id
+Ref: opname.created_by > users.id

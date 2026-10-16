@@ -1,0 +1,32 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+/**
+ * Build a toast message from a base text and the error's own message
+ * (Error, Supabase PostgrestError, or plain { message } object).
+ * Example: 'Gagal menyimpan transaksi: Stok tidak cukup untuk X. Tersedia: 1, diminta: 2'
+ */
+export function withErrorDetail(base: string, error: unknown): string {
+  const detail =
+    error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+      ? error.message.trim()
+      : '';
+  return detail ? `${base}: ${detail}` : `${base}.`;
+}
+
+/**
+ * Sanitize price input by removing leading zeros
+ * Example: '007' → '7', '000' → '0'
+ */
+export function sanitizePriceInput(value: string): string {
+  if (!value) return '';
+  // Remove all non-numeric characters first
+  const numericOnly = value.replace(/[^0-9]/g, '');
+  // Remove leading zeros, but keep at least one digit
+  const sanitized = numericOnly.replace(/^0+(?=.)/, '');
+  return sanitized;
+}
