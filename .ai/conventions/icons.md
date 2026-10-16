@@ -1,7 +1,9 @@
 # Konvensi Ikon
 
-Semua ikon memakai `lucide-react`. Material Icons Round (font dari Google)
-dihapus setelah semua halaman dimigrasi di fase 7.
+Semua ikon memakai `lucide-react`. Font Material Icons Round sudah dihapus
+dari `index.html` (fase 7), jadi class `material-icons-round` tidak lagi
+menampilkan apa-apa. Tabel di bawah dipakai untuk mencari padanan saat
+menerjemahkan desain atau kode lama.
 
 ## Cara pakai
 

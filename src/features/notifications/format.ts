@@ -43,46 +43,6 @@ export function getNotificationLucideIcon(type: string): LucideIcon {
 }
 
 /**
- * Get the notification icon based on type (nama Material Icons).
- * @deprecated Pakai getNotificationLucideIcon. Masih dipakai Header; hapus
- * setelah Header pindah ke lucide.
- */
-export function getNotificationIcon(type: string): string {
-  switch (type) {
-    case 'STOCK_OUT_REQUEST':
-      return 'assignment';
-    case 'STOCK_OUT_PROCESSED':
-      return 'check_circle';
-    case 'STOCK_LOW':
-      return 'warning';
-    case 'STOCK_EMPTY':
-      return 'error';
-    case 'OPNAME_STARTED':
-      return 'search';
-    case 'OPNAME_COMPLETED':
-      return 'task_alt';
-    case 'OPNAME_CREATED':
-      return 'playlist_add_check';
-    case 'OPNAME_STEP_CHANGED':
-      return 'swap_horiz';
-    case 'STOCK_IN':
-      return 'inventory_2';
-    case 'STOCK_OUT_DIRECT':
-      return 'point_of_sale';
-    case 'OPNAME_DISCREPANCY':
-      return 'difference';
-    case 'PRODUCT_ADDED':
-      return 'add_circle';
-    case 'PRODUCT_DELETED':
-      return 'delete';
-    case 'SERVICE_ADDED':
-      return 'medical_services';
-    default:
-      return 'notifications';
-  }
-}
-
-/**
  * Get the notification color based on type (for icon/badge).
  */
 export function getNotificationColor(type: string): string {

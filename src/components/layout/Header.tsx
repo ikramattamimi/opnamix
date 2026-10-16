@@ -1,30 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  Archive,
-  ArrowLeftRight,
-  Bell,
-  BellOff,
-  BriefcaseMedical,
-  CircleAlert,
-  CircleCheck,
-  CircleCheckBig,
-  CirclePlus,
-  ClipboardList,
-  Diff,
-  ListChecks,
-  Loader2,
-  LogOut,
-  Menu,
-  Moon,
-  Search,
-  Store,
-  Sun,
-  Trash2,
-  TriangleAlert,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import { Bell, BellOff, Loader2, LogOut, Menu, Moon, Sun, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   useNotifications,
@@ -32,37 +8,21 @@ import {
   useMarkAllNotificationsRead,
 } from '@/features/notifications/useNotifications';
 import { useAuth } from '@/features/auth/useAuth';
-import { getNotificationColor, formatNotificationTime } from '@/features/notifications/format';
+import {
+  getNotificationColor,
+  getNotificationLucideIcon,
+  formatNotificationTime,
+} from '@/features/notifications/format';
 import { ROUTES } from '@/types/routes';
 import { APP_ROUTES } from '@/app/routes';
 import { getRouteTitle } from '@/app/routeUtils';
 import { useTheme } from '@/app/providers/ThemeProvider';
 
-// Sementara: padanan lucide untuk ikon notifikasi per tipe. Setelah
-// getNotificationLucideIcon dari features/notifications/format masuk ke main,
-// ganti map ini dengan fungsi itu.
-const NOTIFICATION_ICONS: Record<string, LucideIcon> = {
-  STOCK_OUT_REQUEST: ClipboardList,
-  STOCK_OUT_PROCESSED: CircleCheck,
-  STOCK_LOW: TriangleAlert,
-  STOCK_EMPTY: CircleAlert,
-  OPNAME_STARTED: Search,
-  OPNAME_COMPLETED: CircleCheckBig,
-  OPNAME_CREATED: ListChecks,
-  OPNAME_STEP_CHANGED: ArrowLeftRight,
-  STOCK_IN: Archive,
-  STOCK_OUT_DIRECT: Store,
-  OPNAME_DISCREPANCY: Diff,
-  PRODUCT_ADDED: CirclePlus,
-  PRODUCT_DELETED: Trash2,
-  SERVICE_ADDED: BriefcaseMedical,
-};
-
 const NotificationTypeIcon: React.FC<{ type: string; className?: string }> = ({
   type,
   className,
 }) => {
-  const Icon = NOTIFICATION_ICONS[type] ?? Bell;
+  const Icon = getNotificationLucideIcon(type);
   return <Icon className={className} aria-hidden />;
 };
 
