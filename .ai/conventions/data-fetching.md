@@ -83,6 +83,13 @@ helper baru di `invalidate.ts` dan baris di tabel ini.
   kembali aktif.
 - Tutup channel (`supabase.removeChannel`) saat unmount atau logout.
 
+## Tampilan status
+
+Pakai `LoadingState`, `EmptyState`, dan `ErrorState` dari
+`src/components/common/QueryState.tsx` untuk status `isPending`, data kosong,
+dan `isError` (dengan `onRetry={refetch}`). Jangan membuat spinner atau pesan
+kosong sendiri per halaman.
+
 ## Default
 
 Default `QueryClient` ada di `src/app/App.tsx`: `staleTime` 60 detik,
