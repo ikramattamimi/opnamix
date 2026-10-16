@@ -1,7 +1,6 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ROUTES } from '@/types/routes';
 import LoginPage from '@/features/auth/LoginPage';
 import { ToastProvider } from '@/components/ui/toast';
 import { NotificationProvider } from '@/features/notifications/NotificationProvider';
@@ -61,37 +60,6 @@ const AppContentWrapper: React.FC = () => {
     }
   }, [isDarkMode]);
 
-  const getViewTitle = (pathname: string) => {
-    if (pathname.startsWith(ROUTES.RIWAYAT_OPNAME)) return 'Riwayat Opname';
-    if (pathname.startsWith('/audit/stok-opname/konfigurasi')) return 'Konfigurasi Opname';
-    if (pathname.startsWith('/audit/stok-opname/pelaksanaan')) return 'Pelaksanaan Opname';
-    if (pathname.startsWith('/audit/stok-opname/detail')) return 'Detail Opname';
-    switch (pathname) {
-      case ROUTES.DASHBOARD:
-        return 'Dasbor Utama';
-      case ROUTES.MASTER_DATA_PRODUK:
-        return 'Master Data Produk';
-      case ROUTES.MASTER_DATA_JASA:
-        return 'Master Data Jasa';
-      case ROUTES.STOK_MASUK:
-        return 'Penerimaan Stok (Masuk)';
-      case ROUTES.STOK_KELUAR:
-        return 'Pengeluaran Stok (Keluar)';
-      case ROUTES.STOK_OPNAME:
-        return 'Audit Stok (Opname)';
-      case ROUTES.LAPORAN_STOK:
-        return 'Analisis & Laporan Stok';
-      case ROUTES.USER_MANAGEMENT:
-        return 'Manajemen Pengguna';
-      case ROUTES.PROFIL:
-        return 'Profil Saya';
-      case ROUTES.NOTIFICATIONS:
-        return 'Notifikasi';
-      default:
-        return 'Opnamix';
-    }
-  };
-
   if (isAuthLoading) {
     return <LoadingScreen />;
   }
@@ -107,7 +75,6 @@ const AppContentWrapper: React.FC = () => {
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
           userProfile={userProfile as UserProfile | null}
-          getViewTitle={getViewTitle}
         />
       </Suspense>
     </NotificationProvider>

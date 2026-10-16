@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   useNotifications,
@@ -13,22 +13,20 @@ import {
   formatNotificationTime,
 } from '@/features/notifications/format';
 import { ROUTES } from '@/types/routes';
+import { APP_ROUTES } from '@/app/routes';
+import { getRouteTitle } from '@/app/routeUtils';
 
 interface HeaderProps {
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
-  viewName: string;
   onToggleSidebar?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  isDarkMode,
-  onToggleDarkMode,
-  viewName,
-  onToggleSidebar,
-}) => {
+const Header: React.FC<HeaderProps> = ({ isDarkMode, onToggleDarkMode, onToggleSidebar }) => {
   const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const viewName = getRouteTitle(pathname, APP_ROUTES);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const userId = user?.id || '';
