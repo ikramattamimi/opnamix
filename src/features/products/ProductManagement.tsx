@@ -10,6 +10,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { createProductColumns } from './ProductColumns';
 import { useToast } from '@/components/ui/toast';
 import { exportProductsToExcel } from '@/features/reports/exportUtils';
+import { useDashboardStats } from '@/features/dashboard/useDashboard';
 
 const ProductManagement: React.FC = () => {
   const { showToast } = useToast();
@@ -88,33 +89,17 @@ const ProductManagement: React.FC = () => {
     }
   };
 
-  // Fetch real stats
-  const [realStats, setRealStats] = useState({
-    totalValue: 0,
-    lowStock: 0,
-  });
+  // Stat nyata, berbagi cache dengan Dashboard
+  const { data: dashboardStats, error: statsError } = useDashboardStats();
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await import('@/features/dashboard/api').then((m) =>
-          m.dashboardApi.getDashboardStats(),
-        );
-        setRealStats({
-          totalValue: data.totalValue,
-          lowStock: data.lowStockCount,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchStats();
-  }, []);
+    if (statsError) console.error(statsError);
+  }, [statsError]);
 
   const stats = {
     total: totalProducts,
-    lowStock: realStats.lowStock,
-    totalValue: realStats.totalValue,
+    lowStock: dashboardStats?.lowStockCount ?? 0,
+    totalValue: dashboardStats?.totalValue ?? 0,
   };
 
   return (
