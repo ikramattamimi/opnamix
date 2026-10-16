@@ -14,6 +14,10 @@ export interface OpnameLockState {
     isLoading: boolean;
 }
 
+// Status kunci opname untuk UI. Kunci aktif selama ada opname
+// 'sedang_dilaksanakan' di langkah mana pun. Polling ini hanya untuk
+// menampilkan OpnameLockPage; penolakan transaksi stok yang sebenarnya
+// dilakukan di database, jadi tab yang belum ter-refresh tetap aman.
 export function useOpnameLock() {
     const [lockState, setLockState] = useState<OpnameLockState>({
         isLocked: false,

@@ -129,6 +129,18 @@ const generateUniqueServiceCategoryCode = async (name: string) => {
   return candidate;
 };
 
+type OpnameDetailUpdate = { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string };
+
+// Ubah ke format p_updates RPC save_opname_details. Field yang undefined
+// tidak dikirim, sehingga kolomnya tidak diubah di database.
+const toOpnameDetailUpdates = (updates?: OpnameDetailUpdate[]) =>
+  (updates || []).map(u => ({
+    detail_id: parseInt(u.detailId),
+    ...(u.physicalStock !== undefined && { physical_stock: u.physicalStock }),
+    ...(u.stokFinal !== undefined && { stok_final: u.stokFinal }),
+    ...(u.reason !== undefined && { reason: u.reason }),
+  }));
+
 export const api = {
   // PRODUCTS
   getProducts: async (params?: PaginationParams): Promise<PaginatedResponse<Product>> => {
@@ -336,12 +348,12 @@ export const api = {
     if (error) throw error;
   },
 
-  // HELPER: Generate unique transaction number
+  // HELPER: Generate unique transaction number from a database sequence
+  // (format IN-YYYYMMDD-000123 / OUT-YYYYMMDD-000123)
   generateTransactionNumber: async (type: 'masuk' | 'keluar'): Promise<string> => {
-    const prefix = type === 'masuk' ? 'IN' : 'OUT';
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `${prefix}-${timestamp}-${random}`;
+    const { data, error } = await supabase.rpc('next_transaction_number', { p_tipe: type });
+    if (error) throw new Error(error.message);
+    return data as string;
   },
 
   // HELPER: Upload receipt image to Supabase Storage with the user's session
@@ -389,102 +401,41 @@ export const api = {
     }[];
     requestedBy?: string;
   }) => {
-
-    // 1. Get current user ID for created_by
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
-
-    // 2. Insert Header and get the generated ID
-    const { data: insertedTransaction, error: txError } = await supabase
-      .from('transaksi')
-      .insert({
+    // Header, item, jasa, dan perubahan stok (kalau status 'selesai')
+    // disimpan dalam satu transaksi database: berhasil semua atau batal
+    // semua. created_by diisi dari auth.uid() di database.
+    const { error } = await supabase.rpc('create_transaction', {
+      p_payload: {
         nomor: payload.nomor,
         tanggal: payload.tanggal,
         tipe: payload.tipe,
         tipe_sumber: payload.tipe_sumber,
         status: payload.status,
-        nama_pasien: payload.nama_pasien || '-', // Default generic if missing
+        nama_pasien: payload.nama_pasien || '-',
         tanggal_lahir_pasien: payload.tanggal_lahir_pasien || null,
         keterangan: payload.keterangan || '',
-        bukti: payload.bukti || null, // Image URL if provided
+        bukti: payload.bukti || null,
         total: payload.total,
         diskon: payload.diskon ?? 0,
         biaya_layanan: payload.serviceFee ?? 0,
-        created_by: currentUser?.id || null,
-        nama_nakes: payload.requestedBy || null
-      })
-      .select('id, nomor')
-      .single();
-
-    if (txError) {
-      console.error('Error inserting transaction header:', txError);
-      throw txError;
-    }
-
-    if (!insertedTransaction) {
-      throw new Error('Failed to get transaction ID after insert');
-    }
-
-    // 2. Insert Items with both transaksi_id and transaksi_nomor
-    if (payload.items.length > 0) {
-      const details = payload.items.map(item => ({
-        transaksi_id: insertedTransaction.id, // Use the numeric ID
-        transaksi_nomor: payload.nomor, // Also keep the text nomor for reference
-        obat_id: parseInt(item.productId),
-        qty: item.quantity,
-        harga: item.price,
-        subtotal: item.quantity * item.price,
-        batch: item.batch || '-',
-        expire_date: item.expiryDate || null
-      }));
-
-      const { error: itemError } = await supabase.from('transaksi_detail').insert(details);
-      if (itemError) {
-        console.error('Error inserting transaction details:', itemError);
-        throw itemError;
-      }
-    }
-
-    // 3. Insert Services (likely empty for Stock In)
-    if (payload.services.length > 0) {
-      const services = payload.services.map(svc => ({
-        transaksi_id: insertedTransaction.id, // Use the numeric ID
-        transaksi_nomor: payload.nomor, // Also keep the text nomor for reference
-        jasa_id: parseInt(svc.serviceId),
-        qty: 1,
-        harga_jasa: svc.price,
-        subtotal: svc.price
-      }));
-
-      const { error: svcError } = await supabase.from('transaksi_jasa').insert(services);
-      if (svcError) throw svcError;
-    }
-
-    // 4. Update stock atomically in the database. The RPC checks stock
-    // availability and applies every item in one transaction.
-    if (payload.status === 'selesai' && payload.items.length > 0) {
-      const { error: rpcError } = await supabase.rpc('update_stock_atomic', {
-        p_items: payload.items.map(item => ({
+        nama_nakes: payload.requestedBy || null,
+        items: payload.items.map(item => ({
           product_id: parseInt(item.productId),
           quantity: item.quantity,
+          price: item.price,
+          batch: item.batch || '-',
+          expiry_date: item.expiryDate || null,
         })),
-        p_tipe: payload.tipe
-      });
-
-      if (rpcError) {
-        // Stock was not changed: remove the transaction we just inserted.
-        // Children first — transaksi_id foreign keys do not cascade.
-        for (const table of ['transaksi_detail', 'transaksi_jasa', 'transaksi'] as const) {
-          const { error: cleanupError } = await supabase
-            .from(table)
-            .delete()
-            .eq(table === 'transaksi' ? 'id' : 'transaksi_id', insertedTransaction.id);
-          if (cleanupError) {
-            console.error(`Failed to remove ${table} after stock error:`, cleanupError);
-            break;
-          }
-        }
-        throw new Error(rpcError.message);
+        services: payload.services.map(svc => ({
+          service_id: parseInt(svc.serviceId),
+          price: svc.price,
+        })),
       }
+    });
+
+    if (error) {
+      console.error('Error creating transaction:', error);
+      throw new Error(error.message);
     }
 
     return { success: true };
@@ -663,65 +614,17 @@ export const api = {
   },
 
   // UPDATE STATUS
-  updateTransactionStatus: async (nomor: string, status: 'selesai', diskon?: number, total?: number, serviceFee?: number) => {
-    // 1. Get current user for processed_by
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
+  // Satu-satunya status tujuan adalah 'selesai'; pengurangan stok dan
+  // perubahan status dilakukan dalam satu transaksi oleh RPC.
+  updateTransactionStatus: async (nomor: string, _status: 'selesai', diskon?: number, total?: number, serviceFee?: number) => {
+    const { error } = await supabase.rpc('process_stock_out_request', {
+      p_nomor: nomor,
+      p_diskon: diskon ?? null,
+      p_total: total ?? null,
+      p_biaya_layanan: serviceFee ?? null,
+    });
 
-    const updatePayload: any = {
-      status: status,
-      processed_at: new Date().toISOString(),
-      processed_by: currentUser?.id || null,
-    };
-
-    if (diskon !== undefined) updatePayload.diskon = diskon;
-    if (total !== undefined) updatePayload.total = total;
-    if (serviceFee !== undefined) updatePayload.biaya_layanan = serviceFee;
-
-    // 2. Decrement stock first (atomic RPC; rejects if stock is insufficient),
-    // so the request is only marked 'selesai' once the stock really changed
-    const { data: details, error: detailsError } = await supabase
-      .from('transaksi_detail')
-      .select('obat_id, qty')
-      .eq('transaksi_nomor', nomor);
-
-    if (detailsError) throw detailsError;
-
-    const stockItems = (details || []).map(d => ({ product_id: d.obat_id, quantity: d.qty }));
-
-    if (stockItems.length > 0) {
-      const { error: rpcError } = await supabase.rpc('update_stock_atomic', {
-        p_items: stockItems,
-        p_tipe: 'keluar'
-      });
-      if (rpcError) throw new Error(rpcError.message);
-    }
-
-    const restoreStock = async () => {
-      if (stockItems.length === 0) return;
-      const { error: restoreError } = await supabase.rpc('update_stock_atomic', {
-        p_items: stockItems,
-        p_tipe: 'masuk'
-      });
-      if (restoreError) console.error('Failed to restore stock:', restoreError);
-    };
-
-    // 3. Mark as processed, only if still pending (guards against double processing)
-    const { data: updated, error } = await supabase
-      .from('transaksi')
-      .update(updatePayload)
-      .eq('nomor', nomor)
-      .eq('status', 'diajukan')
-      .select('id');
-
-    if (error) {
-      await restoreStock();
-      throw error;
-    }
-
-    if (!updated || updated.length === 0) {
-      await restoreStock();
-      throw new Error('Permintaan ini sudah diproses sebelumnya.');
-    }
+    if (error) throw new Error(error.message);
   },
 
   updatePendingStockOutRequest: async (nomor: string, payload: {
@@ -742,85 +645,31 @@ export const api = {
       price: number;
     }[];
   }) => {
-    const { data: existingTransaction, error: fetchError } = await supabase
-      .from('transaksi')
-      .select('id, status, keterangan')
-      .eq('nomor', nomor)
-      .single();
+    // Header diganti dan item/jasa di-replace dalam satu transaksi;
+    // ditolak di database kalau permintaan sudah bukan 'diajukan'.
+    const { error } = await supabase.rpc('update_pending_stock_out_request', {
+      p_nomor: nomor,
+      p_payload: {
+        tanggal: payload.tanggal ?? null,
+        nama_pasien: payload.nama_pasien,
+        tanggal_lahir_pasien: payload.tanggal_lahir_pasien || null,
+        nama_nakes: payload.nama_nakes || null,
+        total: payload.total,
+        diskon: payload.diskon ?? 0,
+        biaya_layanan: payload.serviceFee ?? 0,
+        items: payload.items.map((item) => ({
+          product_id: parseInt(item.productId),
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        services: payload.services.map((svc) => ({
+          service_id: parseInt(svc.serviceId),
+          price: svc.price,
+        })),
+      }
+    });
 
-    if (fetchError) throw fetchError;
-    if (!existingTransaction) throw new Error('Permintaan tidak ditemukan.');
-    if (existingTransaction.status !== 'diajukan') {
-      throw new Error('Permintaan yang sudah diproses tidak dapat diedit.');
-    }
-
-    const updatePayload = {
-      tanggal: payload.tanggal,
-      nama_pasien: payload.nama_pasien,
-      tanggal_lahir_pasien: payload.tanggal_lahir_pasien || null,
-      nama_nakes: payload.nama_nakes || null,
-      total: payload.total,
-      diskon: payload.diskon ?? 0,
-      biaya_layanan: payload.serviceFee ?? 0,
-      updated_at: new Date().toISOString(),
-    };
-
-    const { error: updateHeaderError } = await supabase
-      .from('transaksi')
-      .update(updatePayload)
-      .eq('id', existingTransaction.id);
-
-    if (updateHeaderError) throw updateHeaderError;
-
-    const { error: deleteDetailError } = await supabase
-      .from('transaksi_detail')
-      .delete()
-      .eq('transaksi_id', existingTransaction.id);
-
-    if (deleteDetailError) throw deleteDetailError;
-
-    const { error: deleteServiceError } = await supabase
-      .from('transaksi_jasa')
-      .delete()
-      .eq('transaksi_id', existingTransaction.id);
-
-    if (deleteServiceError) throw deleteServiceError;
-
-    if (payload.items.length > 0) {
-      const details = payload.items.map((item) => ({
-        transaksi_id: existingTransaction.id,
-        transaksi_nomor: nomor,
-        obat_id: parseInt(item.productId),
-        qty: item.quantity,
-        harga: item.price,
-        subtotal: item.quantity * item.price,
-        batch: '-',
-        expire_date: null,
-      }));
-
-      const { error: insertDetailError } = await supabase
-        .from('transaksi_detail')
-        .insert(details);
-
-      if (insertDetailError) throw insertDetailError;
-    }
-
-    if (payload.services.length > 0) {
-      const services = payload.services.map((svc) => ({
-        transaksi_id: existingTransaction.id,
-        transaksi_nomor: nomor,
-        jasa_id: parseInt(svc.serviceId),
-        qty: 1,
-        harga_jasa: svc.price,
-        subtotal: svc.price,
-      }));
-
-      const { error: insertServiceError } = await supabase
-        .from('transaksi_jasa')
-        .insert(services);
-
-      if (insertServiceError) throw insertServiceError;
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
@@ -1031,43 +880,14 @@ export const api = {
 
   // Complete Step 1: Create detail rows after user confirms product selection
   completeStepOne: async (opnameId: string, selectedProductIds: string[]) => {
-    // 1. Update opname header with selected products and advance to step 2
-    const { error: updateError } = await supabase
-      .from('opname')
-      .update({
-        selected_obat_ids: selectedProductIds,
-        status: 'sedang_dilaksanakan',
-        current_step: 2,
-      })
-      .eq('id', opnameId);
+    // 1-3. Satu transaksi di database: opname menjadi 'sedang_dilaksanakan'
+    // (stok terkunci), lalu detail dibuat dengan snapshot stok terbaru
+    const { error: rpcError } = await supabase.rpc('complete_opname_step_one', {
+      p_opname_id: parseInt(opnameId),
+      p_selected_obat_ids: selectedProductIds,
+    });
 
-    if (updateError) throw updateError;
-
-    // 2. Fetch current stock for selected products
-    const { data: products, error: fetchError } = await supabase
-      .from('master_obat')
-      .select('id, qty')
-      .in('id', selectedProductIds.map(id => parseInt(id)));
-
-    if (fetchError) throw fetchError;
-
-    // 3. Create detail rows with fresh stock snapshots
-    if (products && products.length > 0) {
-      const details = products.map((p: any) => ({
-        opname_id: parseInt(opnameId),
-        obat_id: p.id,
-        stok_sistem: p.qty || 0,
-        stok_fisik: 0,
-        selisih: 0 - (p.qty || 0),
-        status: 'pending',
-      }));
-
-      const { error: insertError } = await supabase
-        .from('opname_detail')
-        .insert(details);
-
-      if (insertError) throw insertError;
-    }
+    if (rpcError) throw new Error(rpcError.message);
 
     // 4. Create notification for step 1→2 transition
     await supabase
@@ -1094,36 +914,26 @@ export const api = {
 
   // Backward to Step 1: Delete all detail rows and reset to step 1
   backwardToStepOne: async (opnameId: string, scheduleObatIds: string[]) => {
-    // 1. Delete all detail rows
-    const { error: deleteError } = await supabase
-      .from('opname_detail')
-      .delete()
-      .eq('opname_id', opnameId);
+    // Hapus detail dan reset ke step 1 dalam satu transaksi (kunci stok dilepas)
+    const { error } = await supabase.rpc('backward_opname_to_step_one', {
+      p_opname_id: parseInt(opnameId),
+      p_schedule_obat_ids: scheduleObatIds,
+    });
 
-    if (deleteError) throw deleteError;
-
-    // 2. Reset opname to step 1
-    const { error: updateError } = await supabase
-      .from('opname')
-      .update({
-        current_step: 1,
-        status: 'belum_dilaksanakan',
-        selected_obat_ids: scheduleObatIds,
-      })
-      .eq('id', opnameId);
-
-    if (updateError) throw updateError;
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
 
-  // Get active opname lock status
+  // Get active opname lock status.
+  // Stok terkunci selama ada opname 'sedang_dilaksanakan' (semua langkah),
+  // sampai opname selesai atau dihapus. Database juga menolak perubahan
+  // stok selama itu (assert_no_active_opname), jadi ini hanya untuk UI.
   getActiveOpnameLock: async () => {
     const { data, error } = await supabase
       .from('opname')
       .select('id, current_step, created_at')
       .eq('status', 'sedang_dilaksanakan')
-      .eq('current_step', 2) // Lock ONLY at step 2; step 3 releases the lock automatically
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -1332,39 +1142,15 @@ export const api = {
   },
 
   saveDraft: async (opnameId: string, step: number, detailUpdates?: { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string }[]) => {
-    // Update current step
-    const { error: stepError } = await supabase
-      .from('opname')
-      .update({ current_step: step })
-      .eq('id', opnameId);
+    // Step dan semua detail disimpan dalam satu request/transaksi;
+    // selisih dihitung di database dari stok_sistem
+    const { error } = await supabase.rpc('save_opname_details', {
+      p_opname_id: parseInt(opnameId),
+      p_step: step,
+      p_updates: toOpnameDetailUpdates(detailUpdates),
+    });
 
-    if (stepError) throw stepError;
-
-    // Update detail rows if provided
-    if (detailUpdates && detailUpdates.length > 0) {
-      for (const update of detailUpdates) {
-        const updateData: any = {};
-        if (update.physicalStock !== undefined) {
-          updateData.stok_fisik = update.physicalStock;
-          // Fetch stok_sistem to compute selisih
-          const { data: detail } = await supabase.from('opname_detail').select('stok_sistem').eq('id', update.detailId).single();
-          if (detail) {
-            updateData.selisih = update.physicalStock - detail.stok_sistem;
-            updateData.status = updateData.selisih === 0 ? 'sesuai' : 'pending';
-          }
-        }
-        if (update.stokFinal !== undefined) updateData.stok_final = update.stokFinal;
-        if (update.reason !== undefined) updateData.alasan = update.reason;
-
-        if (Object.keys(updateData).length > 0) {
-          const { error } = await supabase
-            .from('opname_detail')
-            .update(updateData)
-            .eq('id', update.detailId);
-          if (error) throw error;
-        }
-      }
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
@@ -1374,84 +1160,25 @@ export const api = {
   saveDetailOnly: async (opnameId: string, detailUpdates: { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string }[]) => {
     if (!detailUpdates || detailUpdates.length === 0) return { success: true };
 
-    for (const update of detailUpdates) {
-      const updateData: any = {};
+    const { error } = await supabase.rpc('save_opname_details', {
+      p_opname_id: parseInt(opnameId),
+      p_step: null,
+      p_updates: toOpnameDetailUpdates(detailUpdates),
+    });
 
-      if (update.physicalStock !== undefined) {
-        updateData.stok_fisik = update.physicalStock;
-        // Fetch stok_sistem untuk hitung selisih
-        const { data: detail } = await supabase
-          .from('opname_detail')
-          .select('stok_sistem')
-          .eq('id', update.detailId)
-          .single();
-        if (detail) {
-          updateData.selisih = update.physicalStock - detail.stok_sistem;
-          updateData.status = updateData.selisih === 0 ? 'sesuai' : 'pending';
-        }
-      }
-      if (update.stokFinal !== undefined) updateData.stok_final = update.stokFinal;
-      if (update.reason !== undefined) updateData.alasan = update.reason;
-
-      if (Object.keys(updateData).length > 0) {
-        const { error } = await supabase
-          .from('opname_detail')
-          .update(updateData)
-          .eq('id', update.detailId);
-        if (error) throw error;
-      }
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
 
   // Update selected products for an opname: update selected_obat_ids, delete existing details, re-create with fresh snapshots
   updateOpnameSelection: async (opnameId: string, selectedProductIds: string[]) => {
-    // 1. Update selected_obat_ids and obat_ids on opname header
-    const { error: updateError } = await supabase
-      .from('opname')
-      .update({
-        selected_obat_ids: selectedProductIds,
-        obat_ids: selectedProductIds,
-        current_step: 2,
-      })
-      .eq('id', opnameId);
+    const { error } = await supabase.rpc('update_opname_selection', {
+      p_opname_id: parseInt(opnameId),
+      p_selected_obat_ids: selectedProductIds,
+    });
 
-    if (updateError) throw updateError;
-
-    // 2. Delete all existing opname_detail rows for this opname
-    const { error: deleteError } = await supabase
-      .from('opname_detail')
-      .delete()
-      .eq('opname_id', opnameId);
-
-    if (deleteError) throw deleteError;
-
-    // 3. Fetch current stock for selected products
-    const { data: products, error: fetchError } = await supabase
-      .from('master_obat')
-      .select('id, qty')
-      .in('id', selectedProductIds.map(id => parseInt(id)));
-
-    if (fetchError) throw fetchError;
-
-    // 4. Insert new opname_detail rows with fresh stock snapshots
-    if (products && products.length > 0) {
-      const details = products.map((p: any) => ({
-        opname_id: parseInt(opnameId),
-        obat_id: p.id,
-        stok_sistem: p.qty || 0,
-        stok_fisik: 0,
-        selisih: 0 - (p.qty || 0),
-        status: 'pending',
-      }));
-
-      const { error: insertError } = await supabase
-        .from('opname_detail')
-        .insert(details);
-
-      if (insertError) throw insertError;
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
@@ -1468,76 +1195,35 @@ export const api = {
   },
 
   updateOpnameDetail: async (detailId: string, physicalStock: number) => {
-    const { data: detail, error: fetchError } = await supabase.from('opname_detail').select('stok_sistem').eq('id', detailId).single();
+    const { data: detail, error: fetchError } = await supabase.from('opname_detail').select('opname_id').eq('id', detailId).single();
     if (fetchError) throw fetchError;
 
-    const diff = physicalStock - detail.stok_sistem;
+    const { error } = await supabase.rpc('save_opname_details', {
+      p_opname_id: detail.opname_id,
+      p_step: null,
+      p_updates: toOpnameDetailUpdates([{ detailId, physicalStock }]),
+    });
 
-    const { error } = await supabase
-      .from('opname_detail')
-      .update({
-        stok_fisik: physicalStock,
-        selisih: diff,
-        status: diff === 0 ? 'sesuai' : 'pending'
-      })
-      .eq('id', detailId);
-
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   },
 
   finishOpname: async (opnameId: string) => {
-    // 1. Get all detail rows
-    const { data: details, error: fetchError } = await supabase
-      .from('opname_detail')
-      .select('id, obat_id, stok_fisik, stok_final, selisih, alasan')
-      .eq('opname_id', opnameId);
+    // Satu transaksi di database: status detail, master_obat.qty, dan
+    // status opname berubah bersamaan atau tidak sama sekali.
+    const { error } = await supabase.rpc('finish_opname', {
+      p_opname_id: parseInt(opnameId)
+    });
 
-    if (fetchError) throw fetchError;
-
-    // 2. Mark items and update master stock
-    for (const d of (details || [])) {
-      const finalStock = d.stok_final !== null ? d.stok_final : d.stok_fisik;
-      const detailStatus = d.selisih === 0 ? 'sesuai' : 'disesuaikan';
-
-      // Update detail status
-      await supabase
-        .from('opname_detail')
-        .update({ status: detailStatus, stok_final: finalStock })
-        .eq('id', d.id);
-
-      // Update master_obat.qty
-      await supabase
-        .from('master_obat')
-        .update({ qty: finalStock })
-        .eq('id', d.obat_id);
-    }
-
-    // 3. Mark opname as complete
-    const { error } = await supabase
-      .from('opname')
-      .update({
-        status: 'selesai',
-        current_step: 3,
-        completed_at: new Date().toISOString()
-      })
-      .eq('id', opnameId);
-
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   },
 
   resolveOpnameDifference: async (detailId: string, reason: string) => {
-    const { data: detail, error: fetchError } = await supabase.from('opname_detail').select('obat_id, stok_fisik').eq('id', detailId).single();
-    if (fetchError) throw fetchError;
+    const { error } = await supabase.rpc('resolve_opname_difference', {
+      p_detail_id: parseInt(detailId),
+      p_reason: reason,
+    });
 
-    const { error } = await supabase
-      .from('opname_detail')
-      .update({
-        status: 'disesuaikan',
-        alasan: reason
-      })
-      .eq('id', detailId);
-
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   },
 
   getOpnameHistory: async () => {
