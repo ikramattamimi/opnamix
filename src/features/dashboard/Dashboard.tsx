@@ -1,66 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/common/StatCard';
-import { dashboardApi, DashboardStats, RecentTransaction } from './api';
+import type { DashboardStats, RecentTransaction } from './api';
+import { useDashboardStats, useRecentTransactions } from './useDashboard';
 import { exportRecentTransactionsToExcel } from '@/features/reports/exportUtils';
 
+const EMPTY_TRANSACTIONS: RecentTransaction[] = [];
+
 const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: stats, isPending: loading, error: statsError } = useDashboardStats();
 
   // Pagination state for recent transactions
-  const [recentTrx, setRecentTrx] = useState<RecentTransaction[]>([]);
   const [trxPage, setTrxPage] = useState(1);
-  const [trxTotalPages, setTrxTotalPages] = useState(1);
-  const [trxLoading, setTrxLoading] = useState(false);
+  const {
+    data: trxData,
+    isPending: trxPending,
+    isPlaceholderData: trxPlaceholder,
+    error: trxError,
+  } = useRecentTransactions(trxPage, 5);
+  const recentTrx = trxData?.data ?? EMPTY_TRANSACTIONS;
+  // Halaman lama tetap ditampilkan (keepPreviousData) sampai halaman baru siap
+  const trxTotalPages = trxData?.totalPages ?? 1;
+  const trxLoading = trxPending || trxPlaceholder;
 
   useEffect(() => {
-    const controller = new AbortController();
-    const fetchTrx = async () => {
-      setTrxLoading(true);
-      try {
-        const res = await dashboardApi.getRecentTransactions(trxPage, 5);
-        if (!controller.signal.aborted) {
-          setRecentTrx(res.data);
-          setTrxTotalPages(res.totalPages);
-        }
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error('Failed to fetch recent transactions', error);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setTrxLoading(false);
-        }
-      }
-    };
-
-    fetchTrx();
-    return () => controller.abort();
-  }, [trxPage]);
+    if (statsError) console.error('Failed to fetch dashboard stats', statsError);
+  }, [statsError]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const fetchStats = async () => {
-      try {
-        const data = await dashboardApi.getDashboardStats();
-        if (!controller.signal.aborted) {
-          setStats(data);
-        }
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error('Failed to fetch dashboard stats', error);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchStats();
-    return () => controller.abort();
-  }, []);
+    if (trxError) console.error('Failed to fetch recent transactions', trxError);
+  }, [trxError]);
 
   if (loading) {
     return (
