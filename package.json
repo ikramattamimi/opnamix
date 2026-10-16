@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:types": "npx supabase gen types typescript --project-id nknedmixkadinfmfxfrk --schema public > lib/database.types.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
