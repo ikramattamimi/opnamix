@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
+import { SlidersHorizontal } from 'lucide-react';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
 import type { StockMutationRow } from './types';
 
@@ -100,7 +101,7 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${getTypeStyle()}`}
           >
-            {type === 'penyesuaian' && <span className="material-icons-round text-xs">tune</span>}
+            {type === 'penyesuaian' && <SlidersHorizontal className="size-3" aria-hidden />}
             {getTypeLabel()}
           </span>
         </div>

@@ -1,0 +1,65 @@
+import React from 'react';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+interface FilterFieldProps {
+  label: string;
+  htmlFor: string;
+  children: React.ReactNode;
+}
+
+// Label kecil huruf kapital di atas field filter laporan.
+export const FilterField: React.FC<FilterFieldProps> = ({ label, htmlFor, children }) => (
+  <div className="space-y-2">
+    <Label
+      htmlFor={htmlFor}
+      className="block text-xs font-bold uppercase text-text-secondary-light"
+    >
+      {label}
+    </Label>
+    {children}
+  </div>
+);
+
+interface FilterSelectProps {
+  id: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  options: { value: string; label: string }[];
+  className?: string;
+}
+
+// Select filter laporan dengan tampilan yang sama seperti input tanggal di sebelahnya.
+export const FilterSelect: React.FC<FilterSelectProps> = ({
+  id,
+  value,
+  onValueChange,
+  options,
+  className,
+}) => (
+  <Select value={value} onValueChange={onValueChange}>
+    <SelectTrigger
+      id={id}
+      className={cn(
+        'h-auto min-w-[160px] gap-2 rounded-xl border-0 bg-white px-4 py-2 text-base text-text-primary-light shadow-none dark:bg-card-dark dark:text-white',
+        className,
+      )}
+    >
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent>
+      {options.map((option) => (
+        <SelectItem key={option.value} value={option.value}>
+          {option.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);

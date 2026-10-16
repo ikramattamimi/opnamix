@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
+import type { ColumnDef, FilterFn } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import type { TransactionReportRow } from './api';
+import ColumnFilterHeader from './components/ColumnFilterHeader';
 
 // Type options for filter
 const typeOptions = [
@@ -30,6 +30,10 @@ const formatSource = (source?: string) => {
   return source?.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()) || '-';
 };
 
+// Filter kolom pilihan: cocok persis, atau semua kalau belum dipilih.
+const exactMatchFilter: FilterFn<TransactionReportRow> = (row, id, value) =>
+  value === undefined || value === 'all' || row.getValue(id) === value;
+
 interface TransactionReportColumnsProps {
   onViewDetail: (transaction: TransactionReportRow) => void;
 }
@@ -39,14 +43,7 @@ export const createTransactionReportColumns = ({
 }: TransactionReportColumnsProps): ColumnDef<TransactionReportRow>[] => [
   {
     accessorKey: 'date',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Tanggal</div>
-          <DataTableColumnFilter column={column} title="Tanggal" />
-        </div>
-      );
-    },
+    header: ({ column }) => <ColumnFilterHeader column={column} label="Tanggal" title="Tanggal" />,
     cell: ({ row }) => {
       const date = new Date(row.getValue('date'));
       return (
@@ -65,14 +62,7 @@ export const createTransactionReportColumns = ({
   },
   {
     accessorKey: 'id',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Nomor Ref</div>
-          <DataTableColumnFilter column={column} title="Nomor" />
-        </div>
-      );
-    },
+    header: ({ column }) => <ColumnFilterHeader column={column} label="Nomor Ref" title="Nomor" />,
     cell: ({ row }) => (
       <div className="font-medium text-text-primary-light dark:text-white">
         {row.getValue('id')}
@@ -81,14 +71,9 @@ export const createTransactionReportColumns = ({
   },
   {
     accessorKey: 'type',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Tipe</div>
-          <DataTableColumnFilter column={column} title="Tipe" options={typeOptions} />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <ColumnFilterHeader column={column} label="Tipe" title="Tipe" options={typeOptions} />
+    ),
     cell: ({ row }) => {
       const type = row.getValue('type') as string;
       return (
@@ -105,22 +90,13 @@ export const createTransactionReportColumns = ({
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      return value === undefined || value === 'all' || row.getValue(id) === value;
-    },
+    filterFn: exactMatchFilter,
   },
   {
     accessorKey: 'patient',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">
-            Nama Pasien / Supplier
-          </div>
-          <DataTableColumnFilter column={column} title="Nama" />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <ColumnFilterHeader column={column} label="Nama Pasien / Supplier" title="Nama" />
+    ),
     cell: ({ row }) => {
       const rowType = row.getValue('type') as string;
       const label = rowType === 'masuk' ? 'Supplier' : 'Pasien';
@@ -133,33 +109,21 @@ export const createTransactionReportColumns = ({
   },
   {
     accessorKey: 'source',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Sumber</div>
-          <DataTableColumnFilter column={column} title="Sumber" options={sourceOptions} />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <ColumnFilterHeader column={column} label="Sumber" title="Sumber" options={sourceOptions} />
+    ),
     cell: ({ row }) => (
       <div className="text-text-primary-light dark:text-white">
         {formatSource(row.getValue('source'))}
       </div>
     ),
-    filterFn: (row, id, value) => {
-      return value === undefined || value === 'all' || row.getValue(id) === value;
-    },
+    filterFn: exactMatchFilter,
   },
   {
     accessorKey: 'status',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Status</div>
-          <DataTableColumnFilter column={column} title="Status" options={statusOptions} />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <ColumnFilterHeader column={column} label="Status" title="Status" options={statusOptions} />
+    ),
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       const isPending = status === 'Menunggu';
@@ -179,20 +143,13 @@ export const createTransactionReportColumns = ({
         </span>
       );
     },
-    filterFn: (row, id, value) => {
-      return value === undefined || value === 'all' || row.getValue(id) === value;
-    },
+    filterFn: exactMatchFilter,
   },
   {
     accessorKey: 'birthDate',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Tanggal Lahir</div>
-          <DataTableColumnFilter column={column} title="Tanggal Lahir" />
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <ColumnFilterHeader column={column} label="Tanggal Lahir" title="Tanggal Lahir" />
+    ),
     cell: ({ row }) => {
       const date = row.getValue('birthDate') ? new Date(row.getValue('birthDate')) : null;
       return (
@@ -210,14 +167,7 @@ export const createTransactionReportColumns = ({
   },
   {
     accessorKey: 'nakes',
-    header: ({ column }) => {
-      return (
-        <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Nakes</div>
-          <DataTableColumnFilter column={column} title="Nakes" />
-        </div>
-      );
-    },
+    header: ({ column }) => <ColumnFilterHeader column={column} label="Nakes" title="Nakes" />,
     cell: ({ row }) => (
       <div className="text-text-primary-light dark:text-white">{row.getValue('nakes') || '-'}</div>
     ),
