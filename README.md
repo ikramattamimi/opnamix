@@ -67,9 +67,14 @@ Perintah lain:
 ## Struktur proyek
 
 ```
-components/        Halaman dan komponen UI (StockOpname/ berisi modul opname + spesifikasinya)
-hooks/             React Query hooks per domain
-lib/               Klien Supabase, API, auth, ekspor, utilitas
+src/
+  app/             App, AuthenticatedApp (routing dan provider)
+  components/      ui/ (shadcn), common/ (StatCard, modal, paginasi), layout/ (Header, Sidebar)
+  features/        Satu folder per fitur: halaman, komponen, hook, api.ts, mappers.ts, types.ts
+                   (opname/spec/ berisi spesifikasi modul opname)
+  hooks/           Hook umum (useSupabaseQuery)
+  lib/             Klien Supabase, database.types, utilitas
+  types/           Tipe lintas fitur (paginasi, routes, ApiResult)
 supabase/          Migration SQL dan Edge Functions
 docs/              Analisis sistem, BRD, spesifikasi, dan dokumentasi database
 ```
