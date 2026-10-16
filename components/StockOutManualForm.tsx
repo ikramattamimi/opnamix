@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Product, StockOutManual, StockOutManualItem, PatientData } from '../types';
+import { Product, StockOutManual, StockOutManualItem } from '../types';
 import ProductLookupModal from './ProductLookupModal';
 import { useProducts } from '../hooks/useProducts';
 import { Button } from './ui/button';
@@ -71,7 +71,6 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
     }
 
     const itemErrors: Record<string, { productId?: string; quantity?: string }> = {};
-    let hasValidItem = false;
 
     items.forEach((item) => {
       const currentItemErrors: { productId?: string; quantity?: string } = {};
@@ -82,8 +81,6 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
         // For now, simple validation: if row exists, it must be valid
         currentItemErrors.productId = 'Produk wajib dipilih';
         itemValid = false;
-      } else {
-        hasValidItem = true;
       }
 
       if (typeof item.quantity !== 'number' || isNaN(item.quantity) || item.quantity <= 0) {
@@ -368,7 +365,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {items.map((item, index) => {
+                    {items.map((item) => {
                       const product = products.find((p) => p.id === item.productId);
                       const price = product ? product.sellingPrice : 0;
                       const total = price * item.quantity;

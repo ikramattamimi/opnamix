@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
-import { updateUserProfile, uploadAvatar, updatePassword, UserProfile } from '../lib/auth';
+import { updateUserProfile, uploadAvatar, updatePassword } from '../lib/auth';
 import { useAuth } from '../hooks/useAuth';
 
 const ROLE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
@@ -28,7 +28,7 @@ const ROLE_LABELS: Record<string, { label: string; color: string; icon: string }
 
 const ProfilePage: React.FC = () => {
   const { userProfile: profile, refreshProfile } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formName, setFormName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

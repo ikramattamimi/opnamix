@@ -76,10 +76,10 @@ export async function signIn(email: string, password: string) {
   } catch (error: any) {
     // Translate common Supabase errors to Indonesian
     if (error.message?.includes('Invalid login credentials')) {
-      throw new Error('Email atau password salah');
+      throw new Error('Email atau password salah', { cause: error });
     }
     if (error.message?.includes('Email not confirmed')) {
-      throw new Error('Email belum dikonfirmasi');
+      throw new Error('Email belum dikonfirmasi', { cause: error });
     }
     throw error;
   }

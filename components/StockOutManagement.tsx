@@ -12,7 +12,6 @@ import {
 import { useServices } from '../hooks/useServices';
 import StockOutManualForm from './StockOutManualForm';
 import StockOutRequestForm from './StockOutRequestForm';
-import PaginationControls from './PaginationControls';
 import { Button } from './ui/button';
 import { DataTable } from './ui/data-table';
 import { createStockOutColumns } from './StockOutColumns';
@@ -53,7 +52,6 @@ const StockOutManagement: React.FC = () => {
     nakesName: isNakes && userProfile?.full_name ? userProfile.full_name : undefined,
   });
   const requests = paginatedRequests?.data || [];
-  const totalRequests = paginatedRequests?.total || 0;
 
   // Realtime subscription — refresh tabel otomatis saat ada transaksi baru
   useStockOutRealtime();

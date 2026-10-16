@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from './ui/button';
-import {
-  signUp,
-  updateUserProfileAdmin,
-  deleteAuthUser,
-  adminUpdatePassword,
-  UserProfile,
-} from '../lib/auth';
+import { signUp, updateUserProfileAdmin, deleteAuthUser, adminUpdatePassword } from '../lib/auth';
 import { supabase } from '../lib/supabaseClient';
 import { useToast } from './ui/toast';
 

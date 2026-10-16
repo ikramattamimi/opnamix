@@ -29,7 +29,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
   onClose,
   isLoading = false,
 }) => {
-  const { user, userProfile } = useAuth();
+  const { user } = useAuth();
   const userId = user?.id;
 
   const { data: productData } = useProducts({ page: 1, perPage: 1000 });

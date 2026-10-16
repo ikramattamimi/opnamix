@@ -11,6 +11,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  /* eslint-disable @typescript-eslint/no-unused-vars -- dipakai form reset password yang sedang dikomentari di bawah */
   const [isResetMode, setIsResetMode] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetStatus, setResetStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -28,6 +29,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       setResetMessage(err.message || 'Gagal mengirim link reset password.');
     }
   };
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

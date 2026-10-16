@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Product, Category } from '../types';
+import { Category } from '../types';
 import { useProducts } from '../hooks/useProducts';
 import StatCard from './StatCard';
 import { DataTable } from './ui/data-table';
@@ -8,11 +8,9 @@ import { createTransactionReportColumns } from './TransactionReportColumns';
 import { stockMutationColumns } from './StockMutationColumns';
 import { exportTransactionReportToExcel, exportStockMutationToExcel } from '../lib/exportUtils';
 
-interface StockReportProps {}
-
 import { api } from '../lib/api';
 
-const StockReport: React.FC<StockReportProps> = () => {
+const StockReport: React.FC = () => {
   const { data: productData } = useProducts({ page: 1, perPage: 1000 });
   const products = productData?.data || [];
 
@@ -259,7 +257,7 @@ const StockReport: React.FC<StockReportProps> = () => {
                 Level Stok Produk Teratas
               </h3>
               <div className="h-64 flex items-end justify-around gap-4 px-2">
-                {topProducts.map((p, i) => (
+                {topProducts.map((p) => (
                   <div key={p.id} className="flex flex-col items-center flex-1 group relative">
                     <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-white text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap z-10">
                       Stok: {p.stock}

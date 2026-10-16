@@ -249,7 +249,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
             </div>
 
             <div className="space-y-4">
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <div
                   key={item.id}
                   className="bg-background-light dark:bg-background-dark rounded-2xl p-6 relative"

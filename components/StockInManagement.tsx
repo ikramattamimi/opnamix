@@ -22,11 +22,7 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const {
-    data: paginatedData,
-    isLoading,
-    isPlaceholderData,
-  } = useStockInReceipts({ page, perPage });
+  const { data: paginatedData, isPlaceholderData } = useStockInReceipts({ page, perPage });
   const receipts = paginatedData?.data || [];
   const totalPages = paginatedData?.totalPages || 1;
   const totalReceipts = paginatedData?.total || 0;

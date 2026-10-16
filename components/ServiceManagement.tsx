@@ -47,7 +47,7 @@ const ServiceManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const { data: paginatedData, isLoading, isPlaceholderData } = useServices({ page, perPage });
+  const { data: paginatedData, isPlaceholderData } = useServices({ page, perPage });
   const services = paginatedData?.data || [];
   const totalPages = paginatedData?.totalPages || 1;
   const totalServices = paginatedData?.total || 0;

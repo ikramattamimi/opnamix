@@ -67,15 +67,6 @@ const extractTransactionNoteAndMeta = (rawNote?: string | null) => {
   }
 };
 
-const serializeTransactionNote = (note?: string, meta?: { serviceFee?: number }) => {
-  const cleanNote = (note || '').trim();
-  const normalizedMeta = {
-    serviceFee: Math.max(0, Number(meta?.serviceFee || 0)),
-  };
-
-  return `${cleanNote}${STOCK_OUT_META_MARKER}${JSON.stringify(normalizedMeta)}`;
-};
-
 const mapServiceFromDB = (item: any): Service => ({
   id: item.id.toString(),
   code: item.kode,
@@ -490,7 +481,7 @@ export const api = {
     // Assuming transactions are inserted correctly with details, we map what we get.
 
     const createdByIds = [...new Set((data || []).map((t: any) => t.created_by).filter(Boolean))];
-    let profileMap: Record<string, string> = {};
+    const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
@@ -583,7 +574,7 @@ export const api = {
 
     // Fetch profile names for created_by users
     const createdByIds = [...new Set((data || []).map((t: any) => t.created_by).filter(Boolean))];
-    let profileMap: Record<string, string> = {};
+    const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
@@ -811,7 +802,7 @@ export const api = {
 
     const today = new Date();
     return data.map((schedule: any) => {
-      let nextDate = new Date(today.getFullYear(), today.getMonth(), schedule.tanggal_audit);
+      const nextDate = new Date(today.getFullYear(), today.getMonth(), schedule.tanggal_audit);
       if (nextDate <= today) {
         if (schedule.pengulangan === 'BULANAN') {
           nextDate.setMonth(nextDate.getMonth() + 1);
@@ -1075,7 +1066,7 @@ export const api = {
     if (error) throw error;
 
     const createdByIds = [...new Set((data || []).map((t: any) => t.created_by).filter(Boolean))];
-    let profileMap: Record<string, string> = {};
+    const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
@@ -1373,48 +1364,6 @@ export const api = {
     }));
   },
 
-  getExpiringProducts: async (days: number) => {
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + days);
-    const targetDateStr = targetDate.toISOString().split('T')[0];
-    const todayStr = new Date().toISOString().split('T')[0];
-
-    const { data, error } = await supabase
-      .from('transaksi_detail')
-      .select(
-        `
-        batch,
-        qty,
-        master_obat (nama)
-      `,
-      )
-      .not('batch', 'is', null)
-      .neq('batch', '-'); // Assuming valid batch has date or we just return batch info
-
-    // Note: Real implementation needs strict date column in transksi_detail or parsing batch.
-    // For now we map whatever is in batch as if it's expiry relevant or rely on specific expire_date column if exists.
-    // spec_db says: td.expire_date. Let's assume migration added it or we use batch as proxy for now.
-    // If expire_date doesn't strictly exist in schema yet, this might fail if we query it?
-    // Let's use master_obat buffer stock logic as fallback for "Critical Stock" report if expiry is hard.
-    // BUT spec SC-024 specifically asks for 'Laporan Obat Mendekati Expire'.
-    // I will assume 'batch' might contain expiry or we return mocked data if column missing to avoid crash,
-    // OR better, we query master_obat and return those with low stock as a proxy if expiry is not tracked?
-    // No, let's try to query 'transaksi_detail' assuming it has 'expire_date' as per spec SC-007 mapping?
-    // "expire_date | transaksi_detail | Expire"
-    // If I didn't add it in migration, I should probably add it now or skip.
-    // Let's stick to returning what we have: stock mutation.
-    // ALTERNATIVE: Return logic for Low Stock (Buffer check) which is also critical.
-    // Using buffer_stok for dynamic threshold
-    const { data: lowStock } = await supabase
-      .from('master_obat')
-      .select('*, buffer_stok')
-      .eq('is_active', true)
-      .is('deleted_at', null)
-      .or('qty.lt.buffer_stok,qty.lt.10');
-
-    return lowStock || [];
-  },
-
   getDashboardStats: async () => {
     // 1. Total Barang Count
     const { count: totalProducts, error: countError } = await supabase
@@ -1438,15 +1387,10 @@ export const api = {
     if (prodError) console.error('Error fetching products for stats', prodError);
 
     let totalValue = 0;
-    let lowStockCount = 0;
     const categoryStats: Record<string, number> = {};
 
     products?.forEach((p) => {
       totalValue += (p.qty || 0) * (p.harga || 0);
-      // Use buffer_stok from database for low stock threshold
-      const threshold = p.buffer_stok || 10;
-      if ((p.qty || 0) < threshold) lowStockCount++;
-
       const cat = p.jenis || 'Lainnya';
       categoryStats[cat] = (categoryStats[cat] || 0) + 1;
     });

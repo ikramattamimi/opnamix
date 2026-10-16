@@ -88,6 +88,7 @@ const Dashboard: React.FC = () => {
     (a: any, b: any) => a + b,
     0,
   ) as number;
+  /* eslint-disable @typescript-eslint/no-unused-vars -- dipakai blok "Charts Row" yang sedang dikomentari */
   const safeTotalItems = totalItems || 1; // Prevent divide by zero
   const categories = Object.keys(safeStats.categoryDistribution);
   // Simple color mapping
@@ -97,6 +98,7 @@ const Dashboard: React.FC = () => {
     'Alat Kesehatan': 'bg-orange-400',
     Imunisasi: 'bg-green-400',
   };
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   return (
     <div className="space-y-6">
@@ -340,6 +342,7 @@ const Dashboard: React.FC = () => {
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- dipakai blok "Charts Row" yang sedang dikomentari
 const LowStockItem: React.FC<{ name: string; count: number; color: string }> = ({
   name,
   count,
@@ -368,7 +371,7 @@ const TransactionRow: React.FC<{
   iconBg: string;
   iconColor: string;
   isWarning?: boolean;
-}> = ({ name, status, category, amount, date, icon, iconBg, iconColor, isWarning }) => (
+}> = ({ name, status, category, amount, date, icon, iconBg, iconColor }) => (
   <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
     <td className="py-4 pl-2 flex items-center gap-3">
       <div

@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import { StockInReceipt } from '../types';
 import { QUERY_KEYS } from './useSupabaseQuery';
 
 import { keepPreviousData } from '@tanstack/react-query';
