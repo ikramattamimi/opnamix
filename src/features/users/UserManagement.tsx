@@ -10,30 +10,7 @@ import {
 import type { UserRow } from './types';
 import { useToast } from '@/components/ui/toast';
 import { getErrorMessage } from '@/lib/utils';
-
-const ROLE_OPTIONS = [
-  {
-    value: 'admin',
-    label: 'Admin',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-  },
-  {
-    value: 'farmasi',
-    label: 'Farmasi',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-  },
-  {
-    value: 'nakes',
-    label: 'Nakes',
-    color: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-  },
-] as const;
-
-type RoleValue = (typeof ROLE_OPTIONS)[number]['value'];
-
-const isRoleValue = (role: string): role is RoleValue => {
-  return role === 'admin' || role === 'farmasi' || role === 'nakes';
-};
+import { ROLE_OPTIONS, isRoleValue, type RoleValue } from './roles';
 
 const UserManagement: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
