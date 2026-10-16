@@ -16,6 +16,14 @@ export function useStockInReceipts(params?: PaginationParams) {
   });
 }
 
+// Saran nama supplier untuk form stok masuk
+export function useSupplierSuggestions() {
+  return useQuery({
+    queryKey: stockInKeys.suppliers(),
+    queryFn: () => stockInApi.getDistinctSuppliers(),
+  });
+}
+
 // Payload matches transactionsApi.createTransaction input roughly
 // We might need to refine this based on what StockInForm submits
 export function useCreateStockIn() {

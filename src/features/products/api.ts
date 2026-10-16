@@ -94,16 +94,4 @@ export const productsApi = {
 
     if (error) throw error;
   },
-
-  // Fetch distinct supplier names from past stock-in transactions
-  getDistinctSuppliers: async () => {
-    const { data, error } = await supabase
-      .from('transaksi')
-      .select('nama_pasien')
-      .eq('tipe', 'masuk')
-      .not('nama_pasien', 'is', null);
-    if (error) throw error;
-    const unique = [...new Set((data || []).map((d) => d.nama_pasien).filter(Boolean))];
-    return unique as string[];
-  },
 };

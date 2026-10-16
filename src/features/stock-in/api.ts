@@ -93,4 +93,16 @@ export const stockInApi = {
       totalPages: Math.ceil((count || 0) / perPage),
     };
   },
+
+  // Nama supplier dari transaksi stok masuk sebelumnya (saran di form)
+  getDistinctSuppliers: async (): Promise<string[]> => {
+    const { data, error } = await supabase
+      .from('transaksi')
+      .select('nama_pasien')
+      .eq('tipe', 'masuk')
+      .not('nama_pasien', 'is', null);
+    if (error) throw error;
+    const unique = [...new Set((data || []).map((d) => d.nama_pasien).filter(Boolean))];
+    return unique as string[];
+  },
 };
