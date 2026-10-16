@@ -1,20 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-  signUp,
-  updateUserProfileAdmin,
-  deleteAuthUser,
-  adminUpdatePassword,
-} from '@/features/auth/api';
-import { supabase } from '@/lib/supabaseClient';
+  useUsers,
+  useCreateUser,
+  useUpdateUser,
+  useDeleteUser,
+  useSetUserPassword,
+} from './useUsers';
+import type { UserRow } from './types';
 import { useToast } from '@/components/ui/toast';
-import type { Tables } from '@/lib/database.types';
 import { getErrorMessage } from '@/lib/utils';
-
-type UserRow = Tables<'profiles'> & {
-  roles: string[];
-  last_sign_in_at?: string | null;
-};
 
 const ROLE_OPTIONS = [
   {
@@ -41,8 +36,6 @@ const isRoleValue = (role: string): role is RoleValue => {
 };
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<UserRow[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -64,51 +57,17 @@ const UserManagement: React.FC = () => {
   const [editEmail, setEditEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchUsers = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // RLS allows any logged-in user to read profiles and user_roles
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      const { data: userRoles, error: userRolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      if (profileError) throw profileError;
-      if (userRolesError) throw userRolesError;
-
-      const rolesMap = (userRoles || []).reduce<Record<string, string[]>>((acc, item) => {
-        if (!item.user_id || !item.role) return acc;
-        if (!acc[item.user_id]) {
-          acc[item.user_id] = [];
-        }
-        if (!acc[item.user_id].includes(item.role)) {
-          acc[item.user_id].push(item.role);
-        }
-        return acc;
-      }, {});
-
-      const mergedUsers: UserRow[] = (profiles || []).map((p) => ({
-        ...p,
-        roles: rolesMap[p.id] || (p.role ? [p.role] : []),
-      }));
-
-      // Get last sign in from auth.users via edge function or admin API
-      // For now we just use profiles data
-      setUsers(mergedUsers);
-    } catch (err) {
-      setError('Gagal memuat data pengguna: ' + getErrorMessage(err));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const { data: users = [], isLoading, error: loadError } = useUsers();
+  const createUser = useCreateUser();
+  const updateUser = useUpdateUser();
+  const deleteUser = useDeleteUser();
+  const setUserPassword = useSetUserPassword();
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    if (loadError) {
+      setError('Gagal memuat data pengguna: ' + getErrorMessage(loadError));
+    }
+  }, [loadError]);
 
   // Auto-dismiss messages
   useEffect(() => {
@@ -156,16 +115,16 @@ const UserManagement: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await signUp(formEmail, formPassword, formName, formRoles);
+      await createUser.mutateAsync({
+        email: formEmail,
+        password: formPassword,
+        fullName: formName,
+        roles: formRoles,
+      });
 
-      // Insert profile manually in case trigger doesn't fire
-      // The signUp function uses supabase.auth.signUp which should trigger the profile creation
-      // But let's also upsert the profile just in case
       setSuccess(`Pengguna ${formEmail} berhasil ditambahkan!`);
       setShowAddModal(false);
       resetForm();
-      // Wait a moment for the trigger to fire
-      setTimeout(() => fetchUsers(), 1500);
     } catch (err) {
       showToast('Gagal menambah pengguna.', 'error');
       console.error('Error adding user:', err);
@@ -188,15 +147,17 @@ const UserManagement: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await updateUserProfileAdmin(selectedUser.id, {
-        full_name: formName,
-        roles: formRoles,
-        email: editEmail,
+      await updateUser.mutateAsync({
+        userId: selectedUser.id,
+        updates: {
+          full_name: formName,
+          roles: formRoles,
+          email: editEmail,
+        },
       });
       setSuccess(`Profil ${selectedUser.email} berhasil diperbarui!`);
       setShowEditModal(false);
       resetForm();
-      fetchUsers();
     } catch (err) {
       setError('Gagal memperbarui pengguna: ' + getErrorMessage(err));
     } finally {
@@ -210,12 +171,11 @@ const UserManagement: React.FC = () => {
     setIsSubmitting(true);
     try {
       // Delete from auth.users (profile will cascade-delete)
-      await deleteAuthUser(selectedUser.id);
+      await deleteUser.mutateAsync(selectedUser.id);
 
       setSuccess(`Pengguna ${selectedUser.email} berhasil dihapus!`);
       setShowDeleteConfirm(false);
       setSelectedUser(null);
-      fetchUsers();
     } catch (err) {
       setError('Gagal menghapus pengguna: ' + getErrorMessage(err));
     } finally {
@@ -255,7 +215,7 @@ const UserManagement: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await adminUpdatePassword(selectedUser.id, newPassword);
+      await setUserPassword.mutateAsync({ userId: selectedUser.id, password: newPassword });
       setSuccess(`Password ${selectedUser.full_name || selectedUser.email} berhasil diubah!`);
       setShowResetPasswordModal(false);
       setNewPassword('');

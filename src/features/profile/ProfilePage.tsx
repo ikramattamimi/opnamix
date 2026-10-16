@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { updateUserProfile, uploadAvatar, updatePassword } from '@/features/auth/api';
+import { useProfile, useUpdateProfile, useUploadAvatar, useUpdatePassword } from './useProfile';
 import { useAuth } from '@/features/auth/useAuth';
 import { getErrorMessage, toDate } from '@/lib/utils';
 
@@ -28,7 +28,11 @@ const ROLE_LABELS: Record<string, { label: string; color: string; icon: string }
 };
 
 const ProfilePage: React.FC = () => {
-  const { userProfile: profile, refreshProfile } = useAuth();
+  const { userProfile } = useAuth();
+  const { data: profile } = useProfile(userProfile?.id, userProfile);
+  const updateProfile = useUpdateProfile();
+  const uploadAvatar = useUploadAvatar();
+  const updatePassword = useUpdatePassword();
   const [isLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formName, setFormName] = useState('');
@@ -67,8 +71,10 @@ const ProfilePage: React.FC = () => {
     }
     setIsSubmitting(true);
     try {
-      await updateUserProfile(profile.id, { full_name: formName.trim() });
-      await refreshProfile();
+      await updateProfile.mutateAsync({
+        userId: profile.id,
+        updates: { full_name: formName.trim() },
+      });
       setEditMode(false);
       setSuccess('Profil berhasil diperbarui!');
     } catch (err) {
@@ -98,8 +104,7 @@ const ProfilePage: React.FC = () => {
 
     setIsUploading(true);
     try {
-      await uploadAvatar(profile.id, file);
-      await refreshProfile();
+      await uploadAvatar.mutateAsync({ userId: profile.id, file });
       setSuccess('Foto profil berhasil diperbarui!');
     } catch (err) {
       setError('Gagal upload foto: ' + getErrorMessage(err));
@@ -126,7 +131,7 @@ const ProfilePage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await updatePassword(newPassword);
+      await updatePassword.mutateAsync(newPassword);
       setSuccess('Password berhasil diubah!');
       setNewPassword('');
       setConfirmPassword('');
