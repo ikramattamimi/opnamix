@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { StockInReceipt } from './types';
+import { Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
 
@@ -134,10 +135,10 @@ export const createStockInColumns = ({
           <Button
             variant="ghost"
             size="sm"
-            className="text-primary hover:bg-primary/10"
+            className="text-primary hover:bg-primary/10 [&_svg]:size-5"
             onClick={() => onView(receipt)}
           >
-            <span className="material-icons-round text-base mr-1">visibility</span>
+            <Eye className="mr-1" aria-hidden />
             Detail
           </Button>
         </div>
