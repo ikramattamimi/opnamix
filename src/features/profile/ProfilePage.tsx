@@ -1,55 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  Camera,
-  CircleAlert,
-  CircleCheck,
-  CircleUserRound,
-  Hourglass,
-  KeyRound,
-  Loader2,
-  Lock,
-  Pencil,
-  Pill,
-  ShieldCheck,
-  ShieldPlus,
-  type LucideIcon,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
+import { CircleAlert, CircleCheck } from 'lucide-react';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useProfile, useUpdateProfile, useUploadAvatar, useUpdatePassword } from './useProfile';
 import { useAuth } from '@/features/auth/useAuth';
-import { getErrorMessage, toDate } from '@/lib/utils';
-
-const ROLE_LABELS: Record<string, { label: string; color: string; icon: LucideIcon }> = {
-  admin: {
-    label: 'Admin',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    icon: ShieldCheck,
-  },
-  apoteker: {
-    label: 'Farmasi',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    icon: Pill,
-  },
-  farmasi: {
-    label: 'Farmasi',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    icon: Pill,
-  },
-  nakes: {
-    label: 'Nakes',
-    color: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-    icon: ShieldPlus,
-  },
-};
-
-const FIELD_LABEL_CLASS =
-  'text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark';
-// Ukuran, warna, dan fokus mengikuti input manual sebelumnya
-const FIELD_INPUT_CLASS =
-  'h-auto w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 transition-all';
+import { getErrorMessage } from '@/lib/utils';
+import { getRoleIconColor, getRoleInfo } from './components/profileUi';
+import ProfileHeaderCard from './components/ProfileHeaderCard';
+import ProfileInfoSection from './components/ProfileInfoSection';
+import PasswordSection from './components/PasswordSection';
 
 const ProfilePage: React.FC = () => {
   const { userProfile } = useAuth();
@@ -68,13 +26,6 @@ const ProfilePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-
-  // Password change
-  const [showPasswordSection, setShowPasswordSection] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (profile) {
@@ -112,22 +63,17 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !profile) return;
+  const handleAvatarSelected = async (file: File): Promise<boolean> => {
+    if (!profile) return false;
 
     // Validate
     if (!file.type.startsWith('image/')) {
       setError('File harus berupa gambar (JPG, PNG, dll).');
-      return;
+      return false;
     }
     if (file.size > 2 * 1024 * 1024) {
       setError('Ukuran foto maksimal 2MB.');
-      return;
+      return false;
     }
 
     setIsUploading(true);
@@ -138,34 +84,35 @@ const ProfilePage: React.FC = () => {
       setError('Gagal upload foto: ' + getErrorMessage(err));
     } finally {
       setIsUploading(false);
-      // Reset input
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
+    return true;
   };
 
-  const handleChangePassword = async () => {
+  const handleChangePassword = async (
+    newPassword: string,
+    confirmPassword: string,
+  ): Promise<boolean> => {
     if (!newPassword || !confirmPassword) {
       setError('Semua field password wajib diisi.');
-      return;
+      return false;
     }
     if (newPassword.length < 6) {
       setError('Password baru minimal 6 karakter.');
-      return;
+      return false;
     }
     if (newPassword !== confirmPassword) {
       setError('Password baru dan konfirmasi tidak cocok.');
-      return;
+      return false;
     }
 
     setIsSubmitting(true);
     try {
       await updatePassword.mutateAsync(newPassword);
       setSuccess('Password berhasil diubah!');
-      setNewPassword('');
-      setConfirmPassword('');
-      setShowPasswordSection(false);
+      return true;
     } catch (err) {
       setError('Gagal mengubah password: ' + getErrorMessage(err));
+      return false;
     } finally {
       setIsSubmitting(false);
     }
@@ -189,17 +136,7 @@ const ProfilePage: React.FC = () => {
   }
 
   const userRoles = profile?.roles ?? (profile?.role ? [profile.role] : []);
-  const primaryRole = userRoles.includes('admin')
-    ? 'admin'
-    : userRoles.includes('apoteker')
-      ? 'apoteker'
-      : userRoles.includes('farmasi')
-        ? 'farmasi'
-        : userRoles.includes('nakes')
-          ? 'nakes'
-          : userRoles[0] || 'nakes';
-  const roleInfo = ROLE_LABELS[primaryRole] || ROLE_LABELS.nakes;
-  const RoleIcon = roleInfo.icon;
+  const roleInfo = getRoleInfo(userRoles);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -217,267 +154,26 @@ const ProfilePage: React.FC = () => {
         </div>
       )}
 
-      {/* Profile Card */}
-      <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft overflow-hidden">
-        {/* Banner dengan Avatar di dalamnya */}
-        <div className="h-40 bg-gradient-to-br from-primary via-blue-500 to-indigo-600 relative">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-40"></div>
+      <ProfileHeaderCard
+        profile={profile}
+        roleInfo={roleInfo}
+        isUploading={isUploading}
+        onAvatarSelected={handleAvatarSelected}
+      />
 
-          {/* Avatar di dalam banner */}
-          <div className="absolute bottom-0 left-6 md:left-8 transform translate-y-1/2">
-            <div className="relative group">
-              <div className="w-24 h-24 rounded-2xl border-4 border-white dark:border-card-dark shadow-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                {profile.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                    <span className="text-3xl font-bold text-primary uppercase">
-                      {(profile.full_name || profile.email)?.[0] || '?'}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <button
-                onClick={handleAvatarClick}
-                disabled={isUploading}
-                aria-label="Ubah foto profil"
-                className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all cursor-pointer"
-              >
-                {isUploading ? (
-                  <Hourglass
-                    className="text-white size-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-hidden
-                  />
-                ) : (
-                  <Camera
-                    className="text-white size-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-hidden
-                  />
-                )}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              {isUploading && (
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white dark:bg-card-dark shadow flex items-center justify-center">
-                  <Loader2 className="text-primary size-3 animate-spin" aria-hidden />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      <ProfileInfoSection
+        profile={profile}
+        roleInfo={roleInfo}
+        roleIconColor={getRoleIconColor(userRoles)}
+        editMode={editMode}
+        onEditModeChange={setEditMode}
+        formName={formName}
+        onFormNameChange={setFormName}
+        isSubmitting={isSubmitting}
+        onSave={() => void handleSaveProfile()}
+      />
 
-        {/* User Info - di bawah banner */}
-        <div className="px-6 md:px-8 pt-16 pb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
-                {profile.full_name || 'Belum diatur'}
-              </h2>
-              <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                {profile.email}
-              </p>
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${roleInfo.color}`}
-                >
-                  <RoleIcon className="size-3" aria-hidden />
-                  {roleInfo.label}
-                </span>
-                <span className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                  Bergabung{' '}
-                  {toDate(profile.created_at).toLocaleDateString('id-ID', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Profile Section */}
-      <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft p-6 md:p-8">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <CircleUserRound className="text-primary size-6" aria-hidden />
-            <h3 className="text-lg font-bold text-text-primary-light dark:text-white">
-              Informasi Profil
-            </h3>
-          </div>
-          {!editMode ? (
-            <Button
-              variant="outline"
-              onClick={() => {
-                setEditMode(true);
-                setFormName(profile.full_name || '');
-              }}
-              className="rounded-xl text-sm h-auto py-2 px-4 font-bold flex items-center gap-1.5"
-            >
-              <Pencil className="size-4" aria-hidden />
-              Edit
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setEditMode(false);
-                  setFormName(profile.full_name || '');
-                }}
-                className="rounded-xl text-sm h-auto py-2 px-4 font-bold"
-              >
-                Batal
-              </Button>
-              <Button
-                onClick={handleSaveProfile}
-                disabled={isSubmitting}
-                className="rounded-xl text-sm h-auto py-2 px-4 font-bold bg-primary text-white hover:bg-blue-700"
-              >
-                {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-1.5">
-            <Label htmlFor="profile-full-name" className={FIELD_LABEL_CLASS}>
-              Nama Lengkap
-            </Label>
-            {editMode ? (
-              <Input
-                id="profile-full-name"
-                type="text"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                className={FIELD_INPUT_CLASS}
-              />
-            ) : (
-              <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
-                {profile.full_name || '-'}
-              </p>
-            )}
-          </div>
-          <div className="space-y-1.5">
-            <Label className={FIELD_LABEL_CLASS}>Email</Label>
-            <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
-              {profile.email}
-            </p>
-          </div>
-          <div className="space-y-1.5">
-            <Label className={FIELD_LABEL_CLASS}>Role</Label>
-            <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center gap-2">
-              <RoleIcon
-                className={`size-5 ${userRoles.includes('admin') ? 'text-purple-500' : userRoles.includes('apoteker') || userRoles.includes('farmasi') ? 'text-blue-500' : 'text-green-500'}`}
-                aria-hidden
-              />
-              {roleInfo.label}
-            </p>
-          </div>
-          <div className="space-y-1.5">
-            <Label className={FIELD_LABEL_CLASS}>Terakhir Diperbarui</Label>
-            <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
-              {profile.updated_at
-                ? new Date(profile.updated_at).toLocaleDateString('id-ID', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : '-'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Change Password Section */}
-      <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft p-6 md:p-8">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Lock className="text-primary size-6" aria-hidden />
-            <h3 className="text-lg font-bold text-text-primary-light dark:text-white">Keamanan</h3>
-          </div>
-          {!showPasswordSection && (
-            <Button
-              variant="outline"
-              onClick={() => setShowPasswordSection(true)}
-              className="rounded-xl text-sm h-auto py-2 px-4 font-bold flex items-center gap-1.5"
-            >
-              <KeyRound className="size-4" aria-hidden />
-              Ubah Password
-            </Button>
-          )}
-        </div>
-
-        {showPasswordSection && (
-          <div className="mt-6 space-y-4 max-w-md">
-            <div className="space-y-1.5">
-              <Label htmlFor="profile-new-password" className={FIELD_LABEL_CLASS}>
-                Password Baru
-              </Label>
-              <Input
-                id="profile-new-password"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Minimal 6 karakter"
-                className={FIELD_INPUT_CLASS}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="profile-confirm-password" className={FIELD_LABEL_CLASS}>
-                Konfirmasi Password
-              </Label>
-              <Input
-                id="profile-confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Ulangi password baru"
-                className={FIELD_INPUT_CLASS}
-              />
-            </div>
-            <div className="flex gap-3 pt-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowPasswordSection(false);
-                  setNewPassword('');
-                  setConfirmPassword('');
-                }}
-                className="rounded-xl font-bold h-auto py-2.5 px-6"
-              >
-                Batal
-              </Button>
-              <Button
-                onClick={handleChangePassword}
-                disabled={isSubmitting}
-                className="bg-primary text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 h-auto py-2.5 px-6"
-              >
-                {isSubmitting ? 'Menyimpan...' : 'Ubah Password'}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {!showPasswordSection && (
-          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-3">
-            Pastikan menggunakan password yang kuat dan unik untuk menjaga keamanan akun Anda.
-          </p>
-        )}
-      </div>
+      <PasswordSection isSubmitting={isSubmitting} onChangePassword={handleChangePassword} />
     </div>
   );
 };
