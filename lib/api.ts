@@ -24,6 +24,24 @@ import {
 import { getLowStockItems } from './lowStock';
 import { toDate } from './utils';
 
+// Nama lengkap user per id dari profiles. Id null/duplikat diabaikan.
+const getProfileNames = async (ids: (string | null)[]): Promise<Record<string, string>> => {
+  const uniqueIds = [...new Set(ids.filter((id): id is string => !!id))];
+  if (uniqueIds.length === 0) return {};
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name')
+    .in('id', uniqueIds);
+  if (error) throw error;
+
+  const names: Record<string, string> = {};
+  (data || []).forEach((profile) => {
+    names[profile.id] = profile.full_name || '';
+  });
+  return names;
+};
+
 // Map DB types to Frontend types
 const mapProductFromDB = (item: Tables<'master_obat'>): Product => ({
   id: item.id.toString(),
@@ -524,22 +542,7 @@ export const api = {
     // If logic applied filtering after DB fetch, pagination counts would be wrong.
     // Assuming transactions are inserted correctly with details, we map what we get.
 
-    const createdByIds = [
-      ...new Set((data || []).map((t) => t.created_by).filter((id): id is string => Boolean(id))),
-    ];
-    const profileMap: Record<string, string> = {};
-    if (createdByIds.length > 0) {
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .in('id', createdByIds);
-
-      if (profilesError) throw profilesError;
-
-      (profiles || []).forEach((profile) => {
-        profileMap[profile.id] = profile.full_name || '';
-      });
-    }
+    const profileMap = await getProfileNames((data || []).map((t) => t.created_by));
 
     const validData = data.map((t) => {
       const invoiceFromNote =
@@ -1117,22 +1120,7 @@ export const api = {
 
     if (error) throw error;
 
-    const createdByIds = [
-      ...new Set((data || []).map((t) => t.created_by).filter((id): id is string => Boolean(id))),
-    ];
-    const profileMap: Record<string, string> = {};
-    if (createdByIds.length > 0) {
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .in('id', createdByIds);
-
-      if (profilesError) throw profilesError;
-
-      (profiles || []).forEach((profile) => {
-        profileMap[profile.id] = profile.full_name || '';
-      });
-    }
+    const profileMap = await getProfileNames((data || []).map((t) => t.created_by));
 
     const mappedData = (data || [])
       .map((t) => {
@@ -1237,13 +1225,14 @@ export const api = {
 
     if (error) throw error;
 
+    const auditorNames = await getProfileNames([data.created_by]);
+
     return {
       id: data.id.toString(),
       opnameNumber: `OPN-${data.id}`,
       scheduleDate: data.tanggal_jadwal,
       status: data.status as OpnameStatus,
-      // Query ini tidak join ke profiles, jadi auditor selalu 'Admin'.
-      auditor: 'Admin',
+      auditor: (data.created_by && auditorNames[data.created_by]) || '-',
       currentStep: data.current_step || 1,
       selectedObatIds: data.selected_obat_ids as OpnameObatIds | null,
       completedAt: data.completed_at,
@@ -1387,14 +1376,15 @@ export const api = {
 
     if (error) throw error;
 
+    const auditorNames = await getProfileNames((data || []).map((item) => item.created_by));
+
     return (data || []).map((item) => ({
       id: item.id.toString(),
       opnameNumber: `OPN-${item.id}`,
       date: item.completed_at || item.created_at,
       scheduleDate: item.tanggal_jadwal,
       scheduleName: item.opname_schedule?.nama || 'Jadwal Opname',
-      // Query ini tidak join ke profiles, jadi auditor selalu 'Admin'.
-      auditor: 'Admin',
+      auditor: (item.created_by && auditorNames[item.created_by]) || '-',
       itemsCount: item.opname_detail?.length || 0,
       discrepancyCount: (item.opname_detail || []).filter((d) => d.selisih !== 0).length,
       status: 'selesai',
