@@ -129,6 +129,18 @@ const generateUniqueServiceCategoryCode = async (name: string) => {
   return candidate;
 };
 
+type OpnameDetailUpdate = { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string };
+
+// Ubah ke format p_updates RPC save_opname_details. Field yang undefined
+// tidak dikirim, sehingga kolomnya tidak diubah di database.
+const toOpnameDetailUpdates = (updates?: OpnameDetailUpdate[]) =>
+  (updates || []).map(u => ({
+    detail_id: parseInt(u.detailId),
+    ...(u.physicalStock !== undefined && { physical_stock: u.physicalStock }),
+    ...(u.stokFinal !== undefined && { stok_final: u.stokFinal }),
+    ...(u.reason !== undefined && { reason: u.reason }),
+  }));
+
 export const api = {
   // PRODUCTS
   getProducts: async (params?: PaginationParams): Promise<PaginatedResponse<Product>> => {
@@ -868,43 +880,14 @@ export const api = {
 
   // Complete Step 1: Create detail rows after user confirms product selection
   completeStepOne: async (opnameId: string, selectedProductIds: string[]) => {
-    // 1. Update opname header with selected products and advance to step 2
-    const { error: updateError } = await supabase
-      .from('opname')
-      .update({
-        selected_obat_ids: selectedProductIds,
-        status: 'sedang_dilaksanakan',
-        current_step: 2,
-      })
-      .eq('id', opnameId);
+    // 1-3. Satu transaksi di database: opname menjadi 'sedang_dilaksanakan'
+    // (stok terkunci), lalu detail dibuat dengan snapshot stok terbaru
+    const { error: rpcError } = await supabase.rpc('complete_opname_step_one', {
+      p_opname_id: parseInt(opnameId),
+      p_selected_obat_ids: selectedProductIds,
+    });
 
-    if (updateError) throw updateError;
-
-    // 2. Fetch current stock for selected products
-    const { data: products, error: fetchError } = await supabase
-      .from('master_obat')
-      .select('id, qty')
-      .in('id', selectedProductIds.map(id => parseInt(id)));
-
-    if (fetchError) throw fetchError;
-
-    // 3. Create detail rows with fresh stock snapshots
-    if (products && products.length > 0) {
-      const details = products.map((p: any) => ({
-        opname_id: parseInt(opnameId),
-        obat_id: p.id,
-        stok_sistem: p.qty || 0,
-        stok_fisik: 0,
-        selisih: 0 - (p.qty || 0),
-        status: 'pending',
-      }));
-
-      const { error: insertError } = await supabase
-        .from('opname_detail')
-        .insert(details);
-
-      if (insertError) throw insertError;
-    }
+    if (rpcError) throw new Error(rpcError.message);
 
     // 4. Create notification for step 1→2 transition
     await supabase
@@ -931,25 +914,13 @@ export const api = {
 
   // Backward to Step 1: Delete all detail rows and reset to step 1
   backwardToStepOne: async (opnameId: string, scheduleObatIds: string[]) => {
-    // 1. Delete all detail rows
-    const { error: deleteError } = await supabase
-      .from('opname_detail')
-      .delete()
-      .eq('opname_id', opnameId);
+    // Hapus detail dan reset ke step 1 dalam satu transaksi (kunci stok dilepas)
+    const { error } = await supabase.rpc('backward_opname_to_step_one', {
+      p_opname_id: parseInt(opnameId),
+      p_schedule_obat_ids: scheduleObatIds,
+    });
 
-    if (deleteError) throw deleteError;
-
-    // 2. Reset opname to step 1
-    const { error: updateError } = await supabase
-      .from('opname')
-      .update({
-        current_step: 1,
-        status: 'belum_dilaksanakan',
-        selected_obat_ids: scheduleObatIds,
-      })
-      .eq('id', opnameId);
-
-    if (updateError) throw updateError;
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
@@ -1171,39 +1142,15 @@ export const api = {
   },
 
   saveDraft: async (opnameId: string, step: number, detailUpdates?: { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string }[]) => {
-    // Update current step
-    const { error: stepError } = await supabase
-      .from('opname')
-      .update({ current_step: step })
-      .eq('id', opnameId);
+    // Step dan semua detail disimpan dalam satu request/transaksi;
+    // selisih dihitung di database dari stok_sistem
+    const { error } = await supabase.rpc('save_opname_details', {
+      p_opname_id: parseInt(opnameId),
+      p_step: step,
+      p_updates: toOpnameDetailUpdates(detailUpdates),
+    });
 
-    if (stepError) throw stepError;
-
-    // Update detail rows if provided
-    if (detailUpdates && detailUpdates.length > 0) {
-      for (const update of detailUpdates) {
-        const updateData: any = {};
-        if (update.physicalStock !== undefined) {
-          updateData.stok_fisik = update.physicalStock;
-          // Fetch stok_sistem to compute selisih
-          const { data: detail } = await supabase.from('opname_detail').select('stok_sistem').eq('id', update.detailId).single();
-          if (detail) {
-            updateData.selisih = update.physicalStock - detail.stok_sistem;
-            updateData.status = updateData.selisih === 0 ? 'sesuai' : 'pending';
-          }
-        }
-        if (update.stokFinal !== undefined) updateData.stok_final = update.stokFinal;
-        if (update.reason !== undefined) updateData.alasan = update.reason;
-
-        if (Object.keys(updateData).length > 0) {
-          const { error } = await supabase
-            .from('opname_detail')
-            .update(updateData)
-            .eq('id', update.detailId);
-          if (error) throw error;
-        }
-      }
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
@@ -1213,84 +1160,25 @@ export const api = {
   saveDetailOnly: async (opnameId: string, detailUpdates: { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string }[]) => {
     if (!detailUpdates || detailUpdates.length === 0) return { success: true };
 
-    for (const update of detailUpdates) {
-      const updateData: any = {};
+    const { error } = await supabase.rpc('save_opname_details', {
+      p_opname_id: parseInt(opnameId),
+      p_step: null,
+      p_updates: toOpnameDetailUpdates(detailUpdates),
+    });
 
-      if (update.physicalStock !== undefined) {
-        updateData.stok_fisik = update.physicalStock;
-        // Fetch stok_sistem untuk hitung selisih
-        const { data: detail } = await supabase
-          .from('opname_detail')
-          .select('stok_sistem')
-          .eq('id', update.detailId)
-          .single();
-        if (detail) {
-          updateData.selisih = update.physicalStock - detail.stok_sistem;
-          updateData.status = updateData.selisih === 0 ? 'sesuai' : 'pending';
-        }
-      }
-      if (update.stokFinal !== undefined) updateData.stok_final = update.stokFinal;
-      if (update.reason !== undefined) updateData.alasan = update.reason;
-
-      if (Object.keys(updateData).length > 0) {
-        const { error } = await supabase
-          .from('opname_detail')
-          .update(updateData)
-          .eq('id', update.detailId);
-        if (error) throw error;
-      }
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
 
   // Update selected products for an opname: update selected_obat_ids, delete existing details, re-create with fresh snapshots
   updateOpnameSelection: async (opnameId: string, selectedProductIds: string[]) => {
-    // 1. Update selected_obat_ids and obat_ids on opname header
-    const { error: updateError } = await supabase
-      .from('opname')
-      .update({
-        selected_obat_ids: selectedProductIds,
-        obat_ids: selectedProductIds,
-        current_step: 2,
-      })
-      .eq('id', opnameId);
+    const { error } = await supabase.rpc('update_opname_selection', {
+      p_opname_id: parseInt(opnameId),
+      p_selected_obat_ids: selectedProductIds,
+    });
 
-    if (updateError) throw updateError;
-
-    // 2. Delete all existing opname_detail rows for this opname
-    const { error: deleteError } = await supabase
-      .from('opname_detail')
-      .delete()
-      .eq('opname_id', opnameId);
-
-    if (deleteError) throw deleteError;
-
-    // 3. Fetch current stock for selected products
-    const { data: products, error: fetchError } = await supabase
-      .from('master_obat')
-      .select('id, qty')
-      .in('id', selectedProductIds.map(id => parseInt(id)));
-
-    if (fetchError) throw fetchError;
-
-    // 4. Insert new opname_detail rows with fresh stock snapshots
-    if (products && products.length > 0) {
-      const details = products.map((p: any) => ({
-        opname_id: parseInt(opnameId),
-        obat_id: p.id,
-        stok_sistem: p.qty || 0,
-        stok_fisik: 0,
-        selisih: 0 - (p.qty || 0),
-        status: 'pending',
-      }));
-
-      const { error: insertError } = await supabase
-        .from('opname_detail')
-        .insert(details);
-
-      if (insertError) throw insertError;
-    }
+    if (error) throw new Error(error.message);
 
     return { success: true };
   },
@@ -1307,21 +1195,16 @@ export const api = {
   },
 
   updateOpnameDetail: async (detailId: string, physicalStock: number) => {
-    const { data: detail, error: fetchError } = await supabase.from('opname_detail').select('stok_sistem').eq('id', detailId).single();
+    const { data: detail, error: fetchError } = await supabase.from('opname_detail').select('opname_id').eq('id', detailId).single();
     if (fetchError) throw fetchError;
 
-    const diff = physicalStock - detail.stok_sistem;
+    const { error } = await supabase.rpc('save_opname_details', {
+      p_opname_id: detail.opname_id,
+      p_step: null,
+      p_updates: toOpnameDetailUpdates([{ detailId, physicalStock }]),
+    });
 
-    const { error } = await supabase
-      .from('opname_detail')
-      .update({
-        stok_fisik: physicalStock,
-        selisih: diff,
-        status: diff === 0 ? 'sesuai' : 'pending'
-      })
-      .eq('id', detailId);
-
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   },
 
   finishOpname: async (opnameId: string) => {
@@ -1335,18 +1218,12 @@ export const api = {
   },
 
   resolveOpnameDifference: async (detailId: string, reason: string) => {
-    const { data: detail, error: fetchError } = await supabase.from('opname_detail').select('obat_id, stok_fisik').eq('id', detailId).single();
-    if (fetchError) throw fetchError;
+    const { error } = await supabase.rpc('resolve_opname_difference', {
+      p_detail_id: parseInt(detailId),
+      p_reason: reason,
+    });
 
-    const { error } = await supabase
-      .from('opname_detail')
-      .update({
-        status: 'disesuaikan',
-        alasan: reason
-      })
-      .eq('id', detailId);
-
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   },
 
   getOpnameHistory: async () => {
