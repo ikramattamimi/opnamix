@@ -7,7 +7,9 @@ import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { UserProfile } from '@/features/auth/api';
 import { useActiveOpnameLock, useOpnameLockRealtime } from '@/features/opname/useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
+import { SearchX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/common/QueryState';
 import { APP_ROUTES, type AppRoute } from './routes';
 import { canAccessRoute, getUserRoles } from './routeUtils';
 
@@ -16,15 +18,6 @@ const OpnameLockPage = React.lazy(() => import('@/features/opname/OpnameLockPage
 interface AuthenticatedAppProps {
   userProfile: UserProfile | null;
 }
-
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center h-full w-full min-h-[400px]">
-    <div className="text-center">
-      <span className="material-icons-round text-primary text-4xl animate-spin">refresh</span>
-      <p className="mt-2 text-sm text-text-secondary-light">Memuat modul...</p>
-    </div>
-  </div>
-);
 
 const ProtectedRoute: React.FC<{
   route: AppRoute;
@@ -40,9 +33,7 @@ const ProtectedRoute: React.FC<{
 
 const NotFoundPage = () => (
   <div className="flex flex-col items-center justify-center h-64 text-center">
-    <span className="material-icons-round text-6xl text-gray-300 dark:text-gray-600 mb-4">
-      search_off
-    </span>
+    <SearchX className="size-12 text-gray-300 dark:text-gray-600 mb-4" aria-hidden />
     <h2 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
       Halaman Tidak Ditemukan
     </h2>
@@ -66,7 +57,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
   if (isLocked && opname && !isLoading) {
     if (!(isOpnameRoute && canAccessOpname)) {
       return (
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={<LoadingState fullScreen />}>
           <OpnameLockPage opname={opname} />
         </Suspense>
       );
@@ -81,7 +72,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
         <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
         <div className="p-6 md:p-8">
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingState label="Memuat modul..." className="min-h-[400px]" />}>
             <Routes>
               {APP_ROUTES.map((route) => {
                 const Page = route.element;

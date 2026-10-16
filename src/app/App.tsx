@@ -6,6 +6,7 @@ import { ToastProvider } from '@/components/ui/toast';
 import { NotificationProvider } from '@/features/notifications/NotificationProvider';
 import { AuthProvider, useAuth } from '@/features/auth/useAuth';
 import { UserProfile } from '@/features/auth/api';
+import { LoadingState } from '@/components/common/QueryState';
 import { ThemeProvider } from './providers/ThemeProvider';
 
 const AuthenticatedApp = React.lazy(() => import('./AuthenticatedApp'));
@@ -20,15 +21,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-const LoadingScreen = () => (
-  <div className="flex items-center justify-center min-h-screen bg-background-light dark:bg-background-dark">
-    <div className="text-center">
-      <span className="material-icons-round text-primary text-6xl animate-spin">refresh</span>
-      <p className="mt-4 text-text-secondary-light">Memuat...</p>
-    </div>
-  </div>
-);
 
 const App: React.FC = () => {
   return (
@@ -50,7 +42,7 @@ const AppContentWrapper: React.FC = () => {
   const { user, userProfile, isLoading: isAuthLoading } = useAuth();
 
   if (isAuthLoading) {
-    return <LoadingScreen />;
+    return <LoadingState fullScreen />;
   }
 
   if (!user) {
@@ -59,7 +51,7 @@ const AppContentWrapper: React.FC = () => {
 
   return (
     <NotificationProvider>
-      <Suspense fallback={<LoadingScreen />}>
+      <Suspense fallback={<LoadingState fullScreen />}>
         <AuthenticatedApp userProfile={userProfile as UserProfile | null} />
       </Suspense>
     </NotificationProvider>
