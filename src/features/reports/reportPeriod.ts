@@ -5,6 +5,13 @@ export interface DateRange {
   end: string;
 }
 
+// Nilai filter tanggal laporan: periode yang dipilih dan rentangnya.
+export interface ReportDateRange {
+  period: ReportPeriod;
+  startDate: string;
+  endDate: string;
+}
+
 export const PERIOD_OPTIONS: { value: ReportPeriod; label: string }[] = [
   { value: 'daily', label: 'Hari Ini' },
   { value: 'weekly', label: '7 Hari Terakhir' },
@@ -45,3 +52,27 @@ export const getPeriodRange = (period: ReportPeriod, today = new Date()): DateRa
 
   return { start: toDateInputValue(start), end: toDateInputValue(end) };
 };
+
+// Nilai awal filter laporan: periode hari ini.
+export const createInitialDateRange = (today = new Date()): ReportDateRange => ({
+  period: 'daily',
+  startDate: toDateInputValue(today),
+  endDate: toDateInputValue(today),
+});
+
+// Ganti periode: tanggal ikut berubah, kecuali untuk 'custom'.
+export const applyPeriod = (
+  current: ReportDateRange,
+  period: ReportPeriod,
+  today = new Date(),
+): ReportDateRange => {
+  const range = getPeriodRange(period, today);
+  return range ? { period, startDate: range.start, endDate: range.end } : { ...current, period };
+};
+
+// Mengubah tanggal secara manual selalu memindah periode ke 'custom'.
+export const applyDate = (
+  current: ReportDateRange,
+  field: 'startDate' | 'endDate',
+  value: string,
+): ReportDateRange => ({ ...current, [field]: value, period: 'custom' });
