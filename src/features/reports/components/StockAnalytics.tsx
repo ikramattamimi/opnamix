@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 import { Archive, Banknote, FunnelX, OctagonAlert, Search, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import StatCard from '@/components/common/StatCard';
 import { Category } from '@/features/products/types';
 import { useProducts } from '@/features/products/useProducts';
@@ -10,12 +12,30 @@ import {
   getStockSummary,
   getTopStockProducts,
 } from '../stockAnalytics';
+import { FilterSelect } from './FilterSelect';
 import StockCharts from './StockCharts';
 import StockStatusTable from './StockStatusTable';
 
+const CATEGORY_OPTIONS = [
+  { value: 'Semua', label: 'Semua' },
+  ...Object.values(Category).map((cat) => ({ value: cat, label: cat })),
+];
+
+const STATUS_OPTIONS = [
+  { value: 'Semua', label: 'Semua Status' },
+  { value: 'Aman', label: 'Aman' },
+  { value: 'Menipis', label: 'Menipis' },
+  { value: 'Kritikal', label: 'Kritikal' },
+];
+
+const analyticsSelectClass =
+  'w-auto min-w-0 bg-background-light dark:bg-background-dark rounded-xl px-4 py-2 text-sm font-bold text-inherit dark:text-inherit';
+
 // Tab analisis: ringkasan nilai inventaris, grafik, dan status stok per produk.
 const StockAnalytics: React.FC = () => {
-  const { data: productData } = useProducts({ page: 1, perPage: 1000 });
+  const id = useId();
+  const productsQuery = useProducts({ page: 1, perPage: 1000 });
+  const productData = productsQuery.data;
   const products = useMemo(() => productData?.data ?? [], [productData]);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -73,47 +93,46 @@ const StockAnalytics: React.FC = () => {
             className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-text-secondary-light"
             aria-hidden
           />
-          <input
+          <Input
             type="text"
             placeholder="Cari produk atau SKU..."
-            className="w-full pl-12 pr-4 py-3 bg-background-light dark:bg-background-dark border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-primary/20"
+            aria-label="Cari produk atau SKU"
+            className="h-auto w-full pl-12 pr-4 py-3 bg-background-light dark:bg-background-dark border-none rounded-2xl text-sm md:text-sm font-medium shadow-none focus-visible:ring-2 focus-visible:ring-primary/20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">
-            Kategori:
-          </span>
-          <select
-            className="bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+          <Label
+            htmlFor={`${id}-category`}
+            className="text-xs font-bold text-text-secondary-light uppercase ml-2"
           >
-            <option value="Semua">Semua</option>
-            {Object.values(Category).map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+            Kategori:
+          </Label>
+          <FilterSelect
+            id={`${id}-category`}
+            value={filterCategory}
+            onValueChange={setFilterCategory}
+            options={CATEGORY_OPTIONS}
+            className={analyticsSelectClass}
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">
-            Status:
-          </span>
-          <select
-            className="bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+          <Label
+            htmlFor={`${id}-status`}
+            className="text-xs font-bold text-text-secondary-light uppercase ml-2"
           >
-            <option value="Semua">Semua Status</option>
-            <option value="Aman">Aman</option>
-            <option value="Menipis">Menipis</option>
-            <option value="Kritikal">Kritikal</option>
-          </select>
+            Status:
+          </Label>
+          <FilterSelect
+            id={`${id}-status`}
+            value={filterStatus}
+            onValueChange={setFilterStatus}
+            options={STATUS_OPTIONS}
+            className={analyticsSelectClass}
+          />
         </div>
 
         <Button
@@ -132,7 +151,12 @@ const StockAnalytics: React.FC = () => {
         </Button>
       </div>
 
-      <StockStatusTable products={filteredProducts} />
+      <StockStatusTable
+        products={filteredProducts}
+        isPending={productsQuery.isPending}
+        isError={productsQuery.isError}
+        onRetry={() => void productsQuery.refetch()}
+      />
     </>
   );
 };

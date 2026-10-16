@@ -1,5 +1,12 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { toDate } from '@/lib/utils';
 import type { TransactionReportRow } from '../api';
 
@@ -12,23 +19,27 @@ const TransactionDetailDialog: React.FC<TransactionDetailDialogProps> = ({
   transaction,
   onClose,
 }) => (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-    <div className="bg-white dark:bg-card-dark w-full max-w-4xl rounded-[32px] shadow-soft p-8 overflow-y-auto max-h-[90vh] relative">
+  <Dialog open onOpenChange={(open) => !open && onClose()}>
+    {/* Tombol tutup bawaan DialogContent disembunyikan; dipakai tombol di header. */}
+    <DialogContent className="block w-[calc(100%-2rem)] max-w-4xl max-h-[90vh] overflow-y-auto border-none bg-white dark:bg-card-dark rounded-[32px] sm:rounded-[32px] shadow-soft p-8 [&>button:last-child]:hidden">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
+          <DialogTitle className="text-xl font-bold leading-normal tracking-normal text-text-primary-light dark:text-white">
             Detail Transaksi
-          </h3>
-          <p className="text-sm text-text-secondary-light">{transaction.id}</p>
+          </DialogTitle>
+          <DialogDescription className="text-sm text-text-secondary-light">
+            {transaction.id}
+          </DialogDescription>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Tutup"
-          className="p-2 bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors"
-        >
-          <X className="size-6" aria-hidden />
-        </button>
+        <DialogClose asChild>
+          <button
+            type="button"
+            aria-label="Tutup"
+            className="p-2 bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors"
+          >
+            <X className="size-6" aria-hidden />
+          </button>
+        </DialogClose>
       </div>
 
       <div
@@ -206,8 +217,8 @@ const TransactionDetailDialog: React.FC<TransactionDetailDialogProps> = ({
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </DialogContent>
+  </Dialog>
 );
 
 export default TransactionDetailDialog;

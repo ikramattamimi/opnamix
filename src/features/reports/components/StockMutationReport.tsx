@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Download, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
+import { ErrorState, LoadingState } from '@/components/common/QueryState';
 import { stockMutationColumns } from '../StockMutationColumns';
 import { exportStockMutationToExcel } from '../exportUtils';
 import { createInitialDateRange, type ReportDateRange } from '../reportPeriod';
@@ -64,12 +65,18 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
         </Button>
       </DateRangeFilter>
 
-      <DataTable
-        columns={stockMutationColumns}
-        data={allMutationData}
-        searchable={false}
-        pageSize={10}
-      />
+      {mutationQuery.isError ? (
+        <ErrorState onRetry={() => void mutationQuery.refetch()} />
+      ) : mutationQuery.isPending ? (
+        <LoadingState />
+      ) : (
+        <DataTable
+          columns={stockMutationColumns}
+          data={allMutationData}
+          searchable={false}
+          pageSize={10}
+        />
+      )}
     </div>
   );
 };

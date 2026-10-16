@@ -1,18 +1,26 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import { Download, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
+import { ErrorState, LoadingState } from '@/components/common/QueryState';
 import type { TransactionReportRow } from '../api';
 import { createTransactionReportColumns } from '../TransactionReportColumns';
 import { exportTransactionReportToExcel } from '../exportUtils';
 import { createInitialDateRange, type ReportDateRange } from '../reportPeriod';
 import { useTransactionReport } from '../useReports';
 import DateRangeFilter from './DateRangeFilter';
+import { FilterField, FilterSelect } from './FilterSelect';
 import TransactionDetailDialog from './TransactionDetailDialog';
 
 const EMPTY_TX_ROWS: TransactionReportRow[] = [];
 
 type TransactionStatusFilter = 'Semua' | 'Menunggu' | 'Selesai';
+
+const STATUS_OPTIONS: { value: TransactionStatusFilter; label: string }[] = [
+  { value: 'Semua', label: 'Semua Status' },
+  { value: 'Menunggu', label: 'Menunggu' },
+  { value: 'Selesai', label: 'Selesai' },
+];
 
 interface TransactionReportProps {
   // Query hanya jalan saat tab-nya aktif
@@ -20,6 +28,7 @@ interface TransactionReportProps {
 }
 
 const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
+  const id = useId();
   const [range, setRange] = useState<ReportDateRange>(() => createInitialDateRange());
   const [txStatus, setTxStatus] = useState<TransactionStatusFilter>('Semua');
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionReportRow | null>(null);
@@ -50,20 +59,14 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
   return (
     <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
       <DateRangeFilter value={range} onChange={setRange}>
-        <div className="space-y-2">
-          <label className="text-xs font-bold uppercase text-text-secondary-light">Status</label>
-          <select
+        <FilterField label="Status" htmlFor={`${id}-status`}>
+          <FilterSelect
+            id={`${id}-status`}
             value={txStatus}
-            onChange={(e) => {
-              setTxStatus(e.target.value as TransactionStatusFilter);
-            }}
-            className="block w-full rounded-xl border-gray-200 bg-white px-4 py-2 text-text-primary-light dark:border-gray-700 dark:bg-card-dark dark:text-white"
-          >
-            <option value="Semua">Semua Status</option>
-            <option value="Menunggu">Menunggu</option>
-            <option value="Selesai">Selesai</option>
-          </select>
-        </div>
+            onValueChange={(value) => setTxStatus(value as TransactionStatusFilter)}
+            options={STATUS_OPTIONS}
+          />
+        </FilterField>
         <Button
           onClick={() => void txQuery.refetch()}
           className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2 [&_svg]:size-5"
@@ -82,7 +85,13 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
         </Button>
       </DateRangeFilter>
 
-      <DataTable columns={columns} data={allTxData} searchable={false} pageSize={10} />
+      {txQuery.isError ? (
+        <ErrorState onRetry={() => void txQuery.refetch()} />
+      ) : txQuery.isPending ? (
+        <LoadingState />
+      ) : (
+        <DataTable columns={columns} data={allTxData} searchable={false} pageSize={10} />
+      )}
 
       {selectedTransaction && (
         <TransactionDetailDialog
