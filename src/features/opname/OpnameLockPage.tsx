@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  CircleCheck,
+  Hourglass,
+  Loader2,
+  Lock,
+  Play,
+  RefreshCw,
+  TriangleAlert,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OpnameLockInfo, useActiveOpnameLock } from './useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
@@ -62,13 +71,11 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
           <div className="flex justify-center">
             {isNakes ? (
               <div className="w-24 h-24 bg-amber-100 dark:bg-amber-500/20 rounded-full flex items-center justify-center">
-                <span className="material-icons-round text-amber-500 text-5xl">
-                  hourglass_empty
-                </span>
+                <Hourglass className="size-12 text-amber-500" aria-hidden />
               </div>
             ) : (
               <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="material-icons-round text-primary text-5xl">lock</span>
+                <Lock className="size-12 text-primary" aria-hidden />
               </div>
             )}
           </div>
@@ -113,9 +120,9 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
             {(isAdmin || isFarmasi) && (
               <Button
                 onClick={handleContinueOpname}
-                className="w-full font-bold rounded-xl h-auto py-4 text-base"
+                className="w-full font-bold rounded-xl h-auto py-4 text-base [&_svg]:size-6"
               >
-                <span className="material-icons-round mr-2">play_arrow</span>
+                <Play className="mr-2" aria-hidden />
                 Lanjutkan Opname
               </Button>
             )}
@@ -126,16 +133,16 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
                   onClick={handleCheckStatus}
                   disabled={isChecking}
                   variant="outline"
-                  className="w-full font-bold rounded-xl h-auto py-4 text-base"
+                  className="w-full font-bold rounded-xl h-auto py-4 text-base [&_svg]:size-6"
                 >
                   {isChecking ? (
                     <>
-                      <span className="material-icons-round mr-2 animate-spin">refresh</span>
+                      <Loader2 className="mr-2 animate-spin" aria-hidden />
                       Mengecek...
                     </>
                   ) : (
                     <>
-                      <span className="material-icons-round mr-2">sync</span>
+                      <RefreshCw className="mr-2" aria-hidden />
                       Cek Status Opname
                     </>
                   )}
@@ -144,7 +151,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
                 {isComplete && (
                   <div className="bg-emerald-50 dark:bg-emerald-500/10 border-2 border-emerald-500 rounded-2xl p-4 space-y-3">
                     <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                      <span className="material-icons-round">check_circle</span>
+                      <CircleCheck className="size-6" aria-hidden />
                       <p className="font-bold">Opname Telah Selesai!</p>
                     </div>
                     <p className="text-sm text-emerald-600 dark:text-emerald-400">
@@ -165,9 +172,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
           {/* Warning Note */}
           <div className="bg-amber-50 dark:bg-amber-500/10 border-l-4 border-amber-500 rounded-xl p-4 text-left">
             <div className="flex gap-3">
-              <span className="material-icons-round text-amber-500 text-xl flex-shrink-0">
-                warning
-              </span>
+              <TriangleAlert className="size-5 text-amber-500 flex-shrink-0" aria-hidden />
               <div className="text-sm text-amber-700 dark:text-amber-300">
                 {isAdmin && (
                   <>

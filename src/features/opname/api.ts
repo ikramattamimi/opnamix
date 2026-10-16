@@ -549,3 +549,4 @@ export const opnameApi = {
 };
 
 export type OpnameDetail = ApiResult<typeof opnameApi.getOpnameById>;
+export type OpnameDetailViewRow = ApiResult<typeof opnameApi.getOpnameDetailView>[number];
