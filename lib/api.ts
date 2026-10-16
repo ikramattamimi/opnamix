@@ -147,6 +147,21 @@ const generateUniqueServiceCategoryCode = async (name: string) => {
 // string atau number tergantung asal datanya, jadi pemakai selalu map(String).
 type OpnameObatIds = (string | number)[];
 
+// Satu baris laporan mutasi stok: item transaksi atau item opname.
+export interface StockMutationRow {
+  date: string | null | undefined;
+  trxNumber: string | null;
+  type: string | null;
+  source: string | null;
+  itemName: string;
+  qty: number;
+  status: string | null;
+  systemStock: number | null;
+  physicalStock: number | null;
+  finalStock: number | null;
+  reason: string | null;
+}
+
 type OpnameDetailUpdate = {
   detailId: string;
   physicalStock?: number;
@@ -1059,11 +1074,7 @@ export const api = {
   },
 
   // REPORTING
-  getTransactionReport: async (
-    startDate: string,
-    endDate: string,
-    params?: PaginationParams,
-  ): Promise<PaginatedResponse<any>> => {
+  getTransactionReport: async (startDate: string, endDate: string, params?: PaginationParams) => {
     const { page = 1, perPage = 10, status } = params || {};
 
     let query = supabase
@@ -1570,7 +1581,7 @@ export const api = {
     startDate: string,
     endDate: string,
     params?: PaginationParams,
-  ): Promise<PaginatedResponse<any>> => {
+  ): Promise<PaginatedResponse<StockMutationRow>> => {
     const { page = 1, perPage = 10 } = params || {};
 
     // 1. Get transaction data (stok masuk/keluar)
@@ -1623,7 +1634,7 @@ export const api = {
     if (opnameError) throw opnameError;
 
     // Flatten transaction rows: one row per item
-    const allRows: any[] = [];
+    const allRows: StockMutationRow[] = [];
     data.forEach((t) => {
       if (t.transaksi_detail && Array.isArray(t.transaksi_detail)) {
         t.transaksi_detail.forEach((d) => {
@@ -1775,3 +1786,9 @@ export const api = {
     };
   },
 };
+
+type ApiResult<K extends keyof typeof api> = Awaited<ReturnType<(typeof api)[K]>>;
+export type TransactionReportRow = ApiResult<'getTransactionReport'>['data'][number];
+export type RecentTransaction = ApiResult<'getRecentTransactions'>['data'][number];
+export type DashboardStats = ApiResult<'getDashboardStats'>;
+export type CreateTransactionPayload = Parameters<(typeof api)['createTransaction']>[0];

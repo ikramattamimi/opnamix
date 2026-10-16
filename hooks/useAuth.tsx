@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { User } from '@supabase/supabase-js';
 import {
   getCurrentUser,
   getUserProfile,
@@ -8,7 +9,7 @@ import {
 } from '../lib/auth';
 
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   userProfile: UserProfile | null;
   isLoading: boolean;
   logout: () => Promise<void>;
@@ -18,11 +19,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadUserProfile = async (authUser: any) => {
+  const loadUserProfile = async (authUser: User | null) => {
     if (authUser) {
       try {
         const profile = await getUserProfile();

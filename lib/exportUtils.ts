@@ -1,9 +1,13 @@
+import type { Product, Service, StockInReceipt, StockOutRequest } from '../types';
+import type { RecentTransaction, StockMutationRow, TransactionReportRow } from './api';
+
 type XLSXModule = typeof import('xlsx');
+type ExcelRow = Record<string, string | number>;
 
 const loadXLSX = async (): Promise<XLSXModule> => import('xlsx');
 
 export const exportTransactionReportToExcel = async (
-  data: any[],
+  data: TransactionReportRow[],
   startDate: string,
   endDate: string,
 ) => {
@@ -20,7 +24,7 @@ export const exportTransactionReportToExcel = async (
       'Detail Obat': row.drugDetails?.length
         ? row.drugDetails
             .map(
-              (drug: any) =>
+              (drug) =>
                 `${drug.name} | qty ${drug.quantity} | harga Rp ${Number(drug.price || 0).toLocaleString('id-ID')} | subtotal Rp ${Number(drug.subtotal || 0).toLocaleString('id-ID')}`,
             )
             .join(' ; ')
@@ -29,7 +33,7 @@ export const exportTransactionReportToExcel = async (
       'Detail Jasa': row.serviceDetails?.length
         ? row.serviceDetails
             .map(
-              (service: any) =>
+              (service) =>
                 `${service.name} | qty ${service.quantity} | harga Rp ${Number(service.price || 0).toLocaleString('id-ID')} | subtotal Rp ${Number(service.subtotal || 0).toLocaleString('id-ID')}`,
             )
             .join(' ; ')
@@ -67,7 +71,7 @@ export const exportTransactionReportToExcel = async (
 };
 
 export const exportStockMutationToExcel = async (
-  data: any[],
+  data: StockMutationRow[],
   startDate: string,
   endDate: string,
 ) => {
@@ -117,13 +121,13 @@ export const exportStockMutationToExcel = async (
   }
 };
 
-export const exportStockInToExcel = async (data: any[]) => {
+export const exportStockInToExcel = async (data: StockInReceipt[]) => {
   try {
     const XLSX = await loadXLSX();
-    const excelData: any[] = [];
+    const excelData: ExcelRow[] = [];
     data.forEach((receipt) => {
       if (receipt.items && receipt.items.length > 0) {
-        receipt.items.forEach((item: any, idx: number) => {
+        receipt.items.forEach((item, idx) => {
           excelData.push({
             'No. Invoice': idx === 0 ? receipt.invoiceNumber : '',
             Supplier: idx === 0 ? receipt.supplierName : '',
@@ -174,10 +178,10 @@ export const exportStockInToExcel = async (data: any[]) => {
   }
 };
 
-export const exportStockOutToExcel = async (data: any[]) => {
+export const exportStockOutToExcel = async (data: StockOutRequest[]) => {
   try {
     const XLSX = await loadXLSX();
-    const excelData: any[] = [];
+    const excelData: ExcelRow[] = [];
     data.forEach((req) => {
       const tipeSumber =
         req.tipeSumber === 'PENGAJUAN_NAKES'
@@ -186,7 +190,7 @@ export const exportStockOutToExcel = async (data: any[]) => {
             ? 'Kasir Langsung'
             : req.tipeSumber;
       if (req.drugs && req.drugs.length > 0) {
-        req.drugs.forEach((drug: any, idx: number) => {
+        req.drugs.forEach((drug, idx) => {
           excelData.push({
             'Request ID': idx === 0 ? req.requestId : '',
             Tanggal: idx === 0 ? req.date : '',
@@ -243,7 +247,7 @@ export const exportStockOutToExcel = async (data: any[]) => {
   }
 };
 
-export const exportRecentTransactionsToExcel = async (data: any[]) => {
+export const exportRecentTransactionsToExcel = async (data: RecentTransaction[]) => {
   try {
     const XLSX = await loadXLSX();
     const excelData = data.map((row) => ({
@@ -267,7 +271,7 @@ export const exportRecentTransactionsToExcel = async (data: any[]) => {
   }
 };
 
-export const exportProductsToExcel = async (data: any[]) => {
+export const exportProductsToExcel = async (data: Product[]) => {
   try {
     const XLSX = await loadXLSX();
     const excelData = data.map((row) => ({
@@ -277,7 +281,8 @@ export const exportProductsToExcel = async (data: any[]) => {
       Stok: row.stock,
       Satuan: row.unit,
       'Harga Jual': row.sellingPrice,
-      Kadaluarsa: row.expiryDate ? new Date(row.expiryDate).toLocaleDateString('id-ID') : '-',
+      // Product belum punya tanggal kadaluarsa, jadi kolom ini selalu '-'.
+      Kadaluarsa: '-',
     }));
 
     const wb = XLSX.utils.book_new();
@@ -298,7 +303,7 @@ export const exportProductsToExcel = async (data: any[]) => {
   }
 };
 
-export const exportServicesToExcel = async (data: any[]) => {
+export const exportServicesToExcel = async (data: Service[]) => {
   try {
     const XLSX = await loadXLSX();
     const excelData = data.map((row) => ({

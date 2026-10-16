@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { api } from '../lib/api';
+import { api, CreateTransactionPayload } from '../lib/api';
 import { QUERY_KEYS } from './useSupabaseQuery';
 import { supabase } from '../lib/supabaseClient';
 import { PaginationParams } from '../types';
@@ -42,7 +42,7 @@ export function useStockOutRealtime() {
 export function useCreateStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: any) => api.createTransaction(payload),
+    mutationFn: (payload: CreateTransactionPayload) => api.createTransaction(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
     },
