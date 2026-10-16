@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 
 export interface OpnameLockInfo {
-    id: string;
-    opnameNumber: string;
-    currentStep: number;
-    startedAt: string;
+  id: string;
+  opnameNumber: string;
+  currentStep: number;
+  startedAt: string | null;
 }
 
 export interface OpnameLockState {
-    isLocked: boolean;
-    opname: OpnameLockInfo | null;
-    isLoading: boolean;
+  isLocked: boolean;
+  opname: OpnameLockInfo | null;
+  isLoading: boolean;
 }
 
 // Status kunci opname untuk UI. Kunci aktif selama ada opname
@@ -19,40 +19,40 @@ export interface OpnameLockState {
 // menampilkan OpnameLockPage; penolakan transaksi stok yang sebenarnya
 // dilakukan di database, jadi tab yang belum ter-refresh tetap aman.
 export function useOpnameLock() {
-    const [lockState, setLockState] = useState<OpnameLockState>({
-        isLocked: false,
-        opname: null,
-        isLoading: true
-    });
+  const [lockState, setLockState] = useState<OpnameLockState>({
+    isLocked: false,
+    opname: null,
+    isLoading: true,
+  });
 
-    useEffect(() => {
-        const checkLock = async () => {
-            try {
-                const result = await api.getActiveOpnameLock();
-                setLockState({ ...result, isLoading: false });
-            } catch (error) {
-                console.error('Failed to check opname lock:', error);
-                setLockState({ isLocked: false, opname: null, isLoading: false });
-            }
-        };
-
-        // Initial check
-        checkLock();
-
-        // Poll every 30 seconds
-        const interval = setInterval(checkLock, 30000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    const refetch = async () => {
-        try {
-            const result = await api.getActiveOpnameLock();
-            setLockState({ ...result, isLoading: false });
-        } catch (error) {
-            console.error('Failed to check opname lock:', error);
-        }
+  useEffect(() => {
+    const checkLock = async () => {
+      try {
+        const result = await api.getActiveOpnameLock();
+        setLockState({ ...result, isLoading: false });
+      } catch (error) {
+        console.error('Failed to check opname lock:', error);
+        setLockState({ isLocked: false, opname: null, isLoading: false });
+      }
     };
 
-    return { ...lockState, refetch };
+    // Initial check
+    checkLock();
+
+    // Poll every 30 seconds
+    const interval = setInterval(checkLock, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const refetch = async () => {
+    try {
+      const result = await api.getActiveOpnameLock();
+      setLockState({ ...result, isLoading: false });
+    } catch (error) {
+      console.error('Failed to check opname lock:', error);
+    }
+  };
+
+  return { ...lockState, refetch };
 }

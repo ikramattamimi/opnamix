@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router-dom';
-
 /*
  * Note: While TanStack Query handles states well, this file can serve
  * as a place for shared configurations (like default staleTime) or error logging.
@@ -13,5 +11,5 @@ export const QUERY_KEYS = {
   serviceCategories: ['serviceCategories'],
   stockIn: ['stockIn'],
   stockOut: ['stockOut'],
-  users: ['users']
+  users: ['users'],
 };

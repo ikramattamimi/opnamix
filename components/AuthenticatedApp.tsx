@@ -47,7 +47,7 @@ const ProtectedRoute: React.FC<{
   const { userProfile } = useAuth();
   const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
 
-  if (userRoles.length === 0 || !allowedRoles.some(r => userRoles.includes(r))) {
+  if (userRoles.length === 0 || !allowedRoles.some((r) => userRoles.includes(r))) {
     return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
   return <>{children}</>;
@@ -55,10 +55,14 @@ const ProtectedRoute: React.FC<{
 
 const NotFoundPage = () => (
   <div className="flex flex-col items-center justify-center h-64 text-center">
-    <span className="material-icons-round text-6xl text-gray-300 dark:text-gray-600 mb-4">search_off</span>
-    <h2 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">Halaman Tidak Ditemukan</h2>
+    <span className="material-icons-round text-6xl text-gray-300 dark:text-gray-600 mb-4">
+      search_off
+    </span>
+    <h2 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
+      Halaman Tidak Ditemukan
+    </h2>
     <p className="text-text-secondary-light mb-6">Halaman yang Anda cari tidak tersedia.</p>
-    <Button onClick={() => window.location.href = '/'}>Kembali ke Dashboard</Button>
+    <Button onClick={() => (window.location.href = '/')}>Kembali ke Dashboard</Button>
   </div>
 );
 
@@ -74,7 +78,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
 
   const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
   const isOpnameRoute = location.pathname.startsWith('/audit/stok-opname');
-  const canAccessOpname = userRoles.some(r => ['admin', 'apoteker', 'farmasi'].includes(r));
+  const canAccessOpname = userRoles.some((r) => ['admin', 'apoteker', 'farmasi'].includes(r));
 
   if (isLocked && opname && !isLoading) {
     if (!(isOpnameRoute && canAccessOpname)) {
@@ -88,10 +92,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
 
   return (
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-300 font-body">
-      <Sidebar
-        isMobileOpen={isSidebarOpen}
-        onCloseMobile={() => setIsSidebarOpen(false)}
-      />
+      <Sidebar isMobileOpen={isSidebarOpen} onCloseMobile={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
         <Header
@@ -159,7 +160,9 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
                 path={ROUTES.STOK_OPNAME}
                 element={
                   <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Riwayat Opname"><RiwayatOpnamePage /></ErrorBoundary>
+                    <ErrorBoundary name="Riwayat Opname">
+                      <RiwayatOpnamePage />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
@@ -167,7 +170,9 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
                 path={ROUTES.RIWAYAT_OPNAME}
                 element={
                   <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Riwayat Opname"><RiwayatOpnamePage /></ErrorBoundary>
+                    <ErrorBoundary name="Riwayat Opname">
+                      <RiwayatOpnamePage />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
@@ -175,7 +180,9 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
                 path={ROUTES.KONFIGURASI_OPNAME}
                 element={
                   <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Konfigurasi Opname"><KonfigurasiOpnamePage /></ErrorBoundary>
+                    <ErrorBoundary name="Konfigurasi Opname">
+                      <KonfigurasiOpnamePage />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
@@ -183,7 +190,9 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
                 path={ROUTES.PELAKSANAAN_OPNAME}
                 element={
                   <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Pelaksanaan Opname"><PelaksanaanOpnamePage /></ErrorBoundary>
+                    <ErrorBoundary name="Pelaksanaan Opname">
+                      <PelaksanaanOpnamePage />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
@@ -191,7 +200,9 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
                 path={ROUTES.DETAIL_OPNAME}
                 element={
                   <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Detail Opname"><DetailOpnamePage /></ErrorBoundary>
+                    <ErrorBoundary name="Detail Opname">
+                      <DetailOpnamePage />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />

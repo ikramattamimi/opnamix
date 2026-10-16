@@ -67,17 +67,28 @@ const AppContentWrapper: React.FC = () => {
     if (pathname.startsWith('/audit/stok-opname/pelaksanaan')) return 'Pelaksanaan Opname';
     if (pathname.startsWith('/audit/stok-opname/detail')) return 'Detail Opname';
     switch (pathname) {
-      case ROUTES.DASHBOARD: return 'Dasbor Utama';
-      case ROUTES.MASTER_DATA_PRODUK: return 'Master Data Produk';
-      case ROUTES.MASTER_DATA_JASA: return 'Master Data Jasa';
-      case ROUTES.STOK_MASUK: return 'Penerimaan Stok (Masuk)';
-      case ROUTES.STOK_KELUAR: return 'Pengeluaran Stok (Keluar)';
-      case ROUTES.STOK_OPNAME: return 'Audit Stok (Opname)';
-      case ROUTES.LAPORAN_STOK: return 'Analisis & Laporan Stok';
-      case ROUTES.USER_MANAGEMENT: return 'Manajemen Pengguna';
-      case ROUTES.PROFIL: return 'Profil Saya';
-      case ROUTES.NOTIFICATIONS: return 'Notifikasi';
-      default: return 'Opnamix';
+      case ROUTES.DASHBOARD:
+        return 'Dasbor Utama';
+      case ROUTES.MASTER_DATA_PRODUK:
+        return 'Master Data Produk';
+      case ROUTES.MASTER_DATA_JASA:
+        return 'Master Data Jasa';
+      case ROUTES.STOK_MASUK:
+        return 'Penerimaan Stok (Masuk)';
+      case ROUTES.STOK_KELUAR:
+        return 'Pengeluaran Stok (Keluar)';
+      case ROUTES.STOK_OPNAME:
+        return 'Audit Stok (Opname)';
+      case ROUTES.LAPORAN_STOK:
+        return 'Analisis & Laporan Stok';
+      case ROUTES.USER_MANAGEMENT:
+        return 'Manajemen Pengguna';
+      case ROUTES.PROFIL:
+        return 'Profil Saya';
+      case ROUTES.NOTIFICATIONS:
+        return 'Notifikasi';
+      default:
+        return 'Opnamix';
     }
   };
 
@@ -86,7 +97,7 @@ const AppContentWrapper: React.FC = () => {
   }
 
   if (!user) {
-    return <LoginPage onLoginSuccess={() => { }} />;
+    return <LoginPage onLoginSuccess={() => {}} />;
   }
 
   return (

@@ -1,0 +1,5 @@
+# Commit yang hanya berisi format massal. Pakai:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: format seluruh repo dengan Prettier
+47cb415f4886ce2bd05299e69df0a2929014c30a

@@ -15,14 +15,8 @@ export const calculateRequestTotals = (
   req: TotalsSource,
   overrides: { discount?: number; serviceFee?: number } = {},
 ): StockOutTotals => {
-  const totalDrugs = req.drugs.reduce(
-    (sum, d) => sum + (d.price || 0) * d.quantity,
-    0,
-  );
-  const totalServices = req.services.reduce(
-    (sum, s) => sum + (s.price || 0),
-    0,
-  );
+  const totalDrugs = req.drugs.reduce((sum, d) => sum + (d.price || 0) * d.quantity, 0);
+  const totalServices = req.services.reduce((sum, s) => sum + (s.price || 0), 0);
   const usedDiscount = overrides.discount ?? req.discount ?? 0;
   const usedServiceFee = overrides.serviceFee ?? req.serviceFee ?? 0;
 

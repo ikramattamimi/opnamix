@@ -1,10 +1,13 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { useNotifications } from './NotificationProvider';
 import { useAuth } from '../hooks/useAuth';
-import { getNotificationIcon, getNotificationColor, formatNotificationTime } from '../lib/notifications';
+import {
+  getNotificationIcon,
+  getNotificationColor,
+  formatNotificationTime,
+} from '../lib/notifications';
 import { ROUTES } from '../types';
 
 interface HeaderProps {
@@ -18,13 +21,14 @@ const Header: React.FC<HeaderProps> = ({
   isDarkMode,
   onToggleDarkMode,
   viewName,
-  onToggleSidebar
+  onToggleSidebar,
 }) => {
   const { userProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { notifications, unreadCount, isOpen, setIsOpen, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, isOpen, setIsOpen, markAsRead, markAllAsRead } =
+    useNotifications();
   const notifPanelRef = useRef<HTMLDivElement>(null);
   const notifButtonRef = useRef<HTMLButtonElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -39,25 +43,33 @@ const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
-      
+
       // Close notification panel
       if (
         isOpen &&
-        notifPanelRef.current && !notifPanelRef.current.contains(target) &&
-        notifButtonRef.current && !notifButtonRef.current.contains(target) &&
-        mobileNotifPanelRef.current && !mobileNotifPanelRef.current.contains(target) &&
-        mobileNotifButtonRef.current && !mobileNotifButtonRef.current.contains(target)
+        notifPanelRef.current &&
+        !notifPanelRef.current.contains(target) &&
+        notifButtonRef.current &&
+        !notifButtonRef.current.contains(target) &&
+        mobileNotifPanelRef.current &&
+        !mobileNotifPanelRef.current.contains(target) &&
+        mobileNotifButtonRef.current &&
+        !mobileNotifButtonRef.current.contains(target)
       ) {
         setIsOpen(false);
       }
-      
+
       // Close user menu
       if (
         showUserMenu &&
-        userMenuRef.current && !userMenuRef.current.contains(target) &&
-        userMenuButtonRef.current && !userMenuButtonRef.current.contains(target) &&
-        mobileUserMenuRef.current && !mobileUserMenuRef.current.contains(target) &&
-        mobileUserMenuButtonRef.current && !mobileUserMenuButtonRef.current.contains(target)
+        userMenuRef.current &&
+        !userMenuRef.current.contains(target) &&
+        userMenuButtonRef.current &&
+        !userMenuButtonRef.current.contains(target) &&
+        mobileUserMenuRef.current &&
+        !mobileUserMenuRef.current.contains(target) &&
+        mobileUserMenuButtonRef.current &&
+        !mobileUserMenuButtonRef.current.contains(target)
       ) {
         setShowUserMenu(false);
       }
@@ -69,10 +81,10 @@ const Header: React.FC<HeaderProps> = ({
   // Handle logout with confirmation and loading state
   const handleLogout = async () => {
     if (isLoggingOut) return;
-    
+
     const confirmed = window.confirm('Apakah Anda yakin ingin keluar dari aplikasi?');
     if (!confirmed) return;
-    
+
     setIsLoggingOut(true);
     try {
       await logout();
@@ -85,7 +97,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   // Validate avatar URL to prevent XSS
-  const isValidImageUrl = (url: string | null | undefined): boolean => {
+  const isValidImageUrl = (url: string | null | undefined): url is string => {
     if (!url) return false;
     try {
       const parsed = new URL(url);
@@ -97,11 +109,12 @@ const Header: React.FC<HeaderProps> = ({
 
   // Get avatar content with XSS protection
   const getAvatarContent = () => {
-    if (isValidImageUrl(userProfile?.avatar_url)) {
+    const avatarUrl = userProfile?.avatar_url;
+    if (isValidImageUrl(avatarUrl)) {
       return (
-        <img 
-          src={userProfile!.avatar_url} 
-          alt="Avatar" 
+        <img
+          src={avatarUrl}
+          alt="Avatar"
           className="w-full h-full object-cover"
           onError={(e) => {
             e.currentTarget.style.display = 'none';
@@ -114,13 +127,26 @@ const Header: React.FC<HeaderProps> = ({
 
   const getRoleBadge = () => {
     const roles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
-    const primaryRole = roles.includes('admin') ? 'admin' : roles.includes('apoteker') ? 'apoteker' : roles.includes('farmasi') ? 'farmasi' : roles.includes('nakes') ? 'nakes' : roles[0];
+    const primaryRole = roles.includes('admin')
+      ? 'admin'
+      : roles.includes('apoteker')
+        ? 'apoteker'
+        : roles.includes('farmasi')
+          ? 'farmasi'
+          : roles.includes('nakes')
+            ? 'nakes'
+            : roles[0];
     switch (primaryRole) {
-      case 'admin': return { label: 'Admin', color: 'bg-purple-500' };
-      case 'apoteker': return { label: 'Farmasi', color: 'bg-blue-500' };
-      case 'farmasi': return { label: 'Farmasi', color: 'bg-blue-500' };
-      case 'nakes': return { label: 'Nakes', color: 'bg-green-500' };
-      default: return { label: 'User', color: 'bg-gray-500' };
+      case 'admin':
+        return { label: 'Admin', color: 'bg-purple-500' };
+      case 'apoteker':
+        return { label: 'Farmasi', color: 'bg-blue-500' };
+      case 'farmasi':
+        return { label: 'Farmasi', color: 'bg-blue-500' };
+      case 'nakes':
+        return { label: 'Nakes', color: 'bg-green-500' };
+      default:
+        return { label: 'User', color: 'bg-gray-500' };
     }
   };
 
@@ -138,7 +164,9 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-2xl">
             <div className="flex items-center gap-2">
               <span className="material-icons-round text-primary text-xl">notifications</span>
-              <h3 className="font-bold text-sm text-text-primary-light dark:text-white">Notifikasi</h3>
+              <h3 className="font-bold text-sm text-text-primary-light dark:text-white">
+                Notifikasi
+              </h3>
               {unreadCount > 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {unreadCount > 99 ? '99+' : unreadCount}
@@ -159,7 +187,9 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={() => setIsOpen(false)}
                   className="p-1 -mr-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                 >
-                  <span className="material-icons-round text-lg text-text-secondary-light">close</span>
+                  <span className="material-icons-round text-lg text-text-secondary-light">
+                    close
+                  </span>
                 </button>
               )}
             </div>
@@ -169,8 +199,12 @@ const Header: React.FC<HeaderProps> = ({
           <div className="overflow-y-auto flex-1">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
-                <span className="material-icons-round text-4xl text-gray-300 dark:text-gray-600 mb-2">notifications_off</span>
-                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Belum ada notifikasi</p>
+                <span className="material-icons-round text-4xl text-gray-300 dark:text-gray-600 mb-2">
+                  notifications_off
+                </span>
+                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                  Belum ada notifikasi
+                </p>
               </div>
             ) : (
               notifications.map((notif) => (
@@ -179,18 +213,23 @@ const Header: React.FC<HeaderProps> = ({
                   onClick={() => {
                     if (!notif.is_read) markAsRead(notif.id);
                   }}
-                  className={`w-full text-left px-4 py-3 flex gap-3 items-start transition-colors hover:bg-gray-50 dark:hover:bg-white/5 border-b border-gray-50 dark:border-white/5 last:border-0 ${!notif.is_read ? 'bg-purple-50/50 dark:bg-purple-900/10' : ''
-                    }`}
+                  className={`w-full text-left px-4 py-3 flex gap-3 items-start transition-colors hover:bg-gray-50 dark:hover:bg-white/5 border-b border-gray-50 dark:border-white/5 last:border-0 ${
+                    !notif.is_read ? 'bg-purple-50/50 dark:bg-purple-900/10' : ''
+                  }`}
                 >
                   {/* Icon */}
-                  <span className={`material-icons-round text-xl mt-0.5 flex-shrink-0 ${getNotificationColor(notif.type)}`}>
+                  <span
+                    className={`material-icons-round text-xl mt-0.5 flex-shrink-0 ${getNotificationColor(notif.type)}`}
+                  >
                     {getNotificationIcon(notif.type)}
                   </span>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <p className={`text-sm leading-snug ${!notif.is_read ? 'font-bold text-text-primary-light dark:text-white' : 'font-medium text-text-secondary-light dark:text-text-secondary-dark'}`}>
+                      <p
+                        className={`text-sm leading-snug ${!notif.is_read ? 'font-bold text-text-primary-light dark:text-white' : 'font-medium text-text-secondary-light dark:text-text-secondary-dark'}`}
+                      >
                         {notif.title}
                       </p>
                       {!notif.is_read && (
@@ -212,7 +251,10 @@ const Header: React.FC<HeaderProps> = ({
           {/* Footer: View all link */}
           <div className="border-t border-gray-100 dark:border-white/10 px-4 py-2.5 bg-gray-50 dark:bg-white/5">
             <button
-              onClick={() => { setIsOpen(false); navigate(ROUTES.NOTIFICATIONS); }}
+              onClick={() => {
+                setIsOpen(false);
+                navigate(ROUTES.NOTIFICATIONS);
+              }}
               className="w-full text-center text-xs font-bold text-primary hover:text-primary/80 transition-colors py-1"
             >
               Lihat semua notifikasi
@@ -251,7 +293,7 @@ const Header: React.FC<HeaderProps> = ({
           {notifContent}
         </div>
       );
-    }
+    },
   );
 
   return (
@@ -271,7 +313,9 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Center: Title */}
           <div className="flex-1 text-center px-2">
-            <h1 className="text-lg font-bold text-text-primary-light dark:text-white truncate">{viewName}</h1>
+            <h1 className="text-lg font-bold text-text-primary-light dark:text-white truncate">
+              {viewName}
+            </h1>
           </div>
 
           {/* Right: Notification Bell + Profile Icon */}
@@ -306,8 +350,12 @@ const Header: React.FC<HeaderProps> = ({
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden z-50">
                   <div className="p-4 border-b border-gray-100 dark:border-white/10">
-                    <p className="text-sm font-bold text-text-primary-light dark:text-white">{userProfile?.full_name}</p>
-                    <span className={`inline-block mt-1 px-2 py-1 text-xs font-bold text-white rounded-full ${roleBadge.color}`}>
+                    <p className="text-sm font-bold text-text-primary-light dark:text-white">
+                      {userProfile?.full_name}
+                    </p>
+                    <span
+                      className={`inline-block mt-1 px-2 py-1 text-xs font-bold text-white rounded-full ${roleBadge.color}`}
+                    >
                       {roleBadge.label}
                     </span>
                   </div>
@@ -332,7 +380,9 @@ const Header: React.FC<HeaderProps> = ({
                   >
                     {isLoggingOut ? (
                       <>
-                        <span className="material-icons-round text-[18px] animate-spin">refresh</span>
+                        <span className="material-icons-round text-[18px] animate-spin">
+                          refresh
+                        </span>
                         Keluar...
                       </>
                     ) : (
@@ -355,7 +405,9 @@ const Header: React.FC<HeaderProps> = ({
           <nav className="flex text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">
             <span className="hover:text-primary transition-colors cursor-pointer">Halaman</span>
             <span className="mx-2">/</span>
-            <span className="text-text-primary-light dark:text-text-primary-dark font-medium">{viewName}</span>
+            <span className="text-text-primary-light dark:text-text-primary-dark font-medium">
+              {viewName}
+            </span>
           </nav>
           <h1 className="text-3xl font-bold text-text-primary-light dark:text-white">{viewName}</h1>
         </div>
@@ -386,9 +438,7 @@ const Header: React.FC<HeaderProps> = ({
             onClick={onToggleDarkMode}
             className="text-text-secondary-light hover:text-primary transition-colors h-10 w-10"
           >
-            <span className="material-icons-round">
-              {isDarkMode ? 'light_mode' : 'dark_mode'}
-            </span>
+            <span className="material-icons-round">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>
           </Button>
 
           {/* User Menu */}
@@ -404,8 +454,12 @@ const Header: React.FC<HeaderProps> = ({
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden z-50">
                 <div className="p-4 border-b border-gray-100 dark:border-white/10">
-                  <p className="text-sm font-bold text-text-primary-light dark:text-white">{userProfile?.full_name}</p>
-                  <span className={`inline-block mt-1 px-2 py-1 text-xs font-bold text-white rounded-full ${roleBadge.color}`}>
+                  <p className="text-sm font-bold text-text-primary-light dark:text-white">
+                    {userProfile?.full_name}
+                  </p>
+                  <span
+                    className={`inline-block mt-1 px-2 py-1 text-xs font-bold text-white rounded-full ${roleBadge.color}`}
+                  >
                     {roleBadge.label}
                   </span>
                 </div>

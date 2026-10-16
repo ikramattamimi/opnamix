@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { api } from '../lib/api';
+import { api, CreateTransactionPayload } from '../lib/api';
 import { QUERY_KEYS } from './useSupabaseQuery';
 import { supabase } from '../lib/supabaseClient';
 import { PaginationParams } from '../types';
@@ -25,20 +25,12 @@ export function useStockOutRealtime() {
   useEffect(() => {
     const channel = supabase
       .channel('transaksi-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'transaksi' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'transaksi' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
-        }
-      )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaksi' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transaksi' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
+      })
       .subscribe();
 
     return () => {
@@ -50,7 +42,7 @@ export function useStockOutRealtime() {
 export function useCreateStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: any) => api.createTransaction(payload),
+    mutationFn: (payload: CreateTransactionPayload) => api.createTransaction(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
     },
@@ -60,8 +52,19 @@ export function useCreateStockOutRequest() {
 export function useProcessStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ number, status, diskon, total, serviceFee }: { number: string; status: 'selesai'; diskon?: number; total?: number; serviceFee?: number }) => 
-      api.updateTransactionStatus(number, status, diskon, total, serviceFee),
+    mutationFn: ({
+      number,
+      status,
+      diskon,
+      total,
+      serviceFee,
+    }: {
+      number: string;
+      status: 'selesai';
+      diskon?: number;
+      total?: number;
+      serviceFee?: number;
+    }) => api.updateTransactionStatus(number, status, diskon, total, serviceFee),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products }); // Stock updated

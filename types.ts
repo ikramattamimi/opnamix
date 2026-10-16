@@ -1,16 +1,15 @@
-
 export enum Category {
   Obat = 'Obat',
   BHP = 'BHP (Habis Pakai)',
   Imunisasi = 'Imunisasi',
-  Alkes = 'Alat Kesehatan'
+  Alkes = 'Alat Kesehatan',
 }
 
 export enum ServiceCategory {
   Konsultasi = 'Konsultasi',
   Tindakan = 'Tindakan',
   TesLab = 'Tes Lab',
-  Vaksinasi = 'Vaksinasi'
+  Vaksinasi = 'Vaksinasi',
 }
 
 export enum Unit {
@@ -20,7 +19,7 @@ export enum Unit {
   Box = 'Box',
   Ampul = 'Ampul',
   Sachet = 'Sachet',
-  Pcs = 'Pcs'
+  Pcs = 'Pcs',
 }
 
 export interface PaginationParams {
@@ -56,15 +55,13 @@ export interface Product {
   composition?: string; // kandungan obat
 }
 
-
 export interface ServiceCategoryType {
   id: string;
   name: string;
   code: string;
-  description?: string;
-  isActive: boolean;
+  description?: string | null;
+  isActive: boolean | null;
 }
-
 
 export interface Service {
   id: string;
@@ -74,11 +71,11 @@ export interface Service {
   categoryName?: string; // Display name from joined category
   price: number; // harga
   description: string;
-  isActive: boolean; // is_active
-  createdBy?: string;
-  updatedBy?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  isActive: boolean | null; // is_active
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
   // UI helpers
   icon?: string;
   iconColor?: string;
@@ -162,7 +159,7 @@ export interface StockInReceipt {
   items: StockInItem[];
   status: string;
   receivedBy: string;
-  evidenceUrl?: string; // Add evidenceUrl
+  evidenceUrl?: string | null; // Add evidenceUrl
 }
 
 // Stock Opname Interfaces
@@ -174,11 +171,11 @@ export interface OpnameItem {
   productName: string;
   category: string;
   unit: string;
-  systemStock: number;
-  physicalStock?: number;
-  difference?: number;
-  stokFinal?: number;
-  reason?: string;
+  systemStock: number | null;
+  physicalStock?: number | null;
+  difference?: number | null;
+  stokFinal?: number | null;
+  reason?: string | null;
   detailStatus?: 'pending' | 'sesuai' | 'disesuaikan';
 }
 
@@ -200,13 +197,13 @@ export type PengulanganOpname = 'BULANAN' | 'TRIWULAN' | 'TAHUNAN';
 export interface OpnameSchedule {
   id: string;
   nama: string;
-  tanggalAudit: number; // 1-28
-  waktuJam: number;
-  waktuMenit: number;
+  tanggalAudit: number | null; // 1-28
+  waktuJam: number | null;
+  waktuMenit: number | null;
   pengulangan: PengulanganOpname;
   obatIds: string[] | null; // null = semua obat
   durasiPengerjaan: number | null;
-  isActive: boolean;
+  isActive: boolean | null;
 }
 
 export interface OpnameScheduleConfig {
@@ -219,7 +216,14 @@ export interface OpnameScheduleConfig {
   obatIds?: string[] | null;
 }
 
-export type ViewType = 'dashboard' | 'master-data-produk' | 'master-data-jasa' | 'stok-masuk' | 'stok-keluar' | 'stok-opname' | 'laporan-stok';
+export type ViewType =
+  | 'dashboard'
+  | 'master-data-produk'
+  | 'master-data-jasa'
+  | 'stok-masuk'
+  | 'stok-keluar'
+  | 'stok-opname'
+  | 'laporan-stok';
 
 // Route paths for React Router
 // ==================== NOTIFICATIONS ====================
@@ -246,7 +250,7 @@ export interface AppNotification {
   type: NotificationType;
   title: string;
   message: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   is_read: boolean;
   created_at: string;
 }

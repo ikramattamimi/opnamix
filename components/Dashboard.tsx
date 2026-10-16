@@ -1,16 +1,15 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import StatCard from './StatCard';
-import { api } from '../lib/api';
+import { api, DashboardStats, RecentTransaction } from '../lib/api';
 import { exportRecentTransactionsToExcel } from '../lib/exportUtils';
 
 const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Pagination state for recent transactions
-  const [recentTrx, setRecentTrx] = useState<any[]>([]);
+  const [recentTrx, setRecentTrx] = useState<RecentTransaction[]>([]);
   const [trxPage, setTrxPage] = useState(1);
   const [trxTotalPages, setTrxTotalPages] = useState(1);
   const [trxLoading, setTrxLoading] = useState(false);
@@ -27,7 +26,7 @@ const Dashboard: React.FC = () => {
         }
       } catch (error) {
         if (!controller.signal.aborted) {
-          console.error("Failed to fetch recent transactions", error);
+          console.error('Failed to fetch recent transactions', error);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -50,7 +49,7 @@ const Dashboard: React.FC = () => {
         }
       } catch (error) {
         if (!controller.signal.aborted) {
-          console.error("Failed to fetch dashboard stats", error);
+          console.error('Failed to fetch dashboard stats', error);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -72,7 +71,7 @@ const Dashboard: React.FC = () => {
   }
 
   // Fallback if stats fail
-  const safeStats = stats || {
+  const safeStats: DashboardStats = stats || {
     totalProducts: 0,
     totalValue: 0,
     stokMasuk: 0,
@@ -81,37 +80,63 @@ const Dashboard: React.FC = () => {
     recentTransactions: [],
     lowStockItems: [],
     categoryDistribution: {},
-    weeklyStockOut: []
+    weeklyStockOut: [],
   };
 
   // Process Category Distribution for Pie Chart
-  const totalItems = Object.values(safeStats.categoryDistribution).reduce((a: any, b: any) => a + b, 0) as number;
+  const totalItems = Object.values(safeStats.categoryDistribution).reduce((a, b) => a + b, 0);
+  /* eslint-disable @typescript-eslint/no-unused-vars -- dipakai blok "Charts Row" yang sedang dikomentari */
   const safeTotalItems = totalItems || 1; // Prevent divide by zero
   const categories = Object.keys(safeStats.categoryDistribution);
   // Simple color mapping
   const categoryColors: Record<string, string> = {
-    'Obat': 'bg-primary',
+    Obat: 'bg-primary',
     'BHP (Habis Pakai)': 'bg-secondary',
     'Alat Kesehatan': 'bg-orange-400',
-    'Imunisasi': 'bg-green-400'
+    Imunisasi: 'bg-green-400',
   };
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   return (
     <div className="space-y-6">
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
-        <StatCard label="Total Barang" value={safeStats.totalProducts.toLocaleString()} icon="medication" color="primary" />
-        <StatCard label="Stok Masuk" value={safeStats.stokMasuk.toLocaleString()} icon="download" color="primary" />
-        <StatCard label="Stok Keluar" value={safeStats.stokKeluar.toLocaleString()} icon="upload" color="primary" />
-        <StatCard label="Tertunda" value={safeStats.tertunda.toLocaleString()} icon="pending_actions" color="primary" />
+        <StatCard
+          label="Total Barang"
+          value={safeStats.totalProducts.toLocaleString()}
+          icon="medication"
+          color="primary"
+        />
+        <StatCard
+          label="Stok Masuk"
+          value={safeStats.stokMasuk.toLocaleString()}
+          icon="download"
+          color="primary"
+        />
+        <StatCard
+          label="Stok Keluar"
+          value={safeStats.stokKeluar.toLocaleString()}
+          icon="upload"
+          color="primary"
+        />
+        <StatCard
+          label="Tertunda"
+          value={safeStats.tertunda.toLocaleString()}
+          icon="pending_actions"
+          color="primary"
+        />
 
         <div className="bg-card-light dark:bg-card-dark p-4 rounded-DEFAULT shadow-soft flex items-center col-span-1 md:col-span-2 xl:col-span-2">
           <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mr-4">
-            <span className="material-icons-round text-primary text-2xl">account_balance_wallet</span>
+            <span className="material-icons-round text-primary text-2xl">
+              account_balance_wallet
+            </span>
           </div>
           <div>
             <p className="text-sm text-text-secondary-light font-medium">Total Nilai Inventaris</p>
-            <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">Rp {safeStats.totalValue.toLocaleString('id-ID')}</h3>
+            <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">
+              Rp {safeStats.totalValue.toLocaleString('id-ID')}
+            </h3>
           </div>
           {/* Pertumbuhan dihitung dari data real (placeholder untuk implementasi lengkap) */}
           <div className="ml-auto flex items-center text-green-500 text-sm font-bold bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg">
@@ -137,8 +162,8 @@ const Dashboard: React.FC = () => {
           <div className="h-64 flex items-end justify-between gap-2 px-2">
             {(() => {
               const weekly = safeStats.weeklyStockOut || [];
-              const maxVal = Math.max(...weekly.map((w: any) => w.count), 1);
-              return weekly.map((item: any, idx: number) => {
+              const maxVal = Math.max(...weekly.map((w) => w.count), 1);
+              return weekly.map((item, idx) => {
                 const pct = Math.max((item.count / maxVal) * 100, 4); // min 4% for visibility
                 return (
                   <div key={idx} className="flex flex-col items-center w-full group">
@@ -170,7 +195,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="space-y-3">
               {safeStats.lowStockItems.length > 0 ? (
-                safeStats.lowStockItems.map((item: any, idx: number) => (
+                safeStats.lowStockItems.map((item, idx) => (
                   <LowStockItem key={idx} name={item.nama} count={item.qty} color="bg-red-500" />
                 ))
               ) : (
@@ -221,7 +246,9 @@ const Dashboard: React.FC = () => {
       {/* Recent Transactions Table */}
       <div className="bg-card-light dark:bg-card-dark p-6 rounded-DEFAULT shadow-soft">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-          <h3 className="text-xl font-bold text-text-primary-light dark:text-white">Transaksi Terbaru</h3>
+          <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
+            Transaksi Terbaru
+          </h3>
           <div className="flex gap-2">
             <Button
               variant="secondary"
@@ -235,17 +262,19 @@ const Dashboard: React.FC = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTrxPage(p => Math.max(1, p - 1))}
+                onClick={() => setTrxPage((p) => Math.max(1, p - 1))}
                 disabled={trxPage === 1 || trxLoading}
                 className="h-8 w-8"
               >
                 <span className="material-icons-round text-lg">chevron_left</span>
               </Button>
-              <span className="text-xs font-bold px-2 min-w-[3rem] text-center">{trxPage} / {trxTotalPages}</span>
+              <span className="text-xs font-bold px-2 min-w-[3rem] text-center">
+                {trxPage} / {trxTotalPages}
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTrxPage(p => Math.min(trxTotalPages, p + 1))}
+                onClick={() => setTrxPage((p) => Math.min(trxTotalPages, p + 1))}
                 disabled={trxPage === trxTotalPages || trxLoading}
                 className="h-8 w-8"
               >
@@ -265,15 +294,25 @@ const Dashboard: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="text-left border-b border-gray-100 dark:border-gray-800">
-                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium pl-2">Nama Obat</th>
-                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">Status</th>
-                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">Kategori</th>
-                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">Jumlah</th>
-                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">Tanggal</th>
+                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium pl-2">
+                    Nama Obat
+                  </th>
+                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                    Status
+                  </th>
+                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                    Kategori
+                  </th>
+                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                    Jumlah
+                  </th>
+                  <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                    Tanggal
+                  </th>
                 </tr>
               </thead>
               <tbody className="text-sm font-medium text-text-primary-light dark:text-white">
-                {recentTrx.map((trx: any) => (
+                {recentTrx.map((trx) => (
                   <TransactionRow
                     key={trx.id}
                     name={trx.name}
@@ -300,20 +339,41 @@ const Dashboard: React.FC = () => {
   );
 };
 
-const LowStockItem: React.FC<{ name: string; count: number; color: string }> = ({ name, count, color }) => (
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- dipakai blok "Charts Row" yang sedang dikomentari
+const LowStockItem: React.FC<{ name: string; count: number; color: string }> = ({
+  name,
+  count,
+  color,
+}) => (
   <div className="flex items-center justify-between">
     <div className="flex items-center gap-3">
       <div className={`w-2 h-2 rounded-full ${color}`}></div>
       <span className="text-sm font-medium text-text-primary-light dark:text-white">{name}</span>
     </div>
-    <span className={`text-xs font-bold ${color === 'bg-red-500' ? 'text-red-500 bg-red-50' : 'text-orange-500 bg-orange-50'} dark:bg-opacity-10 px-2 py-1 rounded`}>Sisa {count}</span>
+    <span
+      className={`text-xs font-bold ${color === 'bg-red-500' ? 'text-red-500 bg-red-50' : 'text-orange-500 bg-orange-50'} dark:bg-opacity-10 px-2 py-1 rounded`}
+    >
+      Sisa {count}
+    </span>
   </div>
 );
 
-const TransactionRow: React.FC<{ name: string; status: string; category: string; amount: string; date: string; icon: string; iconBg: string; iconColor: string; isWarning?: boolean }> = ({ name, status, category, amount, date, icon, iconBg, iconColor, isWarning }) => (
+const TransactionRow: React.FC<{
+  name: string;
+  status: string;
+  category: string;
+  amount: string;
+  date: string;
+  icon: string;
+  iconBg: string;
+  iconColor: string;
+  isWarning?: boolean;
+}> = ({ name, status, category, amount, date, icon, iconBg, iconColor }) => (
   <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
     <td className="py-4 pl-2 flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-full ${iconBg} dark:bg-opacity-20 flex items-center justify-center ${iconColor}`}>
+      <div
+        className={`w-10 h-10 rounded-full ${iconBg} dark:bg-opacity-20 flex items-center justify-center ${iconColor}`}
+      >
         <span className="material-icons-round text-lg">{icon}</span>
       </div>
       <span className="font-bold">{name}</span>

@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -29,4 +29,20 @@ export function sanitizePriceInput(value: string): string {
   // Remove leading zeros, but keep at least one digit
   const sanitized = numericOnly.replace(/^0+(?=.)/, '');
   return sanitized;
+}
+
+/**
+ * `message` dari error apa pun yang ditangkap di catch (Error, Supabase
+ * PostgrestError/AuthError, atau objek { message }). undefined kalau tidak ada.
+ */
+export function getErrorMessage(error: unknown): string | undefined {
+  return (error as { message?: string } | null | undefined)?.message;
+}
+
+/**
+ * `new Date(value)` yang juga menerima null/undefined dari kolom database,
+ * dengan hasil yang sama seperti JavaScript: null → epoch, undefined → Invalid Date.
+ */
+export function toDate(value: string | number | Date | null | undefined): Date {
+  return new Date(value as string);
 }

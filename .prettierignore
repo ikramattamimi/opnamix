@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+lib/database.types.ts
+supabase/functions
+.ai
+docs
+dist

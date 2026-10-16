@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Service } from '../types';
-import { useServices, useCreateService, useUpdateService, useDeleteService } from '../hooks/useServices';
+import {
+  useServices,
+  useCreateService,
+  useUpdateService,
+  useDeleteService,
+} from '../hooks/useServices';
 import { useCreateServiceCategory, useServiceCategories } from '../hooks/useServiceCategories';
 import StatCard from './StatCard';
 import PaginationControls from './PaginationControls';
@@ -10,7 +15,7 @@ import { DataTable } from './ui/data-table';
 import { createServiceColumns } from './ServiceColumns';
 import { useToast } from './ui/toast';
 import { exportServicesToExcel } from '../lib/exportUtils';
-import { sanitizePriceInput } from '../lib/utils';
+import { sanitizePriceInput, getErrorMessage } from '../lib/utils';
 
 interface ValidationErrors {
   name?: string;
@@ -19,10 +24,11 @@ interface ValidationErrors {
 }
 
 const generateServiceCode = (name?: string) => {
-  const normalizedName = (name || '')
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, '')
-    .slice(0, 4) || 'SRV';
+  const normalizedName =
+    (name || '')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, '')
+      .slice(0, 4) || 'SRV';
   const timestamp = Date.now().toString().slice(-6);
   return `${normalizedName}-${timestamp}`;
 };
@@ -40,8 +46,8 @@ const ServiceManagement: React.FC = () => {
   const { showToast } = useToast();
   const [page, setPage] = useState(1);
   const perPage = 10;
-  
-  const { data: paginatedData, isLoading, isPlaceholderData } = useServices({ page, perPage });
+
+  const { data: paginatedData, isPlaceholderData } = useServices({ page, perPage });
   const services = paginatedData?.data || [];
   const totalPages = paginatedData?.totalPages || 1;
   const totalServices = paginatedData?.total || 0;
@@ -53,23 +59,25 @@ const ServiceManagement: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  
+
   // Validation State
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
 
   // Delete Confirmation State
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; serviceId: string | null }>({
-    isOpen: false,
-    serviceId: null
-  });
-  
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; serviceId: string | null }>(
+    {
+      isOpen: false,
+      serviceId: null,
+    },
+  );
+
   // Category/Subcategory State
   const { data: categories = [] } = useServiceCategories();
   const [categoryName, setCategoryName] = useState('');
   const [categoryDescription, setCategoryDescription] = useState('');
   const [categoryError, setCategoryError] = useState('');
-  
+
   // Form State
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Service>>({
@@ -77,7 +85,7 @@ const ServiceManagement: React.FC = () => {
     code: '',
     categoryId: '',
     price: undefined,
-    description: ''
+    description: '',
   });
 
   const validateForm = (): boolean => {
@@ -86,7 +94,7 @@ const ServiceManagement: React.FC = () => {
     if (!formData.name || formData.name.trim().length < 3) {
       newErrors.name = 'Nama jasa minimal 3 karakter';
     }
-    
+
     if (!formData.price || formData.price <= 0) {
       newErrors.price = 'Harga harus lebih dari 0';
     }
@@ -96,14 +104,14 @@ const ServiceManagement: React.FC = () => {
   };
 
   const handleBlur = (field: string) => {
-    setTouched(prev => new Set(prev).add(field));
+    setTouched((prev) => new Set(prev).add(field));
     validateForm();
   };
 
   const handleOpenModal = (service?: Service) => {
     setErrors({});
     setTouched(new Set());
-    
+
     if (service) {
       setEditingId(service.id);
       setFormData({
@@ -111,7 +119,7 @@ const ServiceManagement: React.FC = () => {
         code: service.code,
         categoryId: service.categoryId,
         price: service.price,
-        description: service.description || ''
+        description: service.description || '',
       });
     } else {
       setEditingId(null);
@@ -120,7 +128,7 @@ const ServiceManagement: React.FC = () => {
         code: '',
         categoryId: '',
         price: undefined,
-        description: ''
+        description: '',
       });
     }
     setIsModalOpen(true);
@@ -128,7 +136,7 @@ const ServiceManagement: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setTouched(new Set(['name', 'price']));
     if (!validateForm()) return;
 
@@ -199,74 +207,82 @@ const ServiceManagement: React.FC = () => {
       setIsCategoryModalOpen(false);
       setCategoryError('');
       showToast(`Kategori "${createdCategory.name}" berhasil ditambahkan.`, 'success');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating category:', error);
-      setCategoryError(error?.message || 'Gagal menambah kategori.');
+      setCategoryError(getErrorMessage(error) || 'Gagal menambah kategori.');
     }
   };
 
   return (
     <>
-    <div className="space-y-6">
-      {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard label="Total Jasa" value={totalServices.toString()} icon="medical_services" color="primary" />
-        <StatCard 
-          label="Harga Rata-rata" 
-          value={services.length > 0 ? `Rp ${Math.round(services.reduce((acc, s) => acc + (s.price || 0), 0) / services.length).toLocaleString('id-ID')}` : '-'} 
-          icon="attach_money" 
-          color="orange-500" 
-        />
-      </div>
+      <div className="space-y-6">
+        {/* Top Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <StatCard
+            label="Total Jasa"
+            value={totalServices.toString()}
+            icon="medical_services"
+            color="primary"
+          />
+          <StatCard
+            label="Harga Rata-rata"
+            value={
+              services.length > 0
+                ? `Rp ${Math.round(services.reduce((acc, s) => acc + (s.price || 0), 0) / services.length).toLocaleString('id-ID')}`
+                : '-'
+            }
+            icon="attach_money"
+            color="orange-500"
+          />
+        </div>
 
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-text-primary-light dark:text-white">Daftar Jasa</h2>
-        <div className="flex gap-2">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold text-text-primary-light dark:text-white">Daftar Jasa</h2>
+          <div className="flex gap-2">
             <Button
-                variant="outline"
-                className="shadow-md flex items-center gap-2"
-                onClick={openCategoryModal}
+              variant="outline"
+              className="shadow-md flex items-center gap-2"
+              onClick={openCategoryModal}
             >
-                <span className="material-icons-round">playlist_add</span>
-                Tambah Kategori
+              <span className="material-icons-round">playlist_add</span>
+              Tambah Kategori
             </Button>
-            <Button 
-                variant="outline" 
-                className="shadow-md flex items-center gap-2"
-                onClick={() => void exportServicesToExcel(services)}
-                disabled={services.length === 0}
+            <Button
+              variant="outline"
+              className="shadow-md flex items-center gap-2"
+              onClick={() => void exportServicesToExcel(services)}
+              disabled={services.length === 0}
             >
-                <span className="material-icons-round">file_download</span>
-                Ekspor Excel
+              <span className="material-icons-round">file_download</span>
+              Ekspor Excel
             </Button>
-            <Button 
-            onClick={() => handleOpenModal()}
-            className="shadow-md flex items-center gap-2"
-            >
-            <span className="material-icons-round">add</span>
-            Tambah Jasa Baru
+            <Button onClick={() => handleOpenModal()} className="shadow-md flex items-center gap-2">
+              <span className="material-icons-round">add</span>
+              Tambah Jasa Baru
             </Button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="w-full">
+          <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft h-full">
+            <DataTable
+              columns={createServiceColumns({
+                onEdit: handleOpenModal,
+                onDelete: handleDeleteClick,
+              })}
+              data={services}
+              searchable={false}
+            />
+            <PaginationControls
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              isPlaceholderData={isPlaceholderData}
+            />
+          </div>
         </div>
       </div>
-
-      {/* Table */}
-      <div className="w-full">
-        <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft h-full">
-          <DataTable 
-            columns={createServiceColumns({ onEdit: handleOpenModal, onDelete: handleDeleteClick })}
-            data={services}
-            searchable={false}
-          />
-          <PaginationControls 
-            currentPage={page} 
-            totalPages={totalPages} 
-            onPageChange={setPage}
-            isPlaceholderData={isPlaceholderData}
-          />
-        </div>
-      </div>
-
-    </div>
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm m-0">
@@ -276,8 +292,8 @@ const ServiceManagement: React.FC = () => {
                 {editingId ? 'Edit Jasa' : 'Tambah Jasa Baru'}
               </h2>
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setIsModalOpen(false)} 
+                <button
+                  onClick={() => setIsModalOpen(false)}
                   className="p-2 bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors"
                 >
                   <span className="material-icons-round">close</span>
@@ -289,12 +305,15 @@ const ServiceManagement: React.FC = () => {
                 <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
                   Nama Jasa <span className="text-red-500">*</span>
                 </label>
-                <input 
-                  className={getInputClassName('name', "w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white px-4 py-3 text-sm focus:border-primary focus:ring-primary")} 
-                  placeholder="contoh: Konsultasi Umum" 
+                <input
+                  className={getInputClassName(
+                    'name',
+                    'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white px-4 py-3 text-sm focus:border-primary focus:ring-primary',
+                  )}
+                  placeholder="contoh: Konsultasi Umum"
                   type="text"
                   value={formData.name}
-                  onChange={e => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   onBlur={() => handleBlur('name')}
                 />
                 {touched.has('name') && errors.name && (
@@ -308,17 +327,22 @@ const ServiceManagement: React.FC = () => {
                 <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
                   Kategori <span className="text-red-500">*</span>
                 </label>
-                <select 
-                  className={getInputClassName('categoryId', "w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white px-4 py-3 text-sm focus:border-primary focus:ring-primary")}
+                <select
+                  className={getInputClassName(
+                    'categoryId',
+                    'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white px-4 py-3 text-sm focus:border-primary focus:ring-primary',
+                  )}
                   value={formData.categoryId}
-                  onChange={e => {
+                  onChange={(e) => {
                     const newCategoryId = e.target.value;
-                    setFormData({...formData, categoryId: newCategoryId});
+                    setFormData({ ...formData, categoryId: newCategoryId });
                   }}
                 >
                   <option value="">Pilih Kategori</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
                   ))}
                 </select>
                 <button
@@ -341,16 +365,24 @@ const ServiceManagement: React.FC = () => {
                   Harga (Rp) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-3.5 text-text-secondary-light text-sm">Rp</span>
-                  <input 
-                    className={getInputClassName('price', "w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white pl-10 pr-4 py-3 text-sm focus:border-primary focus:ring-primary")} 
-                    placeholder="150000" 
+                  <span className="absolute left-4 top-3.5 text-text-secondary-light text-sm">
+                    Rp
+                  </span>
+                  <input
+                    className={getInputClassName(
+                      'price',
+                      'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white pl-10 pr-4 py-3 text-sm focus:border-primary focus:ring-primary',
+                    )}
+                    placeholder="150000"
                     type="number"
                     min="0"
                     value={formData.price ?? ''}
-                    onChange={e => {
+                    onChange={(e) => {
                       const sanitized = sanitizePriceInput(e.target.value);
-                      setFormData({...formData, price: sanitized === '' ? undefined : Number(sanitized)});
+                      setFormData({
+                        ...formData,
+                        price: sanitized === '' ? undefined : Number(sanitized),
+                      });
                     }}
                     onBlur={() => handleBlur('price')}
                   />
@@ -363,17 +395,19 @@ const ServiceManagement: React.FC = () => {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">Deskripsi</label>
-                <textarea 
-                  className="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white px-4 py-3 text-sm focus:border-primary focus:ring-primary resize-none" 
-                  placeholder="Deskripsi singkat layanan..." 
+                <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
+                  Deskripsi
+                </label>
+                <textarea
+                  className="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-text-primary-light dark:text-white px-4 py-3 text-sm focus:border-primary focus:ring-primary resize-none"
+                  placeholder="Deskripsi singkat layanan..."
                   rows={3}
                   value={formData.description}
-                  onChange={e => setFormData({...formData, description: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 ></textarea>
               </div>
               <div className="pt-4">
-                <Button 
+                <Button
                   type="submit"
                   size="lg"
                   className="w-full font-bold shadow-lg"
@@ -381,11 +415,15 @@ const ServiceManagement: React.FC = () => {
                 >
                   {createService.isPending || updateService.isPending ? (
                     <>
-                      <span className="material-icons-round text-[18px] animate-spin mr-1">refresh</span>
+                      <span className="material-icons-round text-[18px] animate-spin mr-1">
+                        refresh
+                      </span>
                       Menyimpan...
                     </>
+                  ) : editingId ? (
+                    'Simpan Perubahan'
                   ) : (
-                    editingId ? 'Simpan Perubahan' : 'Tambah Data Jasa'
+                    'Tambah Data Jasa'
                   )}
                 </Button>
               </div>

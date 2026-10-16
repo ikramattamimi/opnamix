@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface StatCardProps {
@@ -12,7 +11,9 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ label, value, icon, color, bg }) => {
   return (
     <div className="bg-card-light dark:bg-card-dark p-4 rounded-[20px] shadow-soft flex items-center transition-all hover:scale-[1.02]">
-      <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${bg || 'bg-background-light dark:bg-background-dark'}`}>
+      <div
+        className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${bg || 'bg-background-light dark:bg-background-dark'}`}
+      >
         <span className={`material-icons-round text-${color} text-2xl`}>{icon}</span>
       </div>
       <div>

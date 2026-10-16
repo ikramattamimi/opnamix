@@ -1,27 +1,26 @@
-import React, { useEffect, useRef, useState } from "react";
-import { api } from "../lib/api";
-import { StockOutRequest, StockOutManual, RequestedDrug } from "../types";
-import { useProducts } from "../hooks/useProducts";
+import React, { useEffect, useRef, useState } from 'react';
+import { api, RecentStockOut } from '../lib/api';
+import { StockOutRequest, StockOutManual, RequestedDrug } from '../types';
+import { useProducts } from '../hooks/useProducts';
 import {
   useStockOutRequests,
   useStockOutRealtime,
   useCreateStockOutRequest,
   useProcessStockOutRequest,
   useUpdateStockOutRequest,
-} from "../hooks/useStockOut";
-import { useServices } from "../hooks/useServices";
-import StockOutManualForm from "./StockOutManualForm";
-import StockOutRequestForm from "./StockOutRequestForm";
-import PaginationControls from "./PaginationControls";
-import { Button } from "./ui/button";
-import { DataTable } from "./ui/data-table";
-import { createStockOutColumns } from "./StockOutColumns";
-import { useToast } from "./ui/toast";
-import { withErrorDetail } from "../lib/utils";
-import { exportStockOutToExcel } from "../lib/exportUtils";
-import { calculateRequestTotals } from "../lib/stockOutTotals";
+} from '../hooks/useStockOut';
+import { useServices } from '../hooks/useServices';
+import StockOutManualForm from './StockOutManualForm';
+import StockOutRequestForm from './StockOutRequestForm';
+import { Button } from './ui/button';
+import { DataTable } from './ui/data-table';
+import { createStockOutColumns } from './StockOutColumns';
+import { useToast } from './ui/toast';
+import { withErrorDetail } from '../lib/utils';
+import { exportStockOutToExcel } from '../lib/exportUtils';
+import { calculateRequestTotals } from '../lib/stockOutTotals';
 
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from '@/hooks/useAuth';
 
 const StockOutManagement: React.FC = () => {
   const { showToast } = useToast();
@@ -34,7 +33,7 @@ const StockOutManagement: React.FC = () => {
 
   // Pagination State for Requests
   const perPage = 10;
-  const [filterStatus, setFilterStatus] = useState<string>("Semua");
+  const [filterStatus, setFilterStatus] = useState<string>('Semua');
   const hasInitializedQueueFilter = useRef(false);
 
   // Permission Logic — hoisted up so we can use in query params
@@ -45,18 +44,14 @@ const StockOutManagement: React.FC = () => {
   const isFarmasi = userRoles.includes('apoteker') || userRoles.includes('farmasi');
   const isNakes = userRoles.includes('nakes');
 
-  const {
-    data: paginatedRequests,
-    isLoading: isRequestsLoading,
-  } = useStockOutRequests({
+  const { data: paginatedRequests, isLoading: isRequestsLoading } = useStockOutRequests({
     page: 1,
     perPage: 1000,
-    status: filterStatus === "Semua" ? undefined : filterStatus,
+    status: filterStatus === 'Semua' ? undefined : filterStatus,
     createdBy: isNakes && userId ? userId : undefined,
     nakesName: isNakes && userProfile?.full_name ? userProfile.full_name : undefined,
   });
   const requests = paginatedRequests?.data || [];
-  const totalRequests = paginatedRequests?.total || 0;
 
   // Realtime subscription — refresh tabel otomatis saat ada transaksi baru
   useStockOutRealtime();
@@ -70,21 +65,18 @@ const StockOutManagement: React.FC = () => {
   const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
 
   // Detail Modal State
-  const [selectedRequest, setSelectedRequest] =
-    useState<StockOutRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<StockOutRequest | null>(null);
   const [isProcessMode, setIsProcessMode] = useState(false); // New state for distinct modes
   const [processDiscount, setProcessDiscount] = useState<number>(0);
   const [processServiceFee, setProcessServiceFee] = useState<number>(0);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editableRequest, setEditableRequest] =
-    useState<StockOutRequest | null>(null);
+  const [editableRequest, setEditableRequest] = useState<StockOutRequest | null>(null);
 
   // Confirmation Dialog State
-  const [requestToProcess, setRequestToProcess] =
-    useState<StockOutRequest | null>(null);
+  const [requestToProcess, setRequestToProcess] = useState<StockOutRequest | null>(null);
 
   // Timeline Real Data
-  const [timelineData, setTimelineData] = useState<any[]>([]);
+  const [timelineData, setTimelineData] = useState<RecentStockOut[]>([]);
   const [showTimeline, setShowTimeline] = useState(true);
 
   const fetchTimeline = async () => {
@@ -92,7 +84,7 @@ const StockOutManagement: React.FC = () => {
       const data = await api.getRecentStockOuts(10);
       setTimelineData(data);
     } catch (err) {
-      console.error("Failed to fetch timeline", err);
+      console.error('Failed to fetch timeline', err);
     }
   };
 
@@ -122,13 +114,13 @@ const StockOutManagement: React.FC = () => {
   const canManualStock = isAdmin || isFarmasi;
   const canProcessRequest = isAdmin || isFarmasi;
   const canEditRequest = (request: StockOutRequest) =>
-    request.status === "Menunggu" &&
+    request.status === 'Menunggu' &&
     (isAdmin || isFarmasi || (isNakes && request.createdBy === userId));
 
   useEffect(() => {
     if (hasInitializedQueueFilter.current || !userProfile) return;
 
-    setFilterStatus(isAdmin || isFarmasi ? "Menunggu" : "Semua");
+    setFilterStatus(isAdmin || isFarmasi ? 'Menunggu' : 'Semua');
     hasInitializedQueueFilter.current = true;
   }, [isAdmin, isFarmasi, userProfile]);
 
@@ -141,14 +133,14 @@ const StockOutManagement: React.FC = () => {
         return sum + (product ? product.sellingPrice : 0) * item.quantity;
       }, 0);
 
-      const transactionNumber = await api.generateTransactionNumber("keluar");
+      const transactionNumber = await api.generateTransactionNumber('keluar');
 
       await createTransaction.mutateAsync({
         nomor: transactionNumber,
         tanggal: record.date,
-        tipe: "keluar",
-        tipe_sumber: "KASIR_LANGSUNG",
-        status: "selesai",
+        tipe: 'keluar',
+        tipe_sumber: 'KASIR_LANGSUNG',
+        status: 'selesai',
         nama_pasien: record.patient.fullName,
         tanggal_lahir_pasien: record.patient.birthDate,
         keterangan: record.reason,
@@ -162,7 +154,7 @@ const StockOutManagement: React.FC = () => {
           };
         }),
         services: [],
-        requestedBy: isAdmin ? "Admin" : "Farmasi",
+        requestedBy: isAdmin ? 'Admin' : 'Farmasi',
       });
 
       // Refresh timeline after manual add
@@ -180,21 +172,21 @@ const StockOutManagement: React.FC = () => {
         'success',
       );
     } catch (error) {
-      console.error("Error saving manual record:", error);
-      showToast(withErrorDetail("Gagal menyimpan transaksi manual", error), 'error');
+      console.error('Error saving manual record:', error);
+      showToast(withErrorDetail('Gagal menyimpan transaksi manual', error), 'error');
     }
   };
 
   const handleSaveRequest = async (request: StockOutRequest) => {
     try {
-      const transactionNumber = await api.generateTransactionNumber("keluar");
+      const transactionNumber = await api.generateTransactionNumber('keluar');
 
       await createTransaction.mutateAsync({
         nomor: transactionNumber,
         tanggal: request.date,
-        tipe: "keluar",
+        tipe: 'keluar',
         tipe_sumber: request.tipeSumber,
-        status: "diajukan",
+        status: 'diajukan',
         nama_pasien: request.patient.fullName,
         tanggal_lahir_pasien: request.patient.birthDate,
         keterangan: `Request from Nakes - Original ID: ${request.requestId}`,
@@ -223,8 +215,8 @@ const StockOutManagement: React.FC = () => {
         'success',
       );
     } catch (error) {
-      console.error("Error saving request:", error);
-      showToast(withErrorDetail("Gagal menyimpan pengajuan", error), 'error');
+      console.error('Error saving request:', error);
+      showToast(withErrorDetail('Gagal menyimpan pengajuan', error), 'error');
     }
   };
 
@@ -232,23 +224,22 @@ const StockOutManagement: React.FC = () => {
     if (!requestToProcess || processTransaction.isPending) return;
 
     try {
-      const subtot = getDetailTotals(requestToProcess).totalDrugs + getDetailTotals(requestToProcess).totalServices;
+      const subtot =
+        getDetailTotals(requestToProcess).totalDrugs +
+        getDetailTotals(requestToProcess).totalServices;
       await processTransaction.mutateAsync({
         number: requestToProcess.id,
-        status: "selesai",
+        status: 'selesai',
         diskon: processDiscount,
         serviceFee: processServiceFee,
-        total: Math.max(0, subtot + processServiceFee - processDiscount)
+        total: Math.max(0, subtot + processServiceFee - processDiscount),
       });
-      showToast(
-        "Permintaan berhasil diproses. Stok telah dikurangi secara otomatis.",
-        'success',
-      );
+      showToast('Permintaan berhasil diproses. Stok telah dikurangi secara otomatis.', 'success');
       refreshTimeline(); // Update history
       setRequestToProcess(null); // Close modal
     } catch (error) {
-      console.error("Error processing request:", error);
-      showToast(withErrorDetail("Gagal memproses permintaan", error), 'error');
+      console.error('Error processing request:', error);
+      showToast(withErrorDetail('Gagal memproses permintaan', error), 'error');
     }
   };
 
@@ -265,7 +256,7 @@ const StockOutManagement: React.FC = () => {
 
   const handleEditDrugChange = (
     drugId: string,
-    field: "productId" | "quantity",
+    field: 'productId' | 'quantity',
     value: string | number,
   ) => {
     setEditableRequest((prev) => {
@@ -276,12 +267,12 @@ const StockOutManagement: React.FC = () => {
         drugs: prev.drugs.map((drug) => {
           if (drug.id !== drugId) return drug;
 
-          if (field === "productId") {
+          if (field === 'productId') {
             const product = products.find((item) => item.id === value);
             return {
               ...drug,
               productId: String(value),
-              productName: product?.name || "",
+              productName: product?.name || '',
               unit: product?.unit || drug.unit,
               price: product?.sellingPrice || 0,
             };
@@ -309,7 +300,7 @@ const StockOutManagement: React.FC = () => {
         productName: fallbackProduct.name,
         quantity: 1,
         unit: fallbackProduct.unit,
-        instructions: "-",
+        instructions: '-',
         price: fallbackProduct.sellingPrice,
       };
 
@@ -368,15 +359,15 @@ const StockOutManagement: React.FC = () => {
     const hasContent = editableRequest.drugs.length > 0 || editableRequest.services.length > 0;
 
     if (!editableRequest.patient.fullName.trim()) {
-      showToast("Nama pasien wajib diisi.", "error");
+      showToast('Nama pasien wajib diisi.', 'error');
       return;
     }
     if (!hasContent) {
-      showToast("Tambahkan minimal satu obat atau satu jasa.", "error");
+      showToast('Tambahkan minimal satu obat atau satu jasa.', 'error');
       return;
     }
     if (hasInvalidDrug) {
-      showToast("Pastikan semua item obat sudah dipilih dan jumlahnya valid.", "error");
+      showToast('Pastikan semua item obat sudah dipilih dan jumlahnya valid.', 'error');
       return;
     }
 
@@ -412,10 +403,10 @@ const StockOutManagement: React.FC = () => {
       setProcessDiscount(editableRequest.discount ?? 0);
       setProcessServiceFee(editableRequest.serviceFee ?? 0);
       setIsEditMode(false);
-      showToast("Detail permintaan berhasil diperbarui.", "success");
+      showToast('Detail permintaan berhasil diperbarui.', 'success');
     } catch (error) {
-      console.error("Error updating stock out request:", error);
-      showToast(withErrorDetail("Gagal menyimpan perubahan detail permintaan", error), "error");
+      console.error('Error updating stock out request:', error);
+      showToast(withErrorDetail('Gagal menyimpan perubahan detail permintaan', error), 'error');
     }
   };
 
@@ -423,7 +414,10 @@ const StockOutManagement: React.FC = () => {
     if (!value) return '-';
     const parsed = new Date(value);
     if (Number.isNaN(parsed.getTime())) return '-';
-    return parsed.toLocaleDateString('id-ID', options || { day: '2-digit', month: 'short', year: 'numeric' });
+    return parsed.toLocaleDateString(
+      'id-ID',
+      options || { day: '2-digit', month: 'short', year: 'numeric' },
+    );
   };
 
   const formatDateTimeForDisplay = (value?: string) => {
@@ -450,13 +444,13 @@ const StockOutManagement: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full bg-primary"></span>
               <h4 className="text-sm font-bold text-text-primary-light dark:text-white uppercase tracking-wider">
-                {isNakes ? "Permintaan Obat" : "Pusat Kendali Pengeluaran"}
+                {isNakes ? 'Permintaan Obat' : 'Pusat Kendali Pengeluaran'}
               </h4>
             </div>
             <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm max-w-xl">
               {isNakes
-                ? "Ajukan permintaan obat dan alkes untuk pasien melalui formulir di sini."
-                : "Kelola pengeluaran stok melalui formulir permintaan medis terintegrasi atau lakukan pencatatan manual cepat."}
+                ? 'Ajukan permintaan obat dan alkes untuk pasien melalui formulir di sini.'
+                : 'Kelola pengeluaran stok melalui formulir permintaan medis terintegrasi atau lakukan pencatatan manual cepat.'}
             </p>
           </div>
 
@@ -467,9 +461,7 @@ const StockOutManagement: React.FC = () => {
                 size="sm"
                 className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm transition-all w-auto"
               >
-                <span className="material-icons-round text-base">
-                  medication
-                </span>
+                <span className="material-icons-round text-base">medication</span>
                 <span>Buat Permintaan</span>
               </Button>
             )}
@@ -480,9 +472,7 @@ const StockOutManagement: React.FC = () => {
                 variant="outline"
                 className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm shadow-sm hover:shadow-md transition-all bg-white dark:bg-card-dark text-primary border-primary/20 hover:border-primary/50"
               >
-                <span className="material-icons-round text-sm sm:text-base">
-                  edit_note
-                </span>
+                <span className="material-icons-round text-sm sm:text-base">edit_note</span>
                 <span>Stok Manual</span>
               </Button>
             )}
@@ -494,18 +484,14 @@ const StockOutManagement: React.FC = () => {
           <div className="ps-0 pt-0 p-6 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-background-light dark:bg-background-dark rounded-xl">
-                <span className="material-icons-round text-primary">
-                  pending_actions
-                </span>
+                <span className="material-icons-round text-primary">pending_actions</span>
               </div>
               <h3 className="font-bold text-xl text-text-primary-light dark:text-white tracking-tight">
-                {isNakes
-                  ? "Riwayat Permintaan Saya"
-                  : "Antrean Permintaan Obat"}
+                {isNakes ? 'Riwayat Permintaan Saya' : 'Antrean Permintaan Obat'}
               </h3>
             </div>
             <div className="flex p-1 bg-background-light dark:bg-background-dark rounded-xl">
-              {["Semua", "Menunggu", "Selesai"].map((status) => (
+              {['Semua', 'Menunggu', 'Selesai'].map((status) => (
                 <button
                   key={status}
                   onClick={() => {
@@ -513,8 +499,8 @@ const StockOutManagement: React.FC = () => {
                   }}
                   className={`px-5 py-2 text-sm font-bold rounded-lg transition-all ${
                     filterStatus === status
-                      ? "bg-white dark:bg-card-light shadow-sm text-text-primary-light dark:text-text-primary-dark"
-                      : "text-text-secondary-light hover:text-text-primary-light dark:hover:text-white"
+                      ? 'bg-white dark:bg-card-light shadow-sm text-text-primary-light dark:text-text-primary-dark'
+                      : 'text-text-secondary-light hover:text-text-primary-light dark:hover:text-white'
                   }`}
                 >
                   {status}
@@ -522,7 +508,12 @@ const StockOutManagement: React.FC = () => {
               ))}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="flex items-center gap-1.5" onClick={() => void exportStockOutToExcel(filteredRequests)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5"
+                onClick={() => void exportStockOutToExcel(filteredRequests)}
+              >
                 <span className="material-icons-round text-sm">file_download</span> Ekspor
               </Button>
             </div>
@@ -583,9 +574,9 @@ const StockOutManagement: React.FC = () => {
                 onClick={() => setShowTimeline((prev) => !prev)}
               >
                 <span className="material-icons-round text-sm">
-                  {showTimeline ? "visibility_off" : "visibility"}
+                  {showTimeline ? 'visibility_off' : 'visibility'}
                 </span>
-                {showTimeline ? "Sembunyikan" : "Tampilkan"}
+                {showTimeline ? 'Sembunyikan' : 'Tampilkan'}
               </Button>
               <button
                 onClick={() => refreshTimeline()}
@@ -605,9 +596,7 @@ const StockOutManagement: React.FC = () => {
                     key={i}
                     title={item.title}
                     desc={
-                      <span className="text-text-primary-light dark:text-white">
-                        {item.desc}
-                      </span>
+                      <span className="text-text-primary-light dark:text-white">{item.desc}</span>
                     }
                     time={item.time}
                     dotColor={item.dotColor}
@@ -646,11 +635,13 @@ const StockOutManagement: React.FC = () => {
             <div className="p-6 border-b border-gray-100 dark:border-white/10 flex justify-between items-center bg-gray-50/50 dark:bg-white/5 sticky top-0 backdrop-blur-md z-10">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="material-icons-round text-primary">
-                    receipt_long
-                  </span>
+                  <span className="material-icons-round text-primary">receipt_long</span>
                   <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
-                    {isProcessMode ? "Proses Permintaan" : isEditMode ? "Edit Detail Permintaan" : "Detail Permintaan"}
+                    {isProcessMode
+                      ? 'Proses Permintaan'
+                      : isEditMode
+                        ? 'Edit Detail Permintaan'
+                        : 'Detail Permintaan'}
                   </h3>
                 </div>
                 <p className="text-sm text-text-secondary-light">
@@ -672,9 +663,7 @@ const StockOutManagement: React.FC = () => {
               {/* Patient Card - Cleaned Up */}
               <div className="bg-blue-50 dark:bg-blue-500/10 p-4 rounded-2xl border border-blue-100 dark:border-blue-500/20 flex gap-4 items-center">
                 <div className="p-3 bg-white dark:bg-white/10 rounded-xl shadow-sm">
-                  <span className="material-icons-round text-primary text-3xl">
-                    person
-                  </span>
+                  <span className="material-icons-round text-primary text-3xl">person</span>
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-text-secondary-light uppercase tracking-wider font-bold mb-1">
@@ -699,7 +688,7 @@ const StockOutManagement: React.FC = () => {
                       />
                       <input
                         type="date"
-                        value={editableRequest.patient.birthDate || ""}
+                        value={editableRequest.patient.birthDate || ''}
                         onChange={(e) =>
                           setEditableRequest({
                             ...editableRequest,
@@ -733,15 +722,11 @@ const StockOutManagement: React.FC = () => {
                   </p>
                   <div className="flex items-center gap-2">
                     <span
-                      className={`material-icons-round ${detailRequest?.status === "Menunggu" ? "text-amber-500" : "text-emerald-500"}`}
+                      className={`material-icons-round ${detailRequest?.status === 'Menunggu' ? 'text-amber-500' : 'text-emerald-500'}`}
                     >
-                      {detailRequest?.status === "Menunggu"
-                        ? "schedule"
-                        : "check_circle"}
+                      {detailRequest?.status === 'Menunggu' ? 'schedule' : 'check_circle'}
                     </span>
-                    <span className="font-bold text-lg">
-                      {detailRequest?.status}
-                    </span>
+                    <span className="font-bold text-lg">{detailRequest?.status}</span>
                   </div>
                 </div>
                 <div className="flex-1 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800">
@@ -754,7 +739,8 @@ const StockOutManagement: React.FC = () => {
                       className="size-8 rounded-full"
                       alt=""
                       onError={(e) => {
-                        e.currentTarget.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+                        e.currentTarget.src =
+                          'https://cdn-icons-png.flaticon.com/512/149/149071.png';
                       }}
                     />
                     {isEditMode && editableRequest ? (
@@ -770,9 +756,7 @@ const StockOutManagement: React.FC = () => {
                         className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm font-bold text-text-primary-light dark:text-white"
                       />
                     ) : (
-                      <span className="font-bold">
-                        {detailRequest?.requestedBy}
-                      </span>
+                      <span className="font-bold">{detailRequest?.requestedBy}</span>
                     )}
                   </div>
                 </div>
@@ -782,9 +766,7 @@ const StockOutManagement: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <h4 className="font-bold text-lg flex items-center gap-2">
-                    <span className="material-icons-round text-primary">
-                      medication
-                    </span>
+                    <span className="material-icons-round text-primary">medication</span>
                     Item Obat & Alkes
                   </h4>
                   {isEditMode && (
@@ -819,7 +801,9 @@ const StockOutManagement: React.FC = () => {
                               {isEditMode ? (
                                 <select
                                   value={drug.productId}
-                                  onChange={(e) => handleEditDrugChange(drug.id, "productId", e.target.value)}
+                                  onChange={(e) =>
+                                    handleEditDrugChange(drug.id, 'productId', e.target.value)
+                                  }
                                   className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm text-text-primary-light dark:text-white"
                                 >
                                   {products.map((product) => (
@@ -838,7 +822,9 @@ const StockOutManagement: React.FC = () => {
                                   type="number"
                                   min="1"
                                   value={drug.quantity}
-                                  onChange={(e) => handleEditDrugChange(drug.id, "quantity", e.target.value)}
+                                  onChange={(e) =>
+                                    handleEditDrugChange(drug.id, 'quantity', e.target.value)
+                                  }
                                   className="w-20 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-center text-sm text-text-primary-light dark:text-white"
                                 />
                               ) : (
@@ -846,13 +832,10 @@ const StockOutManagement: React.FC = () => {
                               )}
                             </td>
                             <td className="px-4 py-3 text-right text-text-secondary-light">
-                              Rp {(drug.price || 0).toLocaleString("id-ID")}
+                              Rp {(drug.price || 0).toLocaleString('id-ID')}
                             </td>
                             <td className="px-4 py-3 text-right font-bold text-text-primary-light dark:text-white">
-                              Rp{" "}
-                              {((drug.price || 0) * drug.quantity).toLocaleString(
-                                "id-ID",
-                              )}
+                              Rp {((drug.price || 0) * drug.quantity).toLocaleString('id-ID')}
                             </td>
                             {isEditMode && (
                               <td className="px-4 py-3 text-center">
@@ -885,21 +868,21 @@ const StockOutManagement: React.FC = () => {
               {isEditMode ? (
                 <div>
                   <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-                    <span className="material-icons-round text-primary">
-                      medical_services
-                    </span>
+                    <span className="material-icons-round text-primary">medical_services</span>
                     Layanan Tambahan
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {services.map((service) => {
-                      const checked = !!editableRequest?.services.some((item) => item.id === service.id);
+                      const checked = !!editableRequest?.services.some(
+                        (item) => item.id === service.id,
+                      );
                       return (
                         <label
                           key={service.id}
                           className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 cursor-pointer transition-colors ${
                             checked
-                              ? "border-primary bg-primary/5 dark:bg-primary/10"
-                              : "border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-white/5"
+                              ? 'border-primary bg-primary/5 dark:bg-primary/10'
+                              : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-white/5'
                           }`}
                         >
                           <div className="flex items-center gap-3">
@@ -914,7 +897,7 @@ const StockOutManagement: React.FC = () => {
                             </span>
                           </div>
                           <span className="text-sm font-bold text-primary dark:text-blue-300">
-                            Rp {service.price.toLocaleString("id-ID")}
+                            Rp {service.price.toLocaleString('id-ID')}
                           </span>
                         </label>
                       );
@@ -922,30 +905,29 @@ const StockOutManagement: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                detailRequest && detailRequest.services.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-                    <span className="material-icons-round text-primary">
-                      medical_services
-                    </span>
-                    Layanan Tambahan
-                  </h4>
-                  <div className="flex flex-col gap-2">
-                    {detailRequest.services.map((svc, i) => (
-                      <div
-                        key={i}
-                        className="flex justify-between items-center p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-white/5"
-                      >
-                        <span className="font-bold text-sm text-text-primary-light dark:text-white">
-                          {svc.name}
-                        </span>
-                        <span className="font-bold text-sm text-primary dark:text-blue-300">
-                          Rp {(svc.price || 0).toLocaleString("id-ID")}
-                        </span>
-                      </div>
-                    ))}
+                detailRequest &&
+                detailRequest.services.length > 0 && (
+                  <div>
+                    <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
+                      <span className="material-icons-round text-primary">medical_services</span>
+                      Layanan Tambahan
+                    </h4>
+                    <div className="flex flex-col gap-2">
+                      {detailRequest.services.map((svc, i) => (
+                        <div
+                          key={i}
+                          className="flex justify-between items-center p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-white/5"
+                        >
+                          <span className="font-bold text-sm text-text-primary-light dark:text-white">
+                            {svc.name}
+                          </span>
+                          <span className="font-bold text-sm text-primary dark:text-blue-300">
+                            Rp {(svc.price || 0).toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
                 )
               )}
 
@@ -954,19 +936,19 @@ const StockOutManagement: React.FC = () => {
                 <div className="flex justify-between text-sm text-text-secondary-light">
                   <span>Total Harga Obat</span>
                   <span className="font-bold text-text-primary-light dark:text-white">
-                    Rp{" "}
-                    {detailRequest ? getDetailTotals(detailRequest).totalDrugs.toLocaleString(
-                      "id-ID",
-                    ) : "0"}
+                    Rp{' '}
+                    {detailRequest
+                      ? getDetailTotals(detailRequest).totalDrugs.toLocaleString('id-ID')
+                      : '0'}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm text-text-secondary-light">
                   <span>Total Harga Jasa</span>
                   <span className="font-bold text-text-primary-light dark:text-white">
-                    Rp{" "}
+                    Rp{' '}
                     {detailRequest
-                      ? getDetailTotals(detailRequest).totalServices.toLocaleString("id-ID")
-                      : "0"}
+                      ? getDetailTotals(detailRequest).totalServices.toLocaleString('id-ID')
+                      : '0'}
                   </span>
                 </div>
                 {isProcessMode ? (
@@ -977,10 +959,10 @@ const StockOutManagement: React.FC = () => {
                       <input
                         type="number"
                         min="0"
-                        value={processServiceFee === 0 ? "" : processServiceFee}
+                        value={processServiceFee === 0 ? '' : processServiceFee}
                         onChange={(e) => {
                           const val = e.target.value;
-                          setProcessServiceFee(val === "" ? 0 : Math.max(0, Number(val)));
+                          setProcessServiceFee(val === '' ? 0 : Math.max(0, Number(val)));
                         }}
                         className="w-32 px-3 py-1.5 text-right rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-text-primary-light dark:text-white focus:ring-primary focus:border-primary font-bold text-primary"
                         placeholder="0"
@@ -995,11 +977,12 @@ const StockOutManagement: React.FC = () => {
                       <input
                         type="number"
                         min="0"
-                        value={editableRequest.serviceFee === 0 ? "" : editableRequest.serviceFee}
+                        value={editableRequest.serviceFee === 0 ? '' : editableRequest.serviceFee}
                         onChange={(e) =>
                           setEditableRequest({
                             ...editableRequest,
-                            serviceFee: e.target.value === "" ? 0 : Math.max(0, Number(e.target.value)),
+                            serviceFee:
+                              e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)),
                           })
                         }
                         className="w-32 px-3 py-1.5 text-right rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-text-primary-light dark:text-white focus:ring-primary focus:border-primary font-bold text-primary"
@@ -1008,11 +991,12 @@ const StockOutManagement: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  detailRequest && getDetailTotals(detailRequest).serviceFee > 0 && (
+                  detailRequest &&
+                  getDetailTotals(detailRequest).serviceFee > 0 && (
                     <div className="flex justify-between text-sm text-text-secondary-light">
                       <span>Biaya Layanan</span>
                       <span className="font-bold text-text-primary-light dark:text-white">
-                        Rp {getDetailTotals(detailRequest).serviceFee.toLocaleString("id-ID")}
+                        Rp {getDetailTotals(detailRequest).serviceFee.toLocaleString('id-ID')}
                       </span>
                     </div>
                   )
@@ -1025,10 +1009,10 @@ const StockOutManagement: React.FC = () => {
                       <input
                         type="number"
                         min="0"
-                        value={processDiscount === 0 ? "" : processDiscount}
+                        value={processDiscount === 0 ? '' : processDiscount}
                         onChange={(e) => {
                           const val = e.target.value;
-                          setProcessDiscount(val === "" ? 0 : Math.max(0, Number(val)));
+                          setProcessDiscount(val === '' ? 0 : Math.max(0, Number(val)));
                         }}
                         className="w-32 px-3 py-1.5 text-right rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-text-primary-light dark:text-white focus:ring-primary focus:border-primary font-bold text-red-500"
                         placeholder="0"
@@ -1043,11 +1027,12 @@ const StockOutManagement: React.FC = () => {
                       <input
                         type="number"
                         min="0"
-                        value={editableRequest.discount === 0 ? "" : editableRequest.discount}
+                        value={editableRequest.discount === 0 ? '' : editableRequest.discount}
                         onChange={(e) =>
                           setEditableRequest({
                             ...editableRequest,
-                            discount: e.target.value === "" ? 0 : Math.max(0, Number(e.target.value)),
+                            discount:
+                              e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)),
                           })
                         }
                         className="w-32 px-3 py-1.5 text-right rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-text-primary-light dark:text-white focus:ring-primary focus:border-primary font-bold text-red-500"
@@ -1056,11 +1041,12 @@ const StockOutManagement: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  detailRequest && getDetailTotals(detailRequest).discount > 0 && (
+                  detailRequest &&
+                  getDetailTotals(detailRequest).discount > 0 && (
                     <div className="flex justify-between text-sm text-text-secondary-light">
                       <span>Diskon</span>
                       <span className="font-bold text-red-500">
-                        - Rp {getDetailTotals(detailRequest).discount.toLocaleString("id-ID")}
+                        - Rp {getDetailTotals(detailRequest).discount.toLocaleString('id-ID')}
                       </span>
                     </div>
                   )
@@ -1070,8 +1056,10 @@ const StockOutManagement: React.FC = () => {
                     Total Keseluruhan
                   </span>
                   <span className="font-extrabold text-2xl text-primary dark:text-white">
-                    Rp{" "}
-                    {detailRequest ? getDetailTotals(detailRequest).grandTotal.toLocaleString("id-ID") : "0"}
+                    Rp{' '}
+                    {detailRequest
+                      ? getDetailTotals(detailRequest).grandTotal.toLocaleString('id-ID')
+                      : '0'}
                   </span>
                 </div>
               </div>
@@ -1089,17 +1077,20 @@ const StockOutManagement: React.FC = () => {
                 }}
                 className="px-6 py-2.5 rounded-xl font-bold text-text-secondary-light hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
               >
-                {isEditMode ? "Batal" : "Tutup"}
+                {isEditMode ? 'Batal' : 'Tutup'}
               </button>
-              {!isProcessMode && selectedRequest.status === "Menunggu" && canEditRequest(selectedRequest) && !isEditMode && (
-                <button
-                  onClick={() => setIsEditMode(true)}
-                  className="px-6 py-2.5 rounded-xl font-bold border border-primary/20 text-primary hover:bg-primary/10 transition-colors flex items-center gap-2"
-                >
-                  <span className="material-icons-round text-sm">edit</span>
-                  Edit Detail
-                </button>
-              )}
+              {!isProcessMode &&
+                selectedRequest.status === 'Menunggu' &&
+                canEditRequest(selectedRequest) &&
+                !isEditMode && (
+                  <button
+                    onClick={() => setIsEditMode(true)}
+                    className="px-6 py-2.5 rounded-xl font-bold border border-primary/20 text-primary hover:bg-primary/10 transition-colors flex items-center gap-2"
+                  >
+                    <span className="material-icons-round text-sm">edit</span>
+                    Edit Detail
+                  </button>
+                )}
               {isEditMode && (
                 <button
                   onClick={handleSaveDetailEdit}
@@ -1107,28 +1098,24 @@ const StockOutManagement: React.FC = () => {
                   className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <span className="material-icons-round text-sm">
-                    {updateRequestMutation.isPending ? "refresh" : "save"}
+                    {updateRequestMutation.isPending ? 'refresh' : 'save'}
                   </span>
-                  {updateRequestMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+                  {updateRequestMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
               )}
-              {isProcessMode &&
-                selectedRequest.status === "Menunggu" &&
-                canProcessRequest && (
-                  <button
-                    onClick={() => {
-                      // Transition to Confirmation Modal
-                      setRequestToProcess(selectedRequest);
-                      setSelectedRequest(null);
-                    }}
-                    className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:bg-blue-700 transition-colors flex items-center gap-2"
-                  >
-                    <span className="material-icons-round text-sm">
-                      check_circle
-                    </span>
-                    Proses Permintaan
-                  </button>
-                )}
+              {isProcessMode && selectedRequest.status === 'Menunggu' && canProcessRequest && (
+                <button
+                  onClick={() => {
+                    // Transition to Confirmation Modal
+                    setRequestToProcess(selectedRequest);
+                    setSelectedRequest(null);
+                  }}
+                  className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <span className="material-icons-round text-sm">check_circle</span>
+                  Proses Permintaan
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1145,11 +1132,9 @@ const StockOutManagement: React.FC = () => {
               Proses Permintaan?
             </h3>
             <p className="text-text-secondary-light mb-6">
-              Anda akan memproses permintaan untuk pasien{" "}
-              <span className="font-bold text-primary">
-                {requestToProcess.patient.fullName}
-              </span>
-              . Jika ada item obat, stok akan dikurangi secara otomatis sesuai item yang diminta.
+              Anda akan memproses permintaan untuk pasien{' '}
+              <span className="font-bold text-primary">{requestToProcess.patient.fullName}</span>.
+              Jika ada item obat, stok akan dikurangi secara otomatis sesuai item yang diminta.
             </p>
 
             <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 mb-6 text-left border border-gray-100 dark:border-white/10 max-h-40 overflow-y-auto">
@@ -1184,7 +1169,7 @@ const StockOutManagement: React.FC = () => {
                           {service.name}
                         </span>
                         <span className="font-bold">
-                          Rp {service.price.toLocaleString("id-ID")}
+                          Rp {service.price.toLocaleString('id-ID')}
                         </span>
                       </li>
                     ))}
@@ -1194,22 +1179,36 @@ const StockOutManagement: React.FC = () => {
               {processServiceFee > 0 && (
                 <div className="mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-white/10 flex justify-between text-sm">
                   <span className="text-text-secondary-light">Biaya Layanan</span>
-                  <span className="font-bold text-text-primary-light dark:text-white">Rp {processServiceFee.toLocaleString("id-ID")}</span>
+                  <span className="font-bold text-text-primary-light dark:text-white">
+                    Rp {processServiceFee.toLocaleString('id-ID')}
+                  </span>
                 </div>
               )}
               {processDiscount > 0 && (
-                <div className={`${processServiceFee > 0 ? 'mt-2' : 'mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-white/10'} flex justify-between text-sm`}>
+                <div
+                  className={`${processServiceFee > 0 ? 'mt-2' : 'mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-white/10'} flex justify-between text-sm`}
+                >
                   <span className="text-text-secondary-light">Diskon Diberikan</span>
-                  <span className="font-bold text-red-500">- Rp {processDiscount.toLocaleString("id-ID")}</span>
+                  <span className="font-bold text-red-500">
+                    - Rp {processDiscount.toLocaleString('id-ID')}
+                  </span>
                 </div>
               )}
               {(() => {
-                const subtotal = getDetailTotals(requestToProcess).totalDrugs + getDetailTotals(requestToProcess).totalServices;
+                const subtotal =
+                  getDetailTotals(requestToProcess).totalDrugs +
+                  getDetailTotals(requestToProcess).totalServices;
                 const finalTotal = Math.max(0, subtotal + processServiceFee - processDiscount);
                 return (
-                  <div className={`flex justify-between text-sm ${processDiscount === 0 && processServiceFee === 0 ? 'mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-white/10' : 'mt-2'}`}>
-                    <span className="text-text-primary-light dark:text-white font-bold">Total Tagihan</span>
-                    <span className="font-bold text-primary dark:text-blue-300">Rp {finalTotal.toLocaleString("id-ID")}</span>
+                  <div
+                    className={`flex justify-between text-sm ${processDiscount === 0 && processServiceFee === 0 ? 'mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-white/10' : 'mt-2'}`}
+                  >
+                    <span className="text-text-primary-light dark:text-white font-bold">
+                      Total Tagihan
+                    </span>
+                    <span className="font-bold text-primary dark:text-blue-300">
+                      Rp {finalTotal.toLocaleString('id-ID')}
+                    </span>
                   </div>
                 );
               })()}

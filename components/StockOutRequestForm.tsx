@@ -24,8 +24,12 @@ const isDraftDrugRow = (drug: RequestedDrug) =>
   !drug.productName?.trim() &&
   (drug.quantity === 1 || drug.quantity === 0 || drug.quantity === undefined);
 
-const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClose, isLoading = false }) => {
-  const { user, userProfile } = useAuth();
+const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
+  onSave,
+  onClose,
+  isLoading = false,
+}) => {
+  const { user } = useAuth();
   const userId = user?.id;
 
   const { data: productData } = useProducts({ page: 1, perPage: 1000 });
@@ -36,11 +40,13 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
 
   const [activeLookupId, setActiveLookupId] = useState<string | null>(null);
 
-  const [formNumber, setFormNumber] = useState(`#REQ-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`);
+  const [formNumber, setFormNumber] = useState(
+    `#REQ-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
+  );
   const [patientName, setPatientName] = useState('');
   const [patientBirthDate, setPatientBirthDate] = useState('');
   const [nakesName, setNakesName] = useState('');
-  const [nakesList, setNakesList] = useState<{ id: string; full_name: string }[]>([]);
+  const [nakesList, setNakesList] = useState<{ id: string; full_name: string | null }[]>([]);
 
   useEffect(() => {
     const fetchNakes = async () => {
@@ -50,7 +56,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
         .eq('user_roles.role', 'nakes')
         .order('full_name');
       if (data && data.length > 0) {
-        const list = data.map((p: any) => ({ id: p.id, full_name: p.full_name }));
+        const list = data.map((p) => ({ id: p.id, full_name: p.full_name }));
         setNakesList(list);
         setNakesName(list[0].full_name || '');
       }
@@ -112,7 +118,8 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
     }
 
     // Minimal harus ada 1 obat (valid) ATAU 1 jasa dipilih
-    const hasValidDrug = activeDrugs.length > 0 && activeDrugs.every(d => d.productId && d.quantity > 0);
+    const hasValidDrug =
+      activeDrugs.length > 0 && activeDrugs.every((d) => d.productId && d.quantity > 0);
     const hasService = selectedServices.length > 0;
     if (!hasValidDrug && !hasService && Object.keys(drugErrors).length === 0) {
       // Tidak ada obat dan tidak ada jasa — tampilkan error umum (tidak ada field khusus)
@@ -125,16 +132,26 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
   };
 
   const handleBlur = (field: string) => {
-    setTouched(prev => new Set(prev).add(field));
+    setTouched((prev) => new Set(prev).add(field));
     validateForm();
   };
 
   const addDrug = () => {
-    setRequestedDrugs([...requestedDrugs, { id: Math.random().toString(), productId: '', productName: '', quantity: 1, unit: 'Tablet', instructions: '3x1 Sesudah makan' }]);
+    setRequestedDrugs([
+      ...requestedDrugs,
+      {
+        id: Math.random().toString(),
+        productId: '',
+        productName: '',
+        quantity: 1,
+        unit: 'Tablet',
+        instructions: '3x1 Sesudah makan',
+      },
+    ]);
   };
 
   const removeDrug = (id: string) => {
-    setRequestedDrugs(requestedDrugs.filter(d => d.id !== id));
+    setRequestedDrugs(requestedDrugs.filter((d) => d.id !== id));
     setTouched((prev) => {
       const next = new Set(prev);
       next.delete(`drugs.${id}.productId`);
@@ -150,27 +167,38 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
     }
   };
 
-  const handleDrugChange = (id: string, field: keyof RequestedDrug, value: any) => {
-    setRequestedDrugs(requestedDrugs.map(d => {
-      if (d.id === id) {
-        if (field === 'productId') {
-          const product = products.find(p => p.id === value);
-          return { ...d, productId: value, productName: product?.name || '', unit: product?.unit || 'Tablet' };
+  const handleDrugChange = <K extends keyof RequestedDrug>(
+    id: string,
+    field: K,
+    value: RequestedDrug[K] | undefined, // input angka yang dikosongkan mengirim undefined
+  ) => {
+    setRequestedDrugs(
+      requestedDrugs.map((d) => {
+        if (d.id === id) {
+          if (field === 'productId') {
+            const product = products.find((p) => p.id === value);
+            return {
+              ...d,
+              productId: value as string,
+              productName: product?.name || '',
+              unit: product?.unit || 'Tablet',
+            };
+          }
+          return { ...d, [field]: value };
         }
-        return { ...d, [field]: value };
-      }
-      return d;
-    }));
+        return d;
+      }),
+    );
   };
 
   const toggleService = (id: string) => {
-    setSelectedServices(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    setSelectedServices((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
   const toggleCategory = (categoryName: string) => {
-    setExpandedCategories(prev => {
+    setExpandedCategories((prev) => {
       const next = new Set(prev);
       if (next.has(categoryName)) {
         next.delete(categoryName);
@@ -190,12 +218,12 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
   }, {});
 
   const totalDrugs = requestedDrugs.reduce((sum, drug) => {
-    const product = products.find(p => p.id === drug.productId);
+    const product = products.find((p) => p.id === drug.productId);
     return sum + (product ? product.sellingPrice * drug.quantity : 0);
   }, 0);
 
   const totalServices = selectedServices.reduce((sum, id) => {
-    const service = services.find(s => s.id === id);
+    const service = services.find((s) => s.id === id);
     return sum + (service ? service.price : 0);
   }, 0);
 
@@ -206,7 +234,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
 
     // Touch fields
     const allTouched = new Set<string>(['formNumber', 'patientName']);
-    requestedDrugs.forEach(d => {
+    requestedDrugs.forEach((d) => {
       allTouched.add(`drugs.${d.id}.productId`);
       allTouched.add(`drugs.${d.id}.quantity`);
     });
@@ -223,26 +251,27 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
         fullName: patientName,
         medicalRecordNumber: '-',
         birthDate: patientBirthDate,
-        diagnosis: '-'
+        diagnosis: '-',
       },
       drugs: sanitizedDrugs,
-      services: selectedServices.map(id => {
-        const s = services.find(svc => svc.id === id);
+      services: selectedServices.map((id) => {
+        const s = services.find((svc) => svc.id === id);
         return {
           id: id,
           name: s?.name || 'Unknown',
-          price: s?.price || 0
+          price: s?.price || 0,
         };
       }),
       totalAmount: Math.max(0, totalAmount),
       discount: discount,
       serviceFee: serviceFee,
       requestedBy: nakesName,
-      requestedByAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBqgtWx9e1jooHDwfz33Jdt6bQ2j0HZ4SzvqJ1_axDjTlPbR-tFS58Fod4YQWEWXDCxd9TiTIB1S-bFtU89ptBoAi66Y1P4Df3e4uyUFX0rwZRmusSvpv2_u88tZQiqUWrg2nPdWUuciqKl8oGtia-pDjOTURi6Y1xSvjun4MEl2V5a4roBQ3fa7MXYUJibAxL_7x7QhjdO800MfK4tvvWLW_L4bxKginroIPYTP4Zy2VeA4jJ8LPJW4Ec5qt3yC5Kc3C2HmiVTxeA',
+      requestedByAvatar:
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuBqgtWx9e1jooHDwfz33Jdt6bQ2j0HZ4SzvqJ1_axDjTlPbR-tFS58Fod4YQWEWXDCxd9TiTIB1S-bFtU89ptBoAi66Y1P4Df3e4uyUFX0rwZRmusSvpv2_u88tZQiqUWrg2nPdWUuciqKl8oGtia-pDjOTURi6Y1xSvjun4MEl2V5a4roBQ3fa7MXYUJibAxL_7x7QhjdO800MfK4tvvWLW_L4bxKginroIPYTP4Zy2VeA4jJ8LPJW4Ec5qt3yC5Kc3C2HmiVTxeA',
       status: 'Menunggu',
       date: new Date().toISOString().split('T')[0],
       tipeSumber: 'PENGAJUAN_NAKES',
-      createdBy: userId || ''
+      createdBy: userId || '',
     };
     onSave(request);
   };
@@ -253,9 +282,12 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
 
   const renderCategoryRow = (categoryName: string, categoryServices: typeof services) => {
     const isExpanded = expandedCategories.has(categoryName);
-    const selectedCount = categoryServices.filter(s => selectedServices.includes(s.id)).length;
+    const selectedCount = categoryServices.filter((s) => selectedServices.includes(s.id)).length;
     return (
-      <div key={categoryName} className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
+      <div
+        key={categoryName}
+        className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"
+      >
         <button
           type="button"
           onClick={() => toggleCategory(categoryName)}
@@ -263,16 +295,24 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
         >
           <div className="flex items-center gap-2">
             <span className="material-icons-round text-base text-purple-500">folder</span>
-            <span className="font-bold text-sm text-brand-dark dark:text-white">{categoryName}</span>
+            <span className="font-bold text-sm text-brand-dark dark:text-white">
+              {categoryName}
+            </span>
             {selectedCount > 0 && (
-              <span className="text-[10px] font-bold bg-primary text-white rounded-full px-1.5 py-0.5">{selectedCount}</span>
+              <span className="text-[10px] font-bold bg-primary text-white rounded-full px-1.5 py-0.5">
+                {selectedCount}
+              </span>
             )}
           </div>
-          <span className={`material-icons-round text-base text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>expand_more</span>
+          <span
+            className={`material-icons-round text-base text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          >
+            expand_more
+          </span>
         </button>
         {isExpanded && (
           <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
-            {categoryServices.map(service => (
+            {categoryServices.map((service) => (
               <div
                 key={service.id}
                 onClick={() => toggleService(service.id)}
@@ -280,14 +320,18 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
               >
                 <input
                   checked={selectedServices.includes(service.id)}
-                  onChange={() => { }}
+                  onChange={() => {}}
                   className="rounded border-gray-300 text-primary focus:ring-primary"
                   type="checkbox"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-brand-dark dark:text-white truncate">{service.name}</p>
+                  <p className="font-semibold text-sm text-brand-dark dark:text-white truncate">
+                    {service.name}
+                  </p>
                 </div>
-                <span className="font-bold text-sm text-slate-800 dark:text-slate-300 whitespace-nowrap">Rp {service.price.toLocaleString('id-ID')}</span>
+                <span className="font-bold text-sm text-slate-800 dark:text-slate-300 whitespace-nowrap">
+                  Rp {service.price.toLocaleString('id-ID')}
+                </span>
               </div>
             ))}
           </div>
@@ -300,7 +344,9 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-background-light dark:bg-background-dark w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-[40px] shadow-soft p-4 md:p-8 lg:p-10 font-display">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-brand-dark dark:text-white tracking-tight">Formulir Permintaan Obat</h2>
+          <h2 className="text-3xl font-bold text-brand-dark dark:text-white tracking-tight">
+            Formulir Permintaan Obat
+          </h2>
           <Button
             onClick={onClose}
             variant="ghost"
@@ -311,7 +357,10 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"
+        >
           <div className="lg:col-span-8 flex flex-col gap-6">
             {/* Data Pasien Section */}
             <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
@@ -332,7 +381,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                     className={`w-full rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm focus:border-primary focus:ring-primary dark:text-white ${getInputClassName(touched.has('formNumber') ? errors.formNumber : undefined)}`}
                     type="text"
                     value={formNumber}
-                    onChange={e => setFormNumber(e.target.value)}
+                    onChange={(e) => setFormNumber(e.target.value)}
                     onBlur={() => handleBlur('formNumber')}
                   />
                   {touched.has('formNumber') && errors.formNumber && (
@@ -348,7 +397,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                     placeholder="Masukkan nama pasien"
                     type="text"
                     value={patientName}
-                    onChange={e => setPatientName(e.target.value)}
+                    onChange={(e) => setPatientName(e.target.value)}
                     onBlur={() => handleBlur('patientName')}
                   />
                   {touched.has('patientName') && errors.patientName && (
@@ -363,7 +412,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                     className="w-full rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm focus:border-primary focus:ring-primary dark:text-white"
                     type="date"
                     value={patientBirthDate}
-                    onChange={e => setPatientBirthDate(e.target.value)}
+                    onChange={(e) => setPatientBirthDate(e.target.value)}
                   />
                 </div>
               </div>
@@ -382,13 +431,13 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
               <select
                 className="w-full rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm focus:border-primary focus:ring-primary dark:text-white"
                 value={nakesName}
-                onChange={e => setNakesName(e.target.value)}
+                onChange={(e) => setNakesName(e.target.value)}
               >
-                {nakesList.length === 0 && (
-                  <option value="">Memuat data nakes...</option>
-                )}
-                {nakesList.map(n => (
-                  <option key={n.id} value={n.full_name || ''}>{n.full_name || n.id}</option>
+                {nakesList.length === 0 && <option value="">Memuat data nakes...</option>}
+                {nakesList.map((n) => (
+                  <option key={n.id} value={n.full_name || ''}>
+                    {n.full_name || n.id}
+                  </option>
                 ))}
               </select>
             </div>
@@ -401,7 +450,9 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                     <span className="material-icons-round text-lg">medication</span>
                   </span>
                   Permintaan Obat & Alkes
-                  <span className="text-xs font-normal text-text-secondary-light ml-1">(Opsional)</span>
+                  <span className="text-xs font-normal text-text-secondary-light ml-1">
+                    (Opsional)
+                  </span>
                 </h3>
               </div>
 
@@ -418,8 +469,10 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                     onClick={addDrug}
                     className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-8 flex flex-col items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-primary hover:text-primary transition-all group"
                   >
-                    <span className="material-icons-round text-3xl group-hover:scale-110 transition-transform">add_circle_outline</span>
-                      <span className="font-bold text-sm">Tambah Obat / Alkes</span>
+                    <span className="material-icons-round text-3xl group-hover:scale-110 transition-transform">
+                      add_circle_outline
+                    </span>
+                    <span className="font-bold text-sm">Tambah Obat / Alkes</span>
                     <span className="text-xs text-slate-500">Lewati jika hanya ada jasa</span>
                   </button>
                 </>
@@ -429,8 +482,12 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                     <table className="w-full text-left text-sm">
                       <thead className="bg-gray-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 font-medium border-b border-gray-100 dark:border-gray-700">
                         <tr>
-                          <th className="px-5 py-3">Nama Obat <span className="text-red-500">*</span></th>
-                          <th className="px-5 py-3 w-24 text-center">Jumlah <span className="text-red-500">*</span></th>
+                          <th className="px-5 py-3">
+                            Nama Obat <span className="text-red-500">*</span>
+                          </th>
+                          <th className="px-5 py-3 w-24 text-center">
+                            Jumlah <span className="text-red-500">*</span>
+                          </th>
                           <th className="px-5 py-3">Satuan</th>
                           <th className="px-5 py-3 text-right">Harga</th>
                           <th className="px-5 py-3 text-right">Total Harga</th>
@@ -439,7 +496,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-card-dark">
                         {requestedDrugs.map((drug) => {
-                          const product = products.find(p => p.id === drug.productId);
+                          const product = products.find((p) => p.id === drug.productId);
                           const price = product ? product.sellingPrice : 0;
                           const total = price * drug.quantity;
 
@@ -460,28 +517,51 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                                     placeholder="Pilih Obat..."
                                     readOnly
                                   />
-                                  <span className="material-icons-round text-sm text-slate-400 absolute right-0 top-1 opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+                                  <span className="material-icons-round text-sm text-slate-400 absolute right-0 top-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    edit
+                                  </span>
                                 </div>
-                                {(isProducerIdTouched || Object.keys(errors).length > 0) && drugError?.productId && (
-                                  <p className="text-[10px] text-red-500 mt-0.5">{drugError.productId}</p>
-                                )}
-                                <p className="text-[10px] text-slate-500 mt-1">Stok: {products.find(p => p.id === drug.productId)?.stock || 0} {drug.unit}</p>
+                                {(isProducerIdTouched || Object.keys(errors).length > 0) &&
+                                  drugError?.productId && (
+                                    <p className="text-[10px] text-red-500 mt-0.5">
+                                      {drugError.productId}
+                                    </p>
+                                  )}
+                                <p className="text-[10px] text-slate-500 mt-1">
+                                  Stok: {products.find((p) => p.id === drug.productId)?.stock || 0}{' '}
+                                  {drug.unit}
+                                </p>
                               </td>
                               <td className="px-5 py-3 text-center">
                                 <input
                                   className={`w-16 rounded-lg border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm py-1 px-2 focus:ring-primary focus:border-primary dark:text-white text-center ${isQuantityTouched && drugError?.quantity ? 'border-red-500 focus:border-red-500' : ''}`}
                                   type="number"
-                                  value={(drug.quantity as any) ?? ''}
-                                  onChange={e => handleDrugChange(drug.id, 'quantity', e.target.value === '' ? undefined : Number(e.target.value))}
+                                  value={drug.quantity ?? ''}
+                                  onChange={(e) =>
+                                    handleDrugChange(
+                                      drug.id,
+                                      'quantity',
+                                      e.target.value === '' ? undefined : Number(e.target.value),
+                                    )
+                                  }
                                   onBlur={() => handleBlur(`drugs.${drug.id}.quantity`)}
                                 />
-                                {(isQuantityTouched || Object.keys(errors).length > 0) && drugError?.quantity && (
-                                  <p className="text-[10px] text-red-500 mt-0.5">{drugError.quantity}</p>
-                                )}
+                                {(isQuantityTouched || Object.keys(errors).length > 0) &&
+                                  drugError?.quantity && (
+                                    <p className="text-[10px] text-red-500 mt-0.5">
+                                      {drugError.quantity}
+                                    </p>
+                                  )}
                               </td>
-                              <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{drug.unit}</td>
-                              <td className="px-5 py-3 text-right text-slate-600 dark:text-slate-300">Rp {price.toLocaleString('id-ID')}</td>
-                              <td className="px-5 py-3 text-right font-bold text-slate-800 dark:text-white">Rp {total.toLocaleString('id-ID')}</td>
+                              <td className="px-5 py-3 text-slate-600 dark:text-slate-300">
+                                {drug.unit}
+                              </td>
+                              <td className="px-5 py-3 text-right text-slate-600 dark:text-slate-300">
+                                Rp {price.toLocaleString('id-ID')}
+                              </td>
+                              <td className="px-5 py-3 text-right font-bold text-slate-800 dark:text-white">
+                                Rp {total.toLocaleString('id-ID')}
+                              </td>
                               <td className="px-5 py-3 text-center">
                                 <Button
                                   type="button"
@@ -505,7 +585,9 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                     variant="ghost"
                     className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-6 flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group h-auto"
                   >
-                    <span className="material-icons-round group-hover:scale-110 transition-transform">add_circle</span>
+                    <span className="material-icons-round group-hover:scale-110 transition-transform">
+                      add_circle
+                    </span>
                     <span className="font-bold text-sm">Tambah Obat Lain</span>
                   </Button>
                 </>
@@ -525,12 +607,16 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                 </h3>
               </div>
               <div className="flex flex-col gap-2">
-                {Object.entries(servicesByCategory).map(([catName, catSvcs]) => renderCategoryRow(catName, catSvcs))}
+                {Object.entries(servicesByCategory).map(([catName, catSvcs]) =>
+                  renderCategoryRow(catName, catSvcs),
+                )}
 
                 <div className="mt-2 pt-4 border-t border-dashed border-gray-200 dark:border-gray-700">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-slate-600 font-medium">Subtotal Jasa</span>
-                    <span className="font-bold text-slate-800 dark:text-white">Rp {totalServices.toLocaleString('id-ID')}</span>
+                    <span className="font-bold text-slate-800 dark:text-white">
+                      Rp {totalServices.toLocaleString('id-ID')}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -550,32 +636,34 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                   <span>Rp {totalServices.toLocaleString('id-ID')}</span>
                 </div>
                 <div className="space-y-2 rounded-xl bg-white/10 p-3">
-                  <label className="block text-sm font-medium text-white/90">
-                    Biaya Layanan
-                  </label>
+                  <label className="block text-sm font-medium text-white/90">Biaya Layanan</label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-white/80">Rp</span>
                     <input
                       type="number"
                       min="0"
                       value={serviceFee === 0 ? '' : serviceFee}
-                      onChange={(e) => setServiceFee(e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))}
+                      onChange={(e) =>
+                        setServiceFee(
+                          e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)),
+                        )
+                      }
                       className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-bold text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/40"
                       placeholder="0"
                     />
                   </div>
                 </div>
                 <div className="space-y-2 rounded-xl bg-white/10 p-3">
-                  <label className="block text-sm font-medium text-white/90">
-                    Diskon
-                  </label>
+                  <label className="block text-sm font-medium text-white/90">Diskon</label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-white/80">Rp</span>
                     <input
                       type="number"
                       min="0"
                       value={discount === 0 ? '' : discount}
-                      onChange={(e) => setDiscount(e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))}
+                      onChange={(e) =>
+                        setDiscount(e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))
+                      }
                       className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-bold text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/40"
                       placeholder="0"
                     />
@@ -584,7 +672,9 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({ onSave, onClo
                 <div className="h-px bg-white/20 my-1"></div>
                 <div className="flex justify-between items-end">
                   <span className="text-sm font-medium text-white/90">Total Tagihan</span>
-                  <span className="text-2xl font-bold">Rp {Math.max(0, totalAmount).toLocaleString('id-ID')}</span>
+                  <span className="text-2xl font-bold">
+                    Rp {Math.max(0, totalAmount).toLocaleString('id-ID')}
+                  </span>
                 </div>
               </div>
               <Button

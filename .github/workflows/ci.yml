@@ -30,7 +30,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      # TODO(fase 3 T2): tambahkan `pnpm lint` setelah ESLint dipasang.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format:check
 
       - name: Test
         run: pnpm test
