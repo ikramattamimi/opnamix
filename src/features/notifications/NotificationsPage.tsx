@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { BellOff, CheckCheck, Loader2 } from 'lucide-react';
+import { BellOff, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/useAuth';
 import {
@@ -37,7 +38,7 @@ const FILTER_CHIP_IDLE_CLASS =
 const NotificationsPage: React.FC = () => {
   const { user } = useAuth();
   const userId = user?.id || '';
-  const { data, isLoading } = useNotifications(userId);
+  const { data, isLoading, isError, refetch } = useNotifications(userId);
   const notifications = data?.notifications ?? [];
   const unreadCount = data?.unreadCount ?? 0;
   const { mutate: markAsRead } = useMarkNotificationRead(userId);
@@ -131,19 +132,24 @@ const NotificationsPage: React.FC = () => {
       {/* Notification List */}
       <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="text-primary size-10 animate-spin" aria-hidden />
-          </div>
+          <LoadingState label="Memuat notifikasi..." className="py-16" />
+        ) : isError && !data ? (
+          <ErrorState
+            title="Gagal memuat notifikasi"
+            onRetry={() => void refetch()}
+            className="py-16 px-4"
+          />
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <BellOff className="size-12 text-gray-300 dark:text-gray-600 mb-3" aria-hidden />
-            <p className="font-bold text-text-secondary-light">Tidak ada notifikasi</p>
-            <p className="text-sm text-text-secondary-light/70 mt-1">
-              {filterType !== 'Semua' || filterRead !== 'all'
+          <EmptyState
+            icon={BellOff}
+            title="Tidak ada notifikasi"
+            description={
+              filterType !== 'Semua' || filterRead !== 'all'
                 ? 'Coba ubah filter untuk melihat notifikasi lain.'
-                : 'Belum ada notifikasi yang masuk.'}
-            </p>
-          </div>
+                : 'Belum ada notifikasi yang masuk.'
+            }
+            className="py-16 px-4"
+          />
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {filtered.map((notif) => (

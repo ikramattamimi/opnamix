@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import StatCard from '@/components/common/StatCard';
 import {
   ArrowDown,
@@ -20,7 +21,12 @@ import { exportRecentTransactionsToExcel } from '@/features/reports/exportUtils'
 const EMPTY_TRANSACTIONS: RecentTransaction[] = [];
 
 const Dashboard: React.FC = () => {
-  const { data: stats, isPending: loading, error: statsError } = useDashboardStats();
+  const {
+    data: stats,
+    isPending: loading,
+    error: statsError,
+    refetch: refetchStats,
+  } = useDashboardStats();
 
   // Pagination state for recent transactions
   const [trxPage, setTrxPage] = useState(1);
@@ -29,6 +35,7 @@ const Dashboard: React.FC = () => {
     isPending: trxPending,
     isPlaceholderData: trxPlaceholder,
     error: trxError,
+    refetch: refetchTrx,
   } = useRecentTransactions(trxPage, 5);
   const recentTrx = trxData?.data ?? EMPTY_TRANSACTIONS;
   // Halaman lama tetap ditampilkan (keepPreviousData) sampai halaman baru siap
@@ -44,11 +51,7 @@ const Dashboard: React.FC = () => {
   }, [trxError]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingState label="Memuat dashboard..." className="h-64" />;
   }
 
   // Fallback if stats fail
@@ -82,49 +85,57 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
-        <StatCard
-          label="Total Barang"
-          value={safeStats.totalProducts.toLocaleString()}
-          icon={Pill}
-          color="primary"
-        />
-        <StatCard
-          label="Stok Masuk"
-          value={safeStats.stokMasuk.toLocaleString()}
-          icon={Download}
-          color="primary"
-        />
-        <StatCard
-          label="Stok Keluar"
-          value={safeStats.stokKeluar.toLocaleString()}
-          icon={Upload}
-          color="primary"
-        />
-        <StatCard
-          label="Tertunda"
-          value={safeStats.tertunda.toLocaleString()}
-          icon={ClipboardClock}
-          color="primary"
-        />
+      {statsError && !stats ? (
+        <div className="bg-card-light dark:bg-card-dark rounded-DEFAULT shadow-soft">
+          <ErrorState title="Gagal memuat ringkasan stok" onRetry={() => void refetchStats()} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
+          <StatCard
+            label="Total Barang"
+            value={safeStats.totalProducts.toLocaleString()}
+            icon={Pill}
+            color="primary"
+          />
+          <StatCard
+            label="Stok Masuk"
+            value={safeStats.stokMasuk.toLocaleString()}
+            icon={Download}
+            color="primary"
+          />
+          <StatCard
+            label="Stok Keluar"
+            value={safeStats.stokKeluar.toLocaleString()}
+            icon={Upload}
+            color="primary"
+          />
+          <StatCard
+            label="Tertunda"
+            value={safeStats.tertunda.toLocaleString()}
+            icon={ClipboardClock}
+            color="primary"
+          />
 
-        <div className="bg-card-light dark:bg-card-dark p-4 rounded-DEFAULT shadow-soft flex items-center col-span-1 md:col-span-2 xl:col-span-2">
-          <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mr-4">
-            <Wallet className="text-primary size-6" aria-hidden />
-          </div>
-          <div>
-            <p className="text-sm text-text-secondary-light font-medium">Total Nilai Inventaris</p>
-            <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">
-              Rp {safeStats.totalValue.toLocaleString('id-ID')}
-            </h3>
-          </div>
-          {/* Pertumbuhan dihitung dari data real (placeholder untuk implementasi lengkap) */}
-          <div className="ml-auto flex items-center text-green-500 text-sm font-bold bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg">
-            <TrendingUp className="size-5 mr-1" aria-hidden />
-            Real-time
+          <div className="bg-card-light dark:bg-card-dark p-4 rounded-DEFAULT shadow-soft flex items-center col-span-1 md:col-span-2 xl:col-span-2">
+            <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mr-4">
+              <Wallet className="text-primary size-6" aria-hidden />
+            </div>
+            <div>
+              <p className="text-sm text-text-secondary-light font-medium">
+                Total Nilai Inventaris
+              </p>
+              <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">
+                Rp {safeStats.totalValue.toLocaleString('id-ID')}
+              </h3>
+            </div>
+            {/* Pertumbuhan dihitung dari data real (placeholder untuk implementasi lengkap) */}
+            <div className="ml-auto flex items-center text-green-500 text-sm font-bold bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg">
+              <TrendingUp className="size-5 mr-1" aria-hidden />
+              Real-time
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Charts Row */}
       {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -267,10 +278,13 @@ const Dashboard: React.FC = () => {
         </div>
 
         {trxLoading ? (
-          <div className="py-10 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto mb-2"></div>
-            <p className="text-sm text-text-secondary-light">Memuat transaksi...</p>
-          </div>
+          <LoadingState label="Memuat transaksi..." className="py-10" />
+        ) : trxError && !trxData ? (
+          <ErrorState
+            title="Gagal memuat transaksi"
+            onRetry={() => void refetchTrx()}
+            className="py-10"
+          />
         ) : recentTrx.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -312,9 +326,7 @@ const Dashboard: React.FC = () => {
             </table>
           </div>
         ) : (
-          <div className="text-center py-10 text-text-secondary-light">
-            Belum ada transaksi terbaru.
-          </div>
+          <EmptyState title="Belum ada transaksi terbaru." className="py-10" />
         )}
       </div>
     </div>

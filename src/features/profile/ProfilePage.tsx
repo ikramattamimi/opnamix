@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useProfile, useUpdateProfile, useUploadAvatar, useUpdatePassword } from './useProfile';
@@ -52,11 +53,15 @@ const FIELD_INPUT_CLASS =
 
 const ProfilePage: React.FC = () => {
   const { userProfile } = useAuth();
-  const { data: profile } = useProfile(userProfile?.id, userProfile);
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    isError: isProfileError,
+    refetch: refetchProfile,
+  } = useProfile(userProfile?.id, userProfile);
   const updateProfile = useUpdateProfile();
   const uploadAvatar = useUploadAvatar();
   const updatePassword = useUpdatePassword();
-  const [isLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formName, setFormName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -166,23 +171,21 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="text-primary size-10 animate-spin mx-auto" aria-hidden />
-          <p className="mt-2 text-sm text-text-secondary-light">Memuat profil...</p>
-        </div>
-      </div>
-    );
+  if (isProfileLoading) {
+    return <LoadingState label="Memuat profil..." className="min-h-[400px]" />;
   }
 
   if (!profile) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-text-secondary-light">Profil tidak ditemukan.</p>
-      </div>
-    );
+    if (isProfileError) {
+      return (
+        <ErrorState
+          title="Gagal memuat profil"
+          onRetry={() => void refetchProfile()}
+          className="min-h-[400px]"
+        />
+      );
+    }
+    return <EmptyState title="Profil tidak ditemukan." className="min-h-[400px]" />;
   }
 
   const userRoles = profile?.roles ?? (profile?.role ? [profile.role] : []);
