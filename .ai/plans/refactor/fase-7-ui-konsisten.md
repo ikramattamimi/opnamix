@@ -33,8 +33,9 @@ untuk path, judul, role, ikon sidebar, dan komponen lazy.
 
 ## Current State
 - Relevant files: semua komponen yang memakai `material-icons-round`,
-  `components/ui/*`, `components/ConfirmationModal.tsx`, `App.tsx`,
-  `components/AuthenticatedApp.tsx`, `components/Sidebar.tsx`, `types.ts`
+  `src/components/ui/*`, `src/components/common/ConfirmationModal.tsx`,
+  `src/app/App.tsx`, `src/app/AuthenticatedApp.tsx`,
+  `src/components/layout/Sidebar.tsx`, `src/types/routes.ts`
   (`ROUTES`), `index.html` (link font ikon)
 - Existing patterns: shadcn dengan `class-variance-authority` dan alias di
   `components.json`, serta token warna di `tailwind.config.js` dan

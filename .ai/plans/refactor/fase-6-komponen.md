@@ -40,9 +40,13 @@ dites. Form memakai `react-hook-form` + `zod`.
 - Redesain UI (fase 7 hanya menyeragamkan)
 
 ## Current State
-- Relevant files: tabel di atas, `components/*Columns.tsx`,
-  `components/ProductForm.tsx`, `components/StockInForm.tsx`,
-  `components/StockOutManualForm.tsx`
+- Relevant files: tabel di atas (sekarang di `src/features/<domain>/`),
+  `src/features/*/*Columns.tsx`, `src/features/products/ProductForm.tsx`,
+  `src/features/stock-in/StockInForm.tsx`,
+  `src/features/stock-out/StockOutManualForm.tsx`
+- Struktur: folder fitur saat ini datar. Sub-komponen hasil pemecahan
+  diletakkan di `src/features/<domain>/components/`, sedangkan halaman tetap
+  di root folder fitur.
 - Existing patterns: `*Columns.tsx` (definisi kolom TanStack Table terpisah
   dari halaman) sudah bagus dan dipertahankan. `.ai/specs/form-loading-state.md`
   (prop `isLoading` di form)
