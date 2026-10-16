@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StockOutRequest, RequestedDrug } from './types';
 import ProductLookupModal from '@/features/products/ProductLookupModal';
 import { useProducts } from '@/features/products/useProducts';
 import { useServices } from '@/features/services/useServices';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/features/auth/useAuth';
+import { useNakesProfiles } from './useStockOut';
 
 interface StockOutRequestFormProps {
   onSave: (request: StockOutRequest) => void;
@@ -46,23 +46,14 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
   const [patientName, setPatientName] = useState('');
   const [patientBirthDate, setPatientBirthDate] = useState('');
   const [nakesName, setNakesName] = useState('');
-  const [nakesList, setNakesList] = useState<{ id: string; full_name: string | null }[]>([]);
+  const { data: nakesList = [] } = useNakesProfiles();
 
-  useEffect(() => {
-    const fetchNakes = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, full_name, user_roles!inner(role)')
-        .eq('user_roles.role', 'nakes')
-        .order('full_name');
-      if (data && data.length > 0) {
-        const list = data.map((p) => ({ id: p.id, full_name: p.full_name }));
-        setNakesList(list);
-        setNakesName(list[0].full_name || '');
-      }
-    };
-    fetchNakes();
-  }, []);
+  // Pilih nakes pertama sekali saja saat daftar pertama kali tersedia
+  const [hasDefaultNakes, setHasDefaultNakes] = useState(false);
+  if (!hasDefaultNakes && nakesList.length > 0) {
+    setHasDefaultNakes(true);
+    setNakesName(nakesList[0].full_name || '');
+  }
 
   const [requestedDrugs, setRequestedDrugs] = useState<RequestedDrug[]>([]);
 

@@ -24,6 +24,13 @@ export function useRecentStockOuts(limit: number) {
   });
 }
 
+export function useNakesProfiles() {
+  return useQuery({
+    queryKey: stockOutKeys.nakesProfiles(),
+    queryFn: () => stockOutApi.getNakesProfiles(),
+  });
+}
+
 /**
  * Subscribe ke Supabase Realtime pada tabel `transaksi`.
  * Ketika ada INSERT atau UPDATE, invalidate query stockOut
