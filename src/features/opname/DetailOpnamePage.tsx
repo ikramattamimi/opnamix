@@ -1,44 +1,18 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { opnameApi, OpnameDetail } from './api';
-
-interface DetailRow {
-  id: string;
-  productName: string;
-  stokSistem: number | null;
-  stokFisik: number | null;
-  selisih: number | null;
-  stokFinal: number | null;
-  alasan: string;
-}
+import { useOpname, useOpnameDetailView } from './useOpname';
 
 const DetailOpnamePage: React.FC = () => {
   const { opnameId } = useParams<{ opnameId: string }>();
   const navigate = useNavigate();
-  const [details, setDetails] = useState<DetailRow[]>([]);
-  const [opnameInfo, setOpnameInfo] = useState<OpnameDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const detailQuery = useOpnameDetailView(opnameId);
+  const opnameQuery = useOpname(opnameId);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    loadDetail();
-  }, [opnameId]);
-
-  const loadDetail = async () => {
-    if (!opnameId) return;
-    try {
-      const [detailData, opnameData] = await Promise.all([
-        opnameApi.getOpnameDetailView(opnameId),
-        opnameApi.getOpnameById(opnameId),
-      ]);
-      setDetails(detailData);
-      setOpnameInfo(opnameData);
-    } catch (error) {
-      console.error('Failed to load opname detail:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Kalau gagal dimuat, halaman tetap tampil dengan data kosong
+  const details = useMemo(() => detailQuery.data ?? [], [detailQuery.data]);
+  const opnameInfo = opnameQuery.data;
+  const isLoading = detailQuery.isLoading || opnameQuery.isLoading;
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('id-ID', { dateStyle: 'long' });
