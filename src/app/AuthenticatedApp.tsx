@@ -5,7 +5,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { UserProfile } from '@/features/auth/api';
-import { useOpnameLock } from '@/features/opname/useOpnameLock';
+import { useActiveOpnameLock, useOpnameLockRealtime } from '@/features/opname/useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/components/ui/button';
 
@@ -74,7 +74,10 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
 }) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isLocked, opname, isLoading, refetch } = useOpnameLock();
+  const { data: lock, isLoading } = useActiveOpnameLock();
+  useOpnameLockRealtime();
+  const isLocked = lock?.isLocked ?? false;
+  const opname = lock?.opname ?? null;
 
   const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
   const isOpnameRoute = location.pathname.startsWith('/audit/stok-opname');
@@ -84,7 +87,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
     if (!(isOpnameRoute && canAccessOpname)) {
       return (
         <Suspense fallback={<LoadingSpinner />}>
-          <OpnameLockPage opname={opname} onRefresh={refetch} />
+          <OpnameLockPage opname={opname} />
         </Suspense>
       );
     }

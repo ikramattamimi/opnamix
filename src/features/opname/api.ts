@@ -36,6 +36,8 @@ const toOpnameDetailUpdates = (updates?: OpnameDetailUpdate[]) =>
     ...(u.reason !== undefined && { reason: u.reason }),
   }));
 
+let opnameChannelSeq = 0;
+
 export const opnameApi = {
   // OPNAME SCHEDULES
   createOpnameSchedule: async (config: OpnameScheduleConfig) => {
@@ -323,6 +325,24 @@ export const opnameApi = {
             startedAt: data.created_at,
           }
         : null,
+    };
+  },
+
+  // Dengarkan semua perubahan tabel opname. onSubscribed dipanggil setiap kali
+  // channel SUBSCRIBED, termasuk setelah rejoin karena koneksi sempat putus.
+  // Mengembalikan fungsi untuk menutup channel.
+  subscribeToOpnameChanges: (handlers: { onChange: () => void; onSubscribed: () => void }) => {
+    // Nama unik per langganan: supabase.channel() mengembalikan channel lama
+    // kalau topiknya sama, padahal channel itu mungkin sedang ditutup.
+    const channel = supabase
+      .channel(`opname-changes-${++opnameChannelSeq}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'opname' }, handlers.onChange)
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') handlers.onSubscribed();
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
     };
   },
 
