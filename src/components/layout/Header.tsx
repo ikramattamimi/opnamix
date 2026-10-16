@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useNotifications } from '@/features/notifications/NotificationProvider';
+import {
+  useNotifications,
+  useMarkNotificationRead,
+  useMarkAllNotificationsRead,
+} from '@/features/notifications/useNotifications';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   getNotificationIcon,
   getNotificationColor,
   formatNotificationTime,
-} from '@/features/notifications/api';
+} from '@/features/notifications/format';
 import { ROUTES } from '@/types/routes';
 
 interface HeaderProps {
@@ -23,12 +27,18 @@ const Header: React.FC<HeaderProps> = ({
   viewName,
   onToggleSidebar,
 }) => {
-  const { userProfile, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { notifications, unreadCount, isOpen, setIsOpen, markAsRead, markAllAsRead } =
-    useNotifications();
+  const userId = user?.id || '';
+  const { data: notificationList } = useNotifications(userId);
+  const notifications = notificationList?.notifications ?? [];
+  const unreadCount = notificationList?.unreadCount ?? 0;
+  const { mutate: markAsRead } = useMarkNotificationRead(userId);
+  const { mutate: markAll } = useMarkAllNotificationsRead(userId);
+  const markAllAsRead = () => markAll();
+  const [isOpen, setIsOpen] = useState(false);
   const notifPanelRef = useRef<HTMLDivElement>(null);
   const notifButtonRef = useRef<HTMLButtonElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
