@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/common/StatCard';
-import { ClipboardClock, Download, Pill, Upload } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardClock,
+  Download,
+  Pill,
+  TrendingUp,
+  Upload,
+  Wallet,
+} from 'lucide-react';
 import type { DashboardStats, RecentTransaction } from './api';
 import { useDashboardStats, useRecentTransactions } from './useDashboard';
 import { exportRecentTransactionsToExcel } from '@/features/reports/exportUtils';
@@ -99,9 +110,7 @@ const Dashboard: React.FC = () => {
 
         <div className="bg-card-light dark:bg-card-dark p-4 rounded-DEFAULT shadow-soft flex items-center col-span-1 md:col-span-2 xl:col-span-2">
           <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mr-4">
-            <span className="material-icons-round text-primary text-2xl">
-              account_balance_wallet
-            </span>
+            <Wallet className="text-primary size-6" aria-hidden />
           </div>
           <div>
             <p className="text-sm text-text-secondary-light font-medium">Total Nilai Inventaris</p>
@@ -111,7 +120,7 @@ const Dashboard: React.FC = () => {
           </div>
           {/* Pertumbuhan dihitung dari data real (placeholder untuk implementasi lengkap) */}
           <div className="ml-auto flex items-center text-green-500 text-sm font-bold bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg">
-            <span className="material-icons-round text-base mr-1">trending_up</span>
+            <TrendingUp className="size-5 mr-1" aria-hidden />
             Real-time
           </div>
         </div>
@@ -126,7 +135,7 @@ const Dashboard: React.FC = () => {
               <p className="text-sm text-text-secondary-light">Jumlah transaksi keluar per hari</p>
             </div>
             <Button variant="ghost" size="icon" className="bg-background-light dark:bg-background-dark text-primary hover:bg-gray-200 dark:hover:bg-gray-700">
-              <span className="material-icons-round text-xl">bar_chart</span>
+              <ChartColumn className="size-5" aria-hidden />
             </Button>
           </div>
            TODO: Ambil data konsumsi mingguan dari API (jumlah transaksi keluar per hari dalam 7 hari terakhir)
@@ -161,7 +170,7 @@ const Dashboard: React.FC = () => {
                 <p className="text-sm text-text-secondary-light">Item di bawah ambang batas</p>
               </div>
               <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-lg">
-                <span className="material-icons-round">warning</span>
+                <TriangleAlert className="size-6" aria-hidden />
               </div>
             </div>
             <div className="space-y-3">
@@ -235,9 +244,10 @@ const Dashboard: React.FC = () => {
                 size="icon"
                 onClick={() => setTrxPage((p) => Math.max(1, p - 1))}
                 disabled={trxPage === 1 || trxLoading}
-                className="h-8 w-8"
+                className="h-8 w-8 [&_svg]:size-5"
+                aria-label="Halaman sebelumnya"
               >
-                <span className="material-icons-round text-lg">chevron_left</span>
+                <ChevronLeft aria-hidden />
               </Button>
               <span className="text-xs font-bold px-2 min-w-[3rem] text-center">
                 {trxPage} / {trxTotalPages}
@@ -247,9 +257,10 @@ const Dashboard: React.FC = () => {
                 size="icon"
                 onClick={() => setTrxPage((p) => Math.min(trxTotalPages, p + 1))}
                 disabled={trxPage === trxTotalPages || trxLoading}
-                className="h-8 w-8"
+                className="h-8 w-8 [&_svg]:size-5"
+                aria-label="Halaman berikutnya"
               >
-                <span className="material-icons-round text-lg">chevron_right</span>
+                <ChevronRight aria-hidden />
               </Button>
             </div>
           </div>
@@ -291,7 +302,7 @@ const Dashboard: React.FC = () => {
                     category={trx.category}
                     amount={trx.amount}
                     date={trx.date}
-                    icon={trx.icon}
+                    direction={trx.direction}
                     iconBg={trx.iconBg}
                     iconColor={trx.iconColor}
                     isWarning={trx.isWarning}
@@ -335,17 +346,21 @@ const TransactionRow: React.FC<{
   category: string;
   amount: string;
   date: string;
-  icon: string;
+  direction: 'in' | 'out';
   iconBg: string;
   iconColor: string;
   isWarning?: boolean;
-}> = ({ name, status, category, amount, date, icon, iconBg, iconColor }) => (
+}> = ({ name, status, category, amount, date, direction, iconBg, iconColor }) => (
   <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
     <td className="py-4 pl-2 flex items-center gap-3">
       <div
         className={`w-10 h-10 rounded-full ${iconBg} dark:bg-opacity-20 flex items-center justify-center ${iconColor}`}
       >
-        <span className="material-icons-round text-lg">{icon}</span>
+        {direction === 'in' ? (
+          <ArrowDown className="size-5" aria-hidden />
+        ) : (
+          <ArrowUp className="size-5" aria-hidden />
+        )}
       </div>
       <span className="font-bold">{name}</span>
     </td>

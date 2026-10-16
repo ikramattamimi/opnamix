@@ -1,29 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react';
+import {
+  Camera,
+  CircleAlert,
+  CircleCheck,
+  CircleUserRound,
+  Hourglass,
+  KeyRound,
+  Loader2,
+  Lock,
+  Pencil,
+  Pill,
+  ShieldCheck,
+  ShieldPlus,
+  type LucideIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useProfile, useUpdateProfile, useUploadAvatar, useUpdatePassword } from './useProfile';
 import { useAuth } from '@/features/auth/useAuth';
 import { getErrorMessage, toDate } from '@/lib/utils';
 
-const ROLE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
+const ROLE_LABELS: Record<string, { label: string; color: string; icon: LucideIcon }> = {
   admin: {
     label: 'Admin',
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    icon: 'admin_panel_settings',
+    icon: ShieldCheck,
   },
   apoteker: {
     label: 'Farmasi',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    icon: 'medication',
+    icon: Pill,
   },
   farmasi: {
     label: 'Farmasi',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-    icon: 'medication',
+    icon: Pill,
   },
   nakes: {
     label: 'Nakes',
     color: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-    icon: 'health_and_safety',
+    icon: ShieldPlus,
   },
 };
 
@@ -147,7 +162,7 @@ const ProfilePage: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <span className="material-icons-round text-primary text-4xl animate-spin">refresh</span>
+          <Loader2 className="text-primary size-10 animate-spin mx-auto" aria-hidden />
           <p className="mt-2 text-sm text-text-secondary-light">Memuat profil...</p>
         </div>
       </div>
@@ -173,19 +188,20 @@ const ProfilePage: React.FC = () => {
           ? 'nakes'
           : userRoles[0] || 'nakes';
   const roleInfo = ROLE_LABELS[primaryRole] || ROLE_LABELS.nakes;
+  const RoleIcon = roleInfo.icon;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Messages */}
       {error && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
-          <span className="material-icons-round text-base">error</span>
+          <CircleAlert className="size-5" aria-hidden />
           {error}
         </div>
       )}
       {success && (
         <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
-          <span className="material-icons-round text-base">check_circle</span>
+          <CircleCheck className="size-5" aria-hidden />
           {success}
         </div>
       )}
@@ -217,11 +233,20 @@ const ProfilePage: React.FC = () => {
               <button
                 onClick={handleAvatarClick}
                 disabled={isUploading}
+                aria-label="Ubah foto profil"
                 className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all cursor-pointer"
               >
-                <span className="material-icons-round text-white text-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                  {isUploading ? 'hourglass_top' : 'camera_alt'}
-                </span>
+                {isUploading ? (
+                  <Hourglass
+                    className="text-white size-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-hidden
+                  />
+                ) : (
+                  <Camera
+                    className="text-white size-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-hidden
+                  />
+                )}
               </button>
               <input
                 ref={fileInputRef}
@@ -232,9 +257,7 @@ const ProfilePage: React.FC = () => {
               />
               {isUploading && (
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white dark:bg-card-dark shadow flex items-center justify-center">
-                  <span className="material-icons-round text-primary text-xs animate-spin">
-                    refresh
-                  </span>
+                  <Loader2 className="text-primary size-3 animate-spin" aria-hidden />
                 </div>
               )}
             </div>
@@ -255,7 +278,7 @@ const ProfilePage: React.FC = () => {
                 <span
                   className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${roleInfo.color}`}
                 >
-                  <span className="material-icons-round text-xs">{roleInfo.icon}</span>
+                  <RoleIcon className="size-3" aria-hidden />
                   {roleInfo.label}
                 </span>
                 <span className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
@@ -276,7 +299,7 @@ const ProfilePage: React.FC = () => {
       <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft p-6 md:p-8">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
-            <span className="material-icons-round text-primary">account_circle</span>
+            <CircleUserRound className="text-primary size-6" aria-hidden />
             <h3 className="text-lg font-bold text-text-primary-light dark:text-white">
               Informasi Profil
             </h3>
@@ -290,7 +313,7 @@ const ProfilePage: React.FC = () => {
               }}
               className="rounded-xl text-sm h-auto py-2 px-4 font-bold flex items-center gap-1.5"
             >
-              <span className="material-icons-round text-sm">edit</span>
+              <Pencil className="size-4" aria-hidden />
               Edit
             </Button>
           ) : (
@@ -347,11 +370,10 @@ const ProfilePage: React.FC = () => {
               Role
             </label>
             <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center gap-2">
-              <span
-                className={`material-icons-round text-base ${userRoles.includes('admin') ? 'text-purple-500' : userRoles.includes('apoteker') || userRoles.includes('farmasi') ? 'text-blue-500' : 'text-green-500'}`}
-              >
-                {roleInfo.icon}
-              </span>
+              <RoleIcon
+                className={`size-5 ${userRoles.includes('admin') ? 'text-purple-500' : userRoles.includes('apoteker') || userRoles.includes('farmasi') ? 'text-blue-500' : 'text-green-500'}`}
+                aria-hidden
+              />
               {roleInfo.label}
             </p>
           </div>
@@ -378,7 +400,7 @@ const ProfilePage: React.FC = () => {
       <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft p-6 md:p-8">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="material-icons-round text-primary">lock</span>
+            <Lock className="text-primary size-6" aria-hidden />
             <h3 className="text-lg font-bold text-text-primary-light dark:text-white">Keamanan</h3>
           </div>
           {!showPasswordSection && (
@@ -387,7 +409,7 @@ const ProfilePage: React.FC = () => {
               onClick={() => setShowPasswordSection(true)}
               className="rounded-xl text-sm h-auto py-2 px-4 font-bold flex items-center gap-1.5"
             >
-              <span className="material-icons-round text-sm">key</span>
+              <KeyRound className="size-4" aria-hidden />
               Ubah Password
             </Button>
           )}

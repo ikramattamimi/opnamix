@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BellOff, CheckCheck, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/useAuth';
 import {
@@ -6,7 +7,7 @@ import {
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
 } from './useNotifications';
-import { getNotificationIcon, getNotificationColor, formatNotificationTime } from './format';
+import { getNotificationLucideIcon, getNotificationColor, formatNotificationTime } from './format';
 import { AppNotification } from './types';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -71,7 +72,7 @@ const NotificationsPage: React.FC = () => {
             onClick={markAllAsRead}
             className="text-sm font-bold text-primary hover:text-primary/80 border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 h-auto"
           >
-            <span className="material-icons-round text-sm mr-1.5">done_all</span>
+            <CheckCheck className="size-4 mr-1.5" aria-hidden />
             Tandai semua dibaca
           </Button>
         )}
@@ -118,13 +119,11 @@ const NotificationsPage: React.FC = () => {
       <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <span className="material-icons-round text-primary text-4xl animate-spin">refresh</span>
+            <Loader2 className="text-primary size-10 animate-spin" aria-hidden />
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <span className="material-icons-round text-5xl text-gray-300 dark:text-gray-600 mb-3">
-              notifications_off
-            </span>
+            <BellOff className="size-12 text-gray-300 dark:text-gray-600 mb-3" aria-hidden />
             <p className="font-bold text-text-secondary-light">Tidak ada notifikasi</p>
             <p className="text-sm text-text-secondary-light/70 mt-1">
               {filterType !== 'Semua' || filterRead !== 'all'
@@ -146,11 +145,7 @@ const NotificationsPage: React.FC = () => {
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-white/5`}
                 >
-                  <span
-                    className={`material-icons-round text-xl ${getNotificationColor(notif.type)}`}
-                  >
-                    {getNotificationIcon(notif.type)}
-                  </span>
+                  <NotificationIcon type={notif.type} />
                 </div>
 
                 {/* Content */}
@@ -193,6 +188,11 @@ const NotificationsPage: React.FC = () => {
       )}
     </div>
   );
+};
+
+const NotificationIcon: React.FC<{ type: string }> = ({ type }) => {
+  const Icon = getNotificationLucideIcon(type);
+  return <Icon className={`size-5 ${getNotificationColor(type)}`} aria-hidden />;
 };
 
 export default NotificationsPage;

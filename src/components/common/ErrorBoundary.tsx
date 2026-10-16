@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { CircleAlert } from 'lucide-react';
 
 interface Props {
   children?: ReactNode;
@@ -40,7 +41,7 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="p-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-[20px] text-center">
           <div className="mb-3 bg-red-100 dark:bg-red-500/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
-            <span className="material-icons-round text-red-500">error_outline</span>
+            <CircleAlert className="text-red-500 size-6" aria-hidden />
           </div>
           <h3 className="font-bold text-red-700 dark:text-red-400 mb-2">Terjadi Kesalahan</h3>
           <p className="text-sm text-red-600 dark:text-red-300 mb-4 px-4">

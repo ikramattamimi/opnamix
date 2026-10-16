@@ -1,4 +1,5 @@
 import React from 'react';
+import { CircleAlert, CircleCheck, Info, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ConfirmationModalProps {
@@ -30,21 +31,21 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         return {
           iconBg: 'bg-red-100 dark:bg-red-500/20',
           iconColor: 'text-red-600 dark:text-red-400',
-          icon: 'warning',
+          icon: TriangleAlert,
           confirmBg: 'bg-red-600 hover:bg-red-700 shadow-red-600/30',
         };
       case 'warning':
         return {
           iconBg: 'bg-amber-100 dark:bg-amber-500/20',
           iconColor: 'text-amber-600 dark:text-amber-400',
-          icon: 'error',
+          icon: CircleAlert,
           confirmBg: 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/30',
         };
       case 'success':
         return {
           iconBg: 'bg-green-100 dark:bg-green-500/20',
           iconColor: 'text-green-600 dark:text-green-400',
-          icon: 'check_circle',
+          icon: CircleCheck,
           confirmBg: 'bg-green-600 hover:bg-green-700 shadow-green-600/30',
         };
       case 'info':
@@ -52,13 +53,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         return {
           iconBg: 'bg-blue-100 dark:bg-blue-500/20',
           iconColor: 'text-blue-600 dark:text-blue-400',
-          icon: 'info',
+          icon: Info,
           confirmBg: 'bg-primary hover:bg-blue-700 shadow-primary/30',
         };
     }
   };
 
   const styles = getTypeStyles();
+  const TypeIcon = styles.icon;
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
@@ -66,7 +68,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <div
           className={`w-20 h-20 ${styles.iconBg} rounded-full flex items-center justify-center mx-auto mb-4 ${styles.iconColor}`}
         >
-          <span className="material-icons-round text-4xl">{styles.icon}</span>
+          <TypeIcon className="size-10" aria-hidden />
         </div>
 
         <h3 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">{title}</h3>
@@ -83,9 +85,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </Button>
           <Button
             onClick={onConfirm}
-            className={`flex-1 py-6 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 h-auto ${styles.confirmBg}`}
+            className={`flex-1 py-6 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 h-auto [&_svg]:size-5 ${styles.confirmBg}`}
           >
-            <span className="material-icons-round text-lg">check_circle</span>
+            <CircleCheck aria-hidden />
             {confirmText}
           </Button>
         </div>
