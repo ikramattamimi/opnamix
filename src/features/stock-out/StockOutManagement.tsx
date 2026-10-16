@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StockOutRequest, StockOutManual, RequestedDrug } from './types';
+import { StockOutRequest, StockOutManual } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import {
   useStockOutRequests,
@@ -19,6 +19,15 @@ import { useToast } from '@/components/ui/toast';
 import { withErrorDetail } from '@/lib/utils';
 import { exportStockOutToExcel } from '@/features/reports/exportUtils';
 import { calculateRequestTotals } from './stockOutTotals';
+import {
+  addDrug,
+  cloneRequest,
+  removeDrug,
+  toggleService,
+  updateDrug,
+  validateRequestEdit,
+  type DrugField,
+} from './requestItems';
 
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -87,12 +96,7 @@ const StockOutManagement: React.FC = () => {
       return;
     }
 
-    setEditableRequest({
-      ...selectedRequest,
-      patient: { ...selectedRequest.patient },
-      drugs: selectedRequest.drugs.map((drug) => ({ ...drug })),
-      services: selectedRequest.services.map((service) => ({ ...service })),
-    });
+    setEditableRequest(cloneRequest(selectedRequest));
     setIsEditMode(false);
   }, [selectedRequest]);
 
@@ -231,120 +235,32 @@ const StockOutManagement: React.FC = () => {
     return getRequestTotals(req, isProcessMode ? processDiscount : undefined);
   };
 
-  const handleEditDrugChange = (
-    drugId: string,
-    field: 'productId' | 'quantity',
-    value: string | number,
-  ) => {
-    setEditableRequest((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        drugs: prev.drugs.map((drug) => {
-          if (drug.id !== drugId) return drug;
-
-          if (field === 'productId') {
-            const product = products.find((item) => item.id === value);
-            return {
-              ...drug,
-              productId: String(value),
-              productName: product?.name || '',
-              unit: product?.unit || drug.unit,
-              price: product?.sellingPrice || 0,
-            };
-          }
-
-          return {
-            ...drug,
-            quantity: Math.max(1, Number(value) || 1),
-          };
-        }),
-      };
-    });
+  const handleEditDrugChange = (drugId: string, field: DrugField, value: string | number) => {
+    setEditableRequest((prev) => (prev ? updateDrug(prev, drugId, field, value, products) : prev));
   };
 
   const addEditableDrug = () => {
     const fallbackProduct = products[0];
     if (!fallbackProduct) return;
-
-    setEditableRequest((prev) => {
-      if (!prev) return prev;
-
-      const newDrug: RequestedDrug = {
-        id: `tmp-${Date.now()}`,
-        productId: fallbackProduct.id,
-        productName: fallbackProduct.name,
-        quantity: 1,
-        unit: fallbackProduct.unit,
-        instructions: '-',
-        price: fallbackProduct.sellingPrice,
-      };
-
-      return {
-        ...prev,
-        drugs: [...prev.drugs, newDrug],
-      };
-    });
+    setEditableRequest((prev) =>
+      prev ? addDrug(prev, fallbackProduct, `tmp-${Date.now()}`) : prev,
+    );
   };
 
   const removeEditableDrug = (drugId: string) => {
-    setEditableRequest((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        drugs: prev.drugs.filter((drug) => drug.id !== drugId),
-      };
-    });
+    setEditableRequest((prev) => (prev ? removeDrug(prev, drugId) : prev));
   };
 
   const toggleEditableService = (serviceId: string) => {
-    setEditableRequest((prev) => {
-      if (!prev) return prev;
-
-      const existing = prev.services.find((service) => service.id === serviceId);
-      if (existing) {
-        return {
-          ...prev,
-          services: prev.services.filter((service) => service.id !== serviceId),
-        };
-      }
-
-      const service = services.find((item) => item.id === serviceId);
-      if (!service) return prev;
-
-      return {
-        ...prev,
-        services: [
-          ...prev.services,
-          {
-            id: service.id,
-            name: service.name,
-            price: service.price,
-          },
-        ],
-      };
-    });
+    setEditableRequest((prev) => (prev ? toggleService(prev, serviceId, services) : prev));
   };
 
   const handleSaveDetailEdit = async () => {
     if (!selectedRequest || !editableRequest || updateRequestMutation.isPending) return;
 
-    const hasInvalidDrug = editableRequest.drugs.some(
-      (drug) => !drug.productId || drug.quantity <= 0,
-    );
-    const hasContent = editableRequest.drugs.length > 0 || editableRequest.services.length > 0;
-
-    if (!editableRequest.patient.fullName.trim()) {
-      showToast('Nama pasien wajib diisi.', 'error');
-      return;
-    }
-    if (!hasContent) {
-      showToast('Tambahkan minimal satu obat atau satu jasa.', 'error');
-      return;
-    }
-    if (hasInvalidDrug) {
-      showToast('Pastikan semua item obat sudah dipilih dan jumlahnya valid.', 'error');
+    const validationError = validateRequestEdit(editableRequest);
+    if (validationError) {
+      showToast(validationError, 'error');
       return;
     }
 
