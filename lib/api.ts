@@ -93,6 +93,11 @@ const mapServiceCategoryFromDB = (item: any): ServiceCategoryType => ({
   isActive: item.is_active,
 });
 
+// Kategori jasa opsional: '' dari pilihan "Pilih Kategori" disimpan sebagai null.
+// undefined tetap undefined agar kolomnya tidak ikut diubah saat update.
+const toServiceCategoryId = (categoryId?: string) =>
+  categoryId === undefined ? undefined : categoryId ? parseInt(categoryId) : null;
+
 const generateServiceCategoryCodeBase = (name: string) =>
   name
     .trim()
@@ -314,7 +319,7 @@ export const api = {
         kode: service.code,
         nama: service.name,
         harga: service.price,
-        category_id: service.categoryId,
+        category_id: toServiceCategoryId(service.categoryId),
         is_active: true,
         created_by: user?.id,
       })
@@ -336,7 +341,7 @@ export const api = {
         kode: service.code,
         nama: service.name,
         harga: service.price,
-        category_id: service.categoryId,
+        category_id: toServiceCategoryId(service.categoryId),
         updated_by: user?.id,
         updated_at: new Date().toISOString(),
       })
