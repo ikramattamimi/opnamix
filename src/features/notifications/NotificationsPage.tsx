@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useNotifications } from './NotificationProvider';
-import { getNotificationIcon, getNotificationColor, formatNotificationTime } from './api';
+import { useAuth } from '@/features/auth/useAuth';
+import {
+  useNotifications,
+  useMarkNotificationRead,
+  useMarkAllNotificationsRead,
+} from './useNotifications';
+import { getNotificationIcon, getNotificationColor, formatNotificationTime } from './format';
 import { AppNotification } from './types';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -24,7 +29,14 @@ const TYPE_LABELS: Record<string, string> = {
 const ALL_TYPES = ['Semua', ...Object.keys(TYPE_LABELS)];
 
 const NotificationsPage: React.FC = () => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } = useNotifications();
+  const { user } = useAuth();
+  const userId = user?.id || '';
+  const { data, isLoading } = useNotifications(userId);
+  const notifications = data?.notifications ?? [];
+  const unreadCount = data?.unreadCount ?? 0;
+  const { mutate: markAsRead } = useMarkNotificationRead(userId);
+  const { mutate: markAll } = useMarkAllNotificationsRead(userId);
+  const markAllAsRead = () => markAll();
   const [filterType, setFilterType] = useState('Semua');
   const [filterRead, setFilterRead] = useState<'all' | 'unread' | 'read'>('all');
 
