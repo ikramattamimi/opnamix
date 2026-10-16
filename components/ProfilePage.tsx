@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { updateUserProfile, uploadAvatar, updatePassword } from '../lib/auth';
 import { useAuth } from '../hooks/useAuth';
+import { getErrorMessage } from '../lib/utils';
 
 const ROLE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
   admin: {
@@ -70,8 +71,8 @@ const ProfilePage: React.FC = () => {
       await refreshProfile();
       setEditMode(false);
       setSuccess('Profil berhasil diperbarui!');
-    } catch (err: any) {
-      setError('Gagal menyimpan: ' + err.message);
+    } catch (err) {
+      setError('Gagal menyimpan: ' + getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -100,8 +101,8 @@ const ProfilePage: React.FC = () => {
       await uploadAvatar(profile.id, file);
       await refreshProfile();
       setSuccess('Foto profil berhasil diperbarui!');
-    } catch (err: any) {
-      setError('Gagal upload foto: ' + err.message);
+    } catch (err) {
+      setError('Gagal upload foto: ' + getErrorMessage(err));
     } finally {
       setIsUploading(false);
       // Reset input
@@ -130,8 +131,8 @@ const ProfilePage: React.FC = () => {
       setNewPassword('');
       setConfirmPassword('');
       setShowPasswordSection(false);
-    } catch (err: any) {
-      setError('Gagal mengubah password: ' + err.message);
+    } catch (err) {
+      setError('Gagal mengubah password: ' + getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

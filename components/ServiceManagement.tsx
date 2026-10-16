@@ -15,7 +15,7 @@ import { DataTable } from './ui/data-table';
 import { createServiceColumns } from './ServiceColumns';
 import { useToast } from './ui/toast';
 import { exportServicesToExcel } from '../lib/exportUtils';
-import { sanitizePriceInput } from '../lib/utils';
+import { sanitizePriceInput, getErrorMessage } from '../lib/utils';
 
 interface ValidationErrors {
   name?: string;
@@ -207,9 +207,9 @@ const ServiceManagement: React.FC = () => {
       setIsCategoryModalOpen(false);
       setCategoryError('');
       showToast(`Kategori "${createdCategory.name}" berhasil ditambahkan.`, 'success');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating category:', error);
-      setCategoryError(error?.message || 'Gagal menambah kategori.');
+      setCategoryError(getErrorMessage(error) || 'Gagal menambah kategori.');
     }
   };
 

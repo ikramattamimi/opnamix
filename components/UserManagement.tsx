@@ -4,6 +4,7 @@ import { signUp, updateUserProfileAdmin, deleteAuthUser, adminUpdatePassword } f
 import { supabase } from '../lib/supabaseClient';
 import { useToast } from './ui/toast';
 import type { Tables } from '../lib/database.types';
+import { getErrorMessage } from '../lib/utils';
 
 type UserRow = Tables<'profiles'> & {
   roles: string[];
@@ -93,8 +94,8 @@ const UserManagement: React.FC = () => {
       // Get last sign in from auth.users via edge function or admin API
       // For now we just use profiles data
       setUsers(mergedUsers);
-    } catch (err: any) {
-      setError('Gagal memuat data pengguna: ' + err.message);
+    } catch (err) {
+      setError('Gagal memuat data pengguna: ' + getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -160,10 +161,10 @@ const UserManagement: React.FC = () => {
       resetForm();
       // Wait a moment for the trigger to fire
       setTimeout(() => fetchUsers(), 1500);
-    } catch (err: any) {
+    } catch (err) {
       showToast('Gagal menambah pengguna.', 'error');
       console.error('Error adding user:', err);
-      setError('Gagal menambah pengguna: ' + err.message);
+      setError('Gagal menambah pengguna: ' + getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -191,8 +192,8 @@ const UserManagement: React.FC = () => {
       setShowEditModal(false);
       resetForm();
       fetchUsers();
-    } catch (err: any) {
-      setError('Gagal memperbarui pengguna: ' + err.message);
+    } catch (err) {
+      setError('Gagal memperbarui pengguna: ' + getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -210,8 +211,8 @@ const UserManagement: React.FC = () => {
       setShowDeleteConfirm(false);
       setSelectedUser(null);
       fetchUsers();
-    } catch (err: any) {
-      setError('Gagal menghapus pengguna: ' + err.message);
+    } catch (err) {
+      setError('Gagal menghapus pengguna: ' + getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -254,8 +255,8 @@ const UserManagement: React.FC = () => {
       setShowResetPasswordModal(false);
       setNewPassword('');
       setShowPassword(false);
-    } catch (err: any) {
-      setError('Gagal mengubah password: ' + err.message);
+    } catch (err) {
+      setError('Gagal mengubah password: ' + getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

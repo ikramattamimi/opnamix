@@ -11,7 +11,7 @@ import { Button } from './ui/button';
 import { DataTable } from './ui/data-table';
 import { createStockInColumns } from './StockInColumns';
 import { useToast } from './ui/toast';
-import { withErrorDetail } from '../lib/utils';
+import { withErrorDetail, getErrorMessage } from '../lib/utils';
 
 interface StockInManagementProps {
   products?: Product[]; // Optional now, or removed
@@ -44,10 +44,10 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
       if (file) {
         try {
           imageUrl = await api.uploadReceiptImage(file, transactionNumber);
-        } catch (uploadError: any) {
+        } catch (uploadError) {
           console.error('Error uploading image:', uploadError);
           showToast(
-            `Gagal mengupload gambar: ${uploadError.message || JSON.stringify(uploadError)}`,
+            `Gagal mengupload gambar: ${getErrorMessage(uploadError) || JSON.stringify(uploadError)}`,
             'warning',
           );
           // Continue even if upload fails

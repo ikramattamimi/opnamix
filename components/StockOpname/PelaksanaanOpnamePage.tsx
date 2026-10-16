@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { api } from '../../lib/api';
-import { OpnameItem } from '../../types';
+import { api, OpnameDetail } from '../../lib/api';
+import { OpnameItem, Product } from '../../types';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
 import { calculateOpnameDifference } from '../../lib/opnameCalc';
@@ -15,13 +15,13 @@ const PelaksanaanOpnamePage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [opnameData, setOpnameData] = useState<any>(null);
+  const [opnameData, setOpnameData] = useState<OpnameDetail | null>(null);
   const [items, setItems] = useState<OpnameItem[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [physicalCounts, setPhysicalCounts] = useState<Record<string, number>>({});
-  const [finalStocks, setFinalStocks] = useState<Record<string, number>>({});
+  const [physicalCounts, setPhysicalCounts] = useState<Record<string, number | undefined>>({});
+  const [finalStocks, setFinalStocks] = useState<Record<string, number | undefined>>({});
   const [reasons, setReasons] = useState<Record<string, string>>({});
-  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [scheduleObatIds, setScheduleObatIds] = useState<string[]>([]);
 
   // Confirmation modal state
@@ -90,20 +90,20 @@ const PelaksanaanOpnamePage: React.FC = () => {
         // Pre-select: use selectedObatIds if already saved, otherwise use schedule's obat list
         if (data.selectedObatIds && data.selectedObatIds.length > 0) {
           const selectedIdSet = new Set(data.selectedObatIds.map(String));
-          const filteredProducts = (products.data || []).filter((p: any) =>
+          const filteredProducts = (products.data || []).filter((p) =>
             selectedIdSet.has(String(p.id)),
           );
-          setSelectedIds(new Set(filteredProducts.map((p: any) => String(p.id))));
+          setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
         } else if (scheduleObats.length > 0) {
           // Pre-select all products from schedule
           const scheduleIdSet = new Set(scheduleObats);
-          const filteredProducts = (products.data || []).filter((p: any) =>
+          const filteredProducts = (products.data || []).filter((p) =>
             scheduleIdSet.has(String(p.id)),
           );
-          setSelectedIds(new Set(filteredProducts.map((p: any) => String(p.id))));
+          setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
         } else {
           // No schedule filter = select all
-          setSelectedIds(new Set((products.data || []).map((p: any) => String(p.id))));
+          setSelectedIds(new Set((products.data || []).map((p) => String(p.id))));
         }
       }
     } catch (error) {
@@ -227,12 +227,12 @@ const PelaksanaanOpnamePage: React.FC = () => {
       const scheduleObats = (data.scheduleObatIds || []).map(String);
       if (scheduleObats.length > 0) {
         const scheduleIdSet = new Set(scheduleObats);
-        const filteredProducts = (products.data || []).filter((p: any) =>
+        const filteredProducts = (products.data || []).filter((p) =>
           scheduleIdSet.has(String(p.id)),
         );
-        setSelectedIds(new Set(filteredProducts.map((p: any) => String(p.id))));
+        setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
       } else {
-        setSelectedIds(new Set((products.data || []).map((p: any) => String(p.id))));
+        setSelectedIds(new Set((products.data || []).map((p) => String(p.id))));
       }
 
       setCurrentStep(1);
@@ -641,7 +641,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
                                 const val = e.target.value;
                                 setFinalStocks((prev) => ({
                                   ...prev,
-                                  [item.id]: val === '' ? (undefined as any) : parseInt(val),
+                                  [item.id]: val === '' ? undefined : parseInt(val),
                                 }));
                               }}
                               className="w-full bg-background-light dark:bg-background-dark border-none rounded-xl px-3 py-2 text-center text-sm font-bold"
@@ -746,7 +746,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
                             const val = e.target.value;
                             setFinalStocks((prev) => ({
                               ...prev,
-                              [item.id]: val === '' ? (undefined as any) : parseInt(val),
+                              [item.id]: val === '' ? undefined : parseInt(val),
                             }));
                           }}
                           className="w-full bg-card-light dark:bg-card-dark border-none rounded-xl px-3 py-2.5 text-center text-sm font-bold"

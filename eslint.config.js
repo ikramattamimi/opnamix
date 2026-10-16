@@ -23,8 +23,6 @@ export default tseslint.config(
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      // Sementara: `any` dibersihkan di fase 3 T4, setelah itu kembali ke error.
-      '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
   {

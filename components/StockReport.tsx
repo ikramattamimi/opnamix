@@ -8,7 +8,9 @@ import { createTransactionReportColumns } from './TransactionReportColumns';
 import { stockMutationColumns } from './StockMutationColumns';
 import { exportTransactionReportToExcel, exportStockMutationToExcel } from '../lib/exportUtils';
 
-import { api } from '../lib/api';
+import { api, StockMutationRow, TransactionReportRow } from '../lib/api';
+
+type ReportPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
 
 const StockReport: React.FC = () => {
   const { data: productData } = useProducts({ page: 1, perPage: 1000 });
@@ -20,8 +22,8 @@ const StockReport: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('Semua');
 
   // Transaction Report State
-  const [txReport, setTxReport] = useState<any[]>([]);
-  const [mutations, setMutations] = useState<any[]>([]);
+  const [txReport, setTxReport] = useState<TransactionReportRow[]>([]);
+  const [mutations, setMutations] = useState<StockMutationRow[]>([]);
 
   // Separate date ranges for each report
   const [txStartDate, setTxStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -41,9 +43,9 @@ const StockReport: React.FC = () => {
   >('daily');
 
   // Store all data (used for both display and Excel export)
-  const [allTxData, setAllTxData] = useState<any[]>([]);
-  const [allMutationData, setAllMutationData] = useState<any[]>([]);
-  const [selectedTransaction, setSelectedTransaction] = useState<any | null>(null);
+  const [allTxData, setAllTxData] = useState<TransactionReportRow[]>([]);
+  const [allMutationData, setAllMutationData] = useState<StockMutationRow[]>([]);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionReportRow | null>(null);
 
   // Filtering Logic (Analysis)
   const filteredProducts = useMemo(() => {
@@ -512,7 +514,7 @@ const StockReport: React.FC = () => {
                 </label>
                 <select
                   value={txPeriod}
-                  onChange={(e) => handleTxPeriodChange(e.target.value as any)}
+                  onChange={(e) => handleTxPeriodChange(e.target.value as ReportPeriod)}
                   className="block w-full rounded-xl border-gray-200 bg-white px-4 py-2 text-text-primary-light dark:border-gray-700 dark:bg-card-dark dark:text-white"
                 >
                   <option value="daily">Hari Ini</option>
@@ -618,7 +620,7 @@ const StockReport: React.FC = () => {
                 </label>
                 <select
                   value={mutationPeriod}
-                  onChange={(e) => handleMutationPeriodChange(e.target.value as any)}
+                  onChange={(e) => handleMutationPeriodChange(e.target.value as ReportPeriod)}
                   className="block w-full rounded-xl border-gray-200 bg-white px-4 py-2 text-text-primary-light dark:border-gray-700 dark:bg-card-dark dark:text-white"
                 >
                   <option value="daily">Hari Ini</option>
@@ -773,7 +775,7 @@ const StockReport: React.FC = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                       {selectedTransaction.drugDetails?.length > 0 ? (
-                        selectedTransaction.drugDetails.map((drug: any) => (
+                        selectedTransaction.drugDetails.map((drug) => (
                           <tr key={drug.id}>
                             <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">
                               {drug.name}
@@ -818,7 +820,7 @@ const StockReport: React.FC = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                       {selectedTransaction.serviceDetails?.length > 0 ? (
-                        selectedTransaction.serviceDetails.map((service: any) => (
+                        selectedTransaction.serviceDetails.map((service) => (
                           <tr key={service.id}>
                             <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">
                               {service.name}

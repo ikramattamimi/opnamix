@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnFilter } from './ui/data-table-column-filter';
+import type { StockMutationRow } from '../lib/api';
 
 // Type options for filter
 const typeOptions = [
@@ -15,7 +16,7 @@ const statusOptions = [
   { label: 'Selesai', value: 'selesai' },
 ];
 
-export const stockMutationColumns: ColumnDef<any>[] = [
+export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
   {
     accessorKey: 'date',
     header: ({ column }) => {

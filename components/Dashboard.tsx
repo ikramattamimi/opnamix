@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import StatCard from './StatCard';
-import { api } from '../lib/api';
+import { api, DashboardStats, RecentTransaction } from '../lib/api';
 import { exportRecentTransactionsToExcel } from '../lib/exportUtils';
 
 const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Pagination state for recent transactions
-  const [recentTrx, setRecentTrx] = useState<any[]>([]);
+  const [recentTrx, setRecentTrx] = useState<RecentTransaction[]>([]);
   const [trxPage, setTrxPage] = useState(1);
   const [trxTotalPages, setTrxTotalPages] = useState(1);
   const [trxLoading, setTrxLoading] = useState(false);
@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
   }
 
   // Fallback if stats fail
-  const safeStats = stats || {
+  const safeStats: DashboardStats = stats || {
     totalProducts: 0,
     totalValue: 0,
     stokMasuk: 0,
@@ -84,10 +84,7 @@ const Dashboard: React.FC = () => {
   };
 
   // Process Category Distribution for Pie Chart
-  const totalItems = Object.values(safeStats.categoryDistribution).reduce(
-    (a: any, b: any) => a + b,
-    0,
-  ) as number;
+  const totalItems = Object.values(safeStats.categoryDistribution).reduce((a, b) => a + b, 0);
   /* eslint-disable @typescript-eslint/no-unused-vars -- dipakai blok "Charts Row" yang sedang dikomentari */
   const safeTotalItems = totalItems || 1; // Prevent divide by zero
   const categories = Object.keys(safeStats.categoryDistribution);
@@ -165,8 +162,8 @@ const Dashboard: React.FC = () => {
           <div className="h-64 flex items-end justify-between gap-2 px-2">
             {(() => {
               const weekly = safeStats.weeklyStockOut || [];
-              const maxVal = Math.max(...weekly.map((w: any) => w.count), 1);
-              return weekly.map((item: any, idx: number) => {
+              const maxVal = Math.max(...weekly.map((w) => w.count), 1);
+              return weekly.map((item, idx) => {
                 const pct = Math.max((item.count / maxVal) * 100, 4); // min 4% for visibility
                 return (
                   <div key={idx} className="flex flex-col items-center w-full group">
@@ -198,7 +195,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="space-y-3">
               {safeStats.lowStockItems.length > 0 ? (
-                safeStats.lowStockItems.map((item: any, idx: number) => (
+                safeStats.lowStockItems.map((item, idx) => (
                   <LowStockItem key={idx} name={item.nama} count={item.qty} color="bg-red-500" />
                 ))
               ) : (
@@ -315,7 +312,7 @@ const Dashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="text-sm font-medium text-text-primary-light dark:text-white">
-                {recentTrx.map((trx: any) => (
+                {recentTrx.map((trx) => (
                   <TransactionRow
                     key={trx.id}
                     name={trx.name}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { api } from '../lib/api';
+import { api, RecentStockOut } from '../lib/api';
 import { StockOutRequest, StockOutManual, RequestedDrug } from '../types';
 import { useProducts } from '../hooks/useProducts';
 import {
@@ -76,7 +76,7 @@ const StockOutManagement: React.FC = () => {
   const [requestToProcess, setRequestToProcess] = useState<StockOutRequest | null>(null);
 
   // Timeline Real Data
-  const [timelineData, setTimelineData] = useState<any[]>([]);
+  const [timelineData, setTimelineData] = useState<RecentStockOut[]>([]);
   const [showTimeline, setShowTimeline] = useState(true);
 
   const fetchTimeline = async () => {

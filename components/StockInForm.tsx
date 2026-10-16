@@ -58,7 +58,11 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
     }
   };
 
-  const handleItemChange = (id: string, field: keyof StockInItem, value: any) => {
+  const handleItemChange = <K extends keyof StockInItem>(
+    id: string,
+    field: K,
+    value: StockInItem[K],
+  ) => {
     setItems((prevItems) =>
       prevItems.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );

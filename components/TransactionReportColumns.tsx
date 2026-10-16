@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnFilter } from './ui/data-table-column-filter';
 import { Button } from './ui/button';
+import type { TransactionReportRow } from '../lib/api';
 
 // Type options for filter
 const typeOptions = [
@@ -30,12 +31,12 @@ const formatSource = (source?: string) => {
 };
 
 interface TransactionReportColumnsProps {
-  onViewDetail: (transaction: any) => void;
+  onViewDetail: (transaction: TransactionReportRow) => void;
 }
 
 export const createTransactionReportColumns = ({
   onViewDetail,
-}: TransactionReportColumnsProps): ColumnDef<any>[] => [
+}: TransactionReportColumnsProps): ColumnDef<TransactionReportRow>[] => [
   {
     accessorKey: 'date',
     header: ({ column }) => {

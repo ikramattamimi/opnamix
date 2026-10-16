@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { api } from '../../lib/api';
+import { api, OpnameDetail } from '../../lib/api';
 
 interface DetailRow {
   id: string;
@@ -16,7 +16,7 @@ const DetailOpnamePage: React.FC = () => {
   const { opnameId } = useParams<{ opnameId: string }>();
   const navigate = useNavigate();
   const [details, setDetails] = useState<DetailRow[]>([]);
-  const [opnameInfo, setOpnameInfo] = useState<any>(null);
+  const [opnameInfo, setOpnameInfo] = useState<OpnameDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
 

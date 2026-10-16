@@ -157,7 +157,11 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
     });
   };
 
-  const handleUpdateItem = (id: string, field: keyof StockOutManualItem, value: any) => {
+  const handleUpdateItem = <K extends keyof StockOutManualItem>(
+    id: string,
+    field: K,
+    value: StockOutManualItem[K],
+  ) => {
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
     if (field === 'quantity') {
       // trigger validation/clear error for quantity
@@ -406,7 +410,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                                 type="number"
                                 min="1"
                                 className={`w-full bg-transparent border border-transparent hover:border-gray-200 dark:hover:border-white/10 focus:border-primary rounded-xl text-center font-bold text-sm py-1 ${isQuantityTouched && itemError?.quantity ? 'border-red-500' : ''}`}
-                                value={(item.quantity as any) ?? ''}
+                                value={item.quantity ?? ''}
                                 onChange={(e) =>
                                   handleUpdateItem(
                                     item.id,

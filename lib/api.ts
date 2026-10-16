@@ -1791,4 +1791,6 @@ type ApiResult<K extends keyof typeof api> = Awaited<ReturnType<(typeof api)[K]>
 export type TransactionReportRow = ApiResult<'getTransactionReport'>['data'][number];
 export type RecentTransaction = ApiResult<'getRecentTransactions'>['data'][number];
 export type DashboardStats = ApiResult<'getDashboardStats'>;
+export type OpnameDetail = ApiResult<'getOpnameById'>;
+export type RecentStockOut = ApiResult<'getRecentStockOuts'>[number];
 export type CreateTransactionPayload = Parameters<(typeof api)['createTransaction']>[0];

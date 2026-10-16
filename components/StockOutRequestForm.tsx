@@ -46,7 +46,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
   const [patientName, setPatientName] = useState('');
   const [patientBirthDate, setPatientBirthDate] = useState('');
   const [nakesName, setNakesName] = useState('');
-  const [nakesList, setNakesList] = useState<{ id: string; full_name: string }[]>([]);
+  const [nakesList, setNakesList] = useState<{ id: string; full_name: string | null }[]>([]);
 
   useEffect(() => {
     const fetchNakes = async () => {
@@ -56,7 +56,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
         .eq('user_roles.role', 'nakes')
         .order('full_name');
       if (data && data.length > 0) {
-        const list = data.map((p: any) => ({ id: p.id, full_name: p.full_name }));
+        const list = data.map((p) => ({ id: p.id, full_name: p.full_name }));
         setNakesList(list);
         setNakesName(list[0].full_name || '');
       }
@@ -167,7 +167,11 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
     }
   };
 
-  const handleDrugChange = (id: string, field: keyof RequestedDrug, value: any) => {
+  const handleDrugChange = <K extends keyof RequestedDrug>(
+    id: string,
+    field: K,
+    value: RequestedDrug[K],
+  ) => {
     setRequestedDrugs(
       requestedDrugs.map((d) => {
         if (d.id === id) {
@@ -175,7 +179,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
             const product = products.find((p) => p.id === value);
             return {
               ...d,
-              productId: value,
+              productId: value as string,
               productName: product?.name || '',
               unit: product?.unit || 'Tablet',
             };
@@ -532,7 +536,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
                                 <input
                                   className={`w-16 rounded-lg border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm py-1 px-2 focus:ring-primary focus:border-primary dark:text-white text-center ${isQuantityTouched && drugError?.quantity ? 'border-red-500 focus:border-red-500' : ''}`}
                                   type="number"
-                                  value={(drug.quantity as any) ?? ''}
+                                  value={drug.quantity ?? ''}
                                   onChange={(e) =>
                                     handleDrugChange(
                                       drug.id,

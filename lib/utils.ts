@@ -30,3 +30,11 @@ export function sanitizePriceInput(value: string): string {
   const sanitized = numericOnly.replace(/^0+(?=.)/, '');
   return sanitized;
 }
+
+/**
+ * `message` dari error apa pun yang ditangkap di catch (Error, Supabase
+ * PostgrestError/AuthError, atau objek { message }). undefined kalau tidak ada.
+ */
+export function getErrorMessage(error: unknown): string | undefined {
+  return (error as { message?: string } | null | undefined)?.message;
+}

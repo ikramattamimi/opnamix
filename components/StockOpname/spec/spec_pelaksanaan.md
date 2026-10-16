@@ -21,7 +21,7 @@ Layout mobile: **konten full-width** + **fixed bottom action bar**.
 | --------------------- | ------------------------ | ----------------------------------------------------------- |
 | `currentStep`         | `1 \| 2 \| 3`            | Tahap aktif, diinisialisasi dari `opnameData.currentStep`   |
 | `items`               | `OpnameItem[]`           | Detail rows dari DB (kosong saat step 1 belum dikonfirmasi) |
-| `allProducts`         | `any[]`                  | Semua produk aktif (untuk tampilan step 1)                  |
+| `allProducts`         | `Product[]`              | Semua produk aktif (untuk tampilan step 1)                  |
 | `selectedIds`         | `Set<string>`            | Product IDs yang dipilih di step 1                          |
 | `physicalCounts`      | `Record<string, number>` | `{detailId: count}` — input step 2                          |
 | `finalStocks`         | `Record<string, number>` | `{detailId: final}` — input step 3                          |

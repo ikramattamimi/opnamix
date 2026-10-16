@@ -289,7 +289,7 @@ createNotification({
   type: string;
   title: string;
   message: string;
-  data?: any;
+  data?: Json;
   target_roles?: string[];  // jika kosong → broadcast (target_role = null)
 })
 ```

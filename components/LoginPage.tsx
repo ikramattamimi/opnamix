@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { signIn, resetPassword } from '../lib/auth';
+import { getErrorMessage } from '../lib/utils';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
@@ -24,9 +25,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       await resetPassword(resetEmail);
       setResetStatus('success');
       setResetMessage('Link reset password telah dikirim ke email Anda.');
-    } catch (err: any) {
+    } catch (err) {
       setResetStatus('error');
-      setResetMessage(err.message || 'Gagal mengirim link reset password.');
+      setResetMessage(getErrorMessage(err) || 'Gagal mengirim link reset password.');
     }
   };
   /* eslint-enable @typescript-eslint/no-unused-vars */
@@ -39,8 +40,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     try {
       await signIn(email, password);
       onLoginSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Login gagal. Silakan cek email dan password Anda.');
+    } catch (err) {
+      setError(getErrorMessage(err) || 'Login gagal. Silakan cek email dan password Anda.');
     } finally {
       setIsLoading(false);
     }
