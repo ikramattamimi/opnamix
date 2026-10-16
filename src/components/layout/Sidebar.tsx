@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { ChevronDown, ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ROUTES } from '@/types/routes';
 import { useAuth } from '@/features/auth/useAuth';
+import { APP_ROUTES, type AppRoute, type SidebarParent } from '@/app/routes';
+import { buildSidebarNodes, getUserRoles } from '@/app/routeUtils';
 
 interface SidebarProps {
   isMobileOpen?: boolean;
@@ -12,28 +14,13 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }) => {
   const { userProfile } = useAuth();
-  const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
+  // Menu dibangun dari APP_ROUTES dan difilter per role
+  const nodes = buildSidebarNodes(APP_ROUTES, getUserRoles(userProfile));
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Collapsed by default on medium screens (md to lg), expanded on lg+
     return typeof window !== 'undefined' && window.innerWidth < 1024;
   });
-  const location = useLocation();
-  const isOpnamePath = location.pathname.startsWith('/audit/stok-opname');
-  const [opnameExpanded, setOpnameExpanded] = useState(isOpnamePath);
-
-  // Define visibility based on roles
-  const isAdmin = userRoles.includes('admin');
-  const isFarmasi = userRoles.includes('farmasi') || userRoles.includes('apoteker');
-  const isNakes = userRoles.includes('nakes');
-
-  // Admin and Farmasi have full access to current stock modules
-  // Nakes has limited access
-  const showMasterData = isAdmin || isFarmasi;
-  const showStockIn = isAdmin || isFarmasi;
-  const showStockOut = isAdmin || isFarmasi || isNakes;
-  const showOpname = isAdmin || isFarmasi;
-  const showReports = isAdmin || isFarmasi;
 
   // On mobile overlay, always show full menu (not collapsed)
   const effectiveCollapsed = isMobileOpen ? false : isCollapsed;
@@ -70,11 +57,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
           variant="ghost"
           size="icon"
           onClick={() => setIsCollapsed(!isCollapsed)}
+          aria-label={isCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
           className="absolute -right-3 top-9 bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-700 rounded-full p-1.5 shadow-sm hover:text-primary hover:scale-110 active:scale-95 transition-all duration-200 z-30 h-7 w-7 hidden md:flex"
         >
-          <span className="material-icons-round text-sm">
-            {isCollapsed ? 'chevron_right' : 'chevron_left'}
-          </span>
+          {isCollapsed ? (
+            <ChevronRight className="size-4" aria-hidden />
+          ) : (
+            <ChevronLeft className="size-4" aria-hidden />
+          )}
         </Button>
 
         {/* Header / Logo */}
@@ -107,206 +97,125 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
         </div>
 
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto pb-8 scrollbar-hide">
-          <NavItem
-            icon="dashboard"
-            label="Dashboard"
-            to={ROUTES.DASHBOARD}
-            collapsed={effectiveCollapsed}
-            onCloseMobile={onCloseMobile}
-          />
-
-          {showMasterData && (
-            <>
-              {!effectiveCollapsed && (
-                <div className="px-4 pt-4 pb-2">
+          {nodes.map((node) => {
+            if (node.kind === 'group') {
+              return effectiveCollapsed ? (
+                <div key={`group-${node.label}`} className="h-4"></div>
+              ) : (
+                <div key={`group-${node.label}`} className="px-4 pt-4 pb-2">
                   <p className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">
-                    Master Data
+                    {node.label}
                   </p>
                 </div>
-              )}
-              {effectiveCollapsed && <div className="h-4"></div>}
+              );
+            }
 
-              <NavItem
-                icon="inventory_2"
-                label="Data Produk"
-                to={ROUTES.MASTER_DATA_PRODUK}
-                collapsed={effectiveCollapsed}
-                onCloseMobile={onCloseMobile}
-              />
-              <NavItem
-                icon="medical_services"
-                label="Data Jasa"
-                to={ROUTES.MASTER_DATA_JASA}
-                collapsed={effectiveCollapsed}
-                onCloseMobile={onCloseMobile}
-              />
-            </>
-          )}
-
-          {!effectiveCollapsed && (
-            <div className="px-4 pt-4 pb-2">
-              <p className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">
-                Transaksi
-              </p>
-            </div>
-          )}
-          {effectiveCollapsed && <div className="h-4"></div>}
-
-          {showStockIn && (
-            <NavItem
-              icon="arrow_circle_down"
-              label="Stok Masuk"
-              to={ROUTES.STOK_MASUK}
-              collapsed={effectiveCollapsed}
-              onCloseMobile={onCloseMobile}
-            />
-          )}
-
-          {showStockOut && (
-            <NavItem
-              icon="arrow_circle_up"
-              label="Stok Keluar"
-              to={ROUTES.STOK_KELUAR}
-              collapsed={effectiveCollapsed}
-              onCloseMobile={onCloseMobile}
-            />
-          )}
-
-          {showOpname && (
-            <>
-              {!effectiveCollapsed && (
-                <div className="px-4 pt-4 pb-2">
-                  <p className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">
-                    Audit & Kontrol
-                  </p>
-                </div>
-              )}
-              {effectiveCollapsed && <div className="h-4"></div>}
-
-              {/* Collapsible Stok Opname parent */}
-              <button
-                onClick={() => setOpnameExpanded(!opnameExpanded)}
-                title={effectiveCollapsed ? 'Stok Opname' : ''}
-                className={cn(
-                  'w-full flex items-center py-3 transition-all duration-200 group rounded-xl relative h-auto hover:scale-[1.02] active:scale-[0.98]',
-                  effectiveCollapsed ? 'justify-center px-2' : 'justify-start px-4',
-                  isOpnamePath
-                    ? 'text-primary font-bold'
-                    : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-white font-medium',
-                )}
-              >
-                <span
-                  className={cn(
-                    'material-icons-round text-xl transition-transform duration-200',
-                    !effectiveCollapsed && 'mr-3',
-                    isOpnamePath ? 'text-primary' : 'group-hover:text-primary',
-                  )}
-                >
-                  fact_check
-                </span>
-                {!effectiveCollapsed && (
-                  <>
-                    <span>Stok Opname</span>
-                    <span
-                      className={cn(
-                        'material-icons-round text-sm ml-auto transition-transform duration-300 ease-in-out',
-                        opnameExpanded && 'rotate-180',
-                      )}
-                    >
-                      expand_more
-                    </span>
-                  </>
-                )}
-              </button>
-
-              {/* Sub-menu items */}
-              <div
-                className={cn(
-                  'ml-6 pl-3 border-l-2 border-primary/10 space-y-0.5 overflow-hidden transition-all duration-300 ease-in-out',
-                  opnameExpanded && !effectiveCollapsed
-                    ? 'max-h-48 opacity-100'
-                    : 'max-h-0 opacity-0',
-                )}
-              >
-                <NavItem
-                  icon="history"
-                  label="Riwayat Opname"
-                  to={ROUTES.RIWAYAT_OPNAME}
+            if (node.kind === 'parent') {
+              return (
+                <NavParent
+                  key={`parent-${node.parent.label}`}
+                  parent={node.parent}
+                  items={node.children}
                   collapsed={effectiveCollapsed}
                   onCloseMobile={onCloseMobile}
                 />
-                <NavItem
-                  icon="settings"
-                  label="Konfigurasi Opname"
-                  to={ROUTES.KONFIGURASI_OPNAME}
-                  collapsed={effectiveCollapsed}
-                  onCloseMobile={onCloseMobile}
-                />
-              </div>
-            </>
-          )}
+              );
+            }
 
-          {/* Notifications — visible to all roles */}
-          <NavItem
-            icon="notifications"
-            label="Notifikasi"
-            to={ROUTES.NOTIFICATIONS}
-            collapsed={effectiveCollapsed}
-            onCloseMobile={onCloseMobile}
-          />
-
-          {showReports && (
-            <>
-              {!effectiveCollapsed && (
-                <div className="px-4 pt-4 pb-2">
-                  <p className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">
-                    Laporan
-                  </p>
-                </div>
-              )}
-              {effectiveCollapsed && <div className="h-4"></div>}
-
+            return (
               <NavItem
-                icon="bar_chart"
-                label="Laporan Stok"
-                to={ROUTES.LAPORAN_STOK}
+                key={node.route.path}
+                route={node.route}
                 collapsed={effectiveCollapsed}
                 onCloseMobile={onCloseMobile}
               />
-            </>
-          )}
-
-          {isAdmin && (
-            <NavItem
-              icon="manage_accounts"
-              label="Kelola Pengguna"
-              to={ROUTES.USER_MANAGEMENT}
-              collapsed={effectiveCollapsed}
-              onCloseMobile={onCloseMobile}
-            />
-          )}
-          <NavItem
-            icon="person"
-            label="Profil"
-            to={ROUTES.PROFIL}
-            collapsed={effectiveCollapsed}
-            onCloseMobile={onCloseMobile}
-          />
+            );
+          })}
         </nav>
       </aside>
     </>
   );
 };
 
+interface NavParentProps {
+  parent: SidebarParent;
+  items: AppRoute[];
+  collapsed: boolean;
+  onCloseMobile?: () => void;
+}
+
+// Menu induk yang bisa dibuka-tutup, misalnya Stok Opname
+const NavParent: React.FC<NavParentProps> = ({ parent, items, collapsed, onCloseMobile }) => {
+  const location = useLocation();
+  const isActivePath = location.pathname.startsWith(parent.pathPrefix);
+  const [expanded, setExpanded] = useState(isActivePath);
+  const Icon = parent.icon;
+
+  return (
+    <>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        title={collapsed ? parent.label : ''}
+        className={cn(
+          'w-full flex items-center py-3 transition-all duration-200 group rounded-xl relative h-auto hover:scale-[1.02] active:scale-[0.98]',
+          collapsed ? 'justify-center px-2' : 'justify-start px-4',
+          isActivePath
+            ? 'text-primary font-bold'
+            : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-white font-medium',
+        )}
+      >
+        <Icon
+          className={cn(
+            'size-5 shrink-0 transition-transform duration-200',
+            !collapsed && 'mr-3',
+            isActivePath ? 'text-primary' : 'group-hover:text-primary',
+          )}
+          aria-hidden
+        />
+        {!collapsed && (
+          <>
+            <span>{parent.label}</span>
+            <ChevronDown
+              className={cn(
+                'size-4 ml-auto transition-transform duration-300 ease-in-out',
+                expanded && 'rotate-180',
+              )}
+              aria-hidden
+            />
+          </>
+        )}
+      </button>
+
+      {/* Sub-menu items */}
+      <div
+        className={cn(
+          'ml-6 pl-3 border-l-2 border-primary/10 space-y-0.5 overflow-hidden transition-all duration-300 ease-in-out',
+          expanded && !collapsed ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0',
+        )}
+      >
+        {items.map((item) => (
+          <NavItem
+            key={item.path}
+            route={item}
+            collapsed={collapsed}
+            onCloseMobile={onCloseMobile}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
+
 interface NavItemProps {
-  icon: string;
-  label: string;
-  to?: string;
+  route: AppRoute;
   collapsed?: boolean;
   onCloseMobile?: () => void;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ icon, label, to, collapsed, onCloseMobile }) => {
+const NavItem: React.FC<NavItemProps> = ({ route, collapsed, onCloseMobile }) => {
+  const label = route.sidebar?.label ?? route.title;
+  const Icon: LucideIcon | undefined = route.sidebar?.icon;
+
   const handleClick = () => {
     if (onCloseMobile) {
       // Close mobile menu when clicking on mobile
@@ -317,35 +226,9 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, collapsed, onCloseMo
     }
   };
 
-  if (!to) {
-    // For items without routing (like Settings/Profile - to be implemented later)
-    return (
-      <Button
-        variant="ghost"
-        title={collapsed ? label : ''}
-        onClick={handleClick}
-        className={cn(
-          'w-full flex items-center py-3 transition-all duration-200 group rounded-xl relative h-auto hover:scale-[1.02] active:scale-[0.98]',
-          collapsed ? 'justify-center px-2' : 'justify-start px-4',
-          'text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-white font-medium hover:bg-transparent',
-        )}
-      >
-        <span
-          className={cn(
-            'material-icons-round text-xl group-hover:text-primary transition-all duration-200',
-            !collapsed && 'mr-3',
-          )}
-        >
-          {icon}
-        </span>
-        {!collapsed && <span>{label}</span>}
-      </Button>
-    );
-  }
-
   return (
     <NavLink
-      to={to}
+      to={route.path}
       title={collapsed ? label : ''}
       onClick={handleClick}
       className={({ isActive }) =>
@@ -360,15 +243,16 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, collapsed, onCloseMo
     >
       {({ isActive }) => (
         <>
-          <span
-            className={cn(
-              'material-icons-round text-xl transition-all duration-200',
-              !collapsed && 'mr-3',
-              isActive ? 'text-primary' : 'group-hover:text-primary',
-            )}
-          >
-            {icon}
-          </span>
+          {Icon && (
+            <Icon
+              className={cn(
+                'size-5 shrink-0 transition-all duration-200',
+                !collapsed && 'mr-3',
+                isActive ? 'text-primary' : 'group-hover:text-primary',
+              )}
+              aria-hidden
+            />
+          )}
           {!collapsed && <span>{label}</span>}
           {isActive && !collapsed && (
             <div className="ml-auto w-1 h-8 bg-primary rounded-full absolute right-0"></div>

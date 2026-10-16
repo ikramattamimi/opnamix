@@ -1,5 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  Archive,
+  ArrowLeftRight,
+  Bell,
+  BellOff,
+  BriefcaseMedical,
+  CircleAlert,
+  CircleCheck,
+  CircleCheckBig,
+  CirclePlus,
+  ClipboardList,
+  Diff,
+  ListChecks,
+  Loader2,
+  LogOut,
+  Menu,
+  Moon,
+  Search,
+  Store,
+  Sun,
+  Trash2,
+  TriangleAlert,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   useNotifications,
@@ -7,28 +32,50 @@ import {
   useMarkAllNotificationsRead,
 } from '@/features/notifications/useNotifications';
 import { useAuth } from '@/features/auth/useAuth';
-import {
-  getNotificationIcon,
-  getNotificationColor,
-  formatNotificationTime,
-} from '@/features/notifications/format';
+import { getNotificationColor, formatNotificationTime } from '@/features/notifications/format';
 import { ROUTES } from '@/types/routes';
+import { APP_ROUTES } from '@/app/routes';
+import { getRouteTitle } from '@/app/routeUtils';
+import { useTheme } from '@/app/providers/ThemeProvider';
+
+// Sementara: padanan lucide untuk ikon notifikasi per tipe. Setelah
+// getNotificationLucideIcon dari features/notifications/format masuk ke main,
+// ganti map ini dengan fungsi itu.
+const NOTIFICATION_ICONS: Record<string, LucideIcon> = {
+  STOCK_OUT_REQUEST: ClipboardList,
+  STOCK_OUT_PROCESSED: CircleCheck,
+  STOCK_LOW: TriangleAlert,
+  STOCK_EMPTY: CircleAlert,
+  OPNAME_STARTED: Search,
+  OPNAME_COMPLETED: CircleCheckBig,
+  OPNAME_CREATED: ListChecks,
+  OPNAME_STEP_CHANGED: ArrowLeftRight,
+  STOCK_IN: Archive,
+  STOCK_OUT_DIRECT: Store,
+  OPNAME_DISCREPANCY: Diff,
+  PRODUCT_ADDED: CirclePlus,
+  PRODUCT_DELETED: Trash2,
+  SERVICE_ADDED: BriefcaseMedical,
+};
+
+const NotificationTypeIcon: React.FC<{ type: string; className?: string }> = ({
+  type,
+  className,
+}) => {
+  const Icon = NOTIFICATION_ICONS[type] ?? Bell;
+  return <Icon className={className} aria-hidden />;
+};
 
 interface HeaderProps {
-  isDarkMode: boolean;
-  onToggleDarkMode: () => void;
-  viewName: string;
   onToggleSidebar?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  isDarkMode,
-  onToggleDarkMode,
-  viewName,
-  onToggleSidebar,
-}) => {
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, userProfile, logout } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const viewName = getRouteTitle(pathname, APP_ROUTES);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const userId = user?.id || '';
@@ -173,7 +220,7 @@ const Header: React.FC<HeaderProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-2xl">
             <div className="flex items-center gap-2">
-              <span className="material-icons-round text-primary text-xl">notifications</span>
+              <Bell className="size-5 text-primary" aria-hidden />
               <h3 className="font-bold text-sm text-text-primary-light dark:text-white">
                 Notifikasi
               </h3>
@@ -195,11 +242,10 @@ const Header: React.FC<HeaderProps> = ({
               {isMobile && (
                 <button
                   onClick={() => setIsOpen(false)}
+                  aria-label="Tutup notifikasi"
                   className="p-1 -mr-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                 >
-                  <span className="material-icons-round text-lg text-text-secondary-light">
-                    close
-                  </span>
+                  <X className="size-5 text-text-secondary-light" aria-hidden />
                 </button>
               )}
             </div>
@@ -209,9 +255,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="overflow-y-auto flex-1">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
-                <span className="material-icons-round text-4xl text-gray-300 dark:text-gray-600 mb-2">
-                  notifications_off
-                </span>
+                <BellOff className="size-10 text-gray-300 dark:text-gray-600 mb-2" aria-hidden />
                 <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
                   Belum ada notifikasi
                 </p>
@@ -228,11 +272,10 @@ const Header: React.FC<HeaderProps> = ({
                   }`}
                 >
                   {/* Icon */}
-                  <span
-                    className={`material-icons-round text-xl mt-0.5 flex-shrink-0 ${getNotificationColor(notif.type)}`}
-                  >
-                    {getNotificationIcon(notif.type)}
-                  </span>
+                  <NotificationTypeIcon
+                    type={notif.type}
+                    className={`size-5 mt-0.5 flex-shrink-0 ${getNotificationColor(notif.type)}`}
+                  />
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
@@ -315,9 +358,10 @@ const Header: React.FC<HeaderProps> = ({
           {onToggleSidebar && (
             <button
               onClick={onToggleSidebar}
+              aria-label="Buka menu"
               className="p-2 -ml-2 text-text-primary-light dark:text-white hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
-              <span className="material-icons-round text-[28px]">menu</span>
+              <Menu className="size-7" aria-hidden />
             </button>
           )}
 
@@ -334,10 +378,11 @@ const Header: React.FC<HeaderProps> = ({
             <div className="relative">
               <button
                 ref={mobileNotifButtonRef}
+                aria-label="Notifikasi"
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 text-text-primary-light dark:text-white hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-colors relative"
               >
-                <span className="material-icons-round text-[22px]">notifications_none</span>
+                <Bell className="size-[22px]" aria-hidden />
                 {unreadCount > 0 && (
                   <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-purple-50 dark:border-gray-900">
                     {unreadCount > 99 ? '99+' : unreadCount}
@@ -373,12 +418,14 @@ const Header: React.FC<HeaderProps> = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={onToggleDarkMode}
+                      onClick={toggleDarkMode}
                       className="w-full text-left px-4 py-3 text-sm font-medium text-text-primary-light dark:text-white hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-start gap-2 h-auto"
                     >
-                      <span className="material-icons-round text-[18px]">
-                        {isDarkMode ? 'light_mode' : 'dark_mode'}
-                      </span>
+                      {isDarkMode ? (
+                        <Sun className="size-[18px]" aria-hidden />
+                      ) : (
+                        <Moon className="size-[18px]" aria-hidden />
+                      )}
                       {isDarkMode ? 'Mode Terang' : 'Mode Gelap'}
                     </Button>
                   </div>
@@ -390,14 +437,12 @@ const Header: React.FC<HeaderProps> = ({
                   >
                     {isLoggingOut ? (
                       <>
-                        <span className="material-icons-round text-[18px] animate-spin">
-                          refresh
-                        </span>
+                        <Loader2 className="size-[18px] animate-spin" aria-hidden />
                         Keluar...
                       </>
                     ) : (
                       <>
-                        <span className="material-icons-round text-[18px]">logout</span>
+                        <LogOut className="size-[18px]" aria-hidden />
                         Keluar
                       </>
                     )}
@@ -427,12 +472,13 @@ const Header: React.FC<HeaderProps> = ({
           <div className="relative">
             <Button
               ref={notifButtonRef}
+              aria-label="Notifikasi"
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
               className="text-text-secondary-light hover:text-primary transition-colors relative h-10 w-10"
             >
-              <span className="material-icons-round">notifications_none</span>
+              <Bell className="size-6" aria-hidden />
               {unreadCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-white dark:border-card-dark">
                   {unreadCount > 99 ? '99+' : unreadCount}
@@ -445,10 +491,15 @@ const Header: React.FC<HeaderProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={onToggleDarkMode}
+            onClick={toggleDarkMode}
+            aria-label={isDarkMode ? 'Mode terang' : 'Mode gelap'}
             className="text-text-secondary-light hover:text-primary transition-colors h-10 w-10"
           >
-            <span className="material-icons-round">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>
+            {isDarkMode ? (
+              <Sun className="size-6" aria-hidden />
+            ) : (
+              <Moon className="size-6" aria-hidden />
+            )}
           </Button>
 
           {/* User Menu */}
@@ -481,12 +532,12 @@ const Header: React.FC<HeaderProps> = ({
                 >
                   {isLoggingOut ? (
                     <>
-                      <span className="material-icons-round text-[18px] animate-spin">refresh</span>
+                      <Loader2 className="size-[18px] animate-spin" aria-hidden />
                       Keluar...
                     </>
                   ) : (
                     <>
-                      <span className="material-icons-round text-[18px]">logout</span>
+                      <LogOut className="size-[18px]" aria-hidden />
                       Keluar
                     </>
                   )}

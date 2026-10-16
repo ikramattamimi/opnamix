@@ -7,47 +7,25 @@ import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { UserProfile } from '@/features/auth/api';
 import { useActiveOpnameLock, useOpnameLockRealtime } from '@/features/opname/useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
+import { SearchX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/common/QueryState';
+import { APP_ROUTES, type AppRoute } from './routes';
+import { canAccessRoute, getUserRoles } from './routeUtils';
 
-const Dashboard = React.lazy(() => import('@/features/dashboard/Dashboard'));
-const ProductManagement = React.lazy(() => import('@/features/products/ProductManagement'));
-const ServiceManagement = React.lazy(() => import('@/features/services/ServiceManagement'));
-const StockInManagement = React.lazy(() => import('@/features/stock-in/StockInManagement'));
-const StockOutManagement = React.lazy(() => import('@/features/stock-out/StockOutManagement'));
-const RiwayatOpnamePage = React.lazy(() => import('@/features/opname/RiwayatOpnamePage'));
-const KonfigurasiOpnamePage = React.lazy(() => import('@/features/opname/KonfigurasiOpnamePage'));
-const PelaksanaanOpnamePage = React.lazy(() => import('@/features/opname/PelaksanaanOpnamePage'));
-const DetailOpnamePage = React.lazy(() => import('@/features/opname/DetailOpnamePage'));
-const StockReport = React.lazy(() => import('@/features/reports/StockReport'));
-const UserManagement = React.lazy(() => import('@/features/users/UserManagement'));
-const ProfilePage = React.lazy(() => import('@/features/profile/ProfilePage'));
 const OpnameLockPage = React.lazy(() => import('@/features/opname/OpnameLockPage'));
-const NotificationsPage = React.lazy(() => import('@/features/notifications/NotificationsPage'));
 
 interface AuthenticatedAppProps {
-  isDarkMode: boolean;
-  setIsDarkMode: (value: boolean) => void;
   userProfile: UserProfile | null;
-  getViewTitle: (pathname: string) => string;
 }
 
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center h-full w-full min-h-[400px]">
-    <div className="text-center">
-      <span className="material-icons-round text-primary text-4xl animate-spin">refresh</span>
-      <p className="mt-2 text-sm text-text-secondary-light">Memuat modul...</p>
-    </div>
-  </div>
-);
-
 const ProtectedRoute: React.FC<{
-  allowedRoles: string[];
+  route: AppRoute;
   children: React.ReactNode;
-}> = ({ allowedRoles, children }) => {
+}> = ({ route, children }) => {
   const { userProfile } = useAuth();
-  const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
 
-  if (userRoles.length === 0 || !allowedRoles.some((r) => userRoles.includes(r))) {
+  if (!canAccessRoute(route, getUserRoles(userProfile))) {
     return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
   return <>{children}</>;
@@ -55,9 +33,7 @@ const ProtectedRoute: React.FC<{
 
 const NotFoundPage = () => (
   <div className="flex flex-col items-center justify-center h-64 text-center">
-    <span className="material-icons-round text-6xl text-gray-300 dark:text-gray-600 mb-4">
-      search_off
-    </span>
+    <SearchX className="size-12 text-gray-300 dark:text-gray-600 mb-4" aria-hidden />
     <h2 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
       Halaman Tidak Ditemukan
     </h2>
@@ -66,12 +42,7 @@ const NotFoundPage = () => (
   </div>
 );
 
-const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
-  isDarkMode,
-  setIsDarkMode,
-  userProfile,
-  getViewTitle,
-}) => {
+const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data: lock, isLoading } = useActiveOpnameLock();
@@ -79,14 +50,14 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
   const isLocked = lock?.isLocked ?? false;
   const opname = lock?.opname ?? null;
 
-  const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
+  const userRoles = getUserRoles(userProfile);
   const isOpnameRoute = location.pathname.startsWith('/audit/stok-opname');
   const canAccessOpname = userRoles.some((r) => ['admin', 'apoteker', 'farmasi'].includes(r));
 
   if (isLocked && opname && !isLoading) {
     if (!(isOpnameRoute && canAccessOpname)) {
       return (
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={<LoadingState fullScreen />}>
           <OpnameLockPage opname={opname} />
         </Suspense>
       );
@@ -98,157 +69,28 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
       <Sidebar isMobileOpen={isSidebarOpen} onCloseMobile={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-        <Header
-          isDarkMode={isDarkMode}
-          onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-          viewName={getViewTitle(location.pathname)}
-          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        />
+        <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
         <div className="p-6 md:p-8">
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingState label="Memuat modul..." className="min-h-[400px]" />}>
             <Routes>
-              <Route
-                path={ROUTES.DASHBOARD}
-                element={
-                  <ErrorBoundary name="Dashboard">
-                    <Dashboard />
+              {APP_ROUTES.map((route) => {
+                const Page = route.element;
+                const page = (
+                  <ErrorBoundary name={route.errorName}>
+                    <Page />
                   </ErrorBoundary>
-                }
-              />
-
-              <Route
-                path={ROUTES.MASTER_DATA_PRODUK}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Master Data Produk">
-                      <ProductManagement />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.MASTER_DATA_JASA}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Master Data Jasa">
-                      <ServiceManagement />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.STOK_MASUK}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Penerimaan Stok">
-                      <StockInManagement />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.STOK_KELUAR}
-                element={
-                  <ErrorBoundary name="Pengeluaran Stok">
-                    <StockOutManagement />
-                  </ErrorBoundary>
-                }
-              />
-
-              <Route
-                path={ROUTES.STOK_OPNAME}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Riwayat Opname">
-                      <RiwayatOpnamePage />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.RIWAYAT_OPNAME}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Riwayat Opname">
-                      <RiwayatOpnamePage />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.KONFIGURASI_OPNAME}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Konfigurasi Opname">
-                      <KonfigurasiOpnamePage />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.PELAKSANAAN_OPNAME}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Pelaksanaan Opname">
-                      <PelaksanaanOpnamePage />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.DETAIL_OPNAME}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Detail Opname">
-                      <DetailOpnamePage />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.LAPORAN_STOK}
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'farmasi']}>
-                    <ErrorBoundary name="Laporan Stok">
-                      <StockReport />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.USER_MANAGEMENT}
-                element={
-                  <ProtectedRoute allowedRoles={['admin']}>
-                    <ErrorBoundary name="Manajemen Pengguna">
-                      <UserManagement />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.PROFIL}
-                element={
-                  <ErrorBoundary name="Profil">
-                    <ProfilePage />
-                  </ErrorBoundary>
-                }
-              />
-
-              <Route
-                path={ROUTES.NOTIFICATIONS}
-                element={
-                  <ErrorBoundary name="Notifikasi">
-                    <NotificationsPage />
-                  </ErrorBoundary>
-                }
-              />
+                );
+                return (
+                  <Route
+                    key={route.path}
+                    path={route.path}
+                    element={
+                      route.roles ? <ProtectedRoute route={route}>{page}</ProtectedRoute> : page
+                    }
+                  />
+                );
+              })}
 
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
