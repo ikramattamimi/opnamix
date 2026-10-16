@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { api, CreateTransactionPayload } from '@/lib/api';
+import { transactionsApi, CreateTransactionPayload } from '@/features/transactions/api';
+import { stockOutApi } from './api';
 import { QUERY_KEYS } from '@/hooks/useSupabaseQuery';
 import { supabase } from '@/lib/supabaseClient';
 import { PaginationParams } from '@/types';
@@ -8,7 +9,7 @@ import { PaginationParams } from '@/types';
 export function useStockOutRequests(params?: PaginationParams) {
   return useQuery({
     queryKey: [...QUERY_KEYS.stockOut, params],
-    queryFn: () => api.getStockOutRequests(params),
+    queryFn: () => stockOutApi.getStockOutRequests(params),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 30, // 30 seconds
   });
@@ -42,7 +43,7 @@ export function useStockOutRealtime() {
 export function useCreateStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateTransactionPayload) => api.createTransaction(payload),
+    mutationFn: (payload: CreateTransactionPayload) => transactionsApi.createTransaction(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
     },
@@ -64,7 +65,7 @@ export function useProcessStockOutRequest() {
       diskon?: number;
       total?: number;
       serviceFee?: number;
-    }) => api.updateTransactionStatus(number, status, diskon, total, serviceFee),
+    }) => stockOutApi.updateTransactionStatus(number, status, diskon, total, serviceFee),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products }); // Stock updated
@@ -98,7 +99,7 @@ export function useUpdateStockOutRequest() {
           price: number;
         }[];
       };
-    }) => api.updatePendingStockOutRequest(number, payload),
+    }) => stockOutApi.updatePendingStockOutRequest(number, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
     },

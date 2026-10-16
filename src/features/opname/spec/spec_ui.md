@@ -193,7 +193,7 @@ Modal type `danger`: "Yakin ingin menghapus opname ini beserta semua detailnya? 
 - Judul: "Opname Sedang Berlangsung"
 - Sub: "Mohon menunggu. Opname sedang dilakukan oleh tim farmasi."
 - Aksi: Tombol **Cek Status Opname** (polling manual)
-  - Memanggil `api.getActiveOpnameLock()`
+  - Memanggil `opnameApi.getActiveOpnameLock()`
   - Jika tidak lagi locked → tampilkan panel sukses "Opname Telah Selesai!" + tombol "Muat Ulang Aplikasi" (`window.location.reload()`)
 - Warning: "Mohon Bersabar — Estimasi: ~15-30 menit."
 

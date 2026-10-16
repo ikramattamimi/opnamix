@@ -97,7 +97,9 @@ const ProductManagement: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await import('@/lib/api').then((m) => m.api.getDashboardStats());
+        const data = await import('@/features/dashboard/api').then((m) =>
+          m.dashboardApi.getDashboardStats(),
+        );
         setRealStats({
           totalValue: data.totalValue,
           lowStock: data.lowStockCount,

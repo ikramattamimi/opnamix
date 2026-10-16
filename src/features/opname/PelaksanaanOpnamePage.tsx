@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { api, OpnameDetail } from '@/lib/api';
+import { opnameApi, OpnameDetail } from './api';
+import { productsApi } from '@/features/products/api';
+import { createNotification } from '@/features/notifications/api';
 import { OpnameItem, Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -51,14 +53,14 @@ const PelaksanaanOpnamePage: React.FC = () => {
   const loadOpname = async () => {
     if (!opnameId) return;
     try {
-      const data = await api.getOpnameById(opnameId);
+      const data = await opnameApi.getOpnameById(opnameId);
       setOpnameData(data);
       setCurrentStep(data.currentStep || 1);
       const scheduleObats: string[] = (data.scheduleObatIds || []).map(String);
       setScheduleObatIds(scheduleObats);
 
       // Always load all products for step 1 selection
-      const products = await api.getProducts({ page: 1, perPage: 1000 });
+      const products = await productsApi.getProducts({ page: 1, perPage: 1000 });
       setAllProducts(products.data || []);
 
       if (data.items.length > 0) {
@@ -130,7 +132,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
 
       // Gunakan saveDetailOnly agar current_step di DB TIDAK berubah saat simpan draft.
       // Perubahan step hanya boleh terjadi saat user klik "Lanjutkan" (handleNextStep).
-      await api.saveDetailOnly(opnameId, detailUpdates);
+      await opnameApi.saveDetailOnly(opnameId, detailUpdates);
       showToast('Draft tersimpan.', 'success');
     } catch (error) {
       console.error('Failed to save draft:', error);
@@ -148,10 +150,10 @@ const PelaksanaanOpnamePage: React.FC = () => {
         const selectedProductIds: string[] = Array.from(selectedIds);
 
         // Use completeStepOne to create detail rows
-        await api.completeStepOne(opnameId!, selectedProductIds);
+        await opnameApi.completeStepOne(opnameId!, selectedProductIds);
 
         // Reload opname data to get the newly created detail rows
-        const data = await api.getOpnameById(opnameId!);
+        const data = await opnameApi.getOpnameById(opnameId!);
         setOpnameData(data);
         setItems(data.items);
         setSelectedIds(new Set(data.items.map((i: OpnameItem) => i.productId)));
@@ -174,11 +176,11 @@ const PelaksanaanOpnamePage: React.FC = () => {
           detailId: item.id,
           physicalStock: physicalCounts[item.id] || 0,
         }));
-      await api.saveDraft(opnameId!, 3, detailUpdates);
+      await opnameApi.saveDraft(opnameId!, 3, detailUpdates);
       setCurrentStep(3);
 
       // Create notification for step 2→3 transition
-      await api.createNotification({
+      await createNotification({
         type: 'OPNAME_STEP_CHANGED',
         title: 'Opname Memasuki Tahap 3',
         message: `Opname ${opnameData?.opnameNumber} telah memasuki tahap 3: Penyesuaian Stok.`,
@@ -210,10 +212,10 @@ const PelaksanaanOpnamePage: React.FC = () => {
     try {
       // Going back from step 2 to step 1:
       // Delete all detail rows and reset to step 1
-      await api.backwardToStepOne(opnameId!, scheduleObatIds);
+      await opnameApi.backwardToStepOne(opnameId!, scheduleObatIds);
 
       // Reload opname data
-      const data = await api.getOpnameById(opnameId!);
+      const data = await opnameApi.getOpnameById(opnameId!);
       setOpnameData(data);
       setItems([]);
       setPhysicalCounts({});
@@ -221,7 +223,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
       setReasons({});
 
       // Restore products and selection from schedule's obat_ids
-      const products = await api.getProducts({ page: 1, perPage: 1000 });
+      const products = await productsApi.getProducts({ page: 1, perPage: 1000 });
       setAllProducts(products.data || []);
 
       const scheduleObats = (data.scheduleObatIds || []).map(String);
@@ -238,7 +240,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
       setCurrentStep(1);
 
       // Notify: backward 2→1
-      await api.createNotification({
+      await createNotification({
         type: 'OPNAME_STEP_CHANGED',
         title: 'Opname Kembali ke Tahap 1',
         message: `Opname ${opnameData?.opnameNumber} kembali ke tahap 1: Pemilihan Obat. Progress tahap 2 telah dihapus.`,
@@ -299,11 +301,11 @@ const PelaksanaanOpnamePage: React.FC = () => {
         reason: reasons[item.id] || '',
       }));
 
-      await api.saveDraft(opnameId, 3, detailUpdates);
-      await api.finishOpname(opnameId);
+      await opnameApi.saveDraft(opnameId, 3, detailUpdates);
+      await opnameApi.finishOpname(opnameId);
 
       // Create notification for opname completed
-      await api.createNotification({
+      await createNotification({
         type: 'OPNAME_COMPLETED',
         title: 'Opname Selesai',
         message: `Opname ${opnameData?.opnameNumber} telah selesai. Stok telah diperbarui sesuai hasil opname.`,

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
 import { Button } from '@/components/ui/button';
-import type { TransactionReportRow } from '@/lib/api';
+import type { TransactionReportRow } from './api';
 
 // Type options for filter
 const typeOptions = [

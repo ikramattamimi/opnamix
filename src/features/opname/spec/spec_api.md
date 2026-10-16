@@ -1,7 +1,7 @@
 # Spec API — Kontrak API Modul Opname
 
 > Sub-spec dari [spec.md](./spec.md)  
-> Semua method berada di objek `api` yang diekspor dari `lib/api.ts`.  
+> Semua method berada di objek `opnameApi` yang diekspor dari `features/opname/api.ts`.  
 > Backend: Supabase (PostgreSQL via `supabase-js`).
 
 ---
@@ -169,7 +169,7 @@ Reset ke step 1 dengan menghapus semua detail.
 
 **Output:** `{ success: true }`
 
-> **Catatan:** Notifikasi backward dibuat di frontend (`PelaksanaanOpnamePage`) via `api.createNotification()`, tidak di dalam method ini.
+> **Catatan:** Notifikasi backward dibuat di frontend (`PelaksanaanOpnamePage`) via `createNotification()` dari `features/notifications/api.ts`, tidak di dalam method ini.
 
 ---
 

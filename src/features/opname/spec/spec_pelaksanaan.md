@@ -66,7 +66,7 @@ loadOpname() dipanggil saat mount dan saat opnameId berubah
 **Aksi "Lanjutkan":**
 
 1. Disabled jika `selectedIds.size === 0`
-2. Memanggil `api.completeStepOne(opnameId, [...selectedIds])`
+2. Memanggil `opnameApi.completeStepOne(opnameId, [...selectedIds])`
 3. Efek di backend:
    - Update opname: `status → sedang_dilaksanakan`, `current_step → 2`, `selected_obat_ids → selectedProductIds`
    - Insert `opname_detail` untuk setiap produk dengan `stok_sistem = current qty`
@@ -91,7 +91,7 @@ loadOpname() dipanggil saat mount dan saat opnameId berubah
 
 **Simpan Draft:**
 
-- Memanggil `api.saveDraft(opnameId, currentStep, detailUpdates)`
+- Memanggil `opnameApi.saveDraft(opnameId, currentStep, detailUpdates)`
 - Hanya update data, tidak advance step
 
 **Aksi "Lanjutkan" (Step 2 → Step 3):**
@@ -143,7 +143,7 @@ Pada step 3, tombol Kembali **tidak ditampilkan**.
 
 1. Tampilkan modal peringatan: "⚠️ Kembali ke tahap 1 akan menghapus semua progress input stok fisik..."
 2. Jika dikonfirmasi → `confirmBackward()`:
-   - `api.backwardToStepOne(opnameId, scheduleObatIds)` → hapus semua detail rows, reset opname ke step 1 / `belum_dilaksanakan`
+   - `opnameApi.backwardToStepOne(opnameId, scheduleObatIds)` → hapus semua detail rows, reset opname ke step 1 / `belum_dilaksanakan`
    - Reload produk, restore pre-selection dari `scheduleObatIds`
    - `setCurrentStep(1)`
    - Notifikasi: backward 2→1

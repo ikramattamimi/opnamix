@@ -6,7 +6,7 @@ import { useProducts } from '@/features/products/useProducts';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { getUserProfile } from '@/features/auth/api';
-import { api } from '@/lib/api';
+import { productsApi } from '@/features/products/api';
 
 interface StockInFormProps {
   onSave: (receipt: StockInReceipt, file?: Blob) => void;
@@ -26,7 +26,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
     getUserProfile().then((profile) => {
       if (profile) setCurrentUserName(profile.full_name || profile.email);
     });
-    api
+    productsApi
       .getDistinctSuppliers()
       .then(setSupplierSuggestions)
       .catch(() => {});

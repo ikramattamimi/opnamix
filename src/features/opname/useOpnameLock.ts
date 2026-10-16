@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { opnameApi } from './api';
 
 export interface OpnameLockInfo {
   id: string;
@@ -28,7 +28,7 @@ export function useOpnameLock() {
   useEffect(() => {
     const checkLock = async () => {
       try {
-        const result = await api.getActiveOpnameLock();
+        const result = await opnameApi.getActiveOpnameLock();
         setLockState({ ...result, isLoading: false });
       } catch (error) {
         console.error('Failed to check opname lock:', error);
@@ -47,7 +47,7 @@ export function useOpnameLock() {
 
   const refetch = async () => {
     try {
-      const result = await api.getActiveOpnameLock();
+      const result = await opnameApi.getActiveOpnameLock();
       setLockState({ ...result, isLoading: false });
     } catch (error) {
       console.error('Failed to check opname lock:', error);

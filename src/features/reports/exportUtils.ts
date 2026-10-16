@@ -1,6 +1,7 @@
 import type { Product, Service, StockInReceipt, StockOutRequest } from '@/types';
 import { toDate } from '@/lib/utils';
-import type { RecentTransaction, StockMutationRow, TransactionReportRow } from '@/lib/api';
+import type { RecentTransaction } from '@/features/dashboard/api';
+import type { StockMutationRow, TransactionReportRow } from './api';
 
 type XLSXModule = typeof import('xlsx');
 type ExcelRow = Record<string, string | number>;

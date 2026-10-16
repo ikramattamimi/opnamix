@@ -5,6 +5,7 @@
 
 import { supabase } from '@/lib/supabaseClient';
 import { AppNotification } from '@/types';
+import type { Json } from '@/lib/database.types';
 
 const MAX_NOTIFICATIONS = 50;
 
@@ -191,3 +192,42 @@ export function formatNotificationTime(dateString: string): string {
 
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
+
+/**
+ * Buat notifikasi. Tanpa target_roles berarti broadcast (target_role null),
+ * selain itu satu baris per role.
+ */
+export const createNotification = async (notification: {
+  type: string;
+  title: string;
+  message: string;
+  data?: Json;
+  target_roles?: string[];
+}) => {
+  const roles = notification.target_roles || [];
+
+  if (roles.length === 0) {
+    // Broadcast notification (target_role = null)
+    const { error } = await supabase.from('notifications').insert({
+      type: notification.type,
+      title: notification.title,
+      message: notification.message,
+      data: notification.data || {},
+      target_role: null,
+    });
+    if (error) throw error;
+  } else {
+    // Insert one row per target role so each role receives the notification
+    const rows = roles.map((role) => ({
+      type: notification.type,
+      title: notification.title,
+      message: notification.message,
+      data: notification.data || {},
+      target_role: role,
+    }));
+    const { error } = await supabase.from('notifications').insert(rows);
+    if (error) throw error;
+  }
+
+  return { success: true };
+};

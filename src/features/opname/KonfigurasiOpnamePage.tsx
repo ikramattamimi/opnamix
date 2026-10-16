@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { opnameApi } from './api';
+import { productsApi } from '@/features/products/api';
 import { OpnameSchedule, OpnameScheduleConfig, PengulanganOpname, Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
@@ -46,7 +47,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
 
   const loadSchedules = async () => {
     try {
-      const data = await api.getOpnameSchedules();
+      const data = await opnameApi.getOpnameSchedules();
       setSchedules(data);
     } catch (error) {
       console.error('Failed to load schedules:', error);
@@ -57,7 +58,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
 
   const loadProducts = async () => {
     try {
-      const result = await api.getProducts({ page: 1, perPage: 1000 });
+      const result = await productsApi.getProducts({ page: 1, perPage: 1000 });
       setAllProducts(result.data);
     } catch (error) {
       console.error('Failed to load products:', error);
@@ -118,9 +119,9 @@ const KonfigurasiOpnamePage: React.FC = () => {
     setIsSaving(true);
     try {
       if (editingId) {
-        await api.updateOpnameSchedule(editingId, dataToSave);
+        await opnameApi.updateOpnameSchedule(editingId, dataToSave);
       } else {
-        await api.createOpnameSchedule(dataToSave);
+        await opnameApi.createOpnameSchedule(dataToSave);
       }
       setShowModal(false);
       resetForm();
@@ -142,7 +143,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
     const id = deleteConfirm.id;
     setDeleteConfirm({ isOpen: false, id: '' });
     try {
-      await api.deleteOpnameSchedule(id);
+      await opnameApi.deleteOpnameSchedule(id);
       loadSchedules();
       showToast('Jadwal berhasil dihapus.', 'success');
     } catch (error) {
@@ -153,7 +154,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
 
   const handleToggle = async (id: string, currentStatus: boolean | null) => {
     try {
-      await api.toggleOpnameScheduleStatus(id, !currentStatus);
+      await opnameApi.toggleOpnameScheduleStatus(id, !currentStatus);
       loadSchedules();
     } catch (error) {
       console.error('Failed to toggle schedule:', error);

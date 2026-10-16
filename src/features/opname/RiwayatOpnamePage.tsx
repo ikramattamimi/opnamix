@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/lib/api';
+import { opnameApi } from './api';
+import { productsApi } from '@/features/products/api';
 import { OpnameSchedule, Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
@@ -71,10 +72,10 @@ const RiwayatOpnamePage: React.FC = () => {
   const loadData = async () => {
     try {
       const [upcomingData, draftData, historyData, schedules] = await Promise.all([
-        api.getUpcomingOpnames(),
-        api.getDraftOpnames(),
-        api.getOpnameHistory(),
-        api.getActiveSchedules(),
+        opnameApi.getUpcomingOpnames(),
+        opnameApi.getDraftOpnames(),
+        opnameApi.getOpnameHistory(),
+        opnameApi.getActiveSchedules(),
       ]);
       setUpcoming(upcomingData);
       setDrafts(draftData);
@@ -111,7 +112,7 @@ const RiwayatOpnamePage: React.FC = () => {
     const id = deleteConfirm.id;
     setDeleteConfirm({ isOpen: false, id: '' });
     try {
-      await api.deleteOpname(id);
+      await opnameApi.deleteOpname(id);
       showToast('Opname berhasil dihapus.', 'success');
       loadData();
     } catch (error) {
@@ -127,7 +128,7 @@ const RiwayatOpnamePage: React.FC = () => {
     setManualDate(new Date().toISOString().split('T')[0]);
     setScheduleProducts([]);
     try {
-      const schedules = await api.getOpnameSchedules();
+      const schedules = await opnameApi.getOpnameSchedules();
       setAllSchedules(schedules);
     } catch (error) {
       console.error('Failed to load schedules:', error);
@@ -143,7 +144,7 @@ const RiwayatOpnamePage: React.FC = () => {
     setIsLoadingProducts(true);
     try {
       const schedule = allSchedules.find((s) => s.id === scheduleId);
-      const result = await api.getProducts({ page: 1, perPage: 1000 });
+      const result = await productsApi.getProducts({ page: 1, perPage: 1000 });
       if (schedule?.obatIds === null) {
         setScheduleProducts(result.data);
       } else if (schedule?.obatIds && Array.isArray(schedule.obatIds)) {
@@ -164,7 +165,7 @@ const RiwayatOpnamePage: React.FC = () => {
     setIsCreating(true);
     try {
       // No items passed - details will be created after user selects products in step 1
-      await api.startOpname(selectedScheduleId, manualDate);
+      await opnameApi.startOpname(selectedScheduleId, manualDate);
       setShowManualModal(false);
       showToast(
         'Opname berhasil dibuat. Silakan pilih opname dari daftar untuk melanjutkan.',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StockInReceipt, Product } from '@/types';
-import { api } from '@/lib/api';
+import { transactionsApi } from '@/features/transactions/api';
+import { stockInApi } from './api';
 import { exportStockInToExcel } from '@/features/reports/exportUtils';
 import { useStockInReceipts, useCreateStockIn } from './useStockIn';
 import StatCard from '@/components/common/StatCard';
@@ -37,13 +38,13 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
     setIsSubmitting(true);
     try {
       // Keep generated number only for receipt image filename
-      const transactionNumber = await api.generateTransactionNumber('masuk');
+      const transactionNumber = await transactionsApi.generateTransactionNumber('masuk');
 
       // Upload image if provided
       let imageUrl: string | undefined;
       if (file) {
         try {
-          imageUrl = await api.uploadReceiptImage(file, transactionNumber);
+          imageUrl = await stockInApi.uploadReceiptImage(file, transactionNumber);
         } catch (uploadError) {
           console.error('Error uploading image:', uploadError);
           showToast(

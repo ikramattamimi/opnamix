@@ -9,7 +9,7 @@ import { stockMutationColumns } from './StockMutationColumns';
 import { exportTransactionReportToExcel, exportStockMutationToExcel } from './exportUtils';
 import { toDate } from '@/lib/utils';
 
-import { api, StockMutationRow, TransactionReportRow } from '@/lib/api';
+import { reportsApi, StockMutationRow, TransactionReportRow } from './api';
 
 type ReportPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
 
@@ -153,7 +153,7 @@ const StockReport: React.FC = () => {
       if (activeTab === 'analysis') {
         // Analysis data is derived from props and useMemo, no direct fetch here
       } else if (activeTab === 'transactions') {
-        const allData = await api.getTransactionReport(txStartDate, txEndDate, {
+        const allData = await reportsApi.getTransactionReport(txStartDate, txEndDate, {
           page: 1,
           perPage: 100000,
           status: txStatus === 'Semua' ? undefined : txStatus,
@@ -161,10 +161,14 @@ const StockReport: React.FC = () => {
         setTxReport(allData.data);
         setAllTxData(allData.data);
       } else if (activeTab === 'mutation') {
-        const allData = await api.getStockMutationReport(mutationStartDate, mutationEndDate, {
-          page: 1,
-          perPage: 100000,
-        });
+        const allData = await reportsApi.getStockMutationReport(
+          mutationStartDate,
+          mutationEndDate,
+          {
+            page: 1,
+            perPage: 100000,
+          },
+        );
         setMutations(allData.data);
         setAllMutationData(allData.data);
       }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { api, OpnameDetail } from '@/lib/api';
+import { opnameApi, OpnameDetail } from './api';
 
 interface DetailRow {
   id: string;
@@ -28,8 +28,8 @@ const DetailOpnamePage: React.FC = () => {
     if (!opnameId) return;
     try {
       const [detailData, opnameData] = await Promise.all([
-        api.getOpnameDetailView(opnameId),
-        api.getOpnameById(opnameId),
+        opnameApi.getOpnameDetailView(opnameId),
+        opnameApi.getOpnameById(opnameId),
       ]);
       setDetails(detailData);
       setOpnameInfo(opnameData);

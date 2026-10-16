@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { OpnameLockInfo } from './useOpnameLock';
-import { api } from '@/lib/api';
+import { opnameApi } from './api';
 import { useAuth } from '@/features/auth/useAuth';
 import { toDate } from '@/lib/utils';
 
@@ -38,7 +38,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname, onRefresh }) =>
   const handleCheckStatus = async () => {
     setIsChecking(true);
     try {
-      const result = await api.getActiveOpnameLock();
+      const result = await opnameApi.getActiveOpnameLock();
       if (!result.isLocked) {
         setIsComplete(true);
       }

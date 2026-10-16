@@ -77,7 +77,7 @@ Lock aktif **hanya** saat `opname` dengan `status = 'sedang_dilaksanakan'` **DAN
 
 > **Perubahan dari desain awal:** Lock sebelumnya aktif di `current_step >= 2`. Sekarang lock hanya aktif di step 2 saja. Ketika advance ke step 3, lock dicabut otomatis karena query condition tidak terpenuhi lagi.
 
-Dicek via `api.getActiveOpnameLock()` yang dipanggil oleh hook `useOpnameLock` (polling setiap 30 detik + initial check).
+Dicek via `opnameApi.getActiveOpnameLock()` yang dipanggil oleh hook `useOpnameLock` (polling setiap 30 detik + initial check).
 
 **Perilaku per role:**
 
@@ -179,7 +179,7 @@ interface OpnameLockState {
 function useOpnameLock(): OpnameLockState & { refetch: () => Promise<void> };
 ```
 
-- Polling `api.getActiveOpnameLock()` setiap **30 detik**
+- Polling `opnameApi.getActiveOpnameLock()` setiap **30 detik**
 - Initial check saat mount
 - `refetch()` untuk check manual (dipakai oleh nakes setelah klik "Cek Status")
 

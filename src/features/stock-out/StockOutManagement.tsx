@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { api, RecentStockOut } from '@/lib/api';
+import { stockOutApi, RecentStockOut } from './api';
+import { transactionsApi } from '@/features/transactions/api';
 import { StockOutRequest, StockOutManual, RequestedDrug } from '@/types';
 import { useProducts } from '@/features/products/useProducts';
 import {
@@ -81,7 +82,7 @@ const StockOutManagement: React.FC = () => {
 
   const fetchTimeline = async () => {
     try {
-      const data = await api.getRecentStockOuts(10);
+      const data = await stockOutApi.getRecentStockOuts(10);
       setTimelineData(data);
     } catch (err) {
       console.error('Failed to fetch timeline', err);
@@ -133,7 +134,7 @@ const StockOutManagement: React.FC = () => {
         return sum + (product ? product.sellingPrice : 0) * item.quantity;
       }, 0);
 
-      const transactionNumber = await api.generateTransactionNumber('keluar');
+      const transactionNumber = await transactionsApi.generateTransactionNumber('keluar');
 
       await createTransaction.mutateAsync({
         nomor: transactionNumber,
@@ -179,7 +180,7 @@ const StockOutManagement: React.FC = () => {
 
   const handleSaveRequest = async (request: StockOutRequest) => {
     try {
-      const transactionNumber = await api.generateTransactionNumber('keluar');
+      const transactionNumber = await transactionsApi.generateTransactionNumber('keluar');
 
       await createTransaction.mutateAsync({
         nomor: transactionNumber,

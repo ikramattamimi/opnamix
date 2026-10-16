@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/common/StatCard';
-import { api, DashboardStats, RecentTransaction } from '@/lib/api';
+import { dashboardApi, DashboardStats, RecentTransaction } from './api';
 import { exportRecentTransactionsToExcel } from '@/features/reports/exportUtils';
 
 const Dashboard: React.FC = () => {
@@ -19,7 +19,7 @@ const Dashboard: React.FC = () => {
     const fetchTrx = async () => {
       setTrxLoading(true);
       try {
-        const res = await api.getRecentTransactions(trxPage, 5);
+        const res = await dashboardApi.getRecentTransactions(trxPage, 5);
         if (!controller.signal.aborted) {
           setRecentTrx(res.data);
           setTrxTotalPages(res.totalPages);
@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
     const controller = new AbortController();
     const fetchStats = async () => {
       try {
-        const data = await api.getDashboardStats();
+        const data = await dashboardApi.getDashboardStats();
         if (!controller.signal.aborted) {
           setStats(data);
         }
