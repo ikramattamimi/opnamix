@@ -389,102 +389,41 @@ export const api = {
     }[];
     requestedBy?: string;
   }) => {
-
-    // 1. Get current user ID for created_by
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
-
-    // 2. Insert Header and get the generated ID
-    const { data: insertedTransaction, error: txError } = await supabase
-      .from('transaksi')
-      .insert({
+    // Header, item, jasa, dan perubahan stok (kalau status 'selesai')
+    // disimpan dalam satu transaksi database: berhasil semua atau batal
+    // semua. created_by diisi dari auth.uid() di database.
+    const { error } = await supabase.rpc('create_transaction', {
+      p_payload: {
         nomor: payload.nomor,
         tanggal: payload.tanggal,
         tipe: payload.tipe,
         tipe_sumber: payload.tipe_sumber,
         status: payload.status,
-        nama_pasien: payload.nama_pasien || '-', // Default generic if missing
+        nama_pasien: payload.nama_pasien || '-',
         tanggal_lahir_pasien: payload.tanggal_lahir_pasien || null,
         keterangan: payload.keterangan || '',
-        bukti: payload.bukti || null, // Image URL if provided
+        bukti: payload.bukti || null,
         total: payload.total,
         diskon: payload.diskon ?? 0,
         biaya_layanan: payload.serviceFee ?? 0,
-        created_by: currentUser?.id || null,
-        nama_nakes: payload.requestedBy || null
-      })
-      .select('id, nomor')
-      .single();
-
-    if (txError) {
-      console.error('Error inserting transaction header:', txError);
-      throw txError;
-    }
-
-    if (!insertedTransaction) {
-      throw new Error('Failed to get transaction ID after insert');
-    }
-
-    // 2. Insert Items with both transaksi_id and transaksi_nomor
-    if (payload.items.length > 0) {
-      const details = payload.items.map(item => ({
-        transaksi_id: insertedTransaction.id, // Use the numeric ID
-        transaksi_nomor: payload.nomor, // Also keep the text nomor for reference
-        obat_id: parseInt(item.productId),
-        qty: item.quantity,
-        harga: item.price,
-        subtotal: item.quantity * item.price,
-        batch: item.batch || '-',
-        expire_date: item.expiryDate || null
-      }));
-
-      const { error: itemError } = await supabase.from('transaksi_detail').insert(details);
-      if (itemError) {
-        console.error('Error inserting transaction details:', itemError);
-        throw itemError;
-      }
-    }
-
-    // 3. Insert Services (likely empty for Stock In)
-    if (payload.services.length > 0) {
-      const services = payload.services.map(svc => ({
-        transaksi_id: insertedTransaction.id, // Use the numeric ID
-        transaksi_nomor: payload.nomor, // Also keep the text nomor for reference
-        jasa_id: parseInt(svc.serviceId),
-        qty: 1,
-        harga_jasa: svc.price,
-        subtotal: svc.price
-      }));
-
-      const { error: svcError } = await supabase.from('transaksi_jasa').insert(services);
-      if (svcError) throw svcError;
-    }
-
-    // 4. Update stock atomically in the database. The RPC checks stock
-    // availability and applies every item in one transaction.
-    if (payload.status === 'selesai' && payload.items.length > 0) {
-      const { error: rpcError } = await supabase.rpc('update_stock_atomic', {
-        p_items: payload.items.map(item => ({
+        nama_nakes: payload.requestedBy || null,
+        items: payload.items.map(item => ({
           product_id: parseInt(item.productId),
           quantity: item.quantity,
+          price: item.price,
+          batch: item.batch || '-',
+          expiry_date: item.expiryDate || null,
         })),
-        p_tipe: payload.tipe
-      });
-
-      if (rpcError) {
-        // Stock was not changed: remove the transaction we just inserted.
-        // Children first — transaksi_id foreign keys do not cascade.
-        for (const table of ['transaksi_detail', 'transaksi_jasa', 'transaksi'] as const) {
-          const { error: cleanupError } = await supabase
-            .from(table)
-            .delete()
-            .eq(table === 'transaksi' ? 'id' : 'transaksi_id', insertedTransaction.id);
-          if (cleanupError) {
-            console.error(`Failed to remove ${table} after stock error:`, cleanupError);
-            break;
-          }
-        }
-        throw new Error(rpcError.message);
+        services: payload.services.map(svc => ({
+          service_id: parseInt(svc.serviceId),
+          price: svc.price,
+        })),
       }
+    });
+
+    if (error) {
+      console.error('Error creating transaction:', error);
+      throw new Error(error.message);
     }
 
     return { success: true };
