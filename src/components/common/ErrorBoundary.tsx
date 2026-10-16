@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { CircleAlert } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   children?: ReactNode;
@@ -50,12 +51,13 @@ class ErrorBoundary extends Component<Props, State> {
           <div className="max-h-32 overflow-y-auto text-left bg-white dark:bg-black/20 p-3 rounded-lg border border-red-100 dark:border-white/5 mx-auto max-w-md">
             <p className="font-mono text-[10px] text-red-500">{this.state.error?.message}</p>
           </div>
-          <button
+          <Button
+            variant="outline"
             onClick={() => this.setState({ hasError: false, error: null })}
-            className="mt-4 px-4 py-2 bg-white dark:bg-red-500/20 border border-red-200 dark:border-red-500/20 rounded-xl text-xs font-bold text-red-600 dark:text-white hover:bg-red-50 transition-colors"
+            className="mt-4 h-auto px-4 py-2 bg-white dark:bg-red-500/20 border-red-200 dark:border-red-500/20 rounded-xl text-xs font-bold text-red-600 dark:text-white shadow-none hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
           >
             Coba Muat Ulang
-          </button>
+          </Button>
         </div>
       );
     }

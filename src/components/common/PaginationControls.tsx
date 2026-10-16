@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -6,6 +7,9 @@ interface PaginationControlsProps {
   onPageChange: (page: number) => void;
   isPlaceholderData?: boolean;
 }
+
+const PAGE_BUTTON_CLASS =
+  'h-auto px-4 py-2 bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 rounded-xl text-sm font-bold text-text-secondary-light hover:bg-white dark:hover:bg-white/5 hover:text-primary hover:border-primary transition-all shadow-sm';
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
@@ -21,24 +25,26 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         dari <span className="font-bold text-text-primary-light dark:text-white">{totalPages}</span>
       </span>
       <div className="flex gap-2">
-        <button
+        <Button
+          variant="outline"
           onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
           disabled={currentPage === 1 || isPlaceholderData}
-          className="px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-bold text-text-secondary-light hover:text-primary hover:border-primary disabled:opacity-50 disabled:hover:text-text-secondary-light disabled:hover:border-gray-200 transition-all shadow-sm"
+          className={PAGE_BUTTON_CLASS}
         >
           Sebelumnya
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           onClick={() => {
             if (!isPlaceholderData && currentPage < totalPages && totalPages > 0) {
               onPageChange(currentPage + 1);
             }
           }}
           disabled={currentPage === totalPages || totalPages === 0 || isPlaceholderData}
-          className="px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-bold text-text-secondary-light hover:text-primary hover:border-primary disabled:opacity-50 disabled:hover:text-text-secondary-light disabled:hover:border-gray-200 transition-all shadow-sm"
+          className={PAGE_BUTTON_CLASS}
         >
           Berikutnya
-        </button>
+        </Button>
       </div>
     </div>
   );

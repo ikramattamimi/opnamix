@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { ArrowRight, CircleAlert, LockOpen, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { signIn, resetPassword } from './api';
 import { getErrorMessage } from '@/lib/utils';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
 }
+
+// Gaya input sebelum memakai ui/input; ukuran teks, fokus, dan disabled ditimpa
+// supaya tampilan tidak berubah.
+const LOGIN_INPUT_CLASS =
+  'h-auto w-full bg-gray-50/50 dark:bg-white/5 border-gray-200 dark:border-white/10 rounded-2xl pl-12 pr-4 py-4 text-base md:text-base text-slate-800 dark:text-white font-semibold placeholder:font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/10 focus:border-primary focus-visible:ring-4 focus-visible:ring-primary/10 outline-none transition-all disabled:cursor-default disabled:opacity-100';
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
@@ -98,15 +105,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2 group/input">
-                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide">
+                <Label
+                  htmlFor="login-email"
+                  className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide"
+                >
                   Alamat Email
-                </label>
+                </Label>
                 <div className="relative transition-all duration-300 focus-within:transform focus-within:scale-[1.02]">
-                  <input
+                  <Input
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl pl-12 pr-4 py-4 text-slate-800 dark:text-white font-semibold placeholder:font-normal placeholder-slate-400 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
+                    className={LOGIN_INPUT_CLASS}
                     placeholder="nama@email.com"
                     required
                     disabled={isLoading}
@@ -118,15 +129,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </div>
 
               <div className="space-y-2 group/input">
-                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide">
+                <Label
+                  htmlFor="login-password"
+                  className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide"
+                >
                   Kata Sandi
-                </label>
+                </Label>
                 <div className="relative transition-all duration-300 focus-within:transform focus-within:scale-[1.02]">
-                  <input
+                  <Input
+                    id="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl pl-12 pr-4 py-4 text-slate-800 dark:text-white font-semibold placeholder:font-normal placeholder-slate-400 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
+                    className={LOGIN_INPUT_CLASS}
                     placeholder="••••••••"
                     required
                     disabled={isLoading}

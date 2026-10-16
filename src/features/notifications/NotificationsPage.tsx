@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BellOff, CheckCheck, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   useNotifications,
@@ -28,6 +29,10 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const ALL_TYPES = ['Semua', ...Object.keys(TYPE_LABELS)];
+
+const FILTER_CHIP_CLASS = 'h-auto px-3 py-1.5 rounded-lg text-xs font-bold transition-colors';
+const FILTER_CHIP_IDLE_CLASS =
+  'bg-background-light dark:bg-background-dark text-text-secondary-light hover:bg-background-light dark:hover:bg-background-dark hover:text-text-primary-light dark:hover:text-white';
 
 const NotificationsPage: React.FC = () => {
   const { user } = useAuth();
@@ -83,34 +88,42 @@ const NotificationsPage: React.FC = () => {
         {/* Read filter */}
         <div className="flex gap-2 flex-wrap">
           {(['all', 'unread', 'read'] as const).map((opt) => (
-            <button
+            <Button
               key={opt}
+              variant="ghost"
+              size="sm"
+              aria-pressed={filterRead === opt}
               onClick={() => setFilterRead(opt)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={cn(
+                FILTER_CHIP_CLASS,
                 filterRead === opt
-                  ? 'bg-primary text-white'
-                  : 'bg-background-light dark:bg-background-dark text-text-secondary-light hover:text-text-primary-light dark:hover:text-white'
-              }`}
+                  ? 'bg-primary text-white hover:bg-primary hover:text-white dark:hover:bg-primary'
+                  : FILTER_CHIP_IDLE_CLASS,
+              )}
             >
               {opt === 'all' ? 'Semua' : opt === 'unread' ? 'Belum Dibaca' : 'Sudah Dibaca'}
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* Type filter */}
         <div className="flex gap-2 flex-wrap">
           {ALL_TYPES.map((type) => (
-            <button
+            <Button
               key={type}
+              variant="ghost"
+              size="sm"
+              aria-pressed={filterType === type}
               onClick={() => setFilterType(type)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={cn(
+                FILTER_CHIP_CLASS,
                 filterType === type
-                  ? 'bg-primary/10 text-primary border border-primary/30'
-                  : 'bg-background-light dark:bg-background-dark text-text-secondary-light hover:text-text-primary-light dark:hover:text-white'
-              }`}
+                  ? 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10'
+                  : FILTER_CHIP_IDLE_CLASS,
+              )}
             >
               {type === 'Semua' ? 'Semua Tipe' : TYPE_LABELS[type] || type}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

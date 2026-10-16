@@ -15,6 +15,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useProfile, useUpdateProfile, useUploadAvatar, useUpdatePassword } from './useProfile';
 import { useAuth } from '@/features/auth/useAuth';
 import { getErrorMessage, toDate } from '@/lib/utils';
@@ -41,6 +43,12 @@ const ROLE_LABELS: Record<string, { label: string; color: string; icon: LucideIc
     icon: ShieldPlus,
   },
 };
+
+const FIELD_LABEL_CLASS =
+  'text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark';
+// Ukuran, warna, dan fokus mengikuti input manual sebelumnya
+const FIELD_INPUT_CLASS =
+  'h-auto w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 transition-all';
 
 const ProfilePage: React.FC = () => {
   const { userProfile } = useAuth();
@@ -341,15 +349,16 @@ const ProfilePage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark">
+            <Label htmlFor="profile-full-name" className={FIELD_LABEL_CLASS}>
               Nama Lengkap
-            </label>
+            </Label>
             {editMode ? (
-              <input
+              <Input
+                id="profile-full-name"
                 type="text"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                className={FIELD_INPUT_CLASS}
               />
             ) : (
               <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
@@ -358,17 +367,13 @@ const ProfilePage: React.FC = () => {
             )}
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark">
-              Email
-            </label>
+            <Label className={FIELD_LABEL_CLASS}>Email</Label>
             <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
               {profile.email}
             </p>
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark">
-              Role
-            </label>
+            <Label className={FIELD_LABEL_CLASS}>Role</Label>
             <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center gap-2">
               <RoleIcon
                 className={`size-5 ${userRoles.includes('admin') ? 'text-purple-500' : userRoles.includes('apoteker') || userRoles.includes('farmasi') ? 'text-blue-500' : 'text-green-500'}`}
@@ -378,9 +383,7 @@ const ProfilePage: React.FC = () => {
             </p>
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark">
-              Terakhir Diperbarui
-            </label>
+            <Label className={FIELD_LABEL_CLASS}>Terakhir Diperbarui</Label>
             <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
               {profile.updated_at
                 ? new Date(profile.updated_at).toLocaleDateString('id-ID', {
@@ -418,27 +421,29 @@ const ProfilePage: React.FC = () => {
         {showPasswordSection && (
           <div className="mt-6 space-y-4 max-w-md">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark">
+              <Label htmlFor="profile-new-password" className={FIELD_LABEL_CLASS}>
                 Password Baru
-              </label>
-              <input
+              </Label>
+              <Input
+                id="profile-new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                className={FIELD_INPUT_CLASS}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark">
+              <Label htmlFor="profile-confirm-password" className={FIELD_LABEL_CLASS}>
                 Konfirmasi Password
-              </label>
-              <input
+              </Label>
+              <Input
+                id="profile-confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Ulangi password baru"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                className={FIELD_INPUT_CLASS}
               />
             </div>
             <div className="flex gap-3 pt-2">
