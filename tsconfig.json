@@ -14,7 +14,7 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "strictNullChecks": true
+    "strict": true
   },
   "exclude": ["node_modules", "supabase/functions"]
 }
