@@ -602,65 +602,17 @@ export const api = {
   },
 
   // UPDATE STATUS
-  updateTransactionStatus: async (nomor: string, status: 'selesai', diskon?: number, total?: number, serviceFee?: number) => {
-    // 1. Get current user for processed_by
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
+  // Satu-satunya status tujuan adalah 'selesai'; pengurangan stok dan
+  // perubahan status dilakukan dalam satu transaksi oleh RPC.
+  updateTransactionStatus: async (nomor: string, _status: 'selesai', diskon?: number, total?: number, serviceFee?: number) => {
+    const { error } = await supabase.rpc('process_stock_out_request', {
+      p_nomor: nomor,
+      p_diskon: diskon ?? null,
+      p_total: total ?? null,
+      p_biaya_layanan: serviceFee ?? null,
+    });
 
-    const updatePayload: any = {
-      status: status,
-      processed_at: new Date().toISOString(),
-      processed_by: currentUser?.id || null,
-    };
-
-    if (diskon !== undefined) updatePayload.diskon = diskon;
-    if (total !== undefined) updatePayload.total = total;
-    if (serviceFee !== undefined) updatePayload.biaya_layanan = serviceFee;
-
-    // 2. Decrement stock first (atomic RPC; rejects if stock is insufficient),
-    // so the request is only marked 'selesai' once the stock really changed
-    const { data: details, error: detailsError } = await supabase
-      .from('transaksi_detail')
-      .select('obat_id, qty')
-      .eq('transaksi_nomor', nomor);
-
-    if (detailsError) throw detailsError;
-
-    const stockItems = (details || []).map(d => ({ product_id: d.obat_id, quantity: d.qty }));
-
-    if (stockItems.length > 0) {
-      const { error: rpcError } = await supabase.rpc('update_stock_atomic', {
-        p_items: stockItems,
-        p_tipe: 'keluar'
-      });
-      if (rpcError) throw new Error(rpcError.message);
-    }
-
-    const restoreStock = async () => {
-      if (stockItems.length === 0) return;
-      const { error: restoreError } = await supabase.rpc('update_stock_atomic', {
-        p_items: stockItems,
-        p_tipe: 'masuk'
-      });
-      if (restoreError) console.error('Failed to restore stock:', restoreError);
-    };
-
-    // 3. Mark as processed, only if still pending (guards against double processing)
-    const { data: updated, error } = await supabase
-      .from('transaksi')
-      .update(updatePayload)
-      .eq('nomor', nomor)
-      .eq('status', 'diajukan')
-      .select('id');
-
-    if (error) {
-      await restoreStock();
-      throw error;
-    }
-
-    if (!updated || updated.length === 0) {
-      await restoreStock();
-      throw new Error('Permintaan ini sudah diproses sebelumnya.');
-    }
+    if (error) throw new Error(error.message);
   },
 
   updatePendingStockOutRequest: async (nomor: string, payload: {
