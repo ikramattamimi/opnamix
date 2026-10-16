@@ -59,8 +59,8 @@ export interface ServiceCategoryType {
   id: string;
   name: string;
   code: string;
-  description?: string;
-  isActive: boolean;
+  description?: string | null;
+  isActive: boolean | null;
 }
 
 export interface Service {
@@ -71,11 +71,11 @@ export interface Service {
   categoryName?: string; // Display name from joined category
   price: number; // harga
   description: string;
-  isActive: boolean; // is_active
-  createdBy?: string;
-  updatedBy?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  isActive: boolean | null; // is_active
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
   // UI helpers
   icon?: string;
   iconColor?: string;
@@ -159,7 +159,7 @@ export interface StockInReceipt {
   items: StockInItem[];
   status: string;
   receivedBy: string;
-  evidenceUrl?: string; // Add evidenceUrl
+  evidenceUrl?: string | null; // Add evidenceUrl
 }
 
 // Stock Opname Interfaces
@@ -171,11 +171,11 @@ export interface OpnameItem {
   productName: string;
   category: string;
   unit: string;
-  systemStock: number;
-  physicalStock?: number;
-  difference?: number;
-  stokFinal?: number;
-  reason?: string;
+  systemStock: number | null;
+  physicalStock?: number | null;
+  difference?: number | null;
+  stokFinal?: number | null;
+  reason?: string | null;
   detailStatus?: 'pending' | 'sesuai' | 'disesuaikan';
 }
 
@@ -197,13 +197,13 @@ export type PengulanganOpname = 'BULANAN' | 'TRIWULAN' | 'TAHUNAN';
 export interface OpnameSchedule {
   id: string;
   nama: string;
-  tanggalAudit: number; // 1-28
-  waktuJam: number;
-  waktuMenit: number;
+  tanggalAudit: number | null; // 1-28
+  waktuJam: number | null;
+  waktuMenit: number | null;
   pengulangan: PengulanganOpname;
   obatIds: string[] | null; // null = semua obat
   durasiPengerjaan: number | null;
-  isActive: boolean;
+  isActive: boolean | null;
 }
 
 export interface OpnameScheduleConfig {

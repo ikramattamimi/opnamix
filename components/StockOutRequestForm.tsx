@@ -170,7 +170,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
   const handleDrugChange = <K extends keyof RequestedDrug>(
     id: string,
     field: K,
-    value: RequestedDrug[K],
+    value: RequestedDrug[K] | undefined, // input angka yang dikosongkan mengirim undefined
   ) => {
     setRequestedDrugs(
       requestedDrugs.map((d) => {

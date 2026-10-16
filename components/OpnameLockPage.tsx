@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { OpnameLockInfo } from '../hooks/useOpnameLock';
 import { api } from '../lib/api';
 import { useAuth } from '../hooks/useAuth';
+import { toDate } from '../lib/utils';
 
 interface OpnameLockPageProps {
   opname: OpnameLockInfo;
@@ -103,7 +104,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname, onRefresh }) =>
             <div className="flex items-center justify-between">
               <span className="text-sm text-text-secondary-light">Dimulai</span>
               <span className="font-bold">
-                {new Date(opname.startedAt).toLocaleString('id-ID', {
+                {toDate(opname.startedAt).toLocaleString('id-ID', {
                   dateStyle: 'medium',
                   timeStyle: 'short',
                 })}

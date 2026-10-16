@@ -38,3 +38,11 @@ export function sanitizePriceInput(value: string): string {
 export function getErrorMessage(error: unknown): string | undefined {
   return (error as { message?: string } | null | undefined)?.message;
 }
+
+/**
+ * `new Date(value)` yang juga menerima null/undefined dari kolom database,
+ * dengan hasil yang sama seperti JavaScript: null → epoch, undefined → Invalid Date.
+ */
+export function toDate(value: string | number | Date | null | undefined): Date {
+  return new Date(value as string);
+}

@@ -13,10 +13,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from '../ui/dialog';
+import { toDate } from '../../lib/utils';
 
 interface ScheduleInfo {
   nextDate: string;
-  pengulangan: string;
+  pengulangan: string | null;
   nama: string;
   scheduleId: string;
 }
@@ -24,14 +25,14 @@ interface ScheduleInfo {
 interface OpnameCard {
   id: string;
   opnameNumber: string;
-  scheduleDate: string;
-  status: string;
+  scheduleDate: string | null;
+  status: string | null;
   scheduleName: string;
   currentStep?: number;
-  date?: string;
+  date?: string | null;
   itemsCount?: number;
   discrepancyCount?: number;
-  createdAt?: string;
+  createdAt?: string | null;
 }
 
 const RiwayatOpnamePage: React.FC = () => {
@@ -86,8 +87,8 @@ const RiwayatOpnamePage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('id-ID', { dateStyle: 'long' });
+  const formatDate = (dateStr: string | null) => {
+    return toDate(dateStr).toLocaleDateString('id-ID', { dateStyle: 'long' });
   };
 
   const pengulanganLabel: Record<string, string> = {
@@ -242,7 +243,7 @@ const RiwayatOpnamePage: React.FC = () => {
                   <div key={s.scheduleId} className="bg-white/15 rounded-xl px-4 py-2.5">
                     <p className="text-sm font-bold text-white">{s.nama}</p>
                     <p className="text-xs text-white/60">
-                      {pengulanganLabel[s.pengulangan] || s.pengulangan} · Berikutnya:{' '}
+                      {pengulanganLabel[String(s.pengulangan)] || s.pengulangan} · Berikutnya:{' '}
                       {formatDate(s.nextDate)}
                     </p>
                   </div>
@@ -509,7 +510,7 @@ const RiwayatOpnamePage: React.FC = () => {
                     <div key={s.scheduleId} className="bg-white/15 rounded-xl px-4 py-3">
                       <p className="text-sm font-bold text-white">{s.nama}</p>
                       <p className="text-[11px] text-white/60 mt-0.5">
-                        {pengulanganLabel[s.pengulangan] || s.pengulangan}
+                        {pengulanganLabel[String(s.pengulangan)] || s.pengulangan}
                       </p>
                       <p className="text-[11px] text-white/60">
                         Berikutnya: {formatDate(s.nextDate)}

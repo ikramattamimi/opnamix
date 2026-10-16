@@ -5,9 +5,9 @@ import { api, OpnameDetail } from '../../lib/api';
 interface DetailRow {
   id: string;
   productName: string;
-  stokSistem: number;
-  stokFisik: number;
-  selisih: number;
+  stokSistem: number | null;
+  stokFisik: number | null;
+  selisih: number | null;
   stokFinal: number | null;
   alasan: string;
 }
@@ -215,14 +215,14 @@ const DetailOpnamePage: React.FC = () => {
                         <td className="px-4 py-4 text-center">
                           <span
                             className={`font-bold px-2 py-1 rounded-full text-xs ${
-                              row.selisih > 0
+                              (row.selisih ?? 0) > 0
                                 ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
-                                : row.selisih < 0
+                                : (row.selisih ?? 0) < 0
                                   ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400'
                                   : 'bg-gray-100 text-text-secondary-light dark:bg-gray-500/20'
                             }`}
                           >
-                            {row.selisih > 0 ? `+${row.selisih}` : row.selisih}
+                            {(row.selisih ?? 0) > 0 ? `+${row.selisih}` : row.selisih}
                           </span>
                         </td>
                         <td className="px-4 py-4 text-center text-sm font-bold">
@@ -281,14 +281,14 @@ const DetailOpnamePage: React.FC = () => {
                         </p>
                         <span
                           className={`font-bold text-base ${
-                            row.selisih > 0
+                            (row.selisih ?? 0) > 0
                               ? 'text-green-600 dark:text-green-400'
-                              : row.selisih < 0
+                              : (row.selisih ?? 0) < 0
                                 ? 'text-red-600 dark:text-red-400'
                                 : 'text-text-secondary-light'
                           }`}
                         >
-                          {row.selisih > 0 ? `+${row.selisih}` : row.selisih}
+                          {(row.selisih ?? 0) > 0 ? `+${row.selisih}` : row.selisih}
                         </span>
                       </div>
                       <div className="bg-card-light dark:bg-card-dark rounded-xl p-3 text-center">

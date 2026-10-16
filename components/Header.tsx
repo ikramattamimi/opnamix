@@ -97,7 +97,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   // Validate avatar URL to prevent XSS
-  const isValidImageUrl = (url: string | null | undefined): boolean => {
+  const isValidImageUrl = (url: string | null | undefined): url is string => {
     if (!url) return false;
     try {
       const parsed = new URL(url);
@@ -109,10 +109,11 @@ const Header: React.FC<HeaderProps> = ({
 
   // Get avatar content with XSS protection
   const getAvatarContent = () => {
-    if (isValidImageUrl(userProfile?.avatar_url)) {
+    const avatarUrl = userProfile?.avatar_url;
+    if (isValidImageUrl(avatarUrl)) {
       return (
         <img
-          src={userProfile!.avatar_url}
+          src={avatarUrl}
           alt="Avatar"
           className="w-full h-full object-cover"
           onError={(e) => {

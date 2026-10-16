@@ -5,7 +5,7 @@ export interface OpnameLockInfo {
   id: string;
   opnameNumber: string;
   currentStep: number;
-  startedAt: string;
+  startedAt: string | null;
 }
 
 export interface OpnameLockState {

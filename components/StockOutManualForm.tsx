@@ -160,7 +160,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
   const handleUpdateItem = <K extends keyof StockOutManualItem>(
     id: string,
     field: K,
-    value: StockOutManualItem[K],
+    value: StockOutManualItem[K] | undefined, // input angka yang dikosongkan mengirim undefined
   ) => {
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
     if (field === 'quantity') {

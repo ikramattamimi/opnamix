@@ -61,7 +61,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
   const handleItemChange = <K extends keyof StockInItem>(
     id: string,
     field: K,
-    value: StockInItem[K],
+    value: StockInItem[K] | undefined, // input angka yang dikosongkan mengirim undefined
   ) => {
     setItems((prevItems) =>
       prevItems.map((item) => (item.id === id ? { ...item, [field]: value } : item)),

@@ -21,6 +21,7 @@ import {
   getProductDisplayName,
   getProductDisplayNameFromDb,
 } from './productDisplay';
+import { toDate } from './utils';
 
 // Map DB types to Frontend types
 const mapProductFromDB = (item: Tables<'master_obat'>): Product => ({
@@ -169,6 +170,10 @@ type OpnameDetailUpdate = {
   reason?: string;
 };
 
+// p_step null berarti current_step tidak diubah. Tipe hasil generate tidak
+// menandai argumen RPC yang boleh null, padahal SQL-nya menerima null.
+const NO_STEP_CHANGE = null as unknown as number;
+
 // Ubah ke format p_updates RPC save_opname_details. Field yang undefined
 // tidak dikirim, sehingga kolomnya tidak diubah di database.
 const toOpnameDetailUpdates = (updates?: OpnameDetailUpdate[]) =>
@@ -218,7 +223,7 @@ export const api = {
     const { data, error } = await supabase
       .from('master_obat')
       .insert({
-        kode: product.code,
+        kode: product.code!,
         nama: normalizedName,
         jenis: product.category,
         satuan: product.unit,
@@ -349,8 +354,8 @@ export const api = {
     const { data, error } = await supabase
       .from('master_jasa')
       .insert({
-        kode: service.code,
-        nama: service.name,
+        kode: service.code!,
+        nama: service.name!,
         harga: service.price,
         category_id: toServiceCategoryId(service.categoryId),
         is_active: true,
@@ -518,7 +523,9 @@ export const api = {
     // If logic applied filtering after DB fetch, pagination counts would be wrong.
     // Assuming transactions are inserted correctly with details, we map what we get.
 
-    const createdByIds = [...new Set((data || []).map((t) => t.created_by).filter(Boolean))];
+    const createdByIds = [
+      ...new Set((data || []).map((t) => t.created_by).filter((id): id is string => Boolean(id))),
+    ];
     const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
@@ -540,10 +547,12 @@ export const api = {
           : '';
 
       return {
-        id: t.nomor,
-        invoiceNumber: invoiceFromNote || t.nomor,
+        // nomor selalu diisi saat transaksi dibuat (next_transaction_number)
+        id: t.nomor as string,
+        invoiceNumber: invoiceFromNote || (t.nomor as string),
         supplierName: t.nama_pasien || 'Unknown Supplier',
-        date: t.tanggal,
+        // tanggal selalu diisi saat transaksi dibuat
+        date: t.tanggal as string,
         status: t.status === 'selesai' ? 'Selesai' : 'Menunggu',
         receivedBy: (t.created_by && profileMap[t.created_by]) || 'Admin',
         evidenceUrl: t.bukti, // Map evidenceUrl
@@ -611,7 +620,9 @@ export const api = {
     if (error) throw error;
 
     // Fetch profile names for created_by users
-    const createdByIds = [...new Set((data || []).map((t) => t.created_by).filter(Boolean))];
+    const createdByIds = [
+      ...new Set((data || []).map((t) => t.created_by).filter((id): id is string => Boolean(id))),
+    ];
     const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles } = await supabase
@@ -695,9 +706,10 @@ export const api = {
   ) => {
     const { error } = await supabase.rpc('process_stock_out_request', {
       p_nomor: nomor,
-      p_diskon: diskon ?? null,
-      p_total: total ?? null,
-      p_biaya_layanan: serviceFee ?? null,
+      // Argumen yang tidak dikirim memakai default SQL (null)
+      p_diskon: diskon,
+      p_total: total,
+      p_biaya_layanan: serviceFee,
     });
 
     if (error) throw new Error(error.message);
@@ -840,7 +852,12 @@ export const api = {
 
     const today = new Date();
     return data.map((schedule) => {
-      const nextDate = new Date(today.getFullYear(), today.getMonth(), schedule.tanggal_audit);
+      // tanggal_audit null diteruskan apa adanya (Date memperlakukannya sebagai 0)
+      const nextDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        schedule.tanggal_audit as number,
+      );
       if (nextDate <= today) {
         if (schedule.pengulangan === 'BULANAN') {
           nextDate.setMonth(nextDate.getMonth() + 1);
@@ -1099,7 +1116,9 @@ export const api = {
 
     if (error) throw error;
 
-    const createdByIds = [...new Set((data || []).map((t) => t.created_by).filter(Boolean))];
+    const createdByIds = [
+      ...new Set((data || []).map((t) => t.created_by).filter((id): id is string => Boolean(id))),
+    ];
     const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
@@ -1183,7 +1202,7 @@ export const api = {
           serviceDetails,
         };
       })
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
 
     // Pagination applied AFTER all filtering and mapping so that totalPages
     // reflects the actual number of filtered records, not the raw DB count.
@@ -1231,7 +1250,7 @@ export const api = {
       scheduleName: data.opname_schedule?.nama || 'Jadwal Opname',
       items: (data.opname_detail || []).map((d) => ({
         id: d.id.toString(),
-        productId: d.obat_id.toString(),
+        productId: d.obat_id!.toString(),
         productName: getDisplayNameFromMasterObat(d.master_obat),
         category: d.master_obat?.jenis || 'Obat',
         unit: d.master_obat?.satuan || 'Pcs',
@@ -1283,7 +1302,7 @@ export const api = {
 
     const { error } = await supabase.rpc('save_opname_details', {
       p_opname_id: parseInt(opnameId),
-      p_step: null,
+      p_step: NO_STEP_CHANGE,
       p_updates: toOpnameDetailUpdates(detailUpdates),
     });
 
@@ -1324,8 +1343,8 @@ export const api = {
     if (fetchError) throw fetchError;
 
     const { error } = await supabase.rpc('save_opname_details', {
-      p_opname_id: detail.opname_id,
-      p_step: null,
+      p_opname_id: detail.opname_id!,
+      p_step: NO_STEP_CHANGE,
       p_updates: toOpnameDetailUpdates([{ detailId, physicalStock }]),
     });
 
@@ -1539,7 +1558,7 @@ export const api = {
       }
 
       // Use created_at for accurate timestamps
-      const createdAt = new Date(t.created_at);
+      const createdAt = toDate(t.created_at);
       const now = new Date();
       const diffMs = now.getTime() - createdAt.getTime();
       const diffMins = Math.floor(diffMs / 60000);
@@ -1679,7 +1698,7 @@ export const api = {
     });
 
     // Sort all rows by date descending
-    allRows.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    allRows.sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
 
     // Apply pagination to flattened data
     const from = (page - 1) * perPage;
@@ -1765,7 +1784,7 @@ export const api = {
         category: itemCategory,
         amount: `${isIn ? '+' : '-'}${totalQty}`,
         qty: totalQty,
-        date: new Date(t.tanggal).toLocaleDateString('id-ID', {
+        date: toDate(t.tanggal).toLocaleDateString('id-ID', {
           year: 'numeric',
           month: 'short',
           day: 'numeric',

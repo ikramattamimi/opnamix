@@ -1,4 +1,5 @@
 import type { Product, Service, StockInReceipt, StockOutRequest } from '../types';
+import { toDate } from './utils';
 import type { RecentTransaction, StockMutationRow, TransactionReportRow } from './api';
 
 type XLSXModule = typeof import('xlsx');
@@ -14,7 +15,7 @@ export const exportTransactionReportToExcel = async (
   try {
     const XLSX = await loadXLSX();
     const excelData = data.map((row) => ({
-      Tanggal: new Date(row.date).toLocaleString('id-ID'),
+      Tanggal: toDate(row.date).toLocaleString('id-ID'),
       'Nomor Referensi': row.id,
       Tipe: row.type === 'masuk' ? 'Masuk' : 'Keluar',
       'Atas Nama': row.patient || '-',
@@ -78,7 +79,7 @@ export const exportStockMutationToExcel = async (
   try {
     const XLSX = await loadXLSX();
     const excelData = data.map((row) => ({
-      Tanggal: new Date(row.date).toLocaleString('id-ID'),
+      Tanggal: toDate(row.date).toLocaleString('id-ID'),
       'Nomor Transaksi': row.trxNumber,
       Tipe:
         row.type === 'masuk'

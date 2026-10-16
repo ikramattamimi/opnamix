@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { updateUserProfile, uploadAvatar, updatePassword } from '../lib/auth';
 import { useAuth } from '../hooks/useAuth';
-import { getErrorMessage } from '../lib/utils';
+import { getErrorMessage, toDate } from '../lib/utils';
 
 const ROLE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
   admin: {
@@ -255,7 +255,7 @@ const ProfilePage: React.FC = () => {
                 </span>
                 <span className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
                   Bergabung{' '}
-                  {new Date(profile.created_at).toLocaleDateString('id-ID', {
+                  {toDate(profile.created_at).toLocaleDateString('id-ID', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',

@@ -90,9 +90,10 @@ const KonfigurasiOpnamePage: React.FC = () => {
     setFormData({
       nama: schedule.nama,
       pengulangan: schedule.pengulangan,
-      dayOfMonth: schedule.tanggalAudit,
-      waktuJam: schedule.waktuJam,
-      waktuMenit: schedule.waktuMenit,
+      // Jadwal tersimpan selalu punya nilai ini karena diisi dari form
+      dayOfMonth: schedule.tanggalAudit as number,
+      waktuJam: schedule.waktuJam as number,
+      waktuMenit: schedule.waktuMenit as number,
       durasiPengerjaan: schedule.durasiPengerjaan || 7,
       obatIds: schedule.obatIds,
     });
@@ -150,7 +151,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
     }
   };
 
-  const handleToggle = async (id: string, currentStatus: boolean) => {
+  const handleToggle = async (id: string, currentStatus: boolean | null) => {
     try {
       await api.toggleOpnameScheduleStatus(id, !currentStatus);
       loadSchedules();

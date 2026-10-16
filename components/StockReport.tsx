@@ -7,6 +7,7 @@ import { DataTable } from './ui/data-table';
 import { createTransactionReportColumns } from './TransactionReportColumns';
 import { stockMutationColumns } from './StockMutationColumns';
 import { exportTransactionReportToExcel, exportStockMutationToExcel } from '../lib/exportUtils';
+import { toDate } from '../lib/utils';
 
 import { api, StockMutationRow, TransactionReportRow } from '../lib/api';
 
@@ -703,7 +704,7 @@ const StockReport: React.FC = () => {
                   Tanggal
                 </p>
                 <p className="font-bold text-text-primary-light dark:text-white">
-                  {new Date(selectedTransaction.date).toLocaleString('id-ID')}
+                  {toDate(selectedTransaction.date).toLocaleString('id-ID')}
                 </p>
               </div>
               <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">

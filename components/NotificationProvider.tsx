@@ -188,6 +188,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           const isForUser = newNotification.user_id === userId;
           const isForRole =
             newNotification.user_id === null &&
+            newNotification.target_role !== null &&
             userRolesRef.current.includes(newNotification.target_role);
           const isBroadcast =
             newNotification.user_id === null && newNotification.target_role === null;
