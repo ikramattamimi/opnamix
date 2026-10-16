@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { opnameApi } from './api';
-import { productsApi } from '@/features/products/api';
+import { useDeleteOpname, useStartOpname } from './useOpname';
+import { useDraftOpnames, useOpnameHistory, useUpcomingOpnames } from './useOpnameHistory';
+import { useActiveOpnameSchedules, useOpnameSchedules } from './useOpnameSchedules';
+import { useOpnameProducts } from './useOpnameProducts';
 import { OpnameSchedule } from './types';
 import { Product } from '@/features/products/types';
 import { Button } from '@/components/ui/button';
@@ -37,14 +39,28 @@ interface OpnameCard {
   createdAt?: string | null;
 }
 
+const NO_CARDS: OpnameCard[] = [];
+const NO_SCHEDULES: OpnameSchedule[] = [];
+
 const RiwayatOpnamePage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [upcoming, setUpcoming] = useState<OpnameCard[]>([]);
-  const [drafts, setDrafts] = useState<OpnameCard[]>([]);
-  const [history, setHistory] = useState<OpnameCard[]>([]);
-  const [activeSchedules, setActiveSchedules] = useState<ScheduleInfo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const upcomingQuery = useUpcomingOpnames();
+  const draftsQuery = useDraftOpnames();
+  const historyQuery = useOpnameHistory();
+  const activeSchedulesQuery = useActiveOpnameSchedules();
+  const deleteOpname = useDeleteOpname();
+  const startOpname = useStartOpname();
+  // Kalau gagal dimuat, daftar tetap tampil kosong
+  const upcoming: OpnameCard[] = upcomingQuery.data ?? NO_CARDS;
+  const drafts: OpnameCard[] = draftsQuery.data ?? NO_CARDS;
+  const history: OpnameCard[] = historyQuery.data ?? NO_CARDS;
+  const activeSchedules: ScheduleInfo[] = activeSchedulesQuery.data ?? [];
+  const isLoading =
+    upcomingQuery.isLoading ||
+    draftsQuery.isLoading ||
+    historyQuery.isLoading ||
+    activeSchedulesQuery.isLoading;
 
   // Search states
   const [searchUpcoming, setSearchUpcoming] = useState('');
@@ -55,39 +71,30 @@ const RiwayatOpnamePage: React.FC = () => {
 
   // Manual opname modal state
   const [showManualModal, setShowManualModal] = useState(false);
-  const [allSchedules, setAllSchedules] = useState<OpnameSchedule[]>([]);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string>('');
   const [manualDate, setManualDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isCreating, setIsCreating] = useState(false);
-  const [scheduleProducts, setScheduleProducts] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string }>({
     isOpen: false,
     id: '',
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const [upcomingData, draftData, historyData, schedules] = await Promise.all([
-        opnameApi.getUpcomingOpnames(),
-        opnameApi.getDraftOpnames(),
-        opnameApi.getOpnameHistory(),
-        opnameApi.getActiveSchedules(),
-      ]);
-      setUpcoming(upcomingData);
-      setDrafts(draftData);
-      setHistory(historyData);
-      setActiveSchedules(schedules);
-    } catch (error) {
-      console.error('Failed to load opname data:', error);
-    } finally {
-      setIsLoading(false);
+  // Jadwal dan obat baru diambil saat dibutuhkan oleh modal opname manual
+  const schedulesQuery = useOpnameSchedules({ enabled: showManualModal });
+  const allSchedules = schedulesQuery.data ?? NO_SCHEDULES;
+  const productsQuery = useOpnameProducts({ enabled: !!selectedScheduleId });
+  const isLoadingProducts = productsQuery.isLoading;
+  const scheduleProducts = useMemo<Product[]>(() => {
+    const products = productsQuery.data?.data;
+    if (!selectedScheduleId || !products) return [];
+    const schedule = allSchedules.find((s) => s.id === selectedScheduleId);
+    if (schedule?.obatIds === null) return products;
+    if (schedule?.obatIds && Array.isArray(schedule.obatIds)) {
+      const idSet = new Set(schedule.obatIds.map(String));
+      return products.filter((p) => idSet.has(String(p.id)));
     }
-  };
+    return [];
+  }, [selectedScheduleId, allSchedules, productsQuery.data]);
 
   const formatDate = (dateStr: string | null) => {
     return toDate(dateStr).toLocaleDateString('id-ID', { dateStyle: 'long' });
@@ -113,9 +120,9 @@ const RiwayatOpnamePage: React.FC = () => {
     const id = deleteConfirm.id;
     setDeleteConfirm({ isOpen: false, id: '' });
     try {
-      await opnameApi.deleteOpname(id);
+      // Daftar opname ikut ter-refresh lewat invalidasi
+      await deleteOpname.mutateAsync(id);
       showToast('Opname berhasil dihapus.', 'success');
-      loadData();
     } catch (error) {
       console.error('Failed to delete opname:', error);
       showToast('Gagal menghapus opname.', 'error');
@@ -123,42 +130,14 @@ const RiwayatOpnamePage: React.FC = () => {
   };
 
   // Manual opname handlers
-  const openManualModal = async () => {
+  const openManualModal = () => {
     setShowManualModal(true);
     setSelectedScheduleId('');
     setManualDate(new Date().toISOString().split('T')[0]);
-    setScheduleProducts([]);
-    try {
-      const schedules = await opnameApi.getOpnameSchedules();
-      setAllSchedules(schedules);
-    } catch (error) {
-      console.error('Failed to load schedules:', error);
-    }
   };
 
-  const handleScheduleSelect = async (scheduleId: string) => {
+  const handleScheduleSelect = (scheduleId: string) => {
     setSelectedScheduleId(scheduleId);
-    if (!scheduleId) {
-      setScheduleProducts([]);
-      return;
-    }
-    setIsLoadingProducts(true);
-    try {
-      const schedule = allSchedules.find((s) => s.id === scheduleId);
-      const result = await productsApi.getProducts({ page: 1, perPage: 1000 });
-      if (schedule?.obatIds === null) {
-        setScheduleProducts(result.data);
-      } else if (schedule?.obatIds && Array.isArray(schedule.obatIds)) {
-        const idSet = new Set(schedule.obatIds.map(String));
-        setScheduleProducts(result.data.filter((p) => idSet.has(String(p.id))));
-      } else {
-        setScheduleProducts([]);
-      }
-    } catch (error) {
-      console.error('Failed to load products:', error);
-    } finally {
-      setIsLoadingProducts(false);
-    }
   };
 
   const handleCreateManualOpname = async () => {
@@ -166,15 +145,12 @@ const RiwayatOpnamePage: React.FC = () => {
     setIsCreating(true);
     try {
       // No items passed - details will be created after user selects products in step 1
-      await opnameApi.startOpname(selectedScheduleId, manualDate);
+      await startOpname.mutateAsync({ scheduleId: selectedScheduleId, date: manualDate });
       setShowManualModal(false);
       showToast(
         'Opname berhasil dibuat. Silakan pilih opname dari daftar untuk melanjutkan.',
         'success',
       );
-
-      // Reload opname list to show the new draft
-      loadData();
     } catch (error) {
       console.error('Failed to create manual opname:', error);
       showToast('Gagal membuat opname. Silahkan coba lagi.', 'error');

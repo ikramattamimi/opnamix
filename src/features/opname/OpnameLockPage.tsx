@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { OpnameLockInfo } from './useOpnameLock';
-import { opnameApi } from './api';
+import { OpnameLockInfo, useActiveOpnameLock } from './useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
 import { toDate } from '@/lib/utils';
 
 interface OpnameLockPageProps {
   opname: OpnameLockInfo;
-  onRefresh: () => void;
 }
 
-const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname, onRefresh }) => {
+const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
   const { userProfile } = useAuth();
   const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
   const navigate = useNavigate();
+  // Query yang sama dengan AuthenticatedApp, jadi hasil cek langsung dipakai di sana
+  const { refetch: refetchLock } = useActiveOpnameLock();
   const [isChecking, setIsChecking] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
@@ -37,17 +37,13 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname, onRefresh }) =>
 
   const handleCheckStatus = async () => {
     setIsChecking(true);
-    try {
-      const result = await opnameApi.getActiveOpnameLock();
-      if (!result.isLocked) {
-        setIsComplete(true);
-      }
-      onRefresh();
-    } catch (error) {
-      console.error('Failed to check status:', error);
-    } finally {
-      setIsChecking(false);
+    const result = await refetchLock();
+    if (result.isError) {
+      console.error('Failed to check status:', result.error);
+    } else if (result.data && !result.data.isLocked) {
+      setIsComplete(true);
     }
+    setIsChecking(false);
   };
 
   const handleReload = () => {
