@@ -9,23 +9,23 @@ import { stockMutationColumns } from './StockMutationColumns';
 import { exportTransactionReportToExcel, exportStockMutationToExcel } from './exportUtils';
 import { toDate } from '@/lib/utils';
 
-import { reportsApi, TransactionReportRow } from './api';
+import type { TransactionReportRow } from './api';
 import type { StockMutationRow } from './types';
+import { useStockMutationReport, useTransactionReport } from './useReports';
+
+const EMPTY_TX_ROWS: TransactionReportRow[] = [];
+const EMPTY_MUTATION_ROWS: StockMutationRow[] = [];
 
 type ReportPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
 
 const StockReport: React.FC = () => {
   const { data: productData } = useProducts({ page: 1, perPage: 1000 });
-  const products = productData?.data || [];
+  const products = useMemo(() => productData?.data ?? [], [productData]);
 
   const [activeTab, setActiveTab] = useState<'analysis' | 'transactions' | 'mutation'>('analysis');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('Semua');
   const [filterStatus, setFilterStatus] = useState<string>('Semua');
-
-  // Transaction Report State
-  const [txReport, setTxReport] = useState<TransactionReportRow[]>([]);
-  const [mutations, setMutations] = useState<StockMutationRow[]>([]);
 
   // Separate date ranges for each report
   const [txStartDate, setTxStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -44,9 +44,30 @@ const StockReport: React.FC = () => {
     'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom'
   >('daily');
 
-  // Store all data (used for both display and Excel export)
-  const [allTxData, setAllTxData] = useState<TransactionReportRow[]>([]);
-  const [allMutationData, setAllMutationData] = useState<StockMutationRow[]>([]);
+  // Laporan selalu mengambil SEMUA data periode. Pagination dan filter kolom
+  // ditangani <DataTable pageSize={10}>, jadi jumlah halaman selalu mengikuti
+  // baris yang sedang terfilter. Data yang sama dipakai untuk export Excel.
+  // Query hanya jalan saat tab-nya aktif.
+  const txQuery = useTransactionReport(
+    txStartDate,
+    txEndDate,
+    { page: 1, perPage: 100000, status: txStatus === 'Semua' ? undefined : txStatus },
+    { enabled: activeTab === 'transactions' },
+  );
+  const mutationQuery = useStockMutationReport(
+    mutationStartDate,
+    mutationEndDate,
+    { page: 1, perPage: 100000 },
+    { enabled: activeTab === 'mutation' },
+  );
+  const allTxData = txQuery.data?.data ?? EMPTY_TX_ROWS;
+  const allMutationData = mutationQuery.data?.data ?? EMPTY_MUTATION_ROWS;
+
+  useEffect(() => {
+    const error = txQuery.error ?? mutationQuery.error;
+    if (error) console.error('Error fetching report:', error);
+  }, [txQuery.error, mutationQuery.error]);
+
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionReportRow | null>(null);
 
   // Filtering Logic (Analysis)
@@ -145,42 +166,6 @@ const StockReport: React.FC = () => {
       setMutationEndDate(range.end);
     }
   };
-
-  // Generalized data fetching — always fetch ALL data for the period.
-  // Pagination and column-filtering are handled inside <DataTable pageSize={10}>,
-  // so the page count will always reflect the currently-filtered row count.
-  const fetchData = async () => {
-    try {
-      if (activeTab === 'analysis') {
-        // Analysis data is derived from props and useMemo, no direct fetch here
-      } else if (activeTab === 'transactions') {
-        const allData = await reportsApi.getTransactionReport(txStartDate, txEndDate, {
-          page: 1,
-          perPage: 100000,
-          status: txStatus === 'Semua' ? undefined : txStatus,
-        });
-        setTxReport(allData.data);
-        setAllTxData(allData.data);
-      } else if (activeTab === 'mutation') {
-        const allData = await reportsApi.getStockMutationReport(
-          mutationStartDate,
-          mutationEndDate,
-          {
-            page: 1,
-            perPage: 100000,
-          },
-        );
-        setMutations(allData.data);
-        setAllMutationData(allData.data);
-      }
-    } catch (error) {
-      console.error('Error fetching report:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [activeTab, txStartDate, txEndDate, txStatus, mutationStartDate, mutationEndDate]);
 
   // Export handlers
   const handleExportTransactions = () => {
@@ -575,7 +560,7 @@ const StockReport: React.FC = () => {
                 </select>
               </div>
               <Button
-                onClick={() => fetchData()}
+                onClick={() => void txQuery.refetch()}
                 className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2"
               >
                 <span className="material-icons-round text-base">search</span>
@@ -594,7 +579,7 @@ const StockReport: React.FC = () => {
 
             <DataTable
               columns={createTransactionReportColumns({ onViewDetail: setSelectedTransaction })}
-              data={txReport}
+              data={allTxData}
               searchable={false}
               pageSize={10}
             />
@@ -665,7 +650,7 @@ const StockReport: React.FC = () => {
                 />
               </div>
               <Button
-                onClick={() => fetchData()}
+                onClick={() => void mutationQuery.refetch()}
                 className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2"
               >
                 <span className="material-icons-round text-base">search</span>
@@ -675,7 +660,7 @@ const StockReport: React.FC = () => {
 
             <DataTable
               columns={stockMutationColumns}
-              data={mutations}
+              data={allMutationData}
               searchable={false}
               pageSize={10}
             />
