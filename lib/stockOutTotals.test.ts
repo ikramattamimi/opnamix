@@ -53,7 +53,12 @@ describe('calculateRequestTotals', () => {
   });
 
   it('obat tanpa harga dihitung 0', () => {
-    const totals = calculateRequestTotals({ ...baseRequest, drugs: [drug(3)], services: [], serviceFee: 0 });
+    const totals = calculateRequestTotals({
+      ...baseRequest,
+      drugs: [drug(3)],
+      services: [],
+      serviceFee: 0,
+    });
     expect(totals.totalDrugs).toBe(0);
     expect(totals.grandTotal).toBe(0);
   });

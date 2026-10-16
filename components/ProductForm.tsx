@@ -4,7 +4,6 @@ import { Button } from './ui/button';
 import { sanitizePriceInput } from '../lib/utils';
 import { getProductDisplayName } from '../lib/productDisplay';
 
-
 interface ProductFormProps {
   onSave: (product: Product) => void;
   editingProduct?: Product;
@@ -21,7 +20,12 @@ interface ValidationErrors {
   minStock?: string;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCancel, isLoading = false }) => {
+const ProductForm: React.FC<ProductFormProps> = ({
+  onSave,
+  editingProduct,
+  onCancel,
+  isLoading = false,
+}) => {
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
     category: Category.Obat,
@@ -32,7 +36,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
     minStock: undefined,
     description: '',
     brand: '',
-    composition: ''
+    composition: '',
   });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -57,7 +61,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
       minStock: undefined,
       description: '',
       brand: '',
-      composition: ''
+      composition: '',
     });
     setErrors({});
     setTouched(new Set());
@@ -105,7 +109,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
   };
 
   const handleBlur = (field: string) => {
-    setTouched(prev => new Set(prev).add(field));
+    setTouched((prev) => new Set(prev).add(field));
     validateForm();
   };
 
@@ -118,10 +122,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
       brand: formData.brand,
       composition: formData.composition,
     });
-    
+
     // Mark all fields as touched
-    setTouched(new Set([...(isMedicine ? ['brand', 'composition'] : ['name']), 'sellingPrice', 'stock', 'minStock']));
-    
+    setTouched(
+      new Set([
+        ...(isMedicine ? ['brand', 'composition'] : ['name']),
+        'sellingPrice',
+        'stock',
+        'minStock',
+      ]),
+    );
+
     if (!validateForm()) {
       return;
     }
@@ -139,7 +150,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
       description: formData.description as string,
       color: formData.color || 'bg-primary',
       brand: formData.brand,
-      composition: formData.composition
+      composition: formData.composition,
     };
 
     onSave(finalProduct);
@@ -166,14 +177,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
           {editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}
         </h2>
         <div className="flex items-center gap-2">
-          <button 
+          <button
             type="button"
             onClick={handleReset}
             className="text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
           >
             Reset
           </button>
-          <button 
+          <button
             type="button"
             onClick={onCancel}
             className="p-2 bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors"
@@ -182,16 +193,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
           </button>
         </div>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {!isMedicine && (
           <div>
             <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
               Nama Produk <span className="text-red-500">*</span>
             </label>
-            <input 
-              className={getInputClassName('name', 'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white')}
-              placeholder="Contoh: Paracetamol 500mg" 
+            <input
+              className={getInputClassName(
+                'name',
+                'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white',
+              )}
+              placeholder="Contoh: Paracetamol 500mg"
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -212,9 +226,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
               <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
                 Merek Obat
               </label>
-              <input 
+              <input
                 type="text"
-                className={getInputClassName('brand', 'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white')}
+                className={getInputClassName(
+                  'brand',
+                  'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white',
+                )}
                 placeholder="Contoh: Sanbe, Kimia Farma..."
                 value={formData.brand || ''}
                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
@@ -225,9 +242,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
               <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
                 Kandungan Obat
               </label>
-              <input 
+              <input
                 type="text"
-                className={getInputClassName('composition', 'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white')}
+                className={getInputClassName(
+                  'composition',
+                  'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white',
+                )}
                 placeholder="Contoh: Paracetamol 500mg..."
                 value={formData.composition || ''}
                 onChange={(e) => setFormData({ ...formData, composition: e.target.value })}
@@ -236,7 +256,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
             </div>
             <div className="col-span-2">
               <p className="text-xs text-text-secondary-light">
-                Nama produk otomatis: <span className="font-bold text-text-primary-light dark:text-white">{previewProductName || formData.name || '-'}</span>
+                Nama produk otomatis:{' '}
+                <span className="font-bold text-text-primary-light dark:text-white">
+                  {previewProductName || formData.name || '-'}
+                </span>
               </p>
               {errors.name && (touched.has('brand') || touched.has('composition')) && (
                 <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
@@ -247,30 +270,42 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
             </div>
           </div>
         )}
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">Kategori</label>
-            <select 
+            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
+              Kategori
+            </label>
+            <select
               className="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value as Category })}
             >
-              {Object.values(Category).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              {Object.values(Category).map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">Satuan</label>
-            <select 
+            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
+              Satuan
+            </label>
+            <select
               className="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white"
               value={formData.unit}
               onChange={(e) => setFormData({ ...formData, unit: e.target.value as Unit })}
             >
-              {Object.values(Unit).map(u => <option key={u} value={u}>{u}</option>)}
+              {Object.values(Unit).map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
             </select>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
@@ -278,15 +313,21 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
             </label>
             <div className="relative">
               <span className="absolute left-4 top-3.5 text-text-secondary-light text-sm">Rp</span>
-              <input 
-                className={getInputClassName('sellingPrice', 'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark pl-10 pr-4 py-3 text-sm focus:border-primary focus:ring-primary dark:text-white')}
-                placeholder="0" 
+              <input
+                className={getInputClassName(
+                  'sellingPrice',
+                  'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark pl-10 pr-4 py-3 text-sm focus:border-primary focus:ring-primary dark:text-white',
+                )}
+                placeholder="0"
                 type="number"
                 min="0"
                 value={formData.sellingPrice ?? ''}
                 onChange={(e) => {
                   const sanitized = sanitizePriceInput(e.target.value);
-                  setFormData({ ...formData, sellingPrice: sanitized === '' ? undefined : Number(sanitized) });
+                  setFormData({
+                    ...formData,
+                    sellingPrice: sanitized === '' ? undefined : Number(sanitized),
+                  });
                 }}
                 onBlur={() => handleBlur('sellingPrice')}
               />
@@ -299,19 +340,27 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
             )}
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">Stok Awal</label>
-            <input 
-              className={getInputClassName('stock', 'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white')}
-              placeholder="0" 
+            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
+              Stok Awal
+            </label>
+            <input
+              className={getInputClassName(
+                'stock',
+                'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white',
+              )}
+              placeholder="0"
               type="number"
               min="0"
               value={formData.stock ?? ''}
               onChange={(e) => {
                 const sanitized = sanitizePriceInput(e.target.value);
-                setFormData({ ...formData, stock: sanitized === '' ? undefined : Number(sanitized) });
+                setFormData({
+                  ...formData,
+                  stock: sanitized === '' ? undefined : Number(sanitized),
+                });
               }}
               onBlur={() => handleBlur('stock')}
             />
@@ -323,16 +372,24 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">Stok Minimum</label>
-            <input 
-              className={getInputClassName('minStock', 'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white')}
-              placeholder="Min. Stok" 
+            <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
+              Stok Minimum
+            </label>
+            <input
+              className={getInputClassName(
+                'minStock',
+                'w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white',
+              )}
+              placeholder="Min. Stok"
               type="number"
               min="0"
               value={formData.minStock ?? ''}
               onChange={(e) => {
                 const sanitized = sanitizePriceInput(e.target.value);
-                setFormData({ ...formData, minStock: sanitized === '' ? undefined : Number(sanitized) });
+                setFormData({
+                  ...formData,
+                  minStock: sanitized === '' ? undefined : Number(sanitized),
+                });
               }}
               onBlur={() => handleBlur('minStock')}
             />
@@ -344,46 +401,50 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, editingProduct, onCan
             )}
           </div>
         </div>
-        
+
         <div>
-          <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">Deskripsi / Dosis</label>
-          <textarea 
-            className="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white resize-none" 
-            placeholder="Tambahkan keterangan..." 
+          <label className="block text-sm font-medium text-text-primary-light dark:text-white mb-2">
+            Deskripsi / Dosis
+          </label>
+          <textarea
+            className="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark p-3 text-sm focus:border-primary focus:ring-primary dark:text-white resize-none"
+            placeholder="Tambahkan keterangan..."
             rows={3}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
         </div>
-        
+
         <div className="flex gap-2 pt-2">
-            {editingProduct && (
-              <Button 
-                onClick={onCancel}
-                type="button"
-                variant="outline"
-                size="lg"
-                className="flex-1 font-bold"
-                disabled={isLoading}
-              >
-                Batal
-              </Button>
-            )}
-            <Button 
-              type="submit"
+          {editingProduct && (
+            <Button
+              onClick={onCancel}
+              type="button"
+              variant="outline"
               size="lg"
-              className="w-full font-bold shadow-lg"
+              className="flex-1 font-bold"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <>
-                  <span className="material-icons-round text-[18px] animate-spin mr-1">refresh</span>
-                  Menyimpan...
-                </>
-              ) : (
-                editingProduct ? 'Update Data Produk' : 'Tambah Data Produk'
-              )}
+              Batal
             </Button>
+          )}
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full font-bold shadow-lg"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <span className="material-icons-round text-[18px] animate-spin mr-1">refresh</span>
+                Menyimpan...
+              </>
+            ) : editingProduct ? (
+              'Update Data Produk'
+            ) : (
+              'Tambah Data Produk'
+            )}
+          </Button>
         </div>
       </form>
     </div>

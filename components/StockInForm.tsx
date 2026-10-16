@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { StockInReceipt, StockInItem, Product } from '../types';
 import { compressImage, formatFileSize } from '../lib/imageCompression';
@@ -24,17 +23,20 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
   const [supplierSuggestions, setSupplierSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
-    getUserProfile().then(profile => {
+    getUserProfile().then((profile) => {
       if (profile) setCurrentUserName(profile.full_name || profile.email);
     });
-    api.getDistinctSuppliers().then(setSupplierSuggestions).catch(() => {});
+    api
+      .getDistinctSuppliers()
+      .then(setSupplierSuggestions)
+      .catch(() => {});
   }, []);
 
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [supplierName, setSupplierName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [items, setItems] = useState<Partial<StockInItem>[]>([
-    { id: Math.random().toString(), productId: '', quantity: 0, expiryDate: '', unit: 'Box' }
+    { id: Math.random().toString(), productId: '', quantity: 0, expiryDate: '', unit: 'Box' },
   ]);
   const [file, setFile] = useState<File | null>(null);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -44,17 +46,22 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
   const [isLookupOpen, setIsLookupOpen] = useState(false);
 
   const addItem = () => {
-    setItems([...items, { id: Math.random().toString(), productId: '', quantity: 0, expiryDate: '', unit: 'Box' }]);
+    setItems([
+      ...items,
+      { id: Math.random().toString(), productId: '', quantity: 0, expiryDate: '', unit: 'Box' },
+    ]);
   };
 
   const removeItem = (id: string) => {
     if (items.length > 1) {
-      setItems(items.filter(item => item.id !== id));
+      setItems(items.filter((item) => item.id !== id));
     }
   };
 
   const handleItemChange = (id: string, field: keyof StockInItem, value: any) => {
-    setItems(prevItems => prevItems.map(item => item.id === id ? { ...item, [field]: value } : item));
+    setItems((prevItems) =>
+      prevItems.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+    );
   };
 
   const handleOpenLookup = (rowId: string) => {
@@ -64,16 +71,18 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
 
   const handleProductSelected = (product: Product) => {
     if (activeRowId) {
-      setItems(prevItems => prevItems.map(item => {
-        if (item.id === activeRowId) {
-          return {
-            ...item,
-            productId: product.id,
-            unit: product.unit || item.unit // Auto-fill unit
-          };
-        }
-        return item;
-      }));
+      setItems((prevItems) =>
+        prevItems.map((item) => {
+          if (item.id === activeRowId) {
+            return {
+              ...item,
+              productId: product.id,
+              unit: product.unit || item.unit, // Auto-fill unit
+            };
+          }
+          return item;
+        }),
+      );
     }
     setIsLookupOpen(false);
     setActiveRowId(null);
@@ -105,7 +114,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
           maxWidth: 1920,
           maxHeight: 1080,
           quality: 0.6,
-          mimeType: 'image/webp'
+          mimeType: 'image/webp',
         });
       }
 
@@ -114,8 +123,8 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
         invoiceNumber,
         supplierName: supplierName || 'No Name', // Default
         date,
-        items: items.map(item => {
-          const product = products.find(p => p.id === item.productId);
+        items: items.map((item) => {
+          const product = products.find((p) => p.id === item.productId);
           return {
             id: item.id!,
             productId: item.productId!,
@@ -127,7 +136,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
           };
         }),
         status: 'Selesai',
-        receivedBy: currentUserName || 'Admin'
+        receivedBy: currentUserName || 'Admin',
       };
 
       onSave(newReceipt, compressedFile);
@@ -143,7 +152,9 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white dark:bg-card-dark w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[32px] shadow-soft p-8">
         <div className="flex justify-between items-center mb-8">
-          <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">Formulir Penerimaan Stok</h3>
+          <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">
+            Formulir Penerimaan Stok
+          </h3>
           <Button
             onClick={onClose}
             variant="ghost"
@@ -157,30 +168,39 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Detail Transaksi Section */}
           <div>
-            <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider mb-6">Detail Transaksi</h4>
+            <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider mb-6">
+              Detail Transaksi
+            </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">Nomor Nota / Faktur</label>
+                <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">
+                  Nomor Nota / Faktur
+                </label>
                 <div className="relative">
                   <input
                     className="w-full bg-transparent border border-gray-200 dark:border-white/10 rounded-2xl pl-4 pr-10 py-3.5 text-sm font-medium text-text-primary-light dark:text-white focus:ring-0 focus:border-primary placeholder:text-text-secondary-light transition-all"
                     placeholder="Contoh: INV-2023-001"
                     type="text"
                     value={invoiceNumber}
-                    onChange={e => setInvoiceNumber(e.target.value)}
+                    onChange={(e) => setInvoiceNumber(e.target.value)}
                     required
                   />
-                  <span className="material-icons-round absolute right-4 top-3.5 text-text-secondary-light text-[20px]">tag</span>
+                  <span className="material-icons-round absolute right-4 top-3.5 text-text-secondary-light text-[20px]">
+                    tag
+                  </span>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">Nama Supplier <span className="text-xs font-normal text-text-secondary-light">(Opsional)</span></label>
+                <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">
+                  Nama Supplier{' '}
+                  <span className="text-xs font-normal text-text-secondary-light">(Opsional)</span>
+                </label>
                 <div className="relative">
                   <input
                     className="w-full bg-transparent border border-gray-200 dark:border-white/10 rounded-2xl pl-4 pr-10 py-3.5 text-sm font-medium text-text-primary-light dark:text-white focus:ring-0 focus:border-primary transition-all"
                     placeholder="Ketik nama supplier..."
                     value={supplierName}
-                    onChange={e => setSupplierName(e.target.value)}
+                    onChange={(e) => setSupplierName(e.target.value)}
                     list="suppliers"
                   />
                   <datalist id="suppliers">
@@ -188,19 +208,25 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
                       <option key={idx} value={name} />
                     ))}
                   </datalist>
-                  <span className="material-icons-round absolute right-4 top-3.5 text-text-secondary-light pointer-events-none text-[20px]">local_shipping</span>
+                  <span className="material-icons-round absolute right-4 top-3.5 text-text-secondary-light pointer-events-none text-[20px]">
+                    local_shipping
+                  </span>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">Tanggal Penerimaan</label>
+                <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">
+                  Tanggal Penerimaan
+                </label>
                 <div className="relative">
                   <input
                     className="w-full bg-transparent border border-gray-200 dark:border-white/10 rounded-2xl pl-4 pr-10 py-3.5 text-sm font-medium text-text-primary-light dark:text-white focus:ring-0 focus:border-primary transition-all"
                     type="date"
                     value={date}
-                    onChange={e => setDate(e.target.value)}
+                    onChange={(e) => setDate(e.target.value)}
                   />
-                  <span className="material-icons-round absolute right-4 top-3.5 text-text-secondary-light text-[20px]">calendar_today</span>
+                  <span className="material-icons-round absolute right-4 top-3.5 text-text-secondary-light text-[20px]">
+                    calendar_today
+                  </span>
                 </div>
               </div>
             </div>
@@ -209,7 +235,9 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
           {/* Detail Barang Section */}
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider">Detail Barang</h4>
+              <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider">
+                Detail Barang
+              </h4>
               <Button
                 type="button"
                 onClick={addItem}
@@ -222,7 +250,10 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
 
             <div className="space-y-4">
               {items.map((item, index) => (
-                <div key={item.id} className="bg-background-light dark:bg-background-dark rounded-2xl p-6 relative">
+                <div
+                  key={item.id}
+                  className="bg-background-light dark:bg-background-dark rounded-2xl p-6 relative"
+                >
                   {items.length > 1 && (
                     <Button
                       type="button"
@@ -236,39 +267,56 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="md:col-span-2 space-y-2">
-                      <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">Pilih Produk</label>
+                      <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">
+                        Pilih Produk
+                      </label>
                       <div
                         onClick={() => handleOpenLookup(item.id!)}
                         className="relative cursor-pointer group"
                       >
-                        <div className={`w-full bg-white dark:bg-card-dark border-none rounded-2xl px-4 py-3.5 text-sm font-medium shadow-sm transition-all flex items-center justify-between ${!item.productId ? 'text-text-secondary-light dark:text-text-secondary-dark' : 'text-text-primary-light dark:text-white'}`}>
+                        <div
+                          className={`w-full bg-white dark:bg-card-dark border-none rounded-2xl px-4 py-3.5 text-sm font-medium shadow-sm transition-all flex items-center justify-between ${!item.productId ? 'text-text-secondary-light dark:text-text-secondary-dark' : 'text-text-primary-light dark:text-white'}`}
+                        >
                           <span>
                             {item.productId
-                              ? products.find(p => p.id === item.productId)?.name || 'Produk Terpilih'
+                              ? products.find((p) => p.id === item.productId)?.name ||
+                                'Produk Terpilih'
                               : 'Cari Obat / Alkes...'}
                           </span>
-                          <span className="material-icons-round text-primary group-hover:scale-110 transition-transform">search</span>
+                          <span className="material-icons-round text-primary group-hover:scale-110 transition-transform">
+                            search
+                          </span>
                         </div>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">Tanggal Kedaluwarsa</label>
+                      <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">
+                        Tanggal Kedaluwarsa
+                      </label>
                       <input
                         className="w-full bg-white dark:bg-card-dark border-none rounded-2xl px-4 py-3.5 text-sm font-medium text-text-primary-light dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20"
                         type="date"
                         value={item.expiryDate}
-                        onChange={e => handleItemChange(item.id!, 'expiryDate', e.target.value)}
+                        onChange={(e) => handleItemChange(item.id!, 'expiryDate', e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">Jumlah</label>
+                      <label className="text-sm font-bold text-text-primary-light dark:text-white ml-1">
+                        Jumlah
+                      </label>
                       <div className="flex items-center bg-white dark:bg-card-dark rounded-2xl p-1 shadow-sm">
                         <input
                           className="flex-1 w-full border-none bg-transparent text-center text-sm font-bold text-text-primary-light dark:text-white focus:ring-0 p-0"
                           type="number"
                           value={item.quantity ?? ''}
-                          onChange={e => handleItemChange(item.id!, 'quantity', e.target.value === '' ? undefined : Number(e.target.value))}
+                          onChange={(e) =>
+                            handleItemChange(
+                              item.id!,
+                              'quantity',
+                              e.target.value === '' ? undefined : Number(e.target.value),
+                            )
+                          }
                           required
                         />
                       </div>
@@ -281,7 +329,9 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
 
           {/* Bukti Fisik Section */}
           <div>
-            <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider mb-6">Bukti Fisik (Opsional)</h4>
+            <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider mb-6">
+              Bukti Fisik (Opsional)
+            </h4>
             <div
               onClick={() => document.getElementById('receipt-upload')?.click()}
               className="border-2 border-dashed border-gray-200 dark:border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-background-light dark:hover:bg-white/5 transition-colors group bg-background-light/30"
@@ -297,7 +347,9 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
                   Ukuran asli: {formatFileSize(file.size)}
                 </p>
               )}
-              <p className="text-xs text-text-secondary-light font-medium">File PNG, JPG, dan GIF diizinkan</p>
+              <p className="text-xs text-text-secondary-light font-medium">
+                File PNG, JPG, dan GIF diizinkan
+              </p>
               <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mt-2">
                 Gambar akan otomatis dikompres untuk menghemat storage
               </p>
@@ -347,7 +399,6 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
             </Button>
           </div>
         </form>
-
 
         {isLookupOpen && (
           <ProductLookupModal

@@ -1,11 +1,11 @@
-import * as React from "react"
-import { ColumnDef } from "@tanstack/react-table"
-import { Product } from "../types"
-import { Button } from "./ui/button"
+import * as React from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { Product } from '../types';
+import { Button } from './ui/button';
 
 interface ProductColumnsProps {
-  onEdit: (product: Product) => void
-  onDelete: (id: string) => void
+  onEdit: (product: Product) => void;
+  onDelete: (id: string) => void;
 }
 
 export const createProductColumns = ({
@@ -13,25 +13,21 @@ export const createProductColumns = ({
   onDelete,
 }: ProductColumnsProps): ColumnDef<Product>[] => [
   {
-    accessorKey: "name",
+    accessorKey: 'name',
     header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white">
-        Nama Produk
-      </div>
+      <div className="font-bold text-text-primary-light dark:text-white">Nama Produk</div>
     ),
     cell: ({ row }) => {
-      const product = row.original
+      const product = row.original;
       return (
         <div className="flex items-center gap-3">
           <div
-            className={`w-10 h-10 rounded-xl ${product.color || "bg-primary"} flex items-center justify-center text-white font-bold text-sm shadow-md`}
+            className={`w-10 h-10 rounded-xl ${product.color || 'bg-primary'} flex items-center justify-center text-white font-bold text-sm shadow-md`}
           >
             {product.name.substring(0, 2).toUpperCase()}
           </div>
           <div>
-            <div className="font-bold text-text-primary-light dark:text-white">
-              {product.name}
-            </div>
+            <div className="font-bold text-text-primary-light dark:text-white">{product.name}</div>
             {product.description && (
               <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
                 {product.description}
@@ -39,95 +35,71 @@ export const createProductColumns = ({
             )}
           </div>
         </div>
-      )
+      );
     },
   },
   {
-    accessorKey: "category",
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white">
-        Kategori
-      </div>
-    ),
+    accessorKey: 'category',
+    header: () => <div className="font-bold text-text-primary-light dark:text-white">Kategori</div>,
     cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">
-        {row.getValue("category")}
-      </div>
+      <div className="text-text-primary-light dark:text-white">{row.getValue('category')}</div>
     ),
   },
   {
-    accessorKey: "unit",
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white">
-        Satuan
-      </div>
-    ),
+    accessorKey: 'unit',
+    header: () => <div className="font-bold text-text-primary-light dark:text-white">Satuan</div>,
     cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">
-        {row.getValue("unit")}
-      </div>
+      <div className="text-text-primary-light dark:text-white">{row.getValue('unit')}</div>
     ),
   },
   {
-    accessorKey: "sellingPrice",
+    accessorKey: 'sellingPrice',
     header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white">
-        Harga Jual
-      </div>
+      <div className="font-bold text-text-primary-light dark:text-white">Harga Jual</div>
     ),
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue("sellingPrice"))
-      const formatted = new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
+      const price = parseFloat(row.getValue('sellingPrice'));
+      const formatted = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
         minimumFractionDigits: 0,
-      }).format(price)
-      return (
-        <div className="font-bold text-text-primary-light dark:text-white">
-          {formatted}
-        </div>
-      )
+      }).format(price);
+      return <div className="font-bold text-text-primary-light dark:text-white">{formatted}</div>;
     },
   },
   {
-    accessorKey: "stock",
+    accessorKey: 'stock',
     header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">
-        Stok
-      </div>
+      <div className="font-bold text-text-primary-light dark:text-white text-center">Stok</div>
     ),
     cell: ({ row }) => {
-      const stock = parseInt(row.getValue("stock"))
-      const minStock = row.original.minStock || 0
-      const isLowStock = stock <= minStock
+      const stock = parseInt(row.getValue('stock'));
+      const minStock = row.original.minStock || 0;
+      const isLowStock = stock <= minStock;
 
       return (
         <div className="text-center">
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
               isLowStock
-                ? "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400"
-                : "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
+                ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400'
+                : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
             }`}
           >
-            {isLowStock && (
-              <span className="material-icons-round text-xs">warning</span>
-            )}
+            {isLowStock && <span className="material-icons-round text-xs">warning</span>}
             {stock}
           </span>
         </div>
-      )
+      );
     },
   },
   {
-    id: "actions",
+    id: 'actions',
     header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">
-        Aksi
-      </div>
+      <div className="font-bold text-text-primary-light dark:text-white text-center">Aksi</div>
     ),
     cell: ({ row }) => {
-      const product = row.original
+      const product = row.original;
 
       return (
         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -150,7 +122,7 @@ export const createProductColumns = ({
             <span className="material-icons-round text-base">delete</span>
           </Button>
         </div>
-      )
+      );
     },
   },
-]
+];

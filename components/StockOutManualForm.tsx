@@ -17,7 +17,11 @@ interface ValidationErrors {
   items?: Record<string, { productId?: string; quantity?: string }>;
 }
 
-const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose, isLoading = false }) => {
+const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
+  onSave,
+  onClose,
+  isLoading = false,
+}) => {
   const { data: productData } = useProducts({ page: 1, perPage: 1000 });
   const products = productData?.data || [];
 
@@ -33,7 +37,14 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
 
   /* Initialize with one empty row */
   const [items, setItems] = useState<StockOutManualItem[]>([
-    { id: Math.random().toString(36).substr(2, 9), productId: '', productName: '', quantity: 1, unit: '', instructions: '-' }
+    {
+      id: Math.random().toString(36).substr(2, 9),
+      productId: '',
+      productName: '',
+      quantity: 1,
+      unit: '',
+      instructions: '-',
+    },
   ]);
 
   // Validation State
@@ -67,12 +78,12 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
       let itemValid = true;
 
       if (!item.productId) {
-         // Only flag as error if this is the ONLY item or if user tried to submit
-         // For now, simple validation: if row exists, it must be valid
-         currentItemErrors.productId = 'Produk wajib dipilih';
-         itemValid = false;
+        // Only flag as error if this is the ONLY item or if user tried to submit
+        // For now, simple validation: if row exists, it must be valid
+        currentItemErrors.productId = 'Produk wajib dipilih';
+        itemValid = false;
       } else {
-          hasValidItem = true;
+        hasValidItem = true;
       }
 
       if (typeof item.quantity !== 'number' || isNaN(item.quantity) || item.quantity <= 0) {
@@ -89,14 +100,14 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
     if (Object.keys(itemErrors).length > 0) {
       newErrors.items = itemErrors;
     }
-    
+
     // Additional check: must have at least one completely valid item?
-    // The current logic ensures all visible rows are valid. 
+    // The current logic ensures all visible rows are valid.
     // Usually we want at least one item.
     // If items is empty (removed all), that's invalid too.
     if (items.length === 0) {
-        // This case is handled by removeItem preventing last item removal, but good to be safe
-        isValid = false;
+      // This case is handled by removeItem preventing last item removal, but good to be safe
+      isValid = false;
     }
 
     setErrors(newErrors);
@@ -104,41 +115,57 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
   };
 
   const handleBlur = (field: string) => {
-    setTouched(prev => new Set(prev).add(field));
+    setTouched((prev) => new Set(prev).add(field));
     validateForm();
   };
 
   const handleAddItem = () => {
-    setItems(prev => [
+    setItems((prev) => [
       ...prev,
-      { id: Math.random().toString(36).substr(2, 9), productId: '', productName: '', quantity: 1, unit: '', instructions: '-' }
+      {
+        id: Math.random().toString(36).substr(2, 9),
+        productId: '',
+        productName: '',
+        quantity: 1,
+        unit: '',
+        instructions: '-',
+      },
     ]);
   };
 
   const handleRemoveItem = (id: string) => {
-    setItems(prev => {
+    setItems((prev) => {
       if (prev.length > 1) {
-         // Clean up errors for removed item
-         const newErrors = { ...errors };
-         if (newErrors.items && newErrors.items[id]) {
-            delete newErrors.items[id];
-            setErrors(newErrors);
-         }
-        return prev.filter(item => item.id !== id);
+        // Clean up errors for removed item
+        const newErrors = { ...errors };
+        if (newErrors.items && newErrors.items[id]) {
+          delete newErrors.items[id];
+          setErrors(newErrors);
+        }
+        return prev.filter((item) => item.id !== id);
       } else {
         // If removing last item, just reset it
         // Resetting also means clearing errors for it potentially, but simpler to just reset item content
-        return [{ id: Math.random().toString(36).substr(2, 9), productId: '', productName: '', quantity: 1, unit: '', instructions: '-' }];
+        return [
+          {
+            id: Math.random().toString(36).substr(2, 9),
+            productId: '',
+            productName: '',
+            quantity: 1,
+            unit: '',
+            instructions: '-',
+          },
+        ];
       }
     });
   };
 
   const handleUpdateItem = (id: string, field: keyof StockOutManualItem, value: any) => {
-    setItems(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
     if (field === 'quantity') {
-        // trigger validation/clear error for quantity
-        // Simpler to rely on next submit or blur? 
-        // For numbers, inline validation feedback is nice.
+      // trigger validation/clear error for quantity
+      // Simpler to rely on next submit or blur?
+      // For numbers, inline validation feedback is nice.
     }
   };
 
@@ -149,19 +176,25 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
 
   const handleProductSelect = (product: Product) => {
     if (activeRowId) {
-      setItems(prev => prev.map(item => item.id === activeRowId ? {
-        ...item,
-        productId: product.id,
-        productName: product.name,
-        unit: product.unit
-      } : item));
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === activeRowId
+            ? {
+                ...item,
+                productId: product.id,
+                productName: product.name,
+                unit: product.unit,
+              }
+            : item,
+        ),
+      );
 
       setIsLookupOpen(false);
       setActiveRowId(null);
-      
+
       // Clear specific error if exists
       if (errors.items && errors.items[activeRowId]?.productId) {
-          // Re-validate to clear
+        // Re-validate to clear
       }
     }
   };
@@ -170,16 +203,16 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
     e.preventDefault();
 
     const allTouched = new Set<string>(['formNumber', 'date', 'patientName']);
-    items.forEach(item => {
-        allTouched.add(`items.${item.id}.productId`);
-        allTouched.add(`items.${item.id}.quantity`);
+    items.forEach((item) => {
+      allTouched.add(`items.${item.id}.productId`);
+      allTouched.add(`items.${item.id}.quantity`);
     });
     setTouched(allTouched);
 
     if (!validateForm()) return;
 
     // Filter out empty rows (though validation enforces valid rows now)
-    const validItems = items.filter(i => i.productId && i.quantity > 0);
+    const validItems = items.filter((i) => i.productId && i.quantity > 0);
 
     const record: StockOutManual = {
       id: Math.random().toString(36).substr(2, 9),
@@ -188,13 +221,13 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
         fullName: patientName,
         medicalRecordNumber: '-',
         birthDate: patientBirthDate,
-        diagnosis: '-'
+        diagnosis: '-',
       },
       items: validItems,
       date: date,
       reason: reason || '-',
       tipeSumber: 'KASIR_LANGSUNG',
-      services: []
+      services: [],
     };
 
     onSave(record);
@@ -202,7 +235,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
 
   const totalCost = items.reduce((sum, item) => {
     if (!item.productId) return sum;
-    const product = products.find(p => p.id === item.productId);
+    const product = products.find((p) => p.id === item.productId);
     return sum + (product ? product.sellingPrice * item.quantity : 0);
   }, 0);
 
@@ -214,10 +247,12 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-background-light dark:bg-background-dark w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-[40px] shadow-soft p-4 md:p-8 lg:p-10 font-display">
         <div className="flex justify-between items-center mb-8">
-          <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">Catat Stok Keluar Manual</h3>
-          <Button 
-            onClick={onClose} 
-            variant="ghost" 
+          <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">
+            Catat Stok Keluar Manual
+          </h3>
+          <Button
+            onClick={onClose}
+            variant="ghost"
             size="icon"
             className="rounded-full hover:bg-gray-200 dark:hover:bg-white/5"
           >
@@ -239,7 +274,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
                     className={`w-full rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm focus:border-primary focus:ring-primary text-text-primary-light dark:text-white ${getInputClassName(touched.has('formNumber') ? errors.formNumber : undefined)}`}
                     type="text"
                     value={formNumber}
-                    onChange={e => setFormNumber(e.target.value)}
+                    onChange={(e) => setFormNumber(e.target.value)}
                     onBlur={() => handleBlur('formNumber')}
                   />
                   {touched.has('formNumber') && errors.formNumber && (
@@ -254,7 +289,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
                     className={`w-full rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm focus:border-primary focus:ring-primary text-text-primary-light dark:text-white ${getInputClassName(touched.has('date') ? errors.date : undefined)}`}
                     type="date"
                     value={date}
-                    onChange={e => setDate(e.target.value)}
+                    onChange={(e) => setDate(e.target.value)}
                     onBlur={() => handleBlur('date')}
                   />
                   {touched.has('date') && errors.date && (
@@ -272,7 +307,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
                   placeholder="Masukkan nama pasien"
                   type="text"
                   value={patientName}
-                  onChange={e => setPatientName(e.target.value)}
+                  onChange={(e) => setPatientName(e.target.value)}
                   onBlur={() => handleBlur('patientName')}
                 />
                 {touched.has('patientName') && errors.patientName && (
@@ -282,29 +317,21 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-
                   <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
-
                     Tanggal Lahir
-
                   </label>
 
                   <input
-
                     className="w-full rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm focus:border-primary focus:ring-primary text-text-primary-light dark:text-white"
 
                     type="date"
 
                     value={patientBirthDate}
 
-                    onChange={e => setPatientBirthDate(e.target.value)}
-
+                    onChange={(e) => setPatientBirthDate(e.target.value)}
                   />
-
                 </div>
-
               </div>
-
             </div>
 
             {/* Permintaan Obat & Alkes Section - EDITABLE TABLE */}
@@ -313,60 +340,90 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
                 <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/20 text-secondary">
                   <span className="material-icons-round text-lg">medical_services</span>
                 </span>
-                <h4 className="text-base font-bold text-text-primary-light dark:text-white">Permintaan Obat & Alkes</h4>
+                <h4 className="text-base font-bold text-text-primary-light dark:text-white">
+                  Permintaan Obat & Alkes
+                </h4>
               </div>
 
               <div className="bg-white dark:bg-background-dark/50 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5">
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase">Nama Obat <span className="text-red-500">*</span></th>
-                      <th className="px-4 py-3 text-center text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase w-24">Jml <span className="text-red-500">*</span></th>
-                      <th className="px-4 py-3 text-center text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase w-24">Satuan</th>
-                      <th className="px-4 py-3 text-right text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase">Harga</th>
-                      <th className="px-4 py-3 text-right text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase">Total</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase">
+                        Nama Obat <span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase w-24">
+                        Jml <span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase w-24">
+                        Satuan
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase">
+                        Harga
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase">
+                        Total
+                      </th>
                       <th className="px-4 py-3 text-center w-12"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                     {items.map((item, index) => {
-                      const product = products.find(p => p.id === item.productId);
+                      const product = products.find((p) => p.id === item.productId);
                       const price = product ? product.sellingPrice : 0;
                       const total = price * item.quantity;
-                      
+
                       const itemError = errors.items?.[item.id];
                       const isProductIdTouched = touched.has(`items.${item.id}.productId`);
                       const isQuantityTouched = touched.has(`items.${item.id}.quantity`);
 
                       return (
-                        <tr key={item.id} className="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                        <tr
+                          key={item.id}
+                          className="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                        >
                           <td className="px-4 py-3">
                             <div className="flex flex-col">
-                                <div
+                              <div
                                 onClick={() => handleOpenLookup(item.id)}
                                 className={`cursor-pointer px-3 py-2 rounded-xl border border-transparent hover:border-primary/30 hover:bg-white dark:hover:bg-black/20 transition-all flex items-center justify-between ${!item.productId ? 'text-text-secondary-light italic bg-gray-50/50 dark:bg-white/5' : 'font-bold text-text-primary-light dark:text-white'} ${isProductIdTouched && itemError?.productId ? 'border-red-500 bg-red-50/50' : ''}`}
-                                >
-                                <span className="truncate max-w-[200px]">{item.productName || 'Pilih Obat...'}</span>
-                                <span className="material-icons-round text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">search</span>
-                                </div>
-                                {(isProductIdTouched || Object.keys(errors).length > 0) && itemError?.productId && (
-                                    <span className="text-[10px] text-red-500 mt-1 ml-1">{itemError.productId}</span>
+                              >
+                                <span className="truncate max-w-[200px]">
+                                  {item.productName || 'Pilih Obat...'}
+                                </span>
+                                <span className="material-icons-round text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                  search
+                                </span>
+                              </div>
+                              {(isProductIdTouched || Object.keys(errors).length > 0) &&
+                                itemError?.productId && (
+                                  <span className="text-[10px] text-red-500 mt-1 ml-1">
+                                    {itemError.productId}
+                                  </span>
                                 )}
                             </div>
                           </td>
                           <td className="px-2 py-3">
                             <div className="flex flex-col items-center">
-                                <input
+                              <input
                                 type="number"
                                 min="1"
                                 className={`w-full bg-transparent border border-transparent hover:border-gray-200 dark:hover:border-white/10 focus:border-primary rounded-xl text-center font-bold text-sm py-1 ${isQuantityTouched && itemError?.quantity ? 'border-red-500' : ''}`}
                                 value={(item.quantity as any) ?? ''}
-                                onChange={(e) => handleUpdateItem(item.id, 'quantity', e.target.value === '' ? undefined : Number(e.target.value))}
+                                onChange={(e) =>
+                                  handleUpdateItem(
+                                    item.id,
+                                    'quantity',
+                                    e.target.value === '' ? undefined : Number(e.target.value),
+                                  )
+                                }
                                 onBlur={() => handleBlur(`items.${item.id}.quantity`)}
-                                />
+                              />
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-sm text-center text-text-secondary-light dark:text-gray-400">{item.unit || '-'}</td>
+                          <td className="px-4 py-3 text-sm text-center text-text-secondary-light dark:text-gray-400">
+                            {item.unit || '-'}
+                          </td>
                           <td className="px-4 py-3 text-sm text-right text-text-secondary-light dark:text-gray-400">
                             {price > 0 ? `Rp ${price.toLocaleString('id-ID')}` : '-'}
                           </td>
@@ -409,13 +466,15 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({ onSave, onClose
             {/* Keterangan Section */}
             <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-text-primary-light dark:text-white">Keterangan</label>
+                <label className="text-sm font-bold text-text-primary-light dark:text-white">
+                  Keterangan
+                </label>
                 <textarea
                   className="w-full bg-background-light dark:bg-background-dark border-none rounded-2xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-primary/20 text-text-primary-light dark:text-white resize-none"
                   placeholder="Ketik keterangan di sini..."
                   rows={3}
                   value={reason}
-                  onChange={e => setReason(e.target.value)}
+                  onChange={(e) => setReason(e.target.value)}
                 />
               </div>
             </div>

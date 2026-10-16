@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Button } from "./ui/button";
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button } from './ui/button';
 import {
   signUp,
   updateUserProfileAdmin,
   deleteAuthUser,
   adminUpdatePassword,
   UserProfile,
-} from "../lib/auth";
-import { supabase } from "../lib/supabaseClient";
-import { useToast } from "./ui/toast";
+} from '../lib/auth';
+import { supabase } from '../lib/supabaseClient';
+import { useToast } from './ui/toast';
 
 interface UserRow {
   id: string;
   email: string;
   full_name: string | null;
-  role: "admin" | "nakes" | "farmasi";
+  role: 'admin' | 'nakes' | 'farmasi';
   roles: string[];
   created_at: string;
   updated_at: string;
@@ -23,28 +23,26 @@ interface UserRow {
 
 const ROLE_OPTIONS = [
   {
-    value: "admin",
-    label: "Admin",
-    color:
-      "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400",
+    value: 'admin',
+    label: 'Admin',
+    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
   },
   {
-    value: "farmasi",
-    label: "Farmasi",
-    color: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400",
+    value: 'farmasi',
+    label: 'Farmasi',
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
   },
   {
-    value: "nakes",
-    label: "Nakes",
-    color:
-      "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400",
+    value: 'nakes',
+    label: 'Nakes',
+    color: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
   },
 ] as const;
 
-type RoleValue = (typeof ROLE_OPTIONS)[number]["value"];
+type RoleValue = (typeof ROLE_OPTIONS)[number]['value'];
 
 const isRoleValue = (role: string): role is RoleValue => {
-  return role === "admin" || role === "farmasi" || role === "nakes";
+  return role === 'admin' || role === 'farmasi' || role === 'nakes';
 };
 
 const UserManagement: React.FC = () => {
@@ -55,20 +53,20 @@ const UserManagement: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
-  const [newPassword, setNewPassword] = useState("");
+  const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState("Semua");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState('Semua');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const { showToast } = useToast();
 
   // Form state for add/edit
-  const [formEmail, setFormEmail] = useState("");
-  const [formName, setFormName] = useState("");
-  const [formRoles, setFormRoles] = useState<RoleValue[]>(["nakes"]);
-  const [formPassword, setFormPassword] = useState("");
-  const [editEmail, setEditEmail] = useState("");
+  const [formEmail, setFormEmail] = useState('');
+  const [formName, setFormName] = useState('');
+  const [formRoles, setFormRoles] = useState<RoleValue[]>(['nakes']);
+  const [formPassword, setFormPassword] = useState('');
+  const [editEmail, setEditEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchUsers = useCallback(async () => {
@@ -76,30 +74,27 @@ const UserManagement: React.FC = () => {
     try {
       // RLS allows any logged-in user to read profiles and user_roles
       const { data: profiles, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       const { data: userRoles, error: userRolesError } = await supabase
-        .from("user_roles")
-        .select("user_id, role");
+        .from('user_roles')
+        .select('user_id, role');
 
       if (profileError) throw profileError;
       if (userRolesError) throw userRolesError;
 
-      const rolesMap = (userRoles || []).reduce<Record<string, string[]>>(
-        (acc, item) => {
-          if (!item.user_id || !item.role) return acc;
-          if (!acc[item.user_id]) {
-            acc[item.user_id] = [];
-          }
-          if (!acc[item.user_id].includes(item.role)) {
-            acc[item.user_id].push(item.role);
-          }
-          return acc;
-        },
-        {},
-      );
+      const rolesMap = (userRoles || []).reduce<Record<string, string[]>>((acc, item) => {
+        if (!item.user_id || !item.role) return acc;
+        if (!acc[item.user_id]) {
+          acc[item.user_id] = [];
+        }
+        if (!acc[item.user_id].includes(item.role)) {
+          acc[item.user_id].push(item.role);
+        }
+        return acc;
+      }, {});
 
       const mergedUsers: UserRow[] = (profiles || []).map((p) => ({
         ...p,
@@ -110,7 +105,7 @@ const UserManagement: React.FC = () => {
       // For now we just use profiles data
       setUsers(mergedUsers);
     } catch (err: any) {
-      setError("Gagal memuat data pengguna: " + err.message);
+      setError('Gagal memuat data pengguna: ' + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -135,33 +130,32 @@ const UserManagement: React.FC = () => {
     const matchesSearch =
       u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.full_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole =
-      filterRole === "Semua" || u.roles.includes(filterRole);
+    const matchesRole = filterRole === 'Semua' || u.roles.includes(filterRole);
     return matchesSearch && matchesRole;
   });
 
   const resetForm = () => {
-    setFormEmail("");
-    setFormName("");
-    setFormRoles(["nakes"]);
-    setFormPassword("");
-    setNewPassword("");
+    setFormEmail('');
+    setFormName('');
+    setFormRoles(['nakes']);
+    setFormPassword('');
+    setNewPassword('');
     setShowPassword(false);
-    setEditEmail("");
+    setEditEmail('');
     setError(null);
   };
 
   const handleAdd = async () => {
     if (!formEmail || !formPassword || !formName) {
-      setError("Email, nama, dan password wajib diisi.");
+      setError('Email, nama, dan password wajib diisi.');
       return;
     }
     if (formPassword.length < 6) {
-      setError("Password minimal 6 karakter.");
+      setError('Password minimal 6 karakter.');
       return;
     }
     if (formRoles.length === 0) {
-      setError("Pilih minimal satu role.");
+      setError('Pilih minimal satu role.');
       return;
     }
 
@@ -178,9 +172,9 @@ const UserManagement: React.FC = () => {
       // Wait a moment for the trigger to fire
       setTimeout(() => fetchUsers(), 1500);
     } catch (err: any) {
-      showToast("Gagal menambah pengguna.", "error");
-      console.error("Error adding user:", err);
-      setError("Gagal menambah pengguna: " + err.message);
+      showToast('Gagal menambah pengguna.', 'error');
+      console.error('Error adding user:', err);
+      setError('Gagal menambah pengguna: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -189,11 +183,11 @@ const UserManagement: React.FC = () => {
   const handleEdit = async () => {
     if (!selectedUser) return;
     if (!formName) {
-      setError("Nama wajib diisi.");
+      setError('Nama wajib diisi.');
       return;
     }
-    if (!editEmail || !editEmail.includes("@")) {
-      setError("Email tidak valid.");
+    if (!editEmail || !editEmail.includes('@')) {
+      setError('Email tidak valid.');
       return;
     }
 
@@ -209,7 +203,7 @@ const UserManagement: React.FC = () => {
       resetForm();
       fetchUsers();
     } catch (err: any) {
-      setError("Gagal memperbarui pengguna: " + err.message);
+      setError('Gagal memperbarui pengguna: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -228,7 +222,7 @@ const UserManagement: React.FC = () => {
       setSelectedUser(null);
       fetchUsers();
     } catch (err: any) {
-      setError("Gagal menghapus pengguna: " + err.message);
+      setError('Gagal menghapus pengguna: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -237,10 +231,8 @@ const UserManagement: React.FC = () => {
   const openEdit = (user: UserRow) => {
     const selectedRoles = (user.roles || []).filter(isRoleValue);
     setSelectedUser(user);
-    setFormName(user.full_name || "");
-    setFormRoles(
-      selectedRoles.length > 0 ? selectedRoles : [user.role || "nakes"],
-    );
+    setFormName(user.full_name || '');
+    setFormRoles(selectedRoles.length > 0 ? selectedRoles : [user.role || 'nakes']);
     setEditEmail(user.email);
     setShowEditModal(true);
     setError(null);
@@ -253,7 +245,7 @@ const UserManagement: React.FC = () => {
 
   const openResetPassword = (user: UserRow) => {
     setSelectedUser(user);
-    setNewPassword("");
+    setNewPassword('');
     setShowPassword(false);
     setShowResetPasswordModal(true);
     setError(null);
@@ -262,7 +254,7 @@ const UserManagement: React.FC = () => {
   const handleChangePassword = async () => {
     if (!selectedUser) return;
     if (!newPassword) {
-      setError("Password baru wajib diisi.");
+      setError('Password baru wajib diisi.');
       return;
     }
 
@@ -271,10 +263,10 @@ const UserManagement: React.FC = () => {
       await adminUpdatePassword(selectedUser.id, newPassword);
       setSuccess(`Password ${selectedUser.full_name || selectedUser.email} berhasil diubah!`);
       setShowResetPasswordModal(false);
-      setNewPassword("");
+      setNewPassword('');
       setShowPassword(false);
     } catch (err: any) {
-      setError("Gagal mengubah password: " + err.message);
+      setError('Gagal mengubah password: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -288,14 +280,14 @@ const UserManagement: React.FC = () => {
           return (
             <span
               key={role}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${opt?.color || "bg-gray-100 text-gray-600"}`}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${opt?.color || 'bg-gray-100 text-gray-600'}`}
             >
               <span className="material-icons-round text-xs">
-                {role === "admin"
-                  ? "admin_panel_settings"
-                  : role === "farmasi"
-                    ? "medication"
-                    : "health_and_safety"}
+                {role === 'admin'
+                  ? 'admin_panel_settings'
+                  : role === 'farmasi'
+                    ? 'medication'
+                    : 'health_and_safety'}
               </span>
               {opt?.label || role}
             </span>
@@ -368,16 +360,16 @@ const UserManagement: React.FC = () => {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-10 h-10 rounded-xl ${role.value === "admin" ? "bg-purple-100 dark:bg-purple-500/20" : role.value === "farmasi" ? "bg-blue-100 dark:bg-blue-500/20" : "bg-green-100 dark:bg-green-500/20"} flex items-center justify-center`}
+                  className={`w-10 h-10 rounded-xl ${role.value === 'admin' ? 'bg-purple-100 dark:bg-purple-500/20' : role.value === 'farmasi' ? 'bg-blue-100 dark:bg-blue-500/20' : 'bg-green-100 dark:bg-green-500/20'} flex items-center justify-center`}
                 >
                   <span
-                    className={`material-icons-round ${role.value === "admin" ? "text-purple-600 dark:text-purple-400" : role.value === "farmasi" ? "text-blue-600 dark:text-blue-400" : "text-green-600 dark:text-green-400"}`}
+                    className={`material-icons-round ${role.value === 'admin' ? 'text-purple-600 dark:text-purple-400' : role.value === 'farmasi' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'}`}
                   >
-                    {role.value === "admin"
-                      ? "admin_panel_settings"
-                      : role.value === "farmasi"
-                        ? "medication"
-                        : "health_and_safety"}
+                    {role.value === 'admin'
+                      ? 'admin_panel_settings'
+                      : role.value === 'farmasi'
+                        ? 'medication'
+                        : 'health_and_safety'}
                   </span>
                 </div>
                 <div>
@@ -438,9 +430,7 @@ const UserManagement: React.FC = () => {
                       <span className="material-icons-round text-primary text-3xl animate-spin">
                         refresh
                       </span>
-                      <p className="mt-2 text-sm text-text-secondary-light">
-                        Memuat data...
-                      </p>
+                      <p className="mt-2 text-sm text-text-secondary-light">Memuat data...</p>
                     </td>
                   </tr>
                 ) : filteredUsers.length > 0 ? (
@@ -452,11 +442,11 @@ const UserManagement: React.FC = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center font-bold text-primary text-sm uppercase">
-                            {(user.full_name || user.email)?.[0] || "?"}
+                            {(user.full_name || user.email)?.[0] || '?'}
                           </div>
                           <div>
                             <p className="font-bold text-text-primary-light dark:text-white">
-                              {user.full_name || "-"}
+                              {user.full_name || '-'}
                             </p>
                             <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
                               {user.email}
@@ -467,15 +457,12 @@ const UserManagement: React.FC = () => {
                       <td className="px-6 py-4">{getRoleBadges(user.roles)}</td>
                       <td className="px-6 py-4 text-sm text-text-secondary-light dark:text-text-secondary-dark">
                         {user.created_at
-                          ? new Date(user.created_at).toLocaleDateString(
-                            "id-ID",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            },
-                          )
-                          : "-"}
+                          ? new Date(user.created_at).toLocaleDateString('id-ID', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          : '-'}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-1">
@@ -486,9 +473,7 @@ const UserManagement: React.FC = () => {
                             className="h-8 w-8 text-text-secondary-light hover:text-primary transition-colors"
                             title="Edit"
                           >
-                            <span className="material-icons-round text-base">
-                              edit
-                            </span>
+                            <span className="material-icons-round text-base">edit</span>
                           </Button>
                           <Button
                             variant="ghost"
@@ -497,9 +482,7 @@ const UserManagement: React.FC = () => {
                             className="h-8 w-8 text-text-secondary-light hover:text-amber-500 transition-colors"
                             title="Reset Password"
                           >
-                            <span className="material-icons-round text-base">
-                              lock_reset
-                            </span>
+                            <span className="material-icons-round text-base">lock_reset</span>
                           </Button>
                           <Button
                             variant="ghost"
@@ -508,9 +491,7 @@ const UserManagement: React.FC = () => {
                             className="h-8 w-8 text-text-secondary-light hover:text-red-500 transition-colors"
                             title="Hapus"
                           >
-                            <span className="material-icons-round text-base">
-                              delete
-                            </span>
+                            <span className="material-icons-round text-base">delete</span>
                           </Button>
                         </div>
                       </td>
@@ -520,12 +501,8 @@ const UserManagement: React.FC = () => {
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center opacity-40">
-                        <span className="material-icons-round text-5xl mb-2">
-                          person_off
-                        </span>
-                        <p className="font-bold text-sm">
-                          Tidak ada pengguna ditemukan.
-                        </p>
+                        <span className="material-icons-round text-5xl mb-2">person_off</span>
+                        <p className="font-bold text-sm">Tidak ada pengguna ditemukan.</p>
                       </div>
                     </td>
                   </tr>
@@ -548,9 +525,7 @@ const UserManagement: React.FC = () => {
           >
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold text-text-primary-light dark:text-white flex items-center gap-2">
-                <span className="material-icons-round text-primary">
-                  person_add
-                </span>
+                <span className="material-icons-round text-primary">person_add</span>
                 Tambah Pengguna Baru
               </h3>
               <Button
@@ -647,7 +622,7 @@ const UserManagement: React.FC = () => {
                 disabled={isSubmitting}
                 className="flex-1 bg-primary text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 h-auto py-2.5"
               >
-                {isSubmitting ? "Menyimpan..." : "Simpan"}
+                {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </div>
           </div>
@@ -681,7 +656,7 @@ const UserManagement: React.FC = () => {
 
             <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center font-bold text-primary text-sm uppercase">
-                {(selectedUser.full_name || selectedUser.email)?.[0] || "?"}
+                {(selectedUser.full_name || selectedUser.email)?.[0] || '?'}
               </div>
               <div>
                 <p className="font-bold text-sm text-text-primary-light dark:text-white">
@@ -717,11 +692,9 @@ const UserManagement: React.FC = () => {
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                  <span className="material-icons-round text-xs align-text-bottom">
-                    info
-                  </span>
-                  Email akan diperbarui di profil. Untuk mengubah email login,
-                  gunakan fitur reset password.
+                  <span className="material-icons-round text-xs align-text-bottom">info</span>
+                  Email akan diperbarui di profil. Untuk mengubah email login, gunakan fitur reset
+                  password.
                 </p>
               </div>
               <div className="space-y-1.5">
@@ -771,7 +744,7 @@ const UserManagement: React.FC = () => {
                 disabled={isSubmitting}
                 className="flex-1 bg-primary text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 h-auto py-2.5"
               >
-                {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+                {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
               </Button>
             </div>
           </div>
@@ -790,17 +763,15 @@ const UserManagement: React.FC = () => {
           >
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center mx-auto mb-4">
-                <span className="material-icons-round text-red-500 text-3xl">
-                  warning
-                </span>
+                <span className="material-icons-round text-red-500 text-3xl">warning</span>
               </div>
               <h3 className="text-lg font-bold text-text-primary-light dark:text-white">
                 Hapus Pengguna?
               </h3>
               <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2">
-                Anda akan menghapus profil{" "}
-                <strong>{selectedUser.full_name || selectedUser.email}</strong>.
-                Tindakan ini tidak dapat dibatalkan.
+                Anda akan menghapus profil{' '}
+                <strong>{selectedUser.full_name || selectedUser.email}</strong>. Tindakan ini tidak
+                dapat dibatalkan.
               </p>
             </div>
 
@@ -817,7 +788,7 @@ const UserManagement: React.FC = () => {
                 disabled={isSubmitting}
                 className="flex-1 bg-red-500 text-white rounded-xl font-bold shadow-lg hover:bg-red-600 h-auto py-2.5"
               >
-                {isSubmitting ? "Menghapus..." : "Hapus"}
+                {isSubmitting ? 'Menghapus...' : 'Hapus'}
               </Button>
             </div>
           </div>
@@ -836,9 +807,7 @@ const UserManagement: React.FC = () => {
           >
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold text-text-primary-light dark:text-white flex items-center gap-2">
-                <span className="material-icons-round text-amber-500">
-                  lock_reset
-                </span>
+                <span className="material-icons-round text-amber-500">lock_reset</span>
                 Ubah Password
               </h3>
               <Button
@@ -853,15 +822,13 @@ const UserManagement: React.FC = () => {
 
             <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center font-bold text-primary text-sm uppercase">
-                {(selectedUser.full_name || selectedUser.email)?.[0] || "?"}
+                {(selectedUser.full_name || selectedUser.email)?.[0] || '?'}
               </div>
               <div>
                 <p className="font-bold text-sm text-text-primary-light dark:text-white">
-                  {selectedUser.full_name || "-"}
+                  {selectedUser.full_name || '-'}
                 </p>
-                <p className="text-xs text-text-secondary-light">
-                  {selectedUser.email}
-                </p>
+                <p className="text-xs text-text-secondary-light">{selectedUser.email}</p>
               </div>
             </div>
 
@@ -872,7 +839,7 @@ const UserManagement: React.FC = () => {
                 </label>
                 <div className="relative">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Minimal 8 karakter"
@@ -884,7 +851,7 @@ const UserManagement: React.FC = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary-light hover:text-primary transition-colors"
                   >
                     <span className="material-icons-round text-lg">
-                      {showPassword ? "visibility_off" : "visibility"}
+                      {showPassword ? 'visibility_off' : 'visibility'}
                     </span>
                   </button>
                 </div>
@@ -907,7 +874,7 @@ const UserManagement: React.FC = () => {
                 disabled={isSubmitting || !newPassword}
                 className="flex-1 bg-amber-500 text-white rounded-xl font-bold shadow-lg hover:bg-amber-600 h-auto py-2.5 disabled:opacity-50"
               >
-                {isSubmitting ? "Menyimpan..." : "Simpan Password"}
+                {isSubmitting ? 'Menyimpan...' : 'Simpan Password'}
               </Button>
             </div>
           </div>

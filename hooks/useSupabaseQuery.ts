@@ -13,5 +13,5 @@ export const QUERY_KEYS = {
   serviceCategories: ['serviceCategories'],
   stockIn: ['stockIn'],
   stockOut: ['stockOut'],
-  users: ['users']
+  users: ['users'],
 };

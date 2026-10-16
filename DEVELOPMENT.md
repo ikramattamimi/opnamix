@@ -9,8 +9,8 @@ We use `@tanstack/react-table` with a custom `DataTable` component.
 **Usage:**
 
 ```tsx
-import { DataTable } from "./ui/data-table";
-import { createPageColumns } from "./PageColumns";
+import { DataTable } from './ui/data-table';
+import { createPageColumns } from './PageColumns';
 
 // ...
 <DataTable columns={columns} data={data} searchable={true} />;

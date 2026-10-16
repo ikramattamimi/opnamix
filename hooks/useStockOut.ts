@@ -25,20 +25,12 @@ export function useStockOutRealtime() {
   useEffect(() => {
     const channel = supabase
       .channel('transaksi-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'transaksi' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'transaksi' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
-        }
-      )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaksi' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transaksi' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
+      })
       .subscribe();
 
     return () => {
@@ -60,8 +52,19 @@ export function useCreateStockOutRequest() {
 export function useProcessStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ number, status, diskon, total, serviceFee }: { number: string; status: 'selesai'; diskon?: number; total?: number; serviceFee?: number }) => 
-      api.updateTransactionStatus(number, status, diskon, total, serviceFee),
+    mutationFn: ({
+      number,
+      status,
+      diskon,
+      total,
+      serviceFee,
+    }: {
+      number: string;
+      status: 'selesai';
+      diskon?: number;
+      total?: number;
+      serviceFee?: number;
+    }) => api.updateTransactionStatus(number, status, diskon, total, serviceFee),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products }); // Stock updated

@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getCurrentUser, getUserProfile, onAuthStateChange, signOut, UserProfile } from '../lib/auth';
+import {
+  getCurrentUser,
+  getUserProfile,
+  onAuthStateChange,
+  signOut,
+  UserProfile,
+} from '../lib/auth';
 
 interface AuthContextType {
   user: any | null;
@@ -46,7 +52,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     initAuth();
 
     // Listen to auth changes
-    const { data: { subscription } } = onAuthStateChange(async (authUser) => {
+    const {
+      data: { subscription },
+    } = onAuthStateChange(async (authUser) => {
       setUser(authUser);
       await loadUserProfile(authUser);
     });

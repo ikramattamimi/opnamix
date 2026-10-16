@@ -24,7 +24,7 @@ export function useCreateStockIn() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockIn });
       // Also invalidate products because stock increases
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products }); 
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products });
     },
   });
 }

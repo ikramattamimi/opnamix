@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -9,41 +9,34 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { Input } from "./input"
-import { Button } from "./button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./table"
+} from '@tanstack/react-table';
+import { Input } from './input';
+import { Button } from './button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  searchable?: boolean
-  searchPlaceholder?: string
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  searchable?: boolean;
+  searchPlaceholder?: string;
   /** When provided, enables built-in pagination with this many rows per page.
    *  Pagination is applied AFTER column filters, so page count always matches
    *  the filtered result count. */
-  pageSize?: number
+  pageSize?: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   searchable = false,
-  searchPlaceholder = "Search...",
+  searchPlaceholder = 'Search...',
   pageSize,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [globalFilter, setGlobalFilter] = React.useState("")
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState('');
 
-  const hasPagination = pageSize !== undefined
+  const hasPagination = pageSize !== undefined;
 
   const table = useReactTable({
     data,
@@ -63,19 +56,19 @@ export function DataTable<TData, TValue>({
       columnFilters,
       globalFilter,
     },
-  })
+  });
 
   // When filters change, jump back to first page so the user isn't left on a
   // page that no longer exists.
   React.useEffect(() => {
     if (hasPagination) {
-      table.setPageIndex(0)
+      table.setPageIndex(0);
     }
-  }, [columnFilters, globalFilter])
+  }, [columnFilters, globalFilter]);
 
-  const filteredTotal = table.getFilteredRowModel().rows.length
-  const currentPage = hasPagination ? table.getState().pagination.pageIndex + 1 : 1
-  const totalPages = hasPagination ? table.getPageCount() : 1
+  const filteredTotal = table.getFilteredRowModel().rows.length;
+  const currentPage = hasPagination ? table.getState().pagination.pageIndex + 1 : 1;
+  const totalPages = hasPagination ? table.getPageCount() : 1;
 
   return (
     <div className="space-y-4">
@@ -83,7 +76,7 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center gap-2">
           <Input
             placeholder={searchPlaceholder}
-            value={globalFilter ?? ""}
+            value={globalFilter ?? ''}
             onChange={(event) => setGlobalFilter(event.target.value)}
             className="max-w-sm"
           />
@@ -99,12 +92,9 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -114,7 +104,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                   className="group hover:bg-gray-50 dark:hover:bg-white/5"
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -138,10 +128,10 @@ export function DataTable<TData, TValue>({
       {hasPagination && (
         <div className="flex items-center justify-between px-2 py-3">
           <span className="text-sm text-text-secondary-light dark:text-gray-400">
-            Hal. <span className="font-bold text-text-primary-light dark:text-white">{currentPage}</span>{" "}
-            dari{" "}
-            <span className="font-bold text-text-primary-light dark:text-white">{totalPages}</span>
-            {" "}
+            Hal.{' '}
+            <span className="font-bold text-text-primary-light dark:text-white">{currentPage}</span>{' '}
+            dari{' '}
+            <span className="font-bold text-text-primary-light dark:text-white">{totalPages}</span>{' '}
             <span className="text-xs">({filteredTotal} data)</span>
           </span>
           <div className="flex items-center gap-2">
@@ -167,5 +157,5 @@ export function DataTable<TData, TValue>({
         </div>
       )}
     </div>
-  )
+  );
 }

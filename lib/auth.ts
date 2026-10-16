@@ -42,7 +42,9 @@ export async function signIn(email: string, password: string) {
 
   if (rateLimit[email]?.lockedUntil && Date.now() < rateLimit[email].lockedUntil) {
     const remaining = Math.ceil((rateLimit[email].lockedUntil - Date.now()) / 60000);
-    throw new Error(`Akun terkunci setelah terlalu banyak percobaan gagal. Coba lagi dalam ${remaining} menit.`);
+    throw new Error(
+      `Akun terkunci setelah terlalu banyak percobaan gagal. Coba lagi dalam ${remaining} menit.`,
+    );
   }
 
   try {
@@ -95,7 +97,10 @@ export async function signOut() {
  * Get current user session
  */
 export async function getCurrentUser() {
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
   if (sessionError) throw sessionError;
 
   return session?.user ?? null;
@@ -108,11 +113,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
   if (error) throw error;
 
@@ -122,7 +123,8 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     .select('role')
     .eq('user_id', user.id);
 
-  const roles = userRolesData?.map((r: { role: string }) => r.role) || (data.role ? [data.role] : []);
+  const roles =
+    userRolesData?.map((r: { role: string }) => r.role) || (data.role ? [data.role] : []);
 
   return { ...data, roles };
 }
@@ -155,11 +157,9 @@ export async function signUp(
   email: string,
   password: string,
   fullName: string,
-  roleOrRoles: AppRole | AppRole[]
+  roleOrRoles: AppRole | AppRole[],
 ) {
-  const roles = Array.from(
-    new Set(Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles])
-  );
+  const roles = Array.from(new Set(Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles]));
 
   return invokeAdminUsers<{ id: string }>({ action: 'create', email, password, fullName, roles });
 }
@@ -185,7 +185,7 @@ export async function adminUpdatePassword(userId: string, newPassword: string) {
  */
 export async function updateUserProfileAdmin(
   userId: string,
-  updates: { full_name: string; email: string; roles: string[] }
+  updates: { full_name: string; email: string; roles: string[] },
 ) {
   return invokeAdminUsers<UserProfile>({
     action: 'update',
@@ -196,13 +196,12 @@ export async function updateUserProfileAdmin(
   });
 }
 
-
 /**
  * Update user profile
  */
 export async function updateUserProfile(
   userId: string,
-  updates: Partial<Pick<UserProfile, 'full_name' | 'role' | 'avatar_url' | 'email'>>
+  updates: Partial<Pick<UserProfile, 'full_name' | 'role' | 'avatar_url' | 'email'>>,
 ) {
   const { data, error } = await supabase
     .from('profiles')
@@ -226,12 +225,10 @@ export async function uploadAvatar(userId: string, file: File) {
   const filePath = `${userId}/avatar.${fileExt}`;
 
   // Remove old avatar if exists
-  const { data: existingFiles } = await supabase.storage
-    .from('avatars')
-    .list(userId);
+  const { data: existingFiles } = await supabase.storage.from('avatars').list(userId);
 
   if (existingFiles && existingFiles.length > 0) {
-    const filesToRemove = existingFiles.map(f => `${userId}/${f.name}`);
+    const filesToRemove = existingFiles.map((f) => `${userId}/${f.name}`);
     await supabase.storage.from('avatars').remove(filesToRemove);
   }
 
@@ -243,9 +240,9 @@ export async function uploadAvatar(userId: string, file: File) {
   if (uploadError) throw uploadError;
 
   // Get public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('avatars')
-    .getPublicUrl(filePath);
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
   // Update profile with new avatar URL
   await updateUserProfile(userId, { avatar_url: publicUrl });

@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface PaginationControlsProps {
@@ -17,7 +16,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   return (
     <div className="flex justify-between items-center mt-6 py-4 border-t border-gray-100 dark:border-gray-800">
       <span className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">
-        Hal. <span className="font-bold text-text-primary-light dark:text-white">{currentPage}</span> dari <span className="font-bold text-text-primary-light dark:text-white">{totalPages}</span>
+        Hal.{' '}
+        <span className="font-bold text-text-primary-light dark:text-white">{currentPage}</span>{' '}
+        dari <span className="font-bold text-text-primary-light dark:text-white">{totalPages}</span>
       </span>
       <div className="flex gap-2">
         <button

@@ -1,6 +1,15 @@
-
 import { supabase } from './supabaseClient';
-import { Product, Service, ServiceCategoryType, Unit, Category, StockOutRequest, StockInReceipt, PaginationParams, PaginatedResponse } from '../types';
+import {
+  Product,
+  Service,
+  ServiceCategoryType,
+  Unit,
+  Category,
+  StockOutRequest,
+  StockInReceipt,
+  PaginationParams,
+  PaginatedResponse,
+} from '../types';
 import { getProductDisplayName, getProductDisplayNameFromDb } from './productDisplay';
 
 // Map DB types to Frontend types
@@ -8,8 +17,8 @@ const mapProductFromDB = (item: any): Product => ({
   id: item.id.toString(),
   code: item.kode,
   name: getProductDisplayNameFromDb(item),
-  category: item.jenis as Category || Category.Obat,
-  unit: item.satuan as Unit || Unit.Strip,
+  category: (item.jenis as Category) || Category.Obat,
+  unit: (item.satuan as Unit) || Unit.Strip,
   purchasePrice: 0,
   sellingPrice: item.harga || 0,
   stock: item.qty || 0,
@@ -17,7 +26,7 @@ const mapProductFromDB = (item: any): Product => ({
   description: '',
   color: 'bg-primary',
   brand: item.merek || '',
-  composition: item.kandungan || ''
+  composition: item.kandungan || '',
 });
 
 const getDisplayNameFromMasterObat = (item: any) => getProductDisplayNameFromDb(item) || 'Unknown';
@@ -58,10 +67,7 @@ const extractTransactionNoteAndMeta = (rawNote?: string | null) => {
   }
 };
 
-const serializeTransactionNote = (
-  note?: string,
-  meta?: { serviceFee?: number },
-) => {
+const serializeTransactionNote = (note?: string, meta?: { serviceFee?: number }) => {
   const cleanNote = (note || '').trim();
   const normalizedMeta = {
     serviceFee: Math.max(0, Number(meta?.serviceFee || 0)),
@@ -85,7 +91,7 @@ const mapServiceFromDB = (item: any): Service => ({
   updatedAt: item.updated_at,
   icon: 'medical_services',
   iconColor: 'text-blue-600',
-  iconBg: 'bg-blue-100'
+  iconBg: 'bg-blue-100',
 });
 
 const mapServiceCategoryFromDB = (item: any): ServiceCategoryType => ({
@@ -108,9 +114,7 @@ const generateServiceCategoryCodeBase = (name: string) =>
 const generateUniqueServiceCategoryCode = async (name: string) => {
   const baseCode = generateServiceCategoryCodeBase(name);
 
-  const { data, error } = await supabase
-    .from('service_categories')
-    .select('code');
+  const { data, error } = await supabase.from('service_categories').select('code');
 
   if (error) throw error;
 
@@ -129,12 +133,17 @@ const generateUniqueServiceCategoryCode = async (name: string) => {
   return candidate;
 };
 
-type OpnameDetailUpdate = { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string };
+type OpnameDetailUpdate = {
+  detailId: string;
+  physicalStock?: number;
+  stokFinal?: number;
+  reason?: string;
+};
 
 // Ubah ke format p_updates RPC save_opname_details. Field yang undefined
 // tidak dikirim, sehingga kolomnya tidak diubah di database.
 const toOpnameDetailUpdates = (updates?: OpnameDetailUpdate[]) =>
-  (updates || []).map(u => ({
+  (updates || []).map((u) => ({
     detail_id: parseInt(u.detailId),
     ...(u.physicalStock !== undefined && { physical_stock: u.physicalStock }),
     ...(u.stokFinal !== undefined && { stok_final: u.stokFinal }),
@@ -156,7 +165,9 @@ export const api = {
       .order('nama');
 
     if (search) {
-      query = query.or(`nama.ilike.%${search}%,kode.ilike.%${search}%,merek.ilike.%${search}%,kandungan.ilike.%${search}%`);
+      query = query.or(
+        `nama.ilike.%${search}%,kode.ilike.%${search}%,merek.ilike.%${search}%,kandungan.ilike.%${search}%`,
+      );
     }
 
     const { data, error, count } = await query.range(from, to);
@@ -168,7 +179,7 @@ export const api = {
       total: count || 0,
       page,
       perPage,
-      totalPages: Math.ceil((count || 0) / perPage)
+      totalPages: Math.ceil((count || 0) / perPage),
     };
   },
 
@@ -187,7 +198,7 @@ export const api = {
         buffer_stok: product.minStock,
         is_active: true,
         merek: product.brand,
-        kandungan: product.composition
+        kandungan: product.composition,
       })
       .select()
       .single();
@@ -210,7 +221,7 @@ export const api = {
         qty: product.stock,
         buffer_stok: product.minStock,
         merek: product.brand,
-        kandungan: product.composition
+        kandungan: product.composition,
       })
       .eq('id', id)
       .select()
@@ -238,10 +249,13 @@ export const api = {
 
     let query = supabase
       .from('master_jasa')
-      .select(`
+      .select(
+        `
         *,
         service_categories(name)
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' },
+      )
       .eq('is_active', true)
       .is('deleted_at', null)
       .order('nama');
@@ -259,7 +273,7 @@ export const api = {
       total: count || 0,
       page,
       perPage,
-      totalPages: Math.ceil((count || 0) / perPage)
+      totalPages: Math.ceil((count || 0) / perPage),
     };
   },
 
@@ -299,7 +313,9 @@ export const api = {
   },
 
   createService: async (service: Partial<Service>) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     const { data, error } = await supabase
       .from('master_jasa')
@@ -309,7 +325,7 @@ export const api = {
         harga: service.price,
         category_id: service.categoryId,
         is_active: true,
-        created_by: user?.id
+        created_by: user?.id,
       })
       .select()
       .single();
@@ -319,7 +335,9 @@ export const api = {
   },
 
   updateService: async (id: string, service: Partial<Service>) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     const { data, error } = await supabase
       .from('master_jasa')
@@ -329,7 +347,7 @@ export const api = {
         harga: service.price,
         category_id: service.categoryId,
         updated_by: user?.id,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', id)
       .select()
@@ -419,18 +437,18 @@ export const api = {
         diskon: payload.diskon ?? 0,
         biaya_layanan: payload.serviceFee ?? 0,
         nama_nakes: payload.requestedBy || null,
-        items: payload.items.map(item => ({
+        items: payload.items.map((item) => ({
           product_id: parseInt(item.productId),
           quantity: item.quantity,
           price: item.price,
           batch: item.batch || '-',
           expiry_date: item.expiryDate || null,
         })),
-        services: payload.services.map(svc => ({
+        services: payload.services.map((svc) => ({
           service_id: parseInt(svc.serviceId),
           price: svc.price,
         })),
-      }
+      },
     });
 
     if (error) {
@@ -442,17 +460,22 @@ export const api = {
   },
 
   // READ STOCK IN
-  getStockInReceipts: async (params?: PaginationParams): Promise<PaginatedResponse<StockInReceipt>> => {
+  getStockInReceipts: async (
+    params?: PaginationParams,
+  ): Promise<PaginatedResponse<StockInReceipt>> => {
     const { page = 1, perPage = 10 } = params || {};
     const from = (page - 1) * perPage;
     const to = from + perPage - 1;
 
     const { data, error, count } = await supabase
       .from('transaksi')
-      .select(`
+      .select(
+        `
         *,
         transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (*, master_obat(nama, satuan, jenis, merek, kandungan))
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' },
+      )
       .eq('tipe', 'masuk')
       .order('created_at', { ascending: false })
       .range(from, to);
@@ -462,7 +485,7 @@ export const api = {
       throw error;
     }
 
-    // Filter out items? No, pagination happens in DB. 
+    // Filter out items? No, pagination happens in DB.
     // If logic applied filtering after DB fetch, pagination counts would be wrong.
     // Assuming transactions are inserted correctly with details, we map what we get.
 
@@ -482,11 +505,12 @@ export const api = {
     }
 
     const validData = data.map((t: any) => {
-      const invoiceFromNote = typeof t.keterangan === 'string' && t.keterangan.startsWith('Invoice: ')
-        ? t.keterangan.replace('Invoice: ', '').trim()
-        : '';
+      const invoiceFromNote =
+        typeof t.keterangan === 'string' && t.keterangan.startsWith('Invoice: ')
+          ? t.keterangan.replace('Invoice: ', '').trim()
+          : '';
 
-      return ({
+      return {
         id: t.nomor,
         invoiceNumber: invoiceFromNote || t.nomor,
         supplierName: t.nama_pasien || 'Unknown Supplier',
@@ -494,16 +518,18 @@ export const api = {
         status: t.status === 'selesai' ? 'Selesai' : 'Menunggu',
         receivedBy: (t.created_by && profileMap[t.created_by]) || 'Admin',
         evidenceUrl: t.bukti, // Map evidenceUrl
-        items: t.transaksi_detail ? t.transaksi_detail.map((d: any) => ({
-          id: d.id.toString(),
-          productId: d.obat_id?.toString() || '',
-          productName: getDisplayNameFromMasterObat(d.master_obat),
-          category: d.master_obat?.jenis || 'Obat',
-          quantity: d.qty,
-          unit: d.master_obat?.satuan || 'Pcs',
-          expiryDate: d.expire_date || '-',
-        })) : []
-      })
+        items: t.transaksi_detail
+          ? t.transaksi_detail.map((d: any) => ({
+              id: d.id.toString(),
+              productId: d.obat_id?.toString() || '',
+              productName: getDisplayNameFromMasterObat(d.master_obat),
+              category: d.master_obat?.jenis || 'Obat',
+              quantity: d.qty,
+              unit: d.master_obat?.satuan || 'Pcs',
+              expiryDate: d.expire_date || '-',
+            }))
+          : [],
+      };
     });
 
     return {
@@ -511,23 +537,28 @@ export const api = {
       total: count || 0,
       page,
       perPage,
-      totalPages: Math.ceil((count || 0) / perPage)
+      totalPages: Math.ceil((count || 0) / perPage),
     };
   },
 
   // READ TRANSACTIONS (Specific for Stock Out Queue)
-  getStockOutRequests: async (params?: PaginationParams): Promise<PaginatedResponse<StockOutRequest>> => {
+  getStockOutRequests: async (
+    params?: PaginationParams,
+  ): Promise<PaginatedResponse<StockOutRequest>> => {
     const { page = 1, perPage = 10, status, createdBy } = params || {};
     const from = (page - 1) * perPage;
     const to = from + perPage - 1;
 
     let query = supabase
       .from('transaksi')
-      .select(`
+      .select(
+        `
         *,
         transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (*, master_obat(nama, satuan, jenis, merek, kandungan)),
         transaksi_jasa:transaksi_jasa!transaksi_jasa_transaksi_id_fkey (*, master_jasa(nama))
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' },
+      )
       .eq('tipe', 'keluar')
       .in('tipe_sumber', ['PENGAJUAN_NAKES', 'KASIR_LANGSUNG'])
       .order('created_at', { ascending: false });
@@ -538,7 +569,7 @@ export const api = {
       query = query.eq('status', dbStatus);
     }
 
-// Apply filter for nakes users: match by created_by OR nama_nakes
+    // Apply filter for nakes users: match by created_by OR nama_nakes
     if (createdBy || params?.nakesName) {
       const conditions: string[] = [];
       if (createdBy) conditions.push(`created_by.eq.${createdBy}`);
@@ -559,7 +590,9 @@ export const api = {
         .select('id, full_name')
         .in('id', createdByIds);
       if (profiles) {
-        profiles.forEach((p: any) => { profileMap[p.id] = p.full_name || ''; });
+        profiles.forEach((p: any) => {
+          profileMap[p.id] = p.full_name || '';
+        });
       }
     }
 
@@ -568,39 +601,47 @@ export const api = {
       const normalizedServiceFee = Number(t.biaya_layanan ?? transactionMeta.meta.serviceFee ?? 0);
 
       return {
-      id: t.nomor, // Using nomor as ID
-      requestId: t.nomor,
-      patient: {
-        fullName: t.nama_pasien,
-        medicalRecordNumber: '-', // Not stored in transaksi currently?
-        birthDate: t.tanggal_lahir_pasien || '',
-        diagnosis: '-' // Not stored
-      },
-      drugs: t.transaksi_detail ? t.transaksi_detail.map((d: any) => ({
-        id: d.id.toString(),
-        productId: d.obat_id?.toString() || '',
-        productName: getDisplayNameFromMasterObat(d.master_obat),
-        quantity: d.qty,
-        unit: d.master_obat?.satuan || 'Pcs',
-        instructions: '-', // Not in DB
-        price: d.harga || 0 // Map historical price
-      })) : [],
-      services: t.transaksi_jasa ? t.transaksi_jasa.map((j: any) => ({
-        id: j.jasa_id.toString(),
-        name: j.master_jasa?.nama || 'Unknown Service',
-        price: j.harga_jasa || 0
-      })) : [],
-      createdBy: t.created_by,
-      totalAmount: t.total,
-      discount: t.diskon ?? 0,
-      serviceFee: normalizedServiceFee,
-      requestedBy: t.nama_nakes || (t.created_by && profileMap[t.created_by]) || (t.tipe_sumber === 'PENGAJUAN_NAKES' ? 'Nakes' : 'Farmasi'),
-      requestedByAvatar: t.tipe_sumber === 'PENGAJUAN_NAKES'
-        ? 'https://cdn-icons-png.flaticon.com/512/3774/3774299.png'
-        : 'https://cdn-icons-png.flaticon.com/512/2304/2304226.png',
-      status: t.status === 'diajukan' ? 'Menunggu' : 'Selesai',
-      date: t.tanggal,
-      tipeSumber: t.tipe_sumber
+        id: t.nomor, // Using nomor as ID
+        requestId: t.nomor,
+        patient: {
+          fullName: t.nama_pasien,
+          medicalRecordNumber: '-', // Not stored in transaksi currently?
+          birthDate: t.tanggal_lahir_pasien || '',
+          diagnosis: '-', // Not stored
+        },
+        drugs: t.transaksi_detail
+          ? t.transaksi_detail.map((d: any) => ({
+              id: d.id.toString(),
+              productId: d.obat_id?.toString() || '',
+              productName: getDisplayNameFromMasterObat(d.master_obat),
+              quantity: d.qty,
+              unit: d.master_obat?.satuan || 'Pcs',
+              instructions: '-', // Not in DB
+              price: d.harga || 0, // Map historical price
+            }))
+          : [],
+        services: t.transaksi_jasa
+          ? t.transaksi_jasa.map((j: any) => ({
+              id: j.jasa_id.toString(),
+              name: j.master_jasa?.nama || 'Unknown Service',
+              price: j.harga_jasa || 0,
+            }))
+          : [],
+        createdBy: t.created_by,
+        totalAmount: t.total,
+        discount: t.diskon ?? 0,
+        serviceFee: normalizedServiceFee,
+        requestedBy:
+          t.nama_nakes ||
+          (t.created_by && profileMap[t.created_by]) ||
+          (t.tipe_sumber === 'PENGAJUAN_NAKES' ? 'Nakes' : 'Farmasi'),
+        requestedByAvatar:
+          t.tipe_sumber === 'PENGAJUAN_NAKES'
+            ? 'https://cdn-icons-png.flaticon.com/512/3774/3774299.png'
+            : 'https://cdn-icons-png.flaticon.com/512/2304/2304226.png',
+        status: t.status === 'diajukan' ? 'Menunggu' : 'Selesai',
+        date: t.tanggal,
+        tipeSumber: t.tipe_sumber,
       };
     });
 
@@ -609,14 +650,20 @@ export const api = {
       total: count || 0,
       page,
       perPage,
-      totalPages: Math.ceil((count || 0) / perPage)
+      totalPages: Math.ceil((count || 0) / perPage),
     };
   },
 
   // UPDATE STATUS
   // Satu-satunya status tujuan adalah 'selesai'; pengurangan stok dan
   // perubahan status dilakukan dalam satu transaksi oleh RPC.
-  updateTransactionStatus: async (nomor: string, _status: 'selesai', diskon?: number, total?: number, serviceFee?: number) => {
+  updateTransactionStatus: async (
+    nomor: string,
+    _status: 'selesai',
+    diskon?: number,
+    total?: number,
+    serviceFee?: number,
+  ) => {
     const { error } = await supabase.rpc('process_stock_out_request', {
       p_nomor: nomor,
       p_diskon: diskon ?? null,
@@ -627,24 +674,27 @@ export const api = {
     if (error) throw new Error(error.message);
   },
 
-  updatePendingStockOutRequest: async (nomor: string, payload: {
-    tanggal?: string;
-    nama_pasien: string;
-    tanggal_lahir_pasien?: string;
-    nama_nakes?: string;
-    total: number;
-    diskon?: number;
-    serviceFee?: number;
-    items: {
-      productId: string;
-      quantity: number;
-      price: number;
-    }[];
-    services: {
-      serviceId: string;
-      price: number;
-    }[];
-  }) => {
+  updatePendingStockOutRequest: async (
+    nomor: string,
+    payload: {
+      tanggal?: string;
+      nama_pasien: string;
+      tanggal_lahir_pasien?: string;
+      nama_nakes?: string;
+      total: number;
+      diskon?: number;
+      serviceFee?: number;
+      items: {
+        productId: string;
+        quantity: number;
+        price: number;
+      }[];
+      services: {
+        serviceId: string;
+        price: number;
+      }[];
+    },
+  ) => {
     // Header diganti dan item/jasa di-replace dalam satu transaksi;
     // ditolak di database kalau permintaan sudah bukan 'diajukan'.
     const { error } = await supabase.rpc('update_pending_stock_out_request', {
@@ -666,7 +716,7 @@ export const api = {
           service_id: parseInt(svc.serviceId),
           price: svc.price,
         })),
-      }
+      },
     });
 
     if (error) throw new Error(error.message);
@@ -676,18 +726,16 @@ export const api = {
 
   // OPNAME SCHEDULES
   createOpnameSchedule: async (config: any) => {
-    const { error } = await supabase
-      .from('opname_schedule')
-      .insert({
-        nama: config.nama || 'Jadwal Rutin',
-        tanggal_audit: config.dayOfMonth,
-        waktu_jam: config.waktuJam,
-        waktu_menit: config.waktuMenit,
-        pengulangan: config.pengulangan,
-        obat_ids: config.obatIds || null,
-        durasi_pengerjaan: config.durasiPengerjaan || null,
-        is_active: true
-      });
+    const { error } = await supabase.from('opname_schedule').insert({
+      nama: config.nama || 'Jadwal Rutin',
+      tanggal_audit: config.dayOfMonth,
+      waktu_jam: config.waktuJam,
+      waktu_menit: config.waktuMenit,
+      pengulangan: config.pengulangan,
+      obat_ids: config.obatIds || null,
+      durasi_pengerjaan: config.durasiPengerjaan || null,
+      is_active: true,
+    });
     if (error) throw error;
     return { success: true };
   },
@@ -710,7 +758,7 @@ export const api = {
       pengulangan: s.pengulangan,
       obatIds: s.obat_ids,
       durasiPengerjaan: s.durasi_pengerjaan,
-      isActive: s.is_active
+      isActive: s.is_active,
     }));
   },
 
@@ -777,7 +825,7 @@ export const api = {
         nextDate: nextDate.toISOString(),
         pengulangan: schedule.pengulangan,
         nama: schedule.nama,
-        scheduleId: schedule.id.toString()
+        scheduleId: schedule.id.toString(),
       };
     });
   },
@@ -856,24 +904,22 @@ export const api = {
     if (opError) throw opError;
 
     // Create notification for opname creation (to Admin & Nakes)
-    await supabase
-      .from('notifications')
-      .insert([
-        {
-          type: 'OPNAME_CREATED',
-          title: 'Opname Baru Dibuat',
-          message: `Opname OPN-${opname.id} telah dibuat dan menunggu pemilihan obat.`,
-          data: { opname_id: opname.id, opname_number: `OPN-${opname.id}`, step: 1 },
-          target_role: 'admin',
-        },
-        {
-          type: 'OPNAME_CREATED',
-          title: 'Opname Baru Dibuat',
-          message: `Opname OPN-${opname.id} telah dibuat dan menunggu pemilihan obat.`,
-          data: { opname_id: opname.id, opname_number: `OPN-${opname.id}`, step: 1 },
-          target_role: 'farmasi',
-        },
-      ]);
+    await supabase.from('notifications').insert([
+      {
+        type: 'OPNAME_CREATED',
+        title: 'Opname Baru Dibuat',
+        message: `Opname OPN-${opname.id} telah dibuat dan menunggu pemilihan obat.`,
+        data: { opname_id: opname.id, opname_number: `OPN-${opname.id}`, step: 1 },
+        target_role: 'admin',
+      },
+      {
+        type: 'OPNAME_CREATED',
+        title: 'Opname Baru Dibuat',
+        message: `Opname OPN-${opname.id} telah dibuat dan menunggu pemilihan obat.`,
+        data: { opname_id: opname.id, opname_number: `OPN-${opname.id}`, step: 1 },
+        target_role: 'farmasi',
+      },
+    ]);
 
     return { id: opname.id.toString(), success: true };
   },
@@ -890,24 +936,32 @@ export const api = {
     if (rpcError) throw new Error(rpcError.message);
 
     // 4. Create notification for step 1→2 transition
-    await supabase
-      .from('notifications')
-      .insert([
-        {
-          type: 'OPNAME_STEP_CHANGED',
-          title: 'Opname Dimulai',
-          message: `Opname OPN-${opnameId} telah dimulai dan memasuki tahap 2: Input Stok Fisik. Aplikasi terkunci untuk menjaga integritas data.`,
-          data: { opname_id: parseInt(opnameId), opname_number: `OPN-${opnameId}`, step: 2, product_count: selectedProductIds.length },
-          target_role: 'admin',
+    await supabase.from('notifications').insert([
+      {
+        type: 'OPNAME_STEP_CHANGED',
+        title: 'Opname Dimulai',
+        message: `Opname OPN-${opnameId} telah dimulai dan memasuki tahap 2: Input Stok Fisik. Aplikasi terkunci untuk menjaga integritas data.`,
+        data: {
+          opname_id: parseInt(opnameId),
+          opname_number: `OPN-${opnameId}`,
+          step: 2,
+          product_count: selectedProductIds.length,
         },
-        {
-          type: 'OPNAME_STEP_CHANGED',
-          title: 'Opname Dimulai',
-          message: `Opname OPN-${opnameId} telah dimulai dan memasuki tahap 2: Input Stok Fisik. Aplikasi terkunci untuk menjaga integritas data.`,
-          data: { opname_id: parseInt(opnameId), opname_number: `OPN-${opnameId}`, step: 2, product_count: selectedProductIds.length },
-          target_role: 'farmasi',
+        target_role: 'admin',
+      },
+      {
+        type: 'OPNAME_STEP_CHANGED',
+        title: 'Opname Dimulai',
+        message: `Opname OPN-${opnameId} telah dimulai dan memasuki tahap 2: Input Stok Fisik. Aplikasi terkunci untuk menjaga integritas data.`,
+        data: {
+          opname_id: parseInt(opnameId),
+          opname_number: `OPN-${opnameId}`,
+          step: 2,
+          product_count: selectedProductIds.length,
         },
-      ]);
+        target_role: 'farmasi',
+      },
+    ]);
 
     return { success: true };
   },
@@ -943,12 +997,14 @@ export const api = {
 
     return {
       isLocked: !!data,
-      opname: data ? {
-        id: data.id.toString(),
-        opnameNumber: `OPN-${data.id}`,
-        currentStep: data.current_step || 1,
-        startedAt: data.created_at,
-      } : null
+      opname: data
+        ? {
+            id: data.id.toString(),
+            opnameNumber: `OPN-${data.id}`,
+            currentStep: data.current_step || 1,
+            startedAt: data.created_at,
+          }
+        : null,
     };
   },
 
@@ -964,28 +1020,24 @@ export const api = {
 
     if (roles.length === 0) {
       // Broadcast notification (target_role = null)
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          type: notification.type,
-          title: notification.title,
-          message: notification.message,
-          data: notification.data || {},
-          target_role: null,
-        });
+      const { error } = await supabase.from('notifications').insert({
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        data: notification.data || {},
+        target_role: null,
+      });
       if (error) throw error;
     } else {
       // Insert one row per target role so each role receives the notification
-      const rows = roles.map(role => ({
+      const rows = roles.map((role) => ({
         type: notification.type,
         title: notification.title,
         message: notification.message,
         data: notification.data || {},
         target_role: role,
       }));
-      const { error } = await supabase
-        .from('notifications')
-        .insert(rows);
+      const { error } = await supabase.from('notifications').insert(rows);
       if (error) throw error;
     }
 
@@ -993,16 +1045,22 @@ export const api = {
   },
 
   // REPORTING
-  getTransactionReport: async (startDate: string, endDate: string, params?: PaginationParams): Promise<PaginatedResponse<any>> => {
+  getTransactionReport: async (
+    startDate: string,
+    endDate: string,
+    params?: PaginationParams,
+  ): Promise<PaginatedResponse<any>> => {
     const { page = 1, perPage = 10, status } = params || {};
 
     let query = supabase
       .from('transaksi')
-      .select(`
+      .select(
+        `
         *,
         transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (*, master_obat(nama, jenis, merek, kandungan, harga)),
         transaksi_jasa:transaksi_jasa!transaksi_jasa_transaksi_id_fkey (*, master_jasa(nama))
-      `)
+      `,
+      )
       .gte('tanggal', `${startDate}T00:00:00Z`)
       .lte('tanggal', `${endDate}T23:59:59Z`)
       .order('created_at', { ascending: false });
@@ -1031,58 +1089,76 @@ export const api = {
       });
     }
 
-    const mappedData = (data || []).map((t: any) => {
-      const transactionMeta = extractTransactionNoteAndMeta(t.keterangan);
-      const drugDetails = t.transaksi_detail?.map((d: any) => {
-        const unitPrice = Number(d.harga || 0) > 0
-          ? Number(d.harga || 0)
-          : Number(d.master_obat?.harga || 0);
-        const subtotal = Number(d.subtotal || 0) > 0
-          ? Number(d.subtotal || 0)
-          : ((d.qty || 0) * unitPrice);
+    const mappedData = (data || [])
+      .map((t: any) => {
+        const transactionMeta = extractTransactionNoteAndMeta(t.keterangan);
+        const drugDetails =
+          t.transaksi_detail?.map((d: any) => {
+            const unitPrice =
+              Number(d.harga || 0) > 0 ? Number(d.harga || 0) : Number(d.master_obat?.harga || 0);
+            const subtotal =
+              Number(d.subtotal || 0) > 0 ? Number(d.subtotal || 0) : (d.qty || 0) * unitPrice;
+
+            return {
+              id: d.id?.toString?.() || `${t.nomor}-${d.obat_id}`,
+              name: getDisplayNameFromMasterObat(d.master_obat),
+              quantity: d.qty || 0,
+              price: unitPrice,
+              subtotal,
+            };
+          }) || [];
+
+        const serviceDetails =
+          t.transaksi_jasa?.map((j: any) => ({
+            id: j.id?.toString?.() || `${t.nomor}-${j.jasa_id}`,
+            name: j.master_jasa?.nama || 'Unknown Service',
+            quantity: j.qty || 1,
+            price: j.harga_jasa || 0,
+            subtotal: j.subtotal || (j.qty || 1) * (j.harga_jasa || 0),
+          })) || [];
+
+        const computedDrugTotal = drugDetails.reduce(
+          (sum: number, item: any) => sum + Number(item.subtotal || 0),
+          0,
+        );
+        const computedServiceTotal = serviceDetails.reduce(
+          (sum: number, item: any) => sum + Number(item.subtotal || 0),
+          0,
+        );
+        const serviceFee = Number(t.biaya_layanan ?? transactionMeta.meta.serviceFee ?? 0);
+        const discount = Number(t.diskon || 0);
+        const headerTotal = Number(t.total || 0);
+        const normalizedTotal =
+          headerTotal > 0
+            ? headerTotal
+            : computedDrugTotal + computedServiceTotal + serviceFee - discount;
 
         return {
-          id: d.id?.toString?.() || `${t.nomor}-${d.obat_id}`,
-          name: getDisplayNameFromMasterObat(d.master_obat),
-          quantity: d.qty || 0,
-          price: unitPrice,
-          subtotal,
+          id: t.nomor,
+          date: getTransactionEventTimestamp(t),
+          type: t.tipe,
+          source: t.tipe_sumber,
+          status: t.status === 'diajukan' ? 'Menunggu' : 'Selesai',
+          patient: t.nama_pasien,
+          birthDate: t.tanggal_lahir_pasien,
+          nakes: t.nama_nakes || (t.created_by && profileMap[t.created_by]) || '-',
+          items:
+            t.transaksi_detail
+              ?.map((d: any) => `${getDisplayNameFromMasterObat(d.master_obat)} (${d.qty})`)
+              .join(', ') || '',
+          services:
+            t.transaksi_jasa
+              ?.map((j: any) => j.master_jasa?.nama)
+              .filter(Boolean)
+              .join(', ') || '-',
+          serviceFee,
+          discount,
+          total: normalizedTotal,
+          drugDetails,
+          serviceDetails,
         };
-      }) || [];
-
-      const serviceDetails = t.transaksi_jasa?.map((j: any) => ({
-        id: j.id?.toString?.() || `${t.nomor}-${j.jasa_id}`,
-        name: j.master_jasa?.nama || 'Unknown Service',
-        quantity: j.qty || 1,
-        price: j.harga_jasa || 0,
-        subtotal: j.subtotal || ((j.qty || 1) * (j.harga_jasa || 0)),
-      })) || [];
-
-      const computedDrugTotal = drugDetails.reduce((sum: number, item: any) => sum + Number(item.subtotal || 0), 0);
-      const computedServiceTotal = serviceDetails.reduce((sum: number, item: any) => sum + Number(item.subtotal || 0), 0);
-      const serviceFee = Number(t.biaya_layanan ?? transactionMeta.meta.serviceFee ?? 0);
-      const discount = Number(t.diskon || 0);
-      const headerTotal = Number(t.total || 0);
-      const normalizedTotal = headerTotal > 0 ? headerTotal : (computedDrugTotal + computedServiceTotal + serviceFee - discount);
-
-      return {
-        id: t.nomor,
-        date: getTransactionEventTimestamp(t),
-        type: t.tipe,
-        source: t.tipe_sumber,
-        status: t.status === 'diajukan' ? 'Menunggu' : 'Selesai',
-        patient: t.nama_pasien,
-        birthDate: t.tanggal_lahir_pasien,
-        nakes: t.nama_nakes || (t.created_by && profileMap[t.created_by]) || '-',
-        items: t.transaksi_detail?.map((d: any) => `${getDisplayNameFromMasterObat(d.master_obat)} (${d.qty})`).join(', ') || '',
-        services: t.transaksi_jasa?.map((j: any) => j.master_jasa?.nama).filter(Boolean).join(', ') || '-',
-        serviceFee,
-        discount,
-        total: normalizedTotal,
-        drugDetails,
-        serviceDetails,
-      };
-    }).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      })
+      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     // Pagination applied AFTER all filtering and mapping so that totalPages
     // reflects the actual number of filtered records, not the raw DB count.
@@ -1096,18 +1172,20 @@ export const api = {
       total: totalFiltered,
       page,
       perPage,
-      totalPages: Math.ceil(totalFiltered / perPage)
+      totalPages: Math.ceil(totalFiltered / perPage),
     };
   },
 
   getOpnameById: async (opnameId: string) => {
     const { data, error } = await supabase
       .from('opname')
-      .select(`
+      .select(
+        `
         *,
         opname_schedule(nama, obat_ids),
         opname_detail(*, master_obat(nama, satuan, jenis, merek, kandungan))
-      `)
+      `,
+      )
       .eq('id', opnameId)
       .is('deleted_at', null)
       .single();
@@ -1137,11 +1215,20 @@ export const api = {
         stokFinal: d.stok_final,
         reason: d.alasan,
         detailStatus: d.status,
-      }))
+      })),
     };
   },
 
-  saveDraft: async (opnameId: string, step: number, detailUpdates?: { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string }[]) => {
+  saveDraft: async (
+    opnameId: string,
+    step: number,
+    detailUpdates?: {
+      detailId: string;
+      physicalStock?: number;
+      stokFinal?: number;
+      reason?: string;
+    }[],
+  ) => {
     // Step dan semua detail disimpan dalam satu request/transaksi;
     // selisih dihitung di database dari stok_sistem
     const { error } = await supabase.rpc('save_opname_details', {
@@ -1157,7 +1244,15 @@ export const api = {
 
   // Simpan detail opname TANPA mengubah current_step.
   // Digunakan oleh tombol "Simpan Draft" agar step di DB tidak berubah secara tidak sengaja.
-  saveDetailOnly: async (opnameId: string, detailUpdates: { detailId: string; physicalStock?: number; stokFinal?: number; reason?: string }[]) => {
+  saveDetailOnly: async (
+    opnameId: string,
+    detailUpdates: {
+      detailId: string;
+      physicalStock?: number;
+      stokFinal?: number;
+      reason?: string;
+    }[],
+  ) => {
     if (!detailUpdates || detailUpdates.length === 0) return { success: true };
 
     const { error } = await supabase.rpc('save_opname_details', {
@@ -1195,7 +1290,11 @@ export const api = {
   },
 
   updateOpnameDetail: async (detailId: string, physicalStock: number) => {
-    const { data: detail, error: fetchError } = await supabase.from('opname_detail').select('opname_id').eq('id', detailId).single();
+    const { data: detail, error: fetchError } = await supabase
+      .from('opname_detail')
+      .select('opname_id')
+      .eq('id', detailId)
+      .single();
     if (fetchError) throw fetchError;
 
     const { error } = await supabase.rpc('save_opname_details', {
@@ -1211,7 +1310,7 @@ export const api = {
     // Satu transaksi di database: status detail, master_obat.qty, dan
     // status opname berubah bersamaan atau tidak sama sekali.
     const { error } = await supabase.rpc('finish_opname', {
-      p_opname_id: parseInt(opnameId)
+      p_opname_id: parseInt(opnameId),
     });
 
     if (error) throw new Error(error.message);
@@ -1229,11 +1328,13 @@ export const api = {
   getOpnameHistory: async () => {
     const { data, error } = await supabase
       .from('opname')
-      .select(`
+      .select(
+        `
         *,
         opname_schedule(nama),
         opname_detail (selisih)
-      `)
+      `,
+      )
       .eq('status', 'selesai')
       .is('deleted_at', null)
       .order('completed_at', { ascending: false });
@@ -1280,27 +1381,28 @@ export const api = {
 
     const { data, error } = await supabase
       .from('transaksi_detail')
-      .select(`
+      .select(
+        `
         batch,
         qty,
         master_obat (nama)
-      `)
+      `,
+      )
       .not('batch', 'is', null)
-      .neq('batch', '-') // Assuming valid batch has date or we just return batch info
-      // Note: Real implementation needs strict date column in transksi_detail or parsing batch. 
-      // For now we map whatever is in batch as if it's expiry relevant or rely on specific expire_date column if exists.
-      // spec_db says: td.expire_date. Let's assume migration added it or we use batch as proxy for now.
-      // If expire_date doesn't strictly exist in schema yet, this might fail if we query it?
-      // Let's use master_obat buffer stock logic as fallback for "Critical Stock" report if expiry is hard.
-      // BUT spec SC-024 specifically asks for 'Laporan Obat Mendekati Expire'.
-      // I will assume 'batch' might contain expiry or we return mocked data if column missing to avoid crash, 
-      // OR better, we query master_obat and return those with low stock as a proxy if expiry is not tracked?
-      // No, let's try to query 'transaksi_detail' assuming it has 'expire_date' as per spec SC-007 mapping?
-      // "expire_date | transaksi_detail | Expire"
-      // If I didn't add it in migration, I should probably add it now or skip.
-      // Let's stick to returning what we have: stock mutation.
-      ;
+      .neq('batch', '-'); // Assuming valid batch has date or we just return batch info
 
+    // Note: Real implementation needs strict date column in transksi_detail or parsing batch.
+    // For now we map whatever is in batch as if it's expiry relevant or rely on specific expire_date column if exists.
+    // spec_db says: td.expire_date. Let's assume migration added it or we use batch as proxy for now.
+    // If expire_date doesn't strictly exist in schema yet, this might fail if we query it?
+    // Let's use master_obat buffer stock logic as fallback for "Critical Stock" report if expiry is hard.
+    // BUT spec SC-024 specifically asks for 'Laporan Obat Mendekati Expire'.
+    // I will assume 'batch' might contain expiry or we return mocked data if column missing to avoid crash,
+    // OR better, we query master_obat and return those with low stock as a proxy if expiry is not tracked?
+    // No, let's try to query 'transaksi_detail' assuming it has 'expire_date' as per spec SC-007 mapping?
+    // "expire_date | transaksi_detail | Expire"
+    // If I didn't add it in migration, I should probably add it now or skip.
+    // Let's stick to returning what we have: stock mutation.
     // ALTERNATIVE: Return logic for Low Stock (Buffer check) which is also critical.
     // Using buffer_stok for dynamic threshold
     const { data: lowStock } = await supabase
@@ -1308,7 +1410,7 @@ export const api = {
       .select('*, buffer_stok')
       .eq('is_active', true)
       .is('deleted_at', null)
-      .or('qty.lt.buffer_stok,qty.lt.10')
+      .or('qty.lt.buffer_stok,qty.lt.10');
 
     return lowStock || [];
   },
@@ -1321,11 +1423,11 @@ export const api = {
       .eq('is_active', true)
       .is('deleted_at', null);
 
-    if (countError) console.error("Error fetching product count", countError);
+    if (countError) console.error('Error fetching product count', countError);
 
     // 2. Total Inventory Value (requires calculation)
     // Supabase doesn't have effortless sum() without RPC, so let's fetch minimal payload for now or use RPC if available.
-    // For prototype: fetch all id, qty, harga. 2458 items is manageable but not scalable. 
+    // For prototype: fetch all id, qty, harga. 2458 items is manageable but not scalable.
     // Ideally create a VIEW or RPC. Let's try JS side for now (safe for < 10k items).
     const { data: products, error: prodError } = await supabase
       .from('master_obat')
@@ -1333,13 +1435,13 @@ export const api = {
       .eq('is_active', true)
       .is('deleted_at', null);
 
-    if (prodError) console.error("Error fetching products for stats", prodError);
+    if (prodError) console.error('Error fetching products for stats', prodError);
 
     let totalValue = 0;
     let lowStockCount = 0;
     const categoryStats: Record<string, number> = {};
 
-    products?.forEach(p => {
+    products?.forEach((p) => {
       totalValue += (p.qty || 0) * (p.harga || 0);
       // Use buffer_stok from database for low stock threshold
       const threshold = p.buffer_stok || 10;
@@ -1420,20 +1522,22 @@ export const api = {
         nama: getProductDisplayNameFromDb(item),
       })),
       categoryDistribution: categoryStats,
-      weeklyStockOut: weeklyData
+      weeklyStockOut: weeklyData,
     };
   },
 
   getRecentStockOuts: async (limit: number = 10) => {
     const { data, error } = await supabase
       .from('transaksi')
-      .select(`
+      .select(
+        `
         *,
         transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (
           qty,
           master_obat (nama, jenis, merek, kandungan)
         )
-      `)
+      `,
+      )
       .eq('tipe', 'keluar')
       .eq('status', 'selesai')
       .order('created_at', { ascending: false })
@@ -1443,8 +1547,10 @@ export const api = {
 
     return data.map((t: any) => {
       const itemCount = t.transaksi_detail?.length || 0;
-      const firstItemName = getDisplayNameFromMasterObat(t.transaksi_detail?.[0]?.master_obat) || 'Item';
-      const totalQty = t.transaksi_detail?.reduce((acc: number, d: any) => acc + (d.qty || 0), 0) || 0;
+      const firstItemName =
+        getDisplayNameFromMasterObat(t.transaksi_detail?.[0]?.master_obat) || 'Item';
+      const totalQty =
+        t.transaksi_detail?.reduce((acc: number, d: any) => acc + (d.qty || 0), 0) || 0;
 
       let title = 'Pengeluaran Stok';
       if (t.tipe_sumber === 'KASIR_LANGSUNG') {
@@ -1473,7 +1579,11 @@ export const api = {
       } else if (diffDays < 7) {
         timeStr = `${diffDays} hari lalu`;
       } else {
-        timeStr = createdAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        timeStr = createdAt.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
       }
 
       const itemDesc = itemCount > 1 ? `${firstItemName} +${itemCount - 1} lainnya` : firstItemName;
@@ -1483,18 +1593,23 @@ export const api = {
         title,
         desc: `${itemDesc} (${totalQty} pcs) — ${t.nama_pasien || 'Umum'}`,
         time: timeStr,
-        dotColor: t.tipe_sumber === 'KASIR_LANGSUNG' ? 'bg-primary' : 'bg-emerald-500'
+        dotColor: t.tipe_sumber === 'KASIR_LANGSUNG' ? 'bg-primary' : 'bg-emerald-500',
       };
     });
   },
 
-  getStockMutationReport: async (startDate: string, endDate: string, params?: PaginationParams): Promise<PaginatedResponse<any>> => {
+  getStockMutationReport: async (
+    startDate: string,
+    endDate: string,
+    params?: PaginationParams,
+  ): Promise<PaginatedResponse<any>> => {
     const { page = 1, perPage = 10 } = params || {};
 
     // 1. Get transaction data (stok masuk/keluar)
     const { data, error } = await supabase
       .from('transaksi')
-      .select(`
+      .select(
+        `
         created_at,
         processed_at,
         nomor,
@@ -1502,7 +1617,8 @@ export const api = {
         tipe_sumber,
         status,
         transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (qty, master_obat(nama, jenis, merek, kandungan))
-      `)
+      `,
+      )
       .gte('created_at', `${startDate}T00:00:00Z`)
       .lte('created_at', `${endDate}T23:59:59Z`)
       .eq('status', 'selesai')
@@ -1513,7 +1629,8 @@ export const api = {
     // 2. Get completed opname data (penyesuaian stok)
     const { data: opnameData, error: opnameError } = await supabase
       .from('opname')
-      .select(`
+      .select(
+        `
         id,
         completed_at,
         status,
@@ -1527,7 +1644,8 @@ export const api = {
           alasan,
           master_obat (nama, jenis, merek, kandungan)
         )
-      `)
+      `,
+      )
       .eq('status', 'selesai')
       .is('deleted_at', null)
       .gte('completed_at', `${startDate}T00:00:00Z`)
@@ -1538,7 +1656,7 @@ export const api = {
 
     // Flatten transaction rows: one row per item
     const allRows: any[] = [];
-    data.forEach(t => {
+    data.forEach((t) => {
       if (t.transaksi_detail && Array.isArray(t.transaksi_detail)) {
         t.transaksi_detail.forEach((d: any) => {
           allRows.push({
@@ -1594,7 +1712,7 @@ export const api = {
       total: allRows.length,
       page,
       perPage,
-      totalPages: Math.ceil(allRows.length / perPage)
+      totalPages: Math.ceil(allRows.length / perPage),
     };
   },
 
@@ -1604,7 +1722,7 @@ export const api = {
       .from('profiles')
       .select('id, full_name, user_roles!inner(role)')
       .eq('user_roles.role', 'nakes')
-      .order('full_name')
+      .order('full_name');
     if (error) throw error;
     return (data || []).map((p: any) => ({ id: p.id, full_name: p.full_name }));
   },
@@ -1627,7 +1745,8 @@ export const api = {
 
     const { data, count, error } = await supabase
       .from('transaksi')
-      .select(`
+      .select(
+        `
             nomor,
             tanggal,
             created_at,
@@ -1637,7 +1756,9 @@ export const api = {
                 qty,
                 master_obat (nama, jenis, merek, kandungan)
             )
-        `, { count: 'exact' })
+        `,
+        { count: 'exact' },
+      )
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -1646,8 +1767,11 @@ export const api = {
     const formattedData = (data || []).map((t: any) => {
       const isIn = t.tipe === 'masuk';
       const details = t.transaksi_detail || [];
-      const itemName = details.length > 0 ? (getDisplayNameFromMasterObat(details[0]?.master_obat) || 'Unknown') : 'Item Dihapus';
-      const itemCategory = details.length > 0 ? (details[0]?.master_obat?.jenis || '-') : '-';
+      const itemName =
+        details.length > 0
+          ? getDisplayNameFromMasterObat(details[0]?.master_obat) || 'Unknown'
+          : 'Item Dihapus';
+      const itemCategory = details.length > 0 ? details[0]?.master_obat?.jenis || '-' : '-';
       const itemCount = details.length;
       const totalQty = details.reduce((acc: number, curr: any) => acc + (curr.qty || 0), 0);
 
@@ -1662,11 +1786,15 @@ export const api = {
         category: itemCategory,
         amount: `${isIn ? '+' : '-'}${totalQty}`,
         qty: totalQty,
-        date: new Date(t.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }),
+        date: new Date(t.tanggal).toLocaleDateString('id-ID', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        }),
         icon: isIn ? 'arrow_downward' : 'arrow_upward',
         iconBg: isIn ? 'bg-green-100 dark:bg-green-500/20' : 'bg-red-100 dark:bg-red-500/20',
         iconColor: isIn ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400',
-        isWarning: !isIn && t.status === 'diajukan'
+        isWarning: !isIn && t.status === 'diajukan',
       };
     });
 
@@ -1675,7 +1803,7 @@ export const api = {
       total: count || 0,
       page,
       perPage,
-      totalPages: Math.ceil((count || 0) / perPage)
+      totalPages: Math.ceil((count || 0) / perPage),
     };
-  }
+  },
 };

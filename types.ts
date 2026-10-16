@@ -1,16 +1,15 @@
-
 export enum Category {
   Obat = 'Obat',
   BHP = 'BHP (Habis Pakai)',
   Imunisasi = 'Imunisasi',
-  Alkes = 'Alat Kesehatan'
+  Alkes = 'Alat Kesehatan',
 }
 
 export enum ServiceCategory {
   Konsultasi = 'Konsultasi',
   Tindakan = 'Tindakan',
   TesLab = 'Tes Lab',
-  Vaksinasi = 'Vaksinasi'
+  Vaksinasi = 'Vaksinasi',
 }
 
 export enum Unit {
@@ -20,7 +19,7 @@ export enum Unit {
   Box = 'Box',
   Ampul = 'Ampul',
   Sachet = 'Sachet',
-  Pcs = 'Pcs'
+  Pcs = 'Pcs',
 }
 
 export interface PaginationParams {
@@ -56,7 +55,6 @@ export interface Product {
   composition?: string; // kandungan obat
 }
 
-
 export interface ServiceCategoryType {
   id: string;
   name: string;
@@ -64,7 +62,6 @@ export interface ServiceCategoryType {
   description?: string;
   isActive: boolean;
 }
-
 
 export interface Service {
   id: string;
@@ -219,7 +216,14 @@ export interface OpnameScheduleConfig {
   obatIds?: string[] | null;
 }
 
-export type ViewType = 'dashboard' | 'master-data-produk' | 'master-data-jasa' | 'stok-masuk' | 'stok-keluar' | 'stok-opname' | 'laporan-stok';
+export type ViewType =
+  | 'dashboard'
+  | 'master-data-produk'
+  | 'master-data-jasa'
+  | 'stok-masuk'
+  | 'stok-keluar'
+  | 'stok-opname'
+  | 'laporan-stok';
 
 // Route paths for React Router
 // ==================== NOTIFICATIONS ====================

@@ -16,59 +16,60 @@ export interface CompressImageOptions {
  * @param options - Compression options
  * @returns Compressed image as Blob
  */
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'];
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/bmp',
+  'image/svg+xml',
+];
 
-export async function compressImage(
-  file: File,
-  options: CompressImageOptions = {}
-): Promise<Blob> {
+export async function compressImage(file: File, options: CompressImageOptions = {}): Promise<Blob> {
   // Validate file type
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    throw new Error(`Tipe file tidak valid. Hanya ${ALLOWED_IMAGE_TYPES.join(', ')} yang diizinkan.`);
+    throw new Error(
+      `Tipe file tidak valid. Hanya ${ALLOWED_IMAGE_TYPES.join(', ')} yang diizinkan.`,
+    );
   }
 
-  const {
-    maxWidth = 1920,
-    maxHeight = 1080,
-    quality = 0.8,
-    mimeType = 'image/jpeg'
-  } = options;
+  const { maxWidth = 1920, maxHeight = 1080, quality = 0.8, mimeType = 'image/jpeg' } = options;
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       const img = new Image();
-      
+
       img.onload = () => {
         // Calculate new dimensions
         let width = img.width;
         let height = img.height;
-        
+
         if (width > maxWidth) {
           height = (height * maxWidth) / width;
           width = maxWidth;
         }
-        
+
         if (height > maxHeight) {
           width = (width * maxHeight) / height;
           height = maxHeight;
         }
-        
+
         // Create canvas and compress
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-        
+
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           reject(new Error('Failed to get canvas context'));
           return;
         }
-        
+
         // Draw and compress
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         canvas.toBlob(
           (blob) => {
             if (blob) {
@@ -78,14 +79,14 @@ export async function compressImage(
             }
           },
           mimeType,
-          quality
+          quality,
         );
       };
-      
+
       img.onerror = () => reject(new Error('Failed to load image'));
       img.src = e.target?.result as string;
     };
-    
+
     reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
   });
@@ -99,5 +100,5 @@ export function formatFileSize(bytes: number): string {
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }

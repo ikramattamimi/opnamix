@@ -55,7 +55,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       <div className="w-full max-w-lg relative z-10 perspective-1000">
         {/* Main Card */}
         <div className="bg-white/85 dark:bg-black/45 backdrop-blur-md rounded-[40px] shadow-2xl border border-white/50 dark:border-white/10 p-8 md:p-12 transition-all hover:shadow-primary/10 hover:border-primary/20 group">
-
           {/* Header Section */}
           <div className="text-center mb-10 group-hover:transform group-hover:scale-105 transition-transform duration-500">
             <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center p-2">
@@ -95,7 +94,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2 group/input">
-                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide">Alamat Email</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide">
+                  Alamat Email
+                </label>
                 <div className="relative transition-all duration-300 focus-within:transform focus-within:scale-[1.02]">
                   <input
                     type="email"
@@ -113,7 +114,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </div>
 
               <div className="space-y-2 group/input">
-                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide">Kata Sandi</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wide">
+                  Kata Sandi
+                </label>
                 <div className="relative transition-all duration-300 focus-within:transform focus-within:scale-[1.02]">
                   <input
                     type="password"
@@ -144,7 +147,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   ) : (
                     <>
                       <span className="text-lg">Masuk Aplikasi</span>
-                      <span className="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                      <span className="material-icons-round group-hover:translate-x-1 transition-transform">
+                        arrow_forward
+                      </span>
                     </>
                   )}
                 </div>
@@ -195,8 +200,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <p className="text-center text-slate-400 text-xs mt-8 font-medium">
           &copy; {new Date().getFullYear()} Opnamix. Hak cipta dilindungi.
         </p>
-
-
       </div>
     </div>
   );

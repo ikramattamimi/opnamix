@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Product, Category } from '../types';
@@ -9,7 +8,7 @@ import { createTransactionReportColumns } from './TransactionReportColumns';
 import { stockMutationColumns } from './StockMutationColumns';
 import { exportTransactionReportToExcel, exportStockMutationToExcel } from '../lib/exportUtils';
 
-interface StockReportProps { }
+interface StockReportProps {}
 
 import { api } from '../lib/api';
 
@@ -29,13 +28,19 @@ const StockReport: React.FC<StockReportProps> = () => {
   // Separate date ranges for each report
   const [txStartDate, setTxStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [txEndDate, setTxEndDate] = useState(new Date().toISOString().split('T')[0]);
-  const [mutationStartDate, setMutationStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [mutationStartDate, setMutationStartDate] = useState(
+    new Date().toISOString().split('T')[0],
+  );
   const [mutationEndDate, setMutationEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [txStatus, setTxStatus] = useState<'Semua' | 'Menunggu' | 'Selesai'>('Semua');
 
   // Period filters
-  const [txPeriod, setTxPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom'>('daily');
-  const [mutationPeriod, setMutationPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom'>('daily');
+  const [txPeriod, setTxPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom'>(
+    'daily',
+  );
+  const [mutationPeriod, setMutationPeriod] = useState<
+    'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom'
+  >('daily');
 
   // Store all data (used for both display and Excel export)
   const [allTxData, setAllTxData] = useState<any[]>([]);
@@ -44,11 +49,13 @@ const StockReport: React.FC<StockReportProps> = () => {
 
   // Filtering Logic (Analysis)
   const filteredProducts = useMemo(() => {
-    return products.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.code.toLowerCase().includes(searchTerm.toLowerCase());
+    return products.filter((p) => {
+      const matchesSearch =
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.code.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = filterCategory === 'Semua' || p.category === filterCategory;
 
-      const isCritical = p.stock <= (p.minStock / 2);
+      const isCritical = p.stock <= p.minStock / 2;
       const isLow = p.stock <= p.minStock && !isCritical;
       const currentStatus = isCritical ? 'Kritikal' : isLow ? 'Menipis' : 'Aman';
       const matchesStatus = filterStatus === 'Semua' || currentStatus === filterStatus;
@@ -58,28 +65,26 @@ const StockReport: React.FC<StockReportProps> = () => {
   }, [products, searchTerm, filterCategory, filterStatus]);
 
   // Analytics Calculations
-  const totalValue = products.reduce((acc, p) => acc + (p.stock * p.sellingPrice), 0);
-  const lowStockCount = products.filter(p => p.stock <= p.minStock).length;
-  const criticalStockCount = products.filter(p => p.stock <= (p.minStock / 2)).length;
+  const totalValue = products.reduce((acc, p) => acc + p.stock * p.sellingPrice, 0);
+  const lowStockCount = products.filter((p) => p.stock <= p.minStock).length;
+  const criticalStockCount = products.filter((p) => p.stock <= p.minStock / 2).length;
 
   // Data for Category Donut Chart
   const categoryStats = useMemo(() => {
     const stats: Record<string, number> = {};
-    products.forEach(p => {
+    products.forEach((p) => {
       stats[p.category] = (stats[p.category] || 0) + 1;
     });
     return Object.entries(stats).map(([name, count]) => ({
       name,
       count,
-      percent: Math.round((count / products.length) * 100)
+      percent: Math.round((count / products.length) * 100),
     }));
   }, [products]);
 
   // Data for Stock Level Bar Chart (Top 5 items)
   const topProducts = useMemo(() => {
-    return [...products]
-      .sort((a, b) => b.stock - a.stock)
-      .slice(0, 5);
+    return [...products].sort((a, b) => b.stock - a.stock).slice(0, 5);
   }, [products]);
 
   // Helper function to calculate date range based on period
@@ -113,7 +118,7 @@ const StockReport: React.FC<StockReportProps> = () => {
 
     return {
       start: start.toISOString().split('T')[0],
-      end: end.toISOString().split('T')[0]
+      end: end.toISOString().split('T')[0],
     };
   };
 
@@ -128,7 +133,9 @@ const StockReport: React.FC<StockReportProps> = () => {
   };
 
   // Handle period change for mutation report
-  const handleMutationPeriodChange = (period: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom') => {
+  const handleMutationPeriodChange = (
+    period: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom',
+  ) => {
     setMutationPeriod(period);
     const range = calculateDateRange(period);
     if (range) {
@@ -153,7 +160,10 @@ const StockReport: React.FC<StockReportProps> = () => {
         setTxReport(allData.data);
         setAllTxData(allData.data);
       } else if (activeTab === 'mutation') {
-        const allData = await api.getStockMutationReport(mutationStartDate, mutationEndDate, { page: 1, perPage: 100000 });
+        const allData = await api.getStockMutationReport(mutationStartDate, mutationEndDate, {
+          page: 1,
+          perPage: 100000,
+        });
         setMutations(allData.data);
         setAllMutationData(allData.data);
       }
@@ -175,7 +185,6 @@ const StockReport: React.FC<StockReportProps> = () => {
     void exportStockMutationToExcel(allMutationData, mutationStartDate, mutationEndDate);
   };
 
-
   return (
     <div className="space-y-6">
       {/* Top Action Bar */}
@@ -193,20 +202,22 @@ const StockReport: React.FC<StockReportProps> = () => {
             <Button
               variant={activeTab === 'transactions' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('transactions')}
-              className={`px-6 py-3 text-sm font-bold rounded-xl transition-all shadow-none h-auto ${activeTab === 'transactions'
-                ? 'bg-primary text-white shadow-md hover:bg-primary/90'
-                : 'text-text-secondary-light hover:bg-white dark:hover:bg-white/5 bg-transparent'
-                }`}
+              className={`px-6 py-3 text-sm font-bold rounded-xl transition-all shadow-none h-auto ${
+                activeTab === 'transactions'
+                  ? 'bg-primary text-white shadow-md hover:bg-primary/90'
+                  : 'text-text-secondary-light hover:bg-white dark:hover:bg-white/5 bg-transparent'
+              }`}
             >
               Laporan Transaksi
             </Button>
             <Button
               variant={activeTab === 'mutation' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('mutation')}
-              className={`px-6 py-3 text-sm font-bold rounded-xl transition-all shadow-none h-auto ${activeTab === 'mutation'
-                ? 'bg-primary text-white shadow-md hover:bg-primary/90'
-                : 'text-text-secondary-light hover:bg-white dark:hover:bg-white/5 bg-transparent'
-                }`}
+              className={`px-6 py-3 text-sm font-bold rounded-xl transition-all shadow-none h-auto ${
+                activeTab === 'mutation'
+                  ? 'bg-primary text-white shadow-md hover:bg-primary/90'
+                  : 'text-text-secondary-light hover:bg-white dark:hover:bg-white/5 bg-transparent'
+              }`}
             >
               Mutasi Stok
             </Button>
@@ -218,10 +229,25 @@ const StockReport: React.FC<StockReportProps> = () => {
         <>
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            <StatCard label="Nilai Inventaris" value={`Rp ${(totalValue / 1000000).toFixed(1)}jt`} icon="payments" color="primary" />
-            <StatCard label="Total SKU" value={products.length} icon="inventory_2" color="blue-500" />
+            <StatCard
+              label="Nilai Inventaris"
+              value={`Rp ${(totalValue / 1000000).toFixed(1)}jt`}
+              icon="payments"
+              color="primary"
+            />
+            <StatCard
+              label="Total SKU"
+              value={products.length}
+              icon="inventory_2"
+              color="blue-500"
+            />
             <StatCard label="Stok Menipis" value={lowStockCount} icon="warning" color="amber-500" />
-            <StatCard label="Stok Kritikal" value={criticalStockCount} icon="dangerous" color="red-500" />
+            <StatCard
+              label="Stok Kritikal"
+              value={criticalStockCount}
+              icon="dangerous"
+              color="red-500"
+            />
           </div>
 
           {/* Analytics Visualization Section */}
@@ -248,11 +274,15 @@ const StockReport: React.FC<StockReportProps> = () => {
                         style={{ bottom: `${(p.minStock / 250) * 100}%` }}
                       ></div>
                     </div>
-                    <span className="text-[10px] font-bold text-text-secondary-light mt-2 text-center line-clamp-1">{p.name}</span>
+                    <span className="text-[10px] font-bold text-text-secondary-light mt-2 text-center line-clamp-1">
+                      {p.name}
+                    </span>
                   </div>
                 ))}
               </div>
-              <p className="text-[10px] text-text-secondary-light mt-4 text-center italic">*Garis merah menunjukkan batas minimum stok</p>
+              <p className="text-[10px] text-text-secondary-light mt-4 text-center italic">
+                *Garis merah menunjukkan batas minimum stok
+              </p>
             </div>
 
             {/* Donut Chart: Category Distribution */}
@@ -267,7 +297,9 @@ const StockReport: React.FC<StockReportProps> = () => {
                     <div key={stat.name} className="space-y-1">
                       <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
                         <span className="text-text-secondary-light">{stat.name}</span>
-                        <span className="text-text-primary-light dark:text-white">{stat.percent}%</span>
+                        <span className="text-text-primary-light dark:text-white">
+                          {stat.percent}%
+                        </span>
                       </div>
                       <div className="h-2 w-full bg-background-light dark:bg-background-dark rounded-full overflow-hidden">
                         <div
@@ -281,13 +313,41 @@ const StockReport: React.FC<StockReportProps> = () => {
               </div>
               <div className="relative w-40 h-40 shrink-0">
                 <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
-                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="currentColor" strokeWidth="3" className="text-background-light dark:text-background-dark"></circle>
-                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#4318FF" strokeWidth="3" strokeDasharray="65 35" strokeDashoffset="25"></circle>
-                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#6AD2FF" strokeWidth="3" strokeDasharray="35 65" strokeDashoffset="60"></circle>
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    className="text-background-light dark:text-background-dark"
+                  ></circle>
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#4318FF"
+                    strokeWidth="3"
+                    strokeDasharray="65 35"
+                    strokeDashoffset="25"
+                  ></circle>
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="15.915"
+                    fill="transparent"
+                    stroke="#6AD2FF"
+                    strokeWidth="3"
+                    strokeDasharray="35 65"
+                    strokeDashoffset="60"
+                  ></circle>
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span className="text-xl font-bold">{products.length}</span>
-                  <span className="text-[8px] uppercase font-bold text-text-secondary-light tracking-widest">Total SKU</span>
+                  <span className="text-[8px] uppercase font-bold text-text-secondary-light tracking-widest">
+                    Total SKU
+                  </span>
                 </div>
               </div>
             </div>
@@ -296,7 +356,9 @@ const StockReport: React.FC<StockReportProps> = () => {
           {/* Filters Bar */}
           <div className="bg-card-light dark:bg-card-dark rounded-3xl p-4 shadow-soft flex flex-wrap items-center gap-4">
             <div className="flex-1 min-w-[200px] relative">
-              <span className="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary-light text-xl">search</span>
+              <span className="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary-light text-xl">
+                search
+              </span>
               <input
                 type="text"
                 placeholder="Cari produk atau SKU..."
@@ -307,19 +369,27 @@ const StockReport: React.FC<StockReportProps> = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">Kategori:</span>
+              <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">
+                Kategori:
+              </span>
               <select
                 className="bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
               >
                 <option value="Semua">Semua</option>
-                {Object.values(Category).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                {Object.values(Category).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">Status:</span>
+              <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">
+                Status:
+              </span>
               <select
                 className="bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
                 value={filterStatus}
@@ -335,7 +405,11 @@ const StockReport: React.FC<StockReportProps> = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => { setSearchTerm(''); setFilterCategory('Semua'); setFilterStatus('Semua'); }}
+              onClick={() => {
+                setSearchTerm('');
+                setFilterCategory('Semua');
+                setFilterStatus('Semua');
+              }}
               className="p-3 text-text-secondary-light hover:text-red-500 transition-colors h-auto w-auto"
               title="Reset Filter"
             >
@@ -364,23 +438,34 @@ const StockReport: React.FC<StockReportProps> = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {filteredProducts.map((p) => {
-                    const isCritical = p.stock <= (p.minStock / 2);
+                    const isCritical = p.stock <= p.minStock / 2;
                     const isLow = p.stock <= p.minStock && !isCritical;
 
                     return (
-                      <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+                      <tr
+                        key={p.id}
+                        className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
+                      >
                         <td className="py-4 pl-2">
                           <div className="flex items-center gap-3">
                             <div className={`w-1 h-10 ${p.color} rounded-full`}></div>
                             <div>
-                              <p className="font-bold text-text-primary-light dark:text-white group-hover:text-primary transition-colors">{p.name}</p>
-                              <p className="text-[10px] text-text-secondary-light uppercase tracking-tighter">{p.category} • {p.unit}</p>
+                              <p className="font-bold text-text-primary-light dark:text-white group-hover:text-primary transition-colors">
+                                {p.name}
+                              </p>
+                              <p className="text-[10px] text-text-secondary-light uppercase tracking-tighter">
+                                {p.category} • {p.unit}
+                              </p>
                             </div>
                           </div>
                         </td>
                         <td className="py-4 text-center font-bold text-lg">{p.stock}</td>
-                        <td className="py-4 text-center text-text-secondary-light font-medium">{p.minStock}</td>
-                        <td className="py-4 font-bold text-sm">Rp {(p.stock * p.sellingPrice).toLocaleString('id-ID')}</td>
+                        <td className="py-4 text-center text-text-secondary-light font-medium">
+                          {p.minStock}
+                        </td>
+                        <td className="py-4 font-bold text-sm">
+                          Rp {(p.stock * p.sellingPrice).toLocaleString('id-ID')}
+                        </td>
                         <td className="py-4">
                           {isCritical ? (
                             <span className="px-3 py-1.5 bg-red-100 text-red-600 rounded-xl text-[10px] font-bold flex items-center gap-1 w-fit uppercase tracking-wider">
@@ -392,7 +477,8 @@ const StockReport: React.FC<StockReportProps> = () => {
                             </span>
                           ) : (
                             <span className="px-3 py-1.5 bg-green-100 text-green-600 rounded-xl text-[10px] font-bold flex items-center gap-1 w-fit uppercase tracking-wider">
-                              <span className="material-icons-round text-xs">check_circle</span> Aman
+                              <span className="material-icons-round text-xs">check_circle</span>{' '}
+                              Aman
                             </span>
                           )}
                         </td>
@@ -404,7 +490,9 @@ const StockReport: React.FC<StockReportProps> = () => {
                       <td colSpan={5} className="py-20 text-center">
                         <div className="flex flex-col items-center opacity-40">
                           <span className="material-icons-round text-5xl mb-2">inventory_2</span>
-                          <p className="font-bold text-sm">Tidak ada produk yang sesuai dengan filter.</p>
+                          <p className="font-bold text-sm">
+                            Tidak ada produk yang sesuai dengan filter.
+                          </p>
                         </div>
                       </td>
                     </tr>
@@ -421,7 +509,9 @@ const StockReport: React.FC<StockReportProps> = () => {
           <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
             <div className="flex flex-wrap items-end gap-4 mb-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-text-secondary-light">Periode</label>
+                <label className="text-xs font-bold uppercase text-text-secondary-light">
+                  Periode
+                </label>
                 <select
                   value={txPeriod}
                   onChange={(e) => handleTxPeriodChange(e.target.value as any)}
@@ -435,25 +525,37 @@ const StockReport: React.FC<StockReportProps> = () => {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-text-secondary-light">Dari Tanggal</label>
+                <label className="text-xs font-bold uppercase text-text-secondary-light">
+                  Dari Tanggal
+                </label>
                 <input
                   type="date"
                   value={txStartDate}
-                  onChange={(e) => { setTxStartDate(e.target.value); setTxPeriod('custom'); }}
+                  onChange={(e) => {
+                    setTxStartDate(e.target.value);
+                    setTxPeriod('custom');
+                  }}
                   className="block w-full rounded-xl border-gray-200 bg-white px-4 py-2 text-text-primary-light dark:border-gray-700 dark:bg-card-dark dark:text-white"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-text-secondary-light">Sampai Tanggal</label>
+                <label className="text-xs font-bold uppercase text-text-secondary-light">
+                  Sampai Tanggal
+                </label>
                 <input
                   type="date"
                   value={txEndDate}
-                  onChange={(e) => { setTxEndDate(e.target.value); setTxPeriod('custom'); }}
+                  onChange={(e) => {
+                    setTxEndDate(e.target.value);
+                    setTxPeriod('custom');
+                  }}
                   className="block w-full rounded-xl border-gray-200 bg-white px-4 py-2 text-text-primary-light dark:border-gray-700 dark:bg-card-dark dark:text-white"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-text-secondary-light">Status</label>
+                <label className="text-xs font-bold uppercase text-text-secondary-light">
+                  Status
+                </label>
                 <select
                   value={txStatus}
                   onChange={(e) => {
@@ -497,7 +599,9 @@ const StockReport: React.FC<StockReportProps> = () => {
         <div className="space-y-4">
           <div className="bg-card-light dark:bg-card-dark rounded-[20px] shadow-soft p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg text-text-primary-light dark:text-white">Laporan Mutasi Stok</h3>
+              <h3 className="font-bold text-lg text-text-primary-light dark:text-white">
+                Laporan Mutasi Stok
+              </h3>
               <Button
                 onClick={handleExportMutations}
                 variant="outline"
@@ -511,7 +615,9 @@ const StockReport: React.FC<StockReportProps> = () => {
 
             <div className="flex flex-wrap items-end gap-4 mb-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-text-secondary-light">Periode</label>
+                <label className="text-xs font-bold uppercase text-text-secondary-light">
+                  Periode
+                </label>
                 <select
                   value={mutationPeriod}
                   onChange={(e) => handleMutationPeriodChange(e.target.value as any)}
@@ -525,20 +631,30 @@ const StockReport: React.FC<StockReportProps> = () => {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-text-secondary-light">Dari Tanggal</label>
+                <label className="text-xs font-bold uppercase text-text-secondary-light">
+                  Dari Tanggal
+                </label>
                 <input
                   type="date"
                   value={mutationStartDate}
-                  onChange={(e) => { setMutationStartDate(e.target.value); setMutationPeriod('custom'); }}
+                  onChange={(e) => {
+                    setMutationStartDate(e.target.value);
+                    setMutationPeriod('custom');
+                  }}
                   className="block w-full rounded-xl border-gray-200 bg-white px-4 py-2 text-text-primary-light dark:border-gray-700 dark:bg-card-dark dark:text-white"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-text-secondary-light">Sampai Tanggal</label>
+                <label className="text-xs font-bold uppercase text-text-secondary-light">
+                  Sampai Tanggal
+                </label>
                 <input
                   type="date"
                   value={mutationEndDate}
-                  onChange={(e) => { setMutationEndDate(e.target.value); setMutationPeriod('custom'); }}
+                  onChange={(e) => {
+                    setMutationEndDate(e.target.value);
+                    setMutationPeriod('custom');
+                  }}
                   className="block w-full rounded-xl border-gray-200 bg-white px-4 py-2 text-text-primary-light dark:border-gray-700 dark:bg-card-dark dark:text-white"
                 />
               </div>
@@ -565,7 +681,9 @@ const StockReport: React.FC<StockReportProps> = () => {
           <div className="bg-white dark:bg-card-dark w-full max-w-4xl rounded-[32px] shadow-soft p-8 overflow-y-auto max-h-[90vh] relative">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-xl font-bold text-text-primary-light dark:text-white">Detail Transaksi</h3>
+                <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
+                  Detail Transaksi
+                </h3>
                 <p className="text-sm text-text-secondary-light">{selectedTransaction.id}</p>
               </div>
               <button
@@ -577,46 +695,54 @@ const StockReport: React.FC<StockReportProps> = () => {
               </button>
             </div>
 
-            <div className={`grid grid-cols-1 ${selectedTransaction.type === 'keluar' ? 'md:grid-cols-3 xl:grid-cols-6' : 'md:grid-cols-3 xl:grid-cols-5'} gap-4 mb-6`}>
-                <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
-                  <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Tanggal</p>
+            <div
+              className={`grid grid-cols-1 ${selectedTransaction.type === 'keluar' ? 'md:grid-cols-3 xl:grid-cols-6' : 'md:grid-cols-3 xl:grid-cols-5'} gap-4 mb-6`}
+            >
+              <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
+                <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">
+                  Tanggal
+                </p>
                 <p className="font-bold text-text-primary-light dark:text-white">
                   {new Date(selectedTransaction.date).toLocaleString('id-ID')}
                 </p>
               </div>
               <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
                 <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Tipe</p>
-                  <p className="font-bold text-text-primary-light dark:text-white">
-                    {selectedTransaction.type === 'masuk' ? 'Masuk' : 'Keluar'}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
-                  <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Sumber</p>
-                  <p className="font-bold text-text-primary-light dark:text-white">
-                    {selectedTransaction.source === 'PEMBELIAN'
-                      ? 'Pembelian'
-                      : selectedTransaction.source === 'KASIR_LANGSUNG'
-                        ? 'Kasir Langsung'
-                        : selectedTransaction.source === 'PENGAJUAN_NAKES'
-                          ? 'Pengajuan Nakes'
-                          : selectedTransaction.source || '-'}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
-                  <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Status</p>
-                  <p className="font-bold text-text-primary-light dark:text-white">
-                    {selectedTransaction.status || '-'}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
-                  <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">
-                    {selectedTransaction.type === 'masuk' ? 'Nama Supplier' : 'Nama Pasien'}
+                <p className="font-bold text-text-primary-light dark:text-white">
+                  {selectedTransaction.type === 'masuk' ? 'Masuk' : 'Keluar'}
                 </p>
-                <p className="font-bold text-text-primary-light dark:text-white">{selectedTransaction.patient || '-'}</p>
+              </div>
+              <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
+                <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Sumber</p>
+                <p className="font-bold text-text-primary-light dark:text-white">
+                  {selectedTransaction.source === 'PEMBELIAN'
+                    ? 'Pembelian'
+                    : selectedTransaction.source === 'KASIR_LANGSUNG'
+                      ? 'Kasir Langsung'
+                      : selectedTransaction.source === 'PENGAJUAN_NAKES'
+                        ? 'Pengajuan Nakes'
+                        : selectedTransaction.source || '-'}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
+                <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Status</p>
+                <p className="font-bold text-text-primary-light dark:text-white">
+                  {selectedTransaction.status || '-'}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
+                <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">
+                  {selectedTransaction.type === 'masuk' ? 'Nama Supplier' : 'Nama Pasien'}
+                </p>
+                <p className="font-bold text-text-primary-light dark:text-white">
+                  {selectedTransaction.patient || '-'}
+                </p>
               </div>
               {selectedTransaction.type === 'keluar' && (
                 <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
-                  <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Tanggal Lahir Pasien</p>
+                  <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">
+                    Tanggal Lahir Pasien
+                  </p>
                   <p className="font-bold text-text-primary-light dark:text-white">
                     {selectedTransaction.birthDate
                       ? new Date(selectedTransaction.birthDate).toLocaleDateString('id-ID')
@@ -626,13 +752,17 @@ const StockReport: React.FC<StockReportProps> = () => {
               )}
               <div className="rounded-2xl bg-background-light dark:bg-background-dark p-4">
                 <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Nakes</p>
-                <p className="font-bold text-text-primary-light dark:text-white">{selectedTransaction.nakes || '-'}</p>
+                <p className="font-bold text-text-primary-light dark:text-white">
+                  {selectedTransaction.nakes || '-'}
+                </p>
               </div>
             </div>
 
             <div className="space-y-6">
               <div>
-                <h4 className="font-bold text-lg text-text-primary-light dark:text-white mb-3">Detail Obat</h4>
+                <h4 className="font-bold text-lg text-text-primary-light dark:text-white mb-3">
+                  Detail Obat
+                </h4>
                 <div className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
                   <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 dark:bg-white/5 text-text-secondary-light font-bold border-b border-gray-100 dark:border-gray-800 uppercase text-xs">
@@ -644,16 +774,29 @@ const StockReport: React.FC<StockReportProps> = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                      {selectedTransaction.drugDetails?.length > 0 ? selectedTransaction.drugDetails.map((drug: any) => (
-                        <tr key={drug.id}>
-                          <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">{drug.name}</td>
-                          <td className="px-4 py-3 text-center">{drug.quantity}</td>
-                          <td className="px-4 py-3 text-right">Rp {Number(drug.price || 0).toLocaleString('id-ID')}</td>
-                          <td className="px-4 py-3 text-right font-bold text-text-primary-light dark:text-white">Rp {Number(drug.subtotal || 0).toLocaleString('id-ID')}</td>
-                        </tr>
-                      )) : (
+                      {selectedTransaction.drugDetails?.length > 0 ? (
+                        selectedTransaction.drugDetails.map((drug: any) => (
+                          <tr key={drug.id}>
+                            <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">
+                              {drug.name}
+                            </td>
+                            <td className="px-4 py-3 text-center">{drug.quantity}</td>
+                            <td className="px-4 py-3 text-right">
+                              Rp {Number(drug.price || 0).toLocaleString('id-ID')}
+                            </td>
+                            <td className="px-4 py-3 text-right font-bold text-text-primary-light dark:text-white">
+                              Rp {Number(drug.subtotal || 0).toLocaleString('id-ID')}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
                         <tr>
-                          <td colSpan={4} className="px-4 py-6 text-center text-text-secondary-light">Tidak ada detail obat.</td>
+                          <td
+                            colSpan={4}
+                            className="px-4 py-6 text-center text-text-secondary-light"
+                          >
+                            Tidak ada detail obat.
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -662,7 +805,9 @@ const StockReport: React.FC<StockReportProps> = () => {
               </div>
 
               <div>
-                <h4 className="font-bold text-lg text-text-primary-light dark:text-white mb-3">Detail Jasa</h4>
+                <h4 className="font-bold text-lg text-text-primary-light dark:text-white mb-3">
+                  Detail Jasa
+                </h4>
                 <div className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
                   <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 dark:bg-white/5 text-text-secondary-light font-bold border-b border-gray-100 dark:border-gray-800 uppercase text-xs">
@@ -674,16 +819,29 @@ const StockReport: React.FC<StockReportProps> = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                      {selectedTransaction.serviceDetails?.length > 0 ? selectedTransaction.serviceDetails.map((service: any) => (
-                        <tr key={service.id}>
-                          <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">{service.name}</td>
-                          <td className="px-4 py-3 text-center">{service.quantity}</td>
-                          <td className="px-4 py-3 text-right">Rp {Number(service.price || 0).toLocaleString('id-ID')}</td>
-                          <td className="px-4 py-3 text-right font-bold text-text-primary-light dark:text-white">Rp {Number(service.subtotal || 0).toLocaleString('id-ID')}</td>
-                        </tr>
-                      )) : (
+                      {selectedTransaction.serviceDetails?.length > 0 ? (
+                        selectedTransaction.serviceDetails.map((service: any) => (
+                          <tr key={service.id}>
+                            <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">
+                              {service.name}
+                            </td>
+                            <td className="px-4 py-3 text-center">{service.quantity}</td>
+                            <td className="px-4 py-3 text-right">
+                              Rp {Number(service.price || 0).toLocaleString('id-ID')}
+                            </td>
+                            <td className="px-4 py-3 text-right font-bold text-text-primary-light dark:text-white">
+                              Rp {Number(service.subtotal || 0).toLocaleString('id-ID')}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
                         <tr>
-                          <td colSpan={4} className="px-4 py-6 text-center text-text-secondary-light">Tidak ada detail jasa.</td>
+                          <td
+                            colSpan={4}
+                            className="px-4 py-6 text-center text-text-secondary-light"
+                          >
+                            Tidak ada detail jasa.
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -696,18 +854,26 @@ const StockReport: React.FC<StockReportProps> = () => {
                   {Number(selectedTransaction.serviceFee || 0) > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-text-secondary-light">Biaya Layanan</span>
-                      <span className="font-bold text-text-primary-light dark:text-white">Rp {Number(selectedTransaction.serviceFee || 0).toLocaleString('id-ID')}</span>
+                      <span className="font-bold text-text-primary-light dark:text-white">
+                        Rp {Number(selectedTransaction.serviceFee || 0).toLocaleString('id-ID')}
+                      </span>
                     </div>
                   )}
                   {Number(selectedTransaction.discount || 0) > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-text-secondary-light">Diskon</span>
-                      <span className="font-bold text-red-500">- Rp {Number(selectedTransaction.discount || 0).toLocaleString('id-ID')}</span>
+                      <span className="font-bold text-red-500">
+                        - Rp {Number(selectedTransaction.discount || 0).toLocaleString('id-ID')}
+                      </span>
                     </div>
                   )}
                   <div>
-                    <p className="text-xs uppercase font-bold text-text-secondary-light mb-1">Grand Total</p>
-                    <p className="text-2xl font-bold text-primary">Rp {Number(selectedTransaction.total || 0).toLocaleString('id-ID')}</p>
+                    <p className="text-xs uppercase font-bold text-text-secondary-light mb-1">
+                      Grand Total
+                    </p>
+                    <p className="text-2xl font-bold text-primary">
+                      Rp {Number(selectedTransaction.total || 0).toLocaleString('id-ID')}
+                    </p>
                   </div>
                 </div>
               </div>

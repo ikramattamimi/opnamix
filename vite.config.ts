@@ -17,9 +17,12 @@ export default defineConfig({
 
           if (id.includes('xlsx')) return 'vendor-xlsx';
           if (id.includes('/@supabase/')) return 'vendor-supabase';
-          if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) return 'vendor-react-query';
-          if (id.includes('@tanstack/react-table') || id.includes('@tanstack/table-core')) return 'vendor-react-table';
-          if (id.includes('react-router-dom') || id.includes('react-router')) return 'vendor-router';
+          if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core'))
+            return 'vendor-react-query';
+          if (id.includes('@tanstack/react-table') || id.includes('@tanstack/table-core'))
+            return 'vendor-react-table';
+          if (id.includes('react-router-dom') || id.includes('react-router'))
+            return 'vendor-router';
           if (id.includes('lucide-react')) return 'vendor-icons';
           if (id.includes('@radix-ui')) return 'vendor-radix';
           if (id.includes('react') || id.includes('scheduler')) return 'vendor-react';
@@ -33,6 +36,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
-    }
-  }
+    },
+  },
 });

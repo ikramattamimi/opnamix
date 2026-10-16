@@ -9,6 +9,7 @@
 ## 1. Jadwal Opname
 
 ### `createOpnameSchedule(config: OpnameScheduleConfig)`
+
 Insert baris baru ke `opname_schedule`.
 
 **Input:** `OpnameScheduleConfig`  
@@ -17,6 +18,7 @@ Insert baris baru ke `opname_schedule`.
 ---
 
 ### `getOpnameSchedules()`
+
 Ambil semua jadwal yang belum dihapus (`deleted_at IS NULL`), diurutkan terbaru dulu.
 
 **Output:** `OpnameSchedule[]`
@@ -24,6 +26,7 @@ Ambil semua jadwal yang belum dihapus (`deleted_at IS NULL`), diurutkan terbaru 
 ---
 
 ### `updateOpnameSchedule(id: string, config: OpnameScheduleConfig)`
+
 Update jadwal yang ada.
 
 **Output:** `{ success: true }`
@@ -31,6 +34,7 @@ Update jadwal yang ada.
 ---
 
 ### `deleteOpnameSchedule(id: string)`
+
 Soft-delete: set `deleted_at = now()`, `is_active = false`.
 
 **Output:** void
@@ -38,6 +42,7 @@ Soft-delete: set `deleted_at = now()`, `is_active = false`.
 ---
 
 ### `toggleOpnameScheduleStatus(id: string, isActive: boolean)`
+
 Toggle `is_active` pada jadwal.
 
 **Output:** void
@@ -45,9 +50,11 @@ Toggle `is_active` pada jadwal.
 ---
 
 ### `getActiveSchedules()`
+
 Ambil jadwal dengan `is_active = true` dan kalkulasi `nextDate` berikutnya.
 
 **Logika nextDate:**
+
 ```
 nextDate = tanggal_audit bulan ini
 if nextDate <= today:
@@ -57,9 +64,10 @@ if nextDate <= today:
 ```
 
 **Output:** `ScheduleInfo[]`
+
 ```ts
 interface ScheduleInfo {
-  nextDate: string;      // ISO date
+  nextDate: string; // ISO date
   pengulangan: string;
   nama: string;
   scheduleId: string;
@@ -71,9 +79,11 @@ interface ScheduleInfo {
 ## 2. Eksekusi Opname
 
 ### `startOpname(scheduleId: string | null, date: string)`
+
 Buat header opname baru (tanpa detail rows).
 
 **Efek:**
+
 - Insert `opname` dengan `status = 'belum_dilaksanakan'`, `current_step = 1`
 - Simpan `selected_obat_ids` dari `schedule.obat_ids` (preview awal)
 - Kirim notifikasi `OPNAME_CREATED` ke role admin & farmasi
@@ -83,6 +93,7 @@ Buat header opname baru (tanpa detail rows).
 ---
 
 ### `getUpcomingOpnames()`
+
 Ambil opname dengan `status = 'belum_dilaksanakan'`, urut tanggal jadwal ascending.
 
 **Output:** `OpnameCard[]`
@@ -90,6 +101,7 @@ Ambil opname dengan `status = 'belum_dilaksanakan'`, urut tanggal jadwal ascendi
 ---
 
 ### `getDraftOpnames()`
+
 Ambil opname dengan `status = 'sedang_dilaksanakan'`, urut `created_at` descending.
 
 **Output:** `OpnameCard[]`
@@ -97,6 +109,7 @@ Ambil opname dengan `status = 'sedang_dilaksanakan'`, urut `created_at` descendi
 ---
 
 ### `getOpnameHistory()`
+
 Ambil opname dengan `status = 'selesai'`, plus hitung `discrepancyCount`.
 
 **Output:** `OpnameCard[]` (dengan `itemsCount`, `discrepancyCount`)
@@ -104,9 +117,11 @@ Ambil opname dengan `status = 'selesai'`, plus hitung `discrepancyCount`.
 ---
 
 ### `getOpnameById(opnameId: string)`
+
 Ambil detail satu opname beserta semua `opname_detail` dan info produk dari `master_obat`.
 
 **Output:**
+
 ```ts
 {
   id: string;
@@ -125,9 +140,11 @@ Ambil detail satu opname beserta semua `opname_detail` dan info produk dari `mas
 ---
 
 ### `completeStepOne(opnameId: string, selectedProductIds: string[])`
+
 Konfirmasi pemilihan obat dan buat detail rows. **Trigger lock.**
 
 **Efek:**
+
 1. Update `opname`: `status → sedang_dilaksanakan`, `current_step → 2`, `selected_obat_ids → selectedProductIds`
 2. Fetch `master_obat.qty` untuk setiap produk terpilih (snapshot stok sistem)
 3. Insert `opname_detail` untuk setiap produk:
@@ -142,9 +159,11 @@ Konfirmasi pemilihan obat dan buat detail rows. **Trigger lock.**
 ---
 
 ### `backwardToStepOne(opnameId: string, scheduleObatIds: string[])`
+
 Reset ke step 1 dengan menghapus semua detail.
 
 **Efek:**
+
 1. Delete semua `opname_detail` where `opname_id = opnameId`
 2. Update `opname`: `current_step → 1`, `status → belum_dilaksanakan`, `selected_obat_ids → scheduleObatIds`
 
@@ -155,9 +174,11 @@ Reset ke step 1 dengan menghapus semua detail.
 ---
 
 ### `saveDraft(opnameId, step, detailUpdates?)`
+
 Simpan progress dan advance step.
 
 **Signature:**
+
 ```ts
 saveDraft(
   opnameId: string,
@@ -172,6 +193,7 @@ saveDraft(
 ```
 
 **Efek:**
+
 1. Update `opname.current_step = step`
 2. Untuk setiap `detailUpdate`:
    - Jika `physicalStock` ada: update `stok_fisik`, hitung `selisih = physicalStock - stok_sistem`, set `status` (`sesuai` / `pending`)
@@ -183,9 +205,11 @@ saveDraft(
 ---
 
 ### `finishOpname(opnameId: string)`
+
 Selesaikan opname dan update stok master.
 
 **Efek:**
+
 1. Ambil semua `opname_detail` untuk opname ini
 2. Untuk setiap detail:
    - `finalStock = stok_final ?? stok_fisik`
@@ -198,9 +222,11 @@ Selesaikan opname dan update stok master.
 ---
 
 ### `deleteOpname(opnameId: string)`
+
 Hard delete opname beserta detailnya.
 
 **Efek:**
+
 1. Delete `opname_detail` where `opname_id = opnameId`
 2. Delete `opname` where `id = opnameId`
 
@@ -211,9 +237,11 @@ Hard delete opname beserta detailnya.
 ## 3. View & Lock
 
 ### `getOpnameDetailView(opnameId: string)`
+
 Ambil semua detail untuk tampilan read-only (`DetailOpnamePage`).
 
 **Output:**
+
 ```ts
 {
   id: string;
@@ -223,12 +251,14 @@ Ambil semua detail untuk tampilan read-only (`DetailOpnamePage`).
   selisih: number;
   stokFinal: number | null;
   alasan: string;
-}[]
+}
+[];
 ```
 
 ---
 
 ### `getActiveOpnameLock()`
+
 Cek apakah ada opname yang sedang dalam lock state.
 
 **Query:** `opname WHERE status = 'sedang_dilaksanakan' AND current_step = 2 LIMIT 1`
@@ -236,6 +266,7 @@ Cek apakah ada opname yang sedang dalam lock state.
 > **Perubahan:** Query sebelumnya menggunakan `current_step >= 2`. Sekarang hanya `current_step = 2` agar lock otomatis dicabut ketika opname advance ke step 3.
 
 **Output:**
+
 ```ts
 {
   isLocked: boolean;
@@ -248,9 +279,11 @@ Cek apakah ada opname yang sedang dalam lock state.
 ## 4. Notifikasi
 
 ### `createNotification(notification)`
+
 Insert notifikasi ke tabel `notifications`. Satu row per target role.
 
 **Signature:**
+
 ```ts
 createNotification({
   type: string;
@@ -262,6 +295,7 @@ createNotification({
 ```
 
 **Tipe notif yang digunakan modul opname:**
+
 - `OPNAME_CREATED`
 - `OPNAME_STEP_CHANGED`
 - `OPNAME_COMPLETED`

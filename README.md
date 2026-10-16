@@ -21,11 +21,11 @@
 
 ### Role
 
-| Role | Akses |
-| --- | --- |
-| `admin` | Semua fitur, termasuk manajemen pengguna |
-| `farmasi`, `apoteker` | Menulis master data, stok masuk/keluar, dan opname |
-| `nakes` | Membaca data dan mengajukan permintaan stok keluar miliknya sendiri |
+| Role                  | Akses                                                               |
+| --------------------- | ------------------------------------------------------------------- |
+| `admin`               | Semua fitur, termasuk manajemen pengguna                            |
+| `farmasi`, `apoteker` | Menulis master data, stok masuk/keluar, dan opname                  |
+| `nakes`               | Membaca data dan mengajukan permintaan stok keluar miliknya sendiri |
 
 ## Teknologi
 
@@ -46,9 +46,9 @@ pnpm dev
 
 Perintah lain:
 
-| Perintah | Fungsi |
-| --- | --- |
-| `pnpm build` | Build produksi ke `dist/` |
+| Perintah       | Fungsi                               |
+| -------------- | ------------------------------------ |
+| `pnpm build`   | Build produksi ke `dist/`            |
 | `pnpm preview` | Menjalankan hasil build secara lokal |
 
 ## Menyiapkan Supabase
