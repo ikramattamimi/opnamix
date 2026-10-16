@@ -1,144 +1,215 @@
-Table users {
-  id int [PK]
-  username varchar [unique]
-  full_name varchar
-  email varchar [unique]
-  password_hash varchar
-  role enum
+// Schema database Opnamix (DBML, bisa dibuka di dbdiagram.io)
+//
+// Sumber kebenaran: supabase/migrations/. File ini ringkasan dari
+// 20260101000000_baseline.sql (diambil dari project dev 2026-10-16).
+// Kalau ada migration baru yang mengubah tabel, perbarui juga file ini.
+//
+// User disimpan di auth.users (Supabase Auth). Profil di profiles,
+// role yang dipakai RLS di user_roles. Status dan tipe berupa text,
+// bukan enum Postgres.
+
+Table auth.users {
+  id uuid [pk]
+  email text
+}
+
+Table profiles {
+  id uuid [pk, ref: - auth.users.id]
+  email text [unique, not null]
+  full_name text
+  role text [note: "admin | nakes | apoteker | farmasi (warisan, RLS memakai user_roles)"]
+  avatar_url text
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table user_roles {
+  id uuid [pk]
+  user_id uuid [not null, ref: > profiles.id]
+  role text [not null, note: "admin | nakes | apoteker | farmasi"]
+  created_at timestamptz
+}
+
+Table notifications {
+  id bigint [pk]
+  user_id uuid [ref: > auth.users.id]
+  target_role text [note: "null = semua user"]
+  type text [not null]
+  title text [not null]
+  message text [not null]
+  data jsonb
+  is_read boolean
+  created_at timestamptz
+}
+
+Table service_categories {
+  id integer [pk]
+  name varchar [unique, not null]
+  code varchar [unique, not null]
+  description text
   is_active boolean
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [null]
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table master_jenis_obat {
+  id bigint [pk]
+  kode varchar [unique, not null]
+  nama_jenis varchar [not null]
+  deskripsi text
+  is_active boolean
+  created_at timestamptz
+  updated_at timestamptz
+  created_by uuid [ref: > auth.users.id]
+  updated_by uuid [ref: > auth.users.id]
+}
+
+Table master_satuan {
+  id bigint [pk]
+  kode varchar [unique, not null]
+  nama_satuan varchar [not null]
+  deskripsi text
+  is_active boolean
+  created_at timestamptz
+  updated_at timestamptz
+  created_by uuid [ref: > auth.users.id]
+  updated_by uuid [ref: > auth.users.id]
 }
 
 Table master_obat {
-  id int [PK]
-  kode varchar [unique]
-  nama varchar
-  jenis varchar
-  satuan varchar
-  buffer_stok int
-  harga decimal
-  qty int
+  id bigint [pk]
+  kode text [unique, not null]
+  nama text [not null]
+  jenis text
+  satuan text
+  jenis_obat_id bigint [ref: > master_jenis_obat.id]
+  satuan_id bigint [ref: > master_satuan.id]
+  merek varchar
+  kandungan text
+  buffer_stok integer
+  harga numeric
+  qty integer [note: "diubah lewat update_stock_atomic / finish_opname"]
   is_active boolean
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [null]
-  created_by int
-  updated_by int
+  created_at timestamptz
+  created_by uuid
+  updated_at timestamptz
+  updated_by uuid
+  deleted_at timestamptz
 }
 
 Table master_jasa {
-  id int [PK]
-  kode varchar [unique]
-  nama varchar
-  harga decimal
+  id bigint [pk]
+  kode text [unique, not null]
+  nama text [not null]
+  harga numeric
+  category_id integer [ref: > service_categories.id]
   is_active boolean
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [null]
-  created_by int
-  updated_by int
+  created_at timestamptz
+  created_by uuid
+  updated_at timestamptz
+  updated_by uuid
+  deleted_at timestamptz
 }
 
 Table transaksi {
-  nomor varchar [PK]
-  tanggal timestamp
-  tipe enum
-  bukti varchar [null]
-  nama_pasien varchar [null]
-  tipe_sumber enum
-  keterangan text [null]
-  status enum
-  total decimal
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [null]
-  created_by int
-  processed_by int [null]
-  processed_at timestamp [null]
+  id bigint [pk]
+  nomor text [unique]
+  tanggal timestamptz
+  tipe text [note: "masuk | keluar"]
+  tipe_sumber text [note: "PENGAJUAN_NAKES | KASIR_LANGSUNG | PEMBELIAN"]
+  status text [note: "diajukan | selesai"]
+  bukti text [note: "URL bukti di bucket bukti-stok-masuk"]
+  nama_pasien text
+  tanggal_lahir_pasien date
+  nama_nakes text
+  jasa_id bigint [ref: > master_jasa.id]
+  keterangan text
+  total numeric
+  diskon numeric
+  biaya_layanan numeric [not null]
+  processed_by uuid
+  processed_at timestamptz
+  created_at timestamptz
+  created_by uuid
+  updated_at timestamptz
+  updated_by uuid
+  deleted_at timestamptz
 }
 
 Table transaksi_detail {
-  id int [PK]
-  transaksi_nomor varchar
-  obat_id int
-  qty int
-  harga decimal
-  subtotal decimal
-  expire_date date [null]
-  batch varchar [null]
-  created_at timestamp
-  updated_at timestamp
+  id bigint [pk]
+  transaksi_id bigint [not null, ref: > transaksi.id]
+  transaksi_nomor text [ref: > transaksi.nomor]
+  obat_id bigint [ref: > master_obat.id]
+  qty integer [not null]
+  expire_date date
+  batch text
+  harga numeric
+  subtotal numeric
 }
 
 Table transaksi_jasa {
-  id int [PK]
-  transaksi_nomor varchar
-  jasa_id int
-  harga_jasa decimal
-  created_at timestamp
+  id bigint [pk]
+  transaksi_id bigint [not null, ref: > transaksi.id]
+  transaksi_nomor text [ref: > transaksi.nomor]
+  jasa_id bigint [not null, ref: > master_jasa.id]
+  qty integer
+  harga_jasa numeric
+  subtotal numeric
+  created_at timestamptz
+  created_by uuid [ref: > auth.users.id]
+  updated_at timestamptz
+  updated_by uuid [ref: > auth.users.id]
+  deleted_at timestamptz
 }
 
 Table opname_schedule {
-  id int [PK]
-  nama varchar
-  tanggal_audit int
-  waktu_jam int
-  waktu_menit int
-  pengulangan enum
-  obat_ids json [null]
+  id bigint [pk]
+  nama text [not null]
+  tanggal_audit integer [note: "1-28"]
+  waktu_jam smallint
+  waktu_menit smallint
+  pengulangan text
+  durasi_pengerjaan integer
+  obat_ids jsonb
   is_active boolean
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [null]
-  created_by int
-  updated_by int
+  created_at timestamptz
+  created_by uuid
+  updated_at timestamptz
+  updated_by uuid
+  deleted_at timestamptz
 }
 
 Table opname {
-  id int [PK]
-  schedule_id int [null]
+  id bigint [pk]
+  schedule_id bigint [ref: > opname_schedule.id]
+  status text [note: "belum_dilaksanakan | sedang_dilaksanakan | selesai | dihapus"]
+  current_step smallint [note: "1 pilih obat, 2 input fisik, 3 penyesuaian"]
+  tanggal timestamptz
   tanggal_jadwal date
-  status enum
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [null]
-  created_by int
+  selected_obat_ids jsonb
+  obat_ids jsonb
+  completed_at timestamptz
+  created_at timestamptz
+  created_by uuid
+  updated_at timestamptz
+  updated_by uuid
+  deleted_at timestamptz
 }
 
 Table opname_detail {
-  id int [PK]
-  opname_id int
-  obat_id int
-  stok_sistem int
-  stok_fisik int [null]
-  selisih int [null]
-  status enum
-  alasan text [null]
-  created_at timestamp
-  updated_at timestamp
-  updated_by int [null]
+  id bigint [pk]
+  opname_id bigint [ref: > opname.id]
+  obat_id bigint [ref: > master_obat.id]
+  stok_sistem integer [note: "snapshot qty saat opname mulai"]
+  stok_fisik integer
+  selisih integer
+  stok_final integer
+  status text [note: "pending | sesuai | disesuaikan"]
+  alasan text
+  created_at timestamptz
+  created_by uuid
+  updated_at timestamptz
+  updated_by uuid
+  deleted_at timestamptz
 }
-
-Ref: users.id - master_obat.created_by
-Ref: users.id - master_obat.updated_by
-Ref: users.id - master_jasa.created_by
-Ref: users.id - master_jasa.updated_by
-Ref: users.id - transaksi.created_by
-Ref: users.id - transaksi.processed_by
-Ref: users.id - opname_schedule.created_by
-Ref: users.id - opname_schedule.updated_by
-Ref: users.id - opname.created_by
-Ref: users.id - opname_detail.updated_by
-
-Ref: master_obat.id - transaksi_detail.obat_id
-Ref: master_jasa.id - transaksi_jasa.jasa_id
-Ref: master_obat.id - opname_detail.obat_id
-
-Ref: transaksi.nomor - transaksi_detail.transaksi_nomor
-Ref: transaksi.nomor - transaksi_jasa.transaksi_nomor
-
-Ref: opname_schedule.id - opname.schedule_id
-Ref: opname.id - opname_detail.opname_id
-
