@@ -59,7 +59,11 @@ export function useStockOutRealtime() {
 export function useCreateStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateTransactionPayload) => transactionsApi.createTransaction(payload),
+    // Nomor transaksi dibuat di sini, tepat sebelum transaksi disimpan
+    mutationFn: async (payload: Omit<CreateTransactionPayload, 'nomor'>) => {
+      const nomor = await transactionsApi.generateTransactionNumber('keluar');
+      return transactionsApi.createTransaction({ ...payload, nomor });
+    },
     onSuccess: (_data, payload) => {
       // Stok keluar manual langsung selesai (stok berubah); permintaan nakes
       // masih diajukan (hanya daftar dan hitungan tertunda di dashboard).

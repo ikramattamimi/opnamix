@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { transactionsApi } from '@/features/transactions/api';
 import { StockOutRequest, StockOutManual, RequestedDrug } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import {
@@ -120,10 +119,7 @@ const StockOutManagement: React.FC = () => {
         return sum + (product ? product.sellingPrice : 0) * item.quantity;
       }, 0);
 
-      const transactionNumber = await transactionsApi.generateTransactionNumber('keluar');
-
       await createTransaction.mutateAsync({
-        nomor: transactionNumber,
         tanggal: record.date,
         tipe: 'keluar',
         tipe_sumber: 'KASIR_LANGSUNG',
@@ -164,10 +160,7 @@ const StockOutManagement: React.FC = () => {
 
   const handleSaveRequest = async (request: StockOutRequest) => {
     try {
-      const transactionNumber = await transactionsApi.generateTransactionNumber('keluar');
-
       await createTransaction.mutateAsync({
-        nomor: transactionNumber,
         tanggal: request.date,
         tipe: 'keluar',
         tipe_sumber: request.tipeSumber,
