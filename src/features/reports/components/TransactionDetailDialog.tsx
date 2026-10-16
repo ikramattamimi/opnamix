@@ -1,4 +1,5 @@
 import React from 'react';
+import { X } from 'lucide-react';
 import { toDate } from '@/lib/utils';
 import type { TransactionReportRow } from '../api';
 
@@ -23,9 +24,10 @@ const TransactionDetailDialog: React.FC<TransactionDetailDialogProps> = ({
         <button
           type="button"
           onClick={onClose}
+          aria-label="Tutup"
           className="p-2 bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors"
         >
-          <span className="material-icons-round">close</span>
+          <X className="size-6" aria-hidden />
         </button>
       </div>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChartColumn, ChartPie } from 'lucide-react';
 import type { Product } from '@/features/products/types';
 import type { CategoryStat } from '../stockAnalytics';
 
@@ -14,7 +15,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
     {/* Bar Chart: Stock Levels */}
     <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
       <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-        <span className="material-icons-round text-primary">bar_chart</span>
+        <ChartColumn className="size-6 text-primary" aria-hidden />
         Level Stok Produk Teratas
       </h3>
       <div className="h-64 flex items-end justify-around gap-4 px-2">
@@ -48,7 +49,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
     <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft flex flex-col md:flex-row items-center gap-8">
       <div className="flex-1">
         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-          <span className="material-icons-round text-secondary">pie_chart</span>
+          <ChartPie className="size-6 text-secondary" aria-hidden />
           Distribusi Kategori
         </h3>
         <div className="space-y-4">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Download, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { stockMutationColumns } from '../StockMutationColumns';
@@ -46,9 +47,9 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
           onClick={handleExportMutations}
           variant="outline"
           disabled={allMutationData.length === 0}
-          className="px-6 py-2.5 rounded-xl font-bold h-auto flex items-center gap-2"
+          className="px-6 py-2.5 rounded-xl font-bold h-auto flex items-center gap-2 [&_svg]:size-5"
         >
-          <span className="material-icons-round text-base">download</span>
+          <Download className="size-5" aria-hidden />
           Export Excel
         </Button>
       </div>
@@ -56,9 +57,9 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
       <DateRangeFilter value={range} onChange={setRange}>
         <Button
           onClick={() => void mutationQuery.refetch()}
-          className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2"
+          className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2 [&_svg]:size-5"
         >
-          <span className="material-icons-round text-base">search</span>
+          <Search className="size-5" aria-hidden />
           Tampilkan Laporan
         </Button>
       </DateRangeFilter>

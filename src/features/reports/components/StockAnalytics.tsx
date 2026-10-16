@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Archive, Banknote, OctagonAlert, TriangleAlert } from 'lucide-react';
+import { Archive, Banknote, FunnelX, OctagonAlert, Search, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/common/StatCard';
 import { Category } from '@/features/products/types';
@@ -69,9 +69,10 @@ const StockAnalytics: React.FC = () => {
       {/* Filters Bar */}
       <div className="bg-card-light dark:bg-card-dark rounded-3xl p-4 shadow-soft flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-[200px] relative">
-          <span className="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary-light text-xl">
-            search
-          </span>
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-text-secondary-light"
+            aria-hidden
+          />
           <input
             type="text"
             placeholder="Cari produk atau SKU..."
@@ -123,10 +124,11 @@ const StockAnalytics: React.FC = () => {
             setFilterCategory('Semua');
             setFilterStatus('Semua');
           }}
-          className="p-3 text-text-secondary-light hover:text-red-500 transition-colors h-auto w-auto"
+          className="p-3 text-text-secondary-light hover:text-red-500 transition-colors h-auto w-auto [&_svg]:size-6"
           title="Reset Filter"
+          aria-label="Reset Filter"
         >
-          <span className="material-icons-round">filter_alt_off</span>
+          <FunnelX className="size-6" aria-hidden />
         </Button>
       </div>
 

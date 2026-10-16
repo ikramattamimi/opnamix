@@ -1,4 +1,5 @@
 import React from 'react';
+import { Archive, CircleCheck, OctagonAlert, TriangleAlert } from 'lucide-react';
 import type { Product } from '@/features/products/types';
 import { getStockStatus, getStockValue } from '../stockAnalytics';
 
@@ -58,15 +59,15 @@ const StockStatusTable: React.FC<StockStatusTableProps> = ({ products }) => (
                 <td className="py-4">
                   {status === 'Kritikal' ? (
                     <span className="px-3 py-1.5 bg-red-100 text-red-600 rounded-xl text-[10px] font-bold flex items-center gap-1 w-fit uppercase tracking-wider">
-                      <span className="material-icons-round text-xs">report</span> Kritikal
+                      <OctagonAlert className="size-3" aria-hidden /> Kritikal
                     </span>
                   ) : status === 'Menipis' ? (
                     <span className="px-3 py-1.5 bg-amber-100 text-amber-600 rounded-xl text-[10px] font-bold flex items-center gap-1 w-fit uppercase tracking-wider">
-                      <span className="material-icons-round text-xs">warning</span> Menipis
+                      <TriangleAlert className="size-3" aria-hidden /> Menipis
                     </span>
                   ) : (
                     <span className="px-3 py-1.5 bg-green-100 text-green-600 rounded-xl text-[10px] font-bold flex items-center gap-1 w-fit uppercase tracking-wider">
-                      <span className="material-icons-round text-xs">check_circle</span> Aman
+                      <CircleCheck className="size-3" aria-hidden /> Aman
                     </span>
                   )}
                 </td>
@@ -77,7 +78,7 @@ const StockStatusTable: React.FC<StockStatusTableProps> = ({ products }) => (
             <tr>
               <td colSpan={5} className="py-20 text-center">
                 <div className="flex flex-col items-center opacity-40">
-                  <span className="material-icons-round text-5xl mb-2">inventory_2</span>
+                  <Archive className="size-12 mb-2" aria-hidden />
                   <p className="font-bold text-sm">Tidak ada produk yang sesuai dengan filter.</p>
                 </div>
               </td>
