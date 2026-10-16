@@ -1,5 +1,8 @@
 import React from 'react';
+import { ArrowLeft, Eye, ReceiptText } from 'lucide-react';
 import { StockInReceipt } from './types';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/common/QueryState';
 
 interface StockInDetailProps {
   receipt: StockInReceipt;
@@ -10,12 +13,16 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4 mb-2">
-        <button
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={onBack}
-          className="p-2 bg-white dark:bg-card-dark rounded-full shadow-soft hover:text-primary transition-colors"
+          aria-label="Kembali"
+          className="h-auto w-auto p-2 text-current bg-white dark:bg-card-dark hover:bg-white dark:hover:bg-card-dark rounded-full shadow-soft hover:text-primary transition-colors [&_svg]:size-6"
         >
-          <span className="material-icons-round">arrow_back</span>
-        </button>
+          <ArrowLeft aria-hidden />
+        </Button>
         <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
           Detail Penerimaan Stok
         </h2>
@@ -76,7 +83,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
                   rel="noreferrer"
                   className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold gap-2"
                 >
-                  <span className="material-icons-round">visibility</span>
+                  <Eye className="size-6" aria-hidden />
                   Lihat Full
                 </a>
               </div>
@@ -86,14 +93,11 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
               <h3 className="text-lg font-bold text-text-primary-light dark:text-white mb-4">
                 Bukti Nota
               </h3>
-              <div className="rounded-xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-white/5 p-8 text-center">
-                <span className="material-icons-round text-6xl text-gray-300 dark:text-gray-600 mb-3 block">
-                  receipt_long
-                </span>
-                <p className="text-text-secondary-light dark:text-text-secondary-dark">
-                  Tidak ada bukti nota yang diunggah
-                </p>
-              </div>
+              <EmptyState
+                icon={ReceiptText}
+                title="Tidak ada bukti nota yang diunggah"
+                className="rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-white/5 p-8"
+              />
             </div>
           )}
         </div>

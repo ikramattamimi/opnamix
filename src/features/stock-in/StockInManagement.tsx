@@ -6,7 +6,8 @@ import { stockInApi } from './api';
 import { exportStockInToExcel } from '@/features/reports/exportUtils';
 import { useStockInReceipts, useCreateStockIn } from './useStockIn';
 import StatCard from '@/components/common/StatCard';
-import { Archive, CircleArrowDown, TrendingUp } from 'lucide-react';
+import { Archive, CircleArrowDown, Download, Plus, TrendingUp } from 'lucide-react';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import StockInForm from './StockInForm';
 import StockInDetail from './StockInDetail';
 import PaginationControls from '@/components/common/PaginationControls';
@@ -25,7 +26,13 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const { data: paginatedData, isPlaceholderData } = useStockInReceipts({ page, perPage });
+  const {
+    data: paginatedData,
+    isPlaceholderData,
+    isPending,
+    isError,
+    refetch,
+  } = useStockInReceipts({ page, perPage });
   const receipts = paginatedData?.data || [];
   const totalPages = paginatedData?.totalPages || 1;
   const totalReceipts = paginatedData?.total || 0;
@@ -113,9 +120,9 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
             <div className="flex gap-2">
               <Button
                 onClick={() => setIsFormOpen(true)}
-                className="shadow-lg shadow-primary/30 flex items-center gap-2"
+                className="shadow-lg shadow-primary/30 flex items-center gap-2 [&_svg]:size-5"
               >
-                <span className="material-icons-round text-lg">add</span>
+                <Plus aria-hidden />
                 Terima Stok Baru
               </Button>
               <Button
@@ -123,17 +130,25 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
                 className="flex items-center gap-2"
                 onClick={() => void exportStockInToExcel(receipts)}
               >
-                <span className="material-icons-round text-sm">file_download</span> Ekspor
+                <Download aria-hidden /> Ekspor
               </Button>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <DataTable
-              columns={createStockInColumns({ onView: setSelectedReceipt })}
-              data={receipts}
-              searchable={false}
-            />
+            {isPending ? (
+              <LoadingState label="Memuat penerimaan stok..." />
+            ) : isError ? (
+              <ErrorState onRetry={() => void refetch()} />
+            ) : receipts.length === 0 ? (
+              <EmptyState icon={Archive} title="Belum ada penerimaan stok." />
+            ) : (
+              <DataTable
+                columns={createStockInColumns({ onView: setSelectedReceipt })}
+                data={receipts}
+                searchable={false}
+              />
+            )}
             <PaginationControls
               currentPage={page}
               totalPages={totalPages}

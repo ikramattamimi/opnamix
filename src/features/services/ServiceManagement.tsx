@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Service } from './types';
 import { useServices, useDeleteService } from './useServices';
 import StatCard from '@/components/common/StatCard';
-import { BriefcaseMedical, DollarSign } from 'lucide-react';
+import { BriefcaseMedical, DollarSign, Download, ListPlus, Plus } from 'lucide-react';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import PaginationControls from '@/components/common/PaginationControls';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,13 @@ const ServiceManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const { data: paginatedData, isPlaceholderData } = useServices({ page, perPage });
+  const {
+    data: paginatedData,
+    isPlaceholderData,
+    isPending,
+    isError,
+    refetch,
+  } = useServices({ page, perPage });
   const services = paginatedData?.data || [];
   const totalPages = paginatedData?.totalPages || 1;
   const totalServices = paginatedData?.total || 0;
@@ -87,23 +94,26 @@ const ServiceManagement: React.FC = () => {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className="shadow-md flex items-center gap-2"
+              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
               onClick={() => setIsCategoryModalOpen(true)}
             >
-              <span className="material-icons-round">playlist_add</span>
+              <ListPlus aria-hidden />
               Tambah Kategori
             </Button>
             <Button
               variant="outline"
-              className="shadow-md flex items-center gap-2"
+              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
               onClick={() => void exportServicesToExcel(services)}
               disabled={services.length === 0}
             >
-              <span className="material-icons-round">file_download</span>
+              <Download aria-hidden />
               Ekspor Excel
             </Button>
-            <Button onClick={() => handleOpenModal()} className="shadow-md flex items-center gap-2">
-              <span className="material-icons-round">add</span>
+            <Button
+              onClick={() => handleOpenModal()}
+              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
+            >
+              <Plus aria-hidden />
               Tambah Jasa Baru
             </Button>
           </div>
@@ -112,14 +122,22 @@ const ServiceManagement: React.FC = () => {
         {/* Table */}
         <div className="w-full">
           <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft h-full">
-            <DataTable
-              columns={createServiceColumns({
-                onEdit: handleOpenModal,
-                onDelete: handleDeleteClick,
-              })}
-              data={services}
-              searchable={false}
-            />
+            {isPending ? (
+              <LoadingState label="Memuat jasa..." />
+            ) : isError ? (
+              <ErrorState onRetry={() => void refetch()} />
+            ) : services.length === 0 ? (
+              <EmptyState icon={BriefcaseMedical} title="Belum ada jasa." />
+            ) : (
+              <DataTable
+                columns={createServiceColumns({
+                  onEdit: handleOpenModal,
+                  onDelete: handleDeleteClick,
+                })}
+                data={services}
+                searchable={false}
+              />
+            )}
             <PaginationControls
               currentPage={page}
               totalPages={totalPages}
