@@ -17,7 +17,6 @@ export default defineConfig({
 
           if (id.includes('xlsx')) return 'vendor-xlsx';
           if (id.includes('/@supabase/')) return 'vendor-supabase';
-          if (id.includes('/@aws-sdk/') || id.includes('/@smithy/')) return 'vendor-aws';
           if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) return 'vendor-react-query';
           if (id.includes('@tanstack/react-table') || id.includes('@tanstack/table-core')) return 'vendor-react-table';
           if (id.includes('react-router-dom') || id.includes('react-router')) return 'vendor-router';

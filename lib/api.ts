@@ -344,51 +344,22 @@ export const api = {
     return `${prefix}-${timestamp}-${random}`;
   },
 
-  // HELPER: Upload receipt image to Supabase Storage via S3 Protocol
+  // HELPER: Upload receipt image to Supabase Storage with the user's session
+  // (storage policy allows staff to upload into bukti-stok-masuk/receipts/)
   uploadReceiptImage: async (file: Blob, transactionNumber: string): Promise<string> => {
-    // Dynamically import AWS SDK to reduce initial bundle size and ensure types are loaded only when needed
-    const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
-
-    const s3Client = new S3Client({
-      region: import.meta.env.VITE_S3_REGION,
-      endpoint: import.meta.env.VITE_S3_ENDPOINT,
-      credentials: {
-        accessKeyId: import.meta.env.VITE_S3_ACCESS_KEY_ID,
-        secretAccessKey: import.meta.env.VITE_S3_SECRET_ACCESS_KEY,
-      },
-      forcePathStyle: true, // Required for Supabase S3 compatibility
-    });
-
-    const fileName = `${transactionNumber}-${Date.now()}.webp`;
     const bucketName = 'bukti-stok-masuk';
-    const filePath = `receipts/${fileName}`; // Full path in bucket
+    const filePath = `receipts/${transactionNumber}-${Date.now()}.webp`;
 
-    // Convert Blob to Uint8Array for S3
-    const arrayBuffer = await file.arrayBuffer();
-    const body = new Uint8Array(arrayBuffer);
+    const { error } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, file, { contentType: 'image/webp', cacheControl: '3600' });
 
-    const command = new PutObjectCommand({
-      Bucket: bucketName,
-      Key: filePath, // Note: S3 treats Key as the full path
-      Body: body,
-      ContentType: 'image/webp',
-      // ACL: 'public-read', // Removed to avoid permission issues with Supabase S3 wrapper
-      CacheControl: '3600',
-    });
-
-    try {
-      await s3Client.send(command);
-
-      // Parse project ref from VITE_SUPABASE_URL (e.g. https://<ref>.supabase.co)
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-      const projectRef = new URL(supabaseUrl).hostname.split('.')[0];
-      const publicUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/${bucketName}/${filePath}`;
-
-      return publicUrl;
-    } catch (error) {
-      console.error('S3 Upload Error:', error);
+    if (error) {
+      console.error('Receipt upload error:', error);
       throw error;
     }
+
+    return supabase.storage.from(bucketName).getPublicUrl(filePath).data.publicUrl;
   },
 
   // TRANSACTIONS
