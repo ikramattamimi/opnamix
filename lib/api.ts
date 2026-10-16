@@ -21,6 +21,7 @@ import {
   getProductDisplayName,
   getProductDisplayNameFromDb,
 } from './productDisplay';
+import { getLowStockItems } from './lowStock';
 import { toDate } from './utils';
 
 // Map DB types to Frontend types
@@ -1435,7 +1436,7 @@ export const api = {
     // Ideally create a VIEW or RPC. Let's try JS side for now (safe for < 10k items).
     const { data: products, error: prodError } = await supabase
       .from('master_obat')
-      .select('qty, harga, jenis, buffer_stok') // Added jenis for stats, buffer_stok for threshold
+      .select('nama, qty, harga, jenis, buffer_stok, merek, kandungan')
       .eq('is_active', true)
       .is('deleted_at', null);
 
@@ -1480,17 +1481,9 @@ export const api = {
 
     // 5. Recent Transactions removed from here, will use dedicated endpoint with pagination
 
-    // 6. Low Stock Items (Specific Names)
-
-    // 6. Low Stock Items (Specific Names)
-    // Using buffer_stok field for dynamic threshold, fallback to 10 if not set
-    const { data: lowStockItems } = await supabase
-      .from('master_obat')
-      .select('nama, qty, buffer_stok, jenis, merek, kandungan')
-      .eq('is_active', true)
-      .is('deleted_at', null)
-      .or('qty.lt.buffer_stok,qty.lt.10')
-      .limit(3);
+    // 6. Low Stock Items: dihitung dari data produk di atas, karena PostgREST
+    // tidak bisa membandingkan dua kolom (qty vs buffer_stok) dalam filter.
+    const allLowStock = getLowStockItems(products ?? []);
 
     // 7. Weekly Stock Out Data (last 7 days)
     const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
@@ -1516,7 +1509,8 @@ export const api = {
       stokKeluar: outCount || 0,
       tertunda: pendingCount || 0,
       recentTransactions: [],
-      lowStockItems: (lowStockItems || []).map((item) => ({
+      lowStockCount: allLowStock.length,
+      lowStockItems: allLowStock.slice(0, 3).map((item) => ({
         ...item,
         nama: getProductDisplayNameFromDb(item),
       })),

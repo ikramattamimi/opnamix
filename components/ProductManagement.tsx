@@ -105,7 +105,7 @@ const ProductManagement: React.FC = () => {
         const data = await import('../lib/api').then((m) => m.api.getDashboardStats());
         setRealStats({
           totalValue: data.totalValue,
-          lowStock: data.lowStockItems.length,
+          lowStock: data.lowStockCount,
         });
       } catch (err) {
         console.error(err);

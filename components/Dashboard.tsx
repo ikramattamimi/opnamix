@@ -78,6 +78,7 @@ const Dashboard: React.FC = () => {
     stokKeluar: 0,
     tertunda: 0,
     recentTransactions: [],
+    lowStockCount: 0,
     lowStockItems: [],
     categoryDistribution: {},
     weeklyStockOut: [],
