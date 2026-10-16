@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/common/StatCard';
+import { ClipboardClock, Download, Pill, Upload } from 'lucide-react';
 import type { DashboardStats, RecentTransaction } from './api';
 import { useDashboardStats, useRecentTransactions } from './useDashboard';
 import { exportRecentTransactionsToExcel } from '@/features/reports/exportUtils';
@@ -74,25 +75,25 @@ const Dashboard: React.FC = () => {
         <StatCard
           label="Total Barang"
           value={safeStats.totalProducts.toLocaleString()}
-          icon="medication"
+          icon={Pill}
           color="primary"
         />
         <StatCard
           label="Stok Masuk"
           value={safeStats.stokMasuk.toLocaleString()}
-          icon="download"
+          icon={Download}
           color="primary"
         />
         <StatCard
           label="Stok Keluar"
           value={safeStats.stokKeluar.toLocaleString()}
-          icon="upload"
+          icon={Upload}
           color="primary"
         />
         <StatCard
           label="Tertunda"
           value={safeStats.tertunda.toLocaleString()}
-          icon="pending_actions"
+          icon={ClipboardClock}
           color="primary"
         />
 

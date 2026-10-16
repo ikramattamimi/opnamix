@@ -3,6 +3,7 @@ import { Service } from './types';
 import { useServices, useCreateService, useUpdateService, useDeleteService } from './useServices';
 import { useCreateServiceCategory, useServiceCategories } from './useServiceCategories';
 import StatCard from '@/components/common/StatCard';
+import { BriefcaseMedical, DollarSign } from 'lucide-react';
 import PaginationControls from '@/components/common/PaginationControls';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { Button } from '@/components/ui/button';
@@ -216,7 +217,7 @@ const ServiceManagement: React.FC = () => {
           <StatCard
             label="Total Jasa"
             value={totalServices.toString()}
-            icon="medical_services"
+            icon={BriefcaseMedical}
             color="primary"
           />
           <StatCard
@@ -226,7 +227,7 @@ const ServiceManagement: React.FC = () => {
                 ? `Rp ${Math.round(services.reduce((acc, s) => acc + (s.price || 0), 0) / services.length).toLocaleString('id-ID')}`
                 : '-'
             }
-            icon="attach_money"
+            icon={DollarSign}
             color="orange-500"
           />
         </div>

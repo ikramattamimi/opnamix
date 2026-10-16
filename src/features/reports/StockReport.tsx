@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Category } from '@/features/products/types';
 import { useProducts } from '@/features/products/useProducts';
 import StatCard from '@/components/common/StatCard';
+import { Archive, Banknote, OctagonAlert, TriangleAlert } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table';
 import { createTransactionReportColumns } from './TransactionReportColumns';
 import { stockMutationColumns } from './StockMutationColumns';
@@ -223,20 +224,20 @@ const StockReport: React.FC = () => {
             <StatCard
               label="Nilai Inventaris"
               value={`Rp ${(totalValue / 1000000).toFixed(1)}jt`}
-              icon="payments"
+              icon={Banknote}
               color="primary"
             />
+            <StatCard label="Total SKU" value={products.length} icon={Archive} color="blue-500" />
             <StatCard
-              label="Total SKU"
-              value={products.length}
-              icon="inventory_2"
-              color="blue-500"
+              label="Stok Menipis"
+              value={lowStockCount}
+              icon={TriangleAlert}
+              color="amber-500"
             />
-            <StatCard label="Stok Menipis" value={lowStockCount} icon="warning" color="amber-500" />
             <StatCard
               label="Stok Kritikal"
               value={criticalStockCount}
-              icon="dangerous"
+              icon={OctagonAlert}
               color="red-500"
             />
           </div>

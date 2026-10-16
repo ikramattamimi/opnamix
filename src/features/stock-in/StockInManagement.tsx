@@ -6,6 +6,7 @@ import { stockInApi } from './api';
 import { exportStockInToExcel } from '@/features/reports/exportUtils';
 import { useStockInReceipts, useCreateStockIn } from './useStockIn';
 import StatCard from '@/components/common/StatCard';
+import { Archive, CircleArrowDown, TrendingUp } from 'lucide-react';
 import StockInForm from './StockInForm';
 import StockInDetail from './StockInDetail';
 import PaginationControls from '@/components/common/PaginationControls';
@@ -99,14 +100,9 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
       <div className="space-y-6">
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <StatCard
-            label="Total Stok Masuk"
-            value={totalReceipts}
-            icon="inventory_2"
-            color="primary"
-          />
-          <StatCard label="Masuk Hari Ini" value="-" icon="arrow_circle_down" color="blue-500" />
-          <StatCard label="Growth Stok" value="-" icon="trending_up" color="green-500" />
+          <StatCard label="Total Stok Masuk" value={totalReceipts} icon={Archive} color="primary" />
+          <StatCard label="Masuk Hari Ini" value="-" icon={CircleArrowDown} color="blue-500" />
+          <StatCard label="Growth Stok" value="-" icon={TrendingUp} color="green-500" />
         </div>
 
         <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">

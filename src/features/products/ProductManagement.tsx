@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Product, Category } from './types';
 import StatCard from '@/components/common/StatCard';
+import { Archive, CircleDollarSign, TriangleAlert } from 'lucide-react';
 import ProductForm from './ProductForm';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from './useProducts';
 import PaginationControls from '@/components/common/PaginationControls';
@@ -110,19 +111,19 @@ const ProductManagement: React.FC = () => {
           <StatCard
             label="Total Produk"
             value={stats.total.toLocaleString()}
-            icon="inventory_2"
+            icon={Archive}
             color="primary"
           />
           <StatCard
             label="Total Nilai"
             value={`Rp ${stats.totalValue.toLocaleString('id-ID')}`}
-            icon="monetization_on"
+            icon={CircleDollarSign}
             color="green-500"
           />
           <StatCard
             label="Stok Menipis (Top 3)"
             value={stats.lowStock}
-            icon="warning"
+            icon={TriangleAlert}
             color="red-500"
           />
         </div>
