@@ -1,4 +1,6 @@
 import React from 'react';
+import { CircleCheck, Clock, User } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { formatDateForDisplay } from '@/lib/format';
 import { StockOutRequest } from '../types';
 
@@ -16,7 +18,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
   <>
     <div className="bg-blue-50 dark:bg-blue-500/10 p-4 rounded-2xl border border-blue-100 dark:border-blue-500/20 flex gap-4 items-center">
       <div className="p-3 bg-white dark:bg-white/10 rounded-xl shadow-sm">
-        <span className="material-icons-round text-primary text-3xl">person</span>
+        <User className="size-8 text-primary" aria-hidden />
       </div>
       <div className="flex-1">
         <p className="text-sm text-text-secondary-light uppercase tracking-wider font-bold mb-1">
@@ -24,22 +26,24 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
         </p>
         {onChange ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
+            <Input
               type="text"
               value={request.patient.fullName}
               onChange={(e) =>
                 onChange({ ...request, patient: { ...request.patient, fullName: e.target.value } })
               }
-              className="rounded-xl border border-blue-200 dark:border-blue-500/20 bg-white dark:bg-card-dark px-4 py-3 text-sm font-semibold text-text-primary-light dark:text-white"
+              className="h-auto rounded-xl border border-blue-200 dark:border-blue-500/20 bg-white dark:bg-card-dark px-4 py-3 text-sm md:text-sm font-semibold text-text-primary-light dark:text-white"
               placeholder="Nama pasien"
+              aria-label="Nama pasien"
             />
-            <input
+            <Input
               type="date"
               value={request.patient.birthDate || ''}
+              aria-label="Tanggal lahir pasien"
               onChange={(e) =>
                 onChange({ ...request, patient: { ...request.patient, birthDate: e.target.value } })
               }
-              className="rounded-xl border border-blue-200 dark:border-blue-500/20 bg-white dark:bg-card-dark px-4 py-3 text-sm text-text-primary-light dark:text-white"
+              className="h-auto rounded-xl border border-blue-200 dark:border-blue-500/20 bg-white dark:bg-card-dark px-4 py-3 text-sm md:text-sm text-text-primary-light dark:text-white"
             />
           </div>
         ) : (
@@ -61,11 +65,11 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
           Status Permintaan
         </p>
         <div className="flex items-center gap-2">
-          <span
-            className={`material-icons-round ${request.status === 'Menunggu' ? 'text-amber-500' : 'text-emerald-500'}`}
-          >
-            {request.status === 'Menunggu' ? 'schedule' : 'check_circle'}
-          </span>
+          {request.status === 'Menunggu' ? (
+            <Clock className="size-6 text-amber-500" aria-hidden />
+          ) : (
+            <CircleCheck className="size-6 text-emerald-500" aria-hidden />
+          )}
           <span className="font-bold text-lg">{request.status}</span>
         </div>
       </div>
@@ -81,11 +85,12 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
             }}
           />
           {onChange ? (
-            <input
+            <Input
               type="text"
               value={request.requestedBy}
               onChange={(e) => onChange({ ...request, requestedBy: e.target.value })}
-              className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm font-bold text-text-primary-light dark:text-white"
+              aria-label="Diajukan oleh"
+              className="h-auto w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm md:text-sm font-bold text-text-primary-light dark:text-white"
             />
           ) : (
             <span className="font-bold">{request.requestedBy}</span>

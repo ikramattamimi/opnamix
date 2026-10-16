@@ -1,9 +1,19 @@
 import React from 'react';
+import { CircleCheck, Loader2, Package } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { cn, withErrorDetail } from '@/lib/utils';
 import { useToast } from '@/components/ui/toast';
-import { withErrorDetail } from '@/lib/utils';
 import { calculateRequestTotals } from '../stockOutTotals';
 import { StockOutRequest } from '../types';
 import { useProcessStockOutRequest } from '../useStockOut';
+import { PRIMARY_BUTTON } from './dialogStyles';
 
 // Permintaan yang akan diproses beserta diskon dan biaya layanan dari mode proses
 export interface ProcessDraft {
@@ -46,19 +56,19 @@ const StockOutProcessDialog: React.FC<StockOutProcessDialogProps> = ({ draft, on
   };
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-card-dark w-full max-w-md rounded-3xl shadow-2xl p-6 animate-scaleUp text-center">
+    <AlertDialog open onOpenChange={(open) => !open && !processTransaction.isPending && onClose()}>
+      <AlertDialogContent className="block max-w-md rounded-3xl sm:rounded-3xl border-none bg-white dark:bg-card-dark shadow-2xl p-6 text-center">
         <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
-          <span className="material-icons-round text-4xl">inventory</span>
+          <Package className="size-10" aria-hidden />
         </div>
-        <h3 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
+        <AlertDialogTitle className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
           Proses Permintaan?
-        </h3>
-        <p className="text-text-secondary-light mb-6">
+        </AlertDialogTitle>
+        <AlertDialogDescription className="text-base text-text-secondary-light mb-6">
           Anda akan memproses permintaan untuk pasien{' '}
           <span className="font-bold text-primary">{request.patient.fullName}</span>. Jika ada item
           obat, stok akan dikurangi secara otomatis sesuai item yang diminta.
-        </p>
+        </AlertDialogDescription>
 
         <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-4 mb-6 text-left border border-gray-100 dark:border-white/10 max-h-40 overflow-y-auto">
           <p className="text-xs font-bold text-text-secondary-light uppercase mb-2">
@@ -122,32 +132,32 @@ const StockOutProcessDialog: React.FC<StockOutProcessDialogProps> = ({ draft, on
         </div>
 
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 text-text-secondary-light font-bold hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors"
+          <AlertDialogCancel
+            disabled={processTransaction.isPending}
+            className="flex-1 mt-0 h-auto py-3 border-none shadow-none bg-transparent text-text-secondary-light font-bold hover:text-text-secondary-light hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl"
           >
             Batal
-          </button>
-          <button
+          </AlertDialogCancel>
+          <Button
             onClick={processRequest}
             disabled={processTransaction.isPending}
-            className="flex-1 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            className={cn(PRIMARY_BUTTON, 'flex-1 py-3 text-base [&_svg]:size-5')}
           >
             {processTransaction.isPending ? (
               <>
-                <span className="material-icons-round text-lg animate-spin">refresh</span>
+                <Loader2 className="animate-spin" aria-hidden />
                 Memproses...
               </>
             ) : (
               <>
-                <span className="material-icons-round text-lg">check_circle</span>
+                <CircleCheck aria-hidden />
                 Ya, Proses
               </>
             )}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

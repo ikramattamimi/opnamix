@@ -1,4 +1,5 @@
 import React from 'react';
+import { BriefcaseMedical } from 'lucide-react';
 import type { Service } from '@/features/services/types';
 import { RequestedService } from '../types';
 
@@ -13,7 +14,7 @@ interface RequestServicesProps {
 
 const SectionTitle: React.FC = () => (
   <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-    <span className="material-icons-round text-primary">medical_services</span>
+    <BriefcaseMedical className="size-6 text-primary" aria-hidden />
     Layanan Tambahan
   </h4>
 );

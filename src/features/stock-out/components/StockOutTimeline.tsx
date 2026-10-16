@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { Clock, Eye, EyeOff, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
+import { getErrorMessage } from '@/lib/utils';
 import { useRecentStockOuts } from '../useStockOut';
 
 const TIMELINE_LIMIT = 10;
@@ -7,8 +10,28 @@ const TIMELINE_LIMIT = 10;
 // Riwayat pengeluaran terbaru di bawah tabel.
 // Ter-update otomatis lewat invalidasi stockOutKeys.all (realtime dan mutasi).
 const StockOutTimeline: React.FC = () => {
-  const { data: timelineData = [], refetch } = useRecentStockOuts(TIMELINE_LIMIT);
+  const { data: timelineData = [], isLoading, error, refetch } = useRecentStockOuts(TIMELINE_LIMIT);
   const [showTimeline, setShowTimeline] = useState(true);
+
+  const renderContent = () => {
+    if (isLoading) return <LoadingState />;
+    if (error)
+      return <ErrorState message={getErrorMessage(error)} onRetry={() => void refetch()} />;
+    if (timelineData.length === 0) return <EmptyState title="Belum ada riwayat pengeluaran." />;
+    return (
+      <div className="relative pl-2 border-l-2 border-gray-100 dark:border-gray-700 space-y-8 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+        {timelineData.map((item, i) => (
+          <TimelineItem
+            key={i}
+            title={item.title}
+            desc={<span className="text-text-primary-light dark:text-white">{item.desc}</span>}
+            time={item.time}
+            dotColor={item.dotColor}
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="bg-card-light dark:bg-card-dark rounded-[20px] shadow-soft p-6 mt-6">
@@ -23,40 +46,23 @@ const StockOutTimeline: React.FC = () => {
             className="flex items-center gap-1.5"
             onClick={() => setShowTimeline((prev) => !prev)}
           >
-            <span className="material-icons-round text-sm">
-              {showTimeline ? 'visibility_off' : 'visibility'}
-            </span>
+            {showTimeline ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
             {showTimeline ? 'Sembunyikan' : 'Tampilkan'}
           </Button>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => void refetch()}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors text-primary"
+            className="h-auto w-auto p-2 rounded-full text-primary hover:text-primary hover:bg-gray-100 dark:hover:bg-white/5"
             title="Refresh Timeline"
+            aria-label="Refresh Timeline"
           >
-            <span className="material-icons-round text-sm">refresh</span>
-          </button>
+            <RefreshCw aria-hidden />
+          </Button>
         </div>
       </div>
 
-      {showTimeline && (
-        <div className="relative pl-2 border-l-2 border-gray-100 dark:border-gray-700 space-y-8 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-          {timelineData.length > 0 ? (
-            timelineData.map((item, i) => (
-              <TimelineItem
-                key={i}
-                title={item.title}
-                desc={<span className="text-text-primary-light dark:text-white">{item.desc}</span>}
-                time={item.time}
-                dotColor={item.dotColor}
-              />
-            ))
-          ) : (
-            <div className="text-center py-10 text-text-secondary-light">
-              <p>Belum ada riwayat pengeluaran.</p>
-            </div>
-          )}
-        </div>
-      )}
+      {showTimeline && renderContent()}
     </div>
   );
 };
@@ -79,7 +85,7 @@ const TimelineItem: React.FC<{
         {desc}
       </div>
       <div className="flex items-center gap-1 mt-1">
-        <span className="material-icons-round text-[10px] text-text-secondary-light">schedule</span>
+        <Clock className="size-2.5 text-text-secondary-light" aria-hidden />
         <p className="text-[10px] text-text-secondary-light font-medium uppercase tracking-wider">
           {time}
         </p>

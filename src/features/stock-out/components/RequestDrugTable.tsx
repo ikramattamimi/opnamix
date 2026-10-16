@@ -1,5 +1,14 @@
 import React from 'react';
+import { Pill, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { Product } from '@/features/products/types';
 import type { DrugField } from '../requestItems';
 import { RequestedDrug } from '../types';
@@ -15,12 +24,15 @@ interface RequestDrugTableProps {
   };
 }
 
+const EDIT_FIELD =
+  'h-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm md:text-sm text-text-primary-light dark:text-white';
+
 // Daftar item obat & alkes di detail permintaan
 const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
   <div>
     <div className="flex items-center justify-between gap-3 mb-3">
       <h4 className="font-bold text-lg flex items-center gap-2">
-        <span className="material-icons-round text-primary">medication</span>
+        <Pill className="size-6 text-primary" aria-hidden />
         Item Obat & Alkes
       </h4>
       {edit && (
@@ -31,7 +43,7 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
           onClick={edit.onAdd}
           className="flex items-center gap-1.5"
         >
-          <span className="material-icons-round text-sm">add</span>
+          <Plus aria-hidden />
           Tambah Item
         </Button>
       )}
@@ -53,29 +65,34 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
               <tr key={i}>
                 <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">
                   {edit ? (
-                    <select
+                    <Select
                       value={drug.productId}
-                      onChange={(e) => edit.onChange(drug.id, 'productId', e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm text-text-primary-light dark:text-white"
+                      onValueChange={(value) => edit.onChange(drug.id, 'productId', value)}
                     >
-                      {edit.products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.name}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger aria-label="Nama produk" className={`w-full ${EDIT_FIELD}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {edit.products.map((product) => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   ) : (
                     drug.productName
                   )}
                 </td>
                 <td className="px-4 py-3 text-center font-bold">
                   {edit ? (
-                    <input
+                    <Input
                       type="number"
                       min="1"
+                      aria-label="Jumlah"
                       value={drug.quantity}
                       onChange={(e) => edit.onChange(drug.id, 'quantity', e.target.value)}
-                      className="w-20 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-center text-sm text-text-primary-light dark:text-white"
+                      className={`w-20 mx-auto text-center ${EDIT_FIELD}`}
                     />
                   ) : (
                     drug.quantity
@@ -89,13 +106,16 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                 </td>
                 {edit && (
                   <td className="px-4 py-3 text-center">
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => edit.onRemove(drug.id)}
-                      className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                      aria-label="Hapus item"
+                      className="h-auto w-auto p-2 text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg"
                     >
-                      <span className="material-icons-round text-sm">delete</span>
-                    </button>
+                      <Trash2 aria-hidden />
+                    </Button>
                   </td>
                 )}
               </tr>

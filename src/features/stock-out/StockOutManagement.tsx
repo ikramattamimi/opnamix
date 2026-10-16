@@ -4,6 +4,7 @@ import { useProducts } from '@/features/products/useProducts';
 import { useStockOutRequests, useStockOutRealtime, useCreateStockOutRequest } from './useStockOut';
 import StockOutManualForm from './StockOutManualForm';
 import StockOutRequestForm from './StockOutRequestForm';
+import { NotebookPen, Pill } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { withErrorDetail } from '@/lib/utils';
@@ -29,7 +30,12 @@ const StockOutManagement: React.FC = () => {
   const isFarmasi = userRoles.includes('apoteker') || userRoles.includes('farmasi');
   const isNakes = userRoles.includes('nakes');
 
-  const { data: paginatedRequests, isLoading: isRequestsLoading } = useStockOutRequests({
+  const {
+    data: paginatedRequests,
+    isLoading: isRequestsLoading,
+    error: requestsError,
+    refetch: refetchRequests,
+  } = useStockOutRequests({
     page: 1,
     perPage: 1000,
     status: filterStatus === 'Semua' ? undefined : filterStatus,
@@ -172,9 +178,9 @@ const StockOutManagement: React.FC = () => {
               <Button
                 onClick={() => setIsRequestFormOpen(true)}
                 size="sm"
-                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm transition-all w-auto"
+                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm transition-all w-auto [&_svg]:size-5"
               >
-                <span className="material-icons-round text-base">medication</span>
+                <Pill aria-hidden />
                 <span>Buat Permintaan</span>
               </Button>
             )}
@@ -183,9 +189,9 @@ const StockOutManagement: React.FC = () => {
               <Button
                 onClick={() => setIsManualModalOpen(true)}
                 variant="outline"
-                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm shadow-sm hover:shadow-md transition-all bg-white dark:bg-card-dark text-primary border-primary/20 hover:border-primary/50"
+                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm shadow-sm hover:shadow-md transition-all bg-white dark:bg-card-dark text-primary border-primary/20 hover:border-primary/50 [&_svg]:size-4 sm:[&_svg]:size-5"
               >
-                <span className="material-icons-round text-sm sm:text-base">edit_note</span>
+                <NotebookPen aria-hidden />
                 <span>Stok Manual</span>
               </Button>
             )}
@@ -195,6 +201,8 @@ const StockOutManagement: React.FC = () => {
         <StockOutTable
           requests={requests}
           isLoading={isRequestsLoading}
+          error={requestsError}
+          onRetry={() => void refetchRequests()}
           isNakes={isNakes}
           canProcess={canProcessRequest}
           filterStatus={filterStatus}

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Loader2, Save } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { useProducts } from '@/features/products/useProducts';
 import { useServices } from '@/features/services/useServices';
@@ -18,6 +20,7 @@ import RequestDrugTable from './RequestDrugTable';
 import RequestInfoCards from './RequestInfoCards';
 import RequestServices from './RequestServices';
 import RequestSummary from './RequestSummary';
+import { DIALOG_FOOTER, GHOST_BUTTON, PRIMARY_BUTTON } from './dialogStyles';
 
 interface StockOutEditFormProps {
   request: StockOutRequest;
@@ -115,23 +118,22 @@ const StockOutEditForm: React.FC<StockOutEditFormProps> = ({ request, onCancel, 
         />
       </div>
 
-      <div className="p-6 border-t border-gray-100 dark:border-white/10 flex justify-end gap-3 bg-gray-50/50 dark:bg-white/5 rounded-b-3xl">
-        <button
-          onClick={onCancel}
-          className="px-6 py-2.5 rounded-xl font-bold text-text-secondary-light hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
-        >
+      <div className={DIALOG_FOOTER}>
+        <Button variant="ghost" onClick={onCancel} className={GHOST_BUTTON}>
           Batal
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleSave}
           disabled={updateRequestMutation.isPending}
-          className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          className={PRIMARY_BUTTON}
         >
-          <span className="material-icons-round text-sm">
-            {updateRequestMutation.isPending ? 'refresh' : 'save'}
-          </span>
+          {updateRequestMutation.isPending ? (
+            <Loader2 className="animate-spin" aria-hidden />
+          ) : (
+            <Save aria-hidden />
+          )}
           {updateRequestMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
-        </button>
+        </Button>
       </div>
     </>
   );

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import { StockOutTotals } from '../stockOutTotals';
 
 interface RequestSummaryProps {
@@ -13,14 +15,19 @@ const toAmount = (value: string) => (value === '' ? 0 : Math.max(0, Number(value
 const AmountInput: React.FC<{
   value: number;
   onChange: (value: number) => void;
+  label: string;
   className: string;
-}> = ({ value, onChange, className }) => (
-  <input
+}> = ({ value, onChange, label, className }) => (
+  <Input
     type="number"
     min="0"
+    aria-label={label}
     value={value === 0 ? '' : value}
     onChange={(e) => onChange(toAmount(e.target.value))}
-    className={`w-32 px-3 py-1.5 text-right rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-text-primary-light dark:text-white focus:ring-primary focus:border-primary font-bold ${className}`}
+    className={cn(
+      'h-auto w-32 px-3 py-1.5 text-right text-sm md:text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-text-primary-light dark:text-white focus-visible:ring-primary focus:border-primary font-bold',
+      className,
+    )}
     placeholder="0"
   />
 );
@@ -52,6 +59,7 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({
           <AmountInput
             value={totals.serviceFee}
             onChange={onServiceFeeChange}
+            label="Biaya Layanan"
             className="text-primary"
           />
         </div>
@@ -74,6 +82,7 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({
           <AmountInput
             value={totals.discount}
             onChange={onDiscountChange}
+            label="Diskon"
             className="text-red-500"
           />
         </div>
