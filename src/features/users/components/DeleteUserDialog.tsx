@@ -1,4 +1,5 @@
 import React from 'react';
+import { TriangleAlert } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +45,7 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
       <AlertDialogContent className="max-w-sm gap-5 rounded-2xl sm:rounded-2xl border-none bg-card-light dark:bg-card-dark p-6 shadow-xl">
         <div className="text-center">
           <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center mx-auto mb-4">
-            <span className="material-icons-round text-red-500 text-3xl">warning</span>
+            <TriangleAlert className="size-8 text-red-500" aria-hidden />
           </div>
           <AlertDialogTitle className="text-lg font-bold text-text-primary-light dark:text-white">
             Hapus Pengguna?

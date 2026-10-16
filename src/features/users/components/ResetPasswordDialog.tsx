@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff, RotateCcwKey } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -60,7 +61,7 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className={dialogContentClass} aria-describedby={undefined}>
         <DialogTitle className={dialogTitleClass}>
-          <span className="material-icons-round text-amber-500">lock_reset</span>
+          <RotateCcwKey className="size-6 text-amber-500" aria-hidden />
           Ubah Password
         </DialogTitle>
 
@@ -91,15 +92,16 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
                         {...field}
                       />
                     </FormControl>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary-light hover:text-primary transition-colors"
+                      aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-auto w-auto p-0 hover:bg-transparent dark:hover:bg-transparent text-text-secondary-light hover:text-primary transition-colors active:scale-100 [&_svg]:size-5"
                     >
-                      <span className="material-icons-round text-lg">
-                        {showPassword ? 'visibility_off' : 'visibility'}
-                      </span>
-                    </button>
+                      {showPassword ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
+                    </Button>
                   </div>
                   <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">
                     Harus mengandung huruf besar, huruf kecil, dan angka.

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Info, Pencil, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -86,9 +87,11 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({ user, onClose, onSucces
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className={dialogContentClass} aria-describedby={undefined}>
         <DialogTitle className={dialogTitleClass}>
-          <span className="material-icons-round text-primary">
-            {isEdit ? 'edit' : 'person_add'}
-          </span>
+          {isEdit ? (
+            <Pencil className="size-6 text-primary" aria-hidden />
+          ) : (
+            <UserPlus className="size-6 text-primary" aria-hidden />
+          )}
           {isEdit ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}
         </DialogTitle>
 
@@ -142,7 +145,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({ user, onClose, onSucces
                     <FormMessage />
                     {isEdit && (
                       <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                        <span className="material-icons-round text-xs align-text-bottom">info</span>
+                        <Info className="inline size-3 align-text-bottom" aria-hidden />
                         Email akan diperbarui di profil. Untuk mengubah email login, gunakan fitur
                         reset password.
                       </p>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { CircleAlert, CircleCheck, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getErrorMessage } from '@/lib/utils';
 import { useUsers } from './useUsers';
 import type { UserRow } from './types';
 import UserStats from './components/UserStats';
@@ -17,13 +17,7 @@ const UserManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const { data: users = [], isLoading, error: loadError } = useUsers();
-
-  useEffect(() => {
-    if (loadError) {
-      setError('Gagal memuat data pengguna: ' + getErrorMessage(loadError));
-    }
-  }, [loadError]);
+  const { data: users = [], isLoading, error: loadError, refetch } = useUsers();
 
   // Auto-dismiss messages
   useEffect(() => {
@@ -67,7 +61,7 @@ const UserManagement: React.FC = () => {
             onClick={() => openDialog({ type: 'create' })}
             className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all h-auto flex items-center gap-2"
           >
-            <span className="material-icons-round text-base">person_add</span>
+            <UserPlus className="size-5" aria-hidden />
             Tambah Pengguna
           </Button>
         </div>
@@ -75,13 +69,13 @@ const UserManagement: React.FC = () => {
         {/* Toast Messages - Fixed Position */}
         {error && (
           <div className="fixed top-4 right-4 z-[60] bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
-            <span className="material-icons-round text-base">error</span>
+            <CircleAlert className="size-5 shrink-0" aria-hidden />
             {error}
           </div>
         )}
         {success && (
           <div className="fixed top-4 right-4 z-[60] bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
-            <span className="material-icons-round text-base">check_circle</span>
+            <CircleCheck className="size-5 shrink-0" aria-hidden />
             {success}
           </div>
         )}
@@ -91,6 +85,8 @@ const UserManagement: React.FC = () => {
         <UserTable
           users={users}
           isLoading={isLoading}
+          error={loadError}
+          onRetry={() => refetch()}
           onEdit={(user) => openDialog({ type: 'edit', user })}
           onResetPassword={(user) => openDialog({ type: 'resetPassword', user })}
           onDelete={(user) => setDialog({ type: 'delete', user })}

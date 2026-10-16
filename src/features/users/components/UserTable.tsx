@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
+import { Pencil, RotateCcwKey, Search, Trash2, UserX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
+import { getErrorMessage } from '@/lib/utils';
+import { ROLE_OPTIONS } from '../roles';
 import type { UserRow } from '../types';
 import RoleBadges from './RoleBadges';
 import UserAvatar from './UserAvatar';
@@ -7,6 +19,8 @@ import UserAvatar from './UserAvatar';
 interface UserTableProps {
   users: UserRow[];
   isLoading: boolean;
+  error: unknown;
+  onRetry: () => void;
   onEdit: (user: UserRow) => void;
   onResetPassword: (user: UserRow) => void;
   onDelete: (user: UserRow) => void;
@@ -21,10 +35,14 @@ const formatCreatedAt = (value: string | null) =>
       })
     : '-';
 
+const actionButtonClass = 'h-8 w-8 text-text-secondary-light transition-colors';
+
 // Filter cari/role dan tabel pengguna
 const UserTable: React.FC<UserTableProps> = ({
   users,
   isLoading,
+  error,
+  onRetry,
   onEdit,
   onResetPassword,
   onDelete,
@@ -40,32 +58,55 @@ const UserTable: React.FC<UserTableProps> = ({
     return matchesSearch && matchesRole;
   });
 
+  const renderStatus = () => {
+    if (isLoading) return <LoadingState label="Memuat data..." />;
+    if (error) {
+      return (
+        <ErrorState
+          title="Gagal memuat data pengguna"
+          message={getErrorMessage(error)}
+          onRetry={onRetry}
+        />
+      );
+    }
+    return <EmptyState icon={UserX} title="Tidak ada pengguna ditemukan." />;
+  };
+
+  const showRows = !isLoading && !error && filteredUsers.length > 0;
+
   return (
     <>
       {/* Filter Bar */}
       <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 shadow-soft flex flex-wrap items-center gap-4">
         <div className="relative flex-1 min-w-[200px]">
-          <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary-light text-lg">
-            search
-          </span>
-          <input
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary-light size-5"
+            aria-hidden
+          />
+          <Input
             type="text"
             placeholder="Cari nama atau email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+            className="h-auto pl-10 pr-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm md:text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
           />
         </div>
-        <select
-          value={filterRole}
-          onChange={(e) => setFilterRole(e.target.value)}
-          className="rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm px-4 py-2.5 focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="Semua">Semua Role</option>
-          <option value="admin">Admin</option>
-          <option value="farmasi">Farmasi</option>
-          <option value="nakes">Nakes</option>
-        </select>
+        <Select value={filterRole} onValueChange={setFilterRole}>
+          <SelectTrigger
+            aria-label="Filter role"
+            className="w-auto h-auto gap-2 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm px-4 py-2.5 focus:ring-2 focus:ring-primary/30"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Semua">Semua Role</SelectItem>
+            {ROLE_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* User Table */}
@@ -81,16 +122,7 @@ const UserTable: React.FC<UserTableProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center">
-                    <span className="material-icons-round text-primary text-3xl animate-spin">
-                      refresh
-                    </span>
-                    <p className="mt-2 text-sm text-text-secondary-light">Memuat data...</p>
-                  </td>
-                </tr>
-              ) : filteredUsers.length > 0 ? (
+              {showRows ? (
                 filteredUsers.map((user) => (
                   <tr
                     key={user.id}
@@ -121,28 +153,31 @@ const UserTable: React.FC<UserTableProps> = ({
                           variant="ghost"
                           size="icon"
                           onClick={() => onEdit(user)}
-                          className="h-8 w-8 text-text-secondary-light hover:text-primary transition-colors"
+                          className={`${actionButtonClass} hover:text-primary`}
                           title="Edit"
+                          aria-label="Edit"
                         >
-                          <span className="material-icons-round text-base">edit</span>
+                          <Pencil className="size-5" aria-hidden />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => onResetPassword(user)}
-                          className="h-8 w-8 text-text-secondary-light hover:text-amber-500 transition-colors"
+                          className={`${actionButtonClass} hover:text-amber-500`}
                           title="Reset Password"
+                          aria-label="Reset Password"
                         >
-                          <span className="material-icons-round text-base">lock_reset</span>
+                          <RotateCcwKey className="size-5" aria-hidden />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => onDelete(user)}
-                          className="h-8 w-8 text-text-secondary-light hover:text-red-500 transition-colors"
+                          className={`${actionButtonClass} hover:text-red-500`}
                           title="Hapus"
+                          aria-label="Hapus"
                         >
-                          <span className="material-icons-round text-base">delete</span>
+                          <Trash2 className="size-5" aria-hidden />
                         </Button>
                       </div>
                     </td>
@@ -150,11 +185,8 @@ const UserTable: React.FC<UserTableProps> = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center opacity-40">
-                      <span className="material-icons-round text-5xl mb-2">person_off</span>
-                      <p className="font-bold text-sm">Tidak ada pengguna ditemukan.</p>
-                    </div>
+                  <td colSpan={4} className="px-6">
+                    {renderStatus()}
                   </td>
                 </tr>
               )}
