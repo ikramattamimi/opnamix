@@ -1,2 +1,5 @@
 allowBuilds:
   esbuild: true
+
+# Tolak paket yang dirilis kurang dari 24 jam (proteksi supply-chain)
+minimumReleaseAge: 1440
