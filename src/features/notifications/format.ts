@@ -1,7 +1,51 @@
 // Helper tampilan notifikasi (ikon, warna, waktu relatif). Tanpa akses data.
+import {
+  Archive,
+  ArrowLeftRight,
+  Bell,
+  BriefcaseMedical,
+  CircleAlert,
+  CircleCheck,
+  CircleCheckBig,
+  CirclePlus,
+  ClipboardList,
+  Diff,
+  ListChecks,
+  Search,
+  Store,
+  Trash2,
+  TriangleAlert,
+  type LucideIcon,
+} from 'lucide-react';
+
+const NOTIFICATION_ICONS: Record<string, LucideIcon> = {
+  STOCK_OUT_REQUEST: ClipboardList,
+  STOCK_OUT_PROCESSED: CircleCheck,
+  STOCK_LOW: TriangleAlert,
+  STOCK_EMPTY: CircleAlert,
+  OPNAME_STARTED: Search,
+  OPNAME_COMPLETED: CircleCheckBig,
+  OPNAME_CREATED: ListChecks,
+  OPNAME_STEP_CHANGED: ArrowLeftRight,
+  STOCK_IN: Archive,
+  STOCK_OUT_DIRECT: Store,
+  OPNAME_DISCREPANCY: Diff,
+  PRODUCT_ADDED: CirclePlus,
+  PRODUCT_DELETED: Trash2,
+  SERVICE_ADDED: BriefcaseMedical,
+};
 
 /**
- * Get the notification icon based on type.
+ * Ikon lucide untuk tipe notifikasi.
+ */
+export function getNotificationLucideIcon(type: string): LucideIcon {
+  return NOTIFICATION_ICONS[type] ?? Bell;
+}
+
+/**
+ * Get the notification icon based on type (nama Material Icons).
+ * @deprecated Pakai getNotificationLucideIcon. Masih dipakai Header; hapus
+ * setelah Header pindah ke lucide.
  */
 export function getNotificationIcon(type: string): string {
   switch (type) {

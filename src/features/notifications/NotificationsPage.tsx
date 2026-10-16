@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { BellOff, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   useNotifications,
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
 } from './useNotifications';
-import { getNotificationIcon, getNotificationColor, formatNotificationTime } from './format';
+import { getNotificationLucideIcon, getNotificationColor, formatNotificationTime } from './format';
 import { AppNotification } from './types';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -28,10 +31,14 @@ const TYPE_LABELS: Record<string, string> = {
 
 const ALL_TYPES = ['Semua', ...Object.keys(TYPE_LABELS)];
 
+const FILTER_CHIP_CLASS = 'h-auto px-3 py-1.5 rounded-lg text-xs font-bold transition-colors';
+const FILTER_CHIP_IDLE_CLASS =
+  'bg-background-light dark:bg-background-dark text-text-secondary-light hover:bg-background-light dark:hover:bg-background-dark hover:text-text-primary-light dark:hover:text-white';
+
 const NotificationsPage: React.FC = () => {
   const { user } = useAuth();
   const userId = user?.id || '';
-  const { data, isLoading } = useNotifications(userId);
+  const { data, isLoading, isError, refetch } = useNotifications(userId);
   const notifications = data?.notifications ?? [];
   const unreadCount = data?.unreadCount ?? 0;
   const { mutate: markAsRead } = useMarkNotificationRead(userId);
@@ -71,7 +78,7 @@ const NotificationsPage: React.FC = () => {
             onClick={markAllAsRead}
             className="text-sm font-bold text-primary hover:text-primary/80 border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 h-auto"
           >
-            <span className="material-icons-round text-sm mr-1.5">done_all</span>
+            <CheckCheck className="size-4 mr-1.5" aria-hidden />
             Tandai semua dibaca
           </Button>
         )}
@@ -82,34 +89,42 @@ const NotificationsPage: React.FC = () => {
         {/* Read filter */}
         <div className="flex gap-2 flex-wrap">
           {(['all', 'unread', 'read'] as const).map((opt) => (
-            <button
+            <Button
               key={opt}
+              variant="ghost"
+              size="sm"
+              aria-pressed={filterRead === opt}
               onClick={() => setFilterRead(opt)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={cn(
+                FILTER_CHIP_CLASS,
                 filterRead === opt
-                  ? 'bg-primary text-white'
-                  : 'bg-background-light dark:bg-background-dark text-text-secondary-light hover:text-text-primary-light dark:hover:text-white'
-              }`}
+                  ? 'bg-primary text-white hover:bg-primary hover:text-white dark:hover:bg-primary'
+                  : FILTER_CHIP_IDLE_CLASS,
+              )}
             >
               {opt === 'all' ? 'Semua' : opt === 'unread' ? 'Belum Dibaca' : 'Sudah Dibaca'}
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* Type filter */}
         <div className="flex gap-2 flex-wrap">
           {ALL_TYPES.map((type) => (
-            <button
+            <Button
               key={type}
+              variant="ghost"
+              size="sm"
+              aria-pressed={filterType === type}
               onClick={() => setFilterType(type)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              className={cn(
+                FILTER_CHIP_CLASS,
                 filterType === type
-                  ? 'bg-primary/10 text-primary border border-primary/30'
-                  : 'bg-background-light dark:bg-background-dark text-text-secondary-light hover:text-text-primary-light dark:hover:text-white'
-              }`}
+                  ? 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10'
+                  : FILTER_CHIP_IDLE_CLASS,
+              )}
             >
               {type === 'Semua' ? 'Semua Tipe' : TYPE_LABELS[type] || type}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -117,21 +132,24 @@ const NotificationsPage: React.FC = () => {
       {/* Notification List */}
       <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <span className="material-icons-round text-primary text-4xl animate-spin">refresh</span>
-          </div>
+          <LoadingState label="Memuat notifikasi..." className="py-16" />
+        ) : isError && !data ? (
+          <ErrorState
+            title="Gagal memuat notifikasi"
+            onRetry={() => void refetch()}
+            className="py-16 px-4"
+          />
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <span className="material-icons-round text-5xl text-gray-300 dark:text-gray-600 mb-3">
-              notifications_off
-            </span>
-            <p className="font-bold text-text-secondary-light">Tidak ada notifikasi</p>
-            <p className="text-sm text-text-secondary-light/70 mt-1">
-              {filterType !== 'Semua' || filterRead !== 'all'
+          <EmptyState
+            icon={BellOff}
+            title="Tidak ada notifikasi"
+            description={
+              filterType !== 'Semua' || filterRead !== 'all'
                 ? 'Coba ubah filter untuk melihat notifikasi lain.'
-                : 'Belum ada notifikasi yang masuk.'}
-            </p>
-          </div>
+                : 'Belum ada notifikasi yang masuk.'
+            }
+            className="py-16 px-4"
+          />
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {filtered.map((notif) => (
@@ -146,11 +164,7 @@ const NotificationsPage: React.FC = () => {
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-white/5`}
                 >
-                  <span
-                    className={`material-icons-round text-xl ${getNotificationColor(notif.type)}`}
-                  >
-                    {getNotificationIcon(notif.type)}
-                  </span>
+                  <NotificationIcon type={notif.type} />
                 </div>
 
                 {/* Content */}
@@ -193,6 +207,11 @@ const NotificationsPage: React.FC = () => {
       )}
     </div>
   );
+};
+
+const NotificationIcon: React.FC<{ type: string }> = ({ type }) => {
+  const Icon = getNotificationLucideIcon(type);
+  return <Icon className={`size-5 ${getNotificationColor(type)}`} aria-hidden />;
 };
 
 export default NotificationsPage;

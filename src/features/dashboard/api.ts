@@ -159,7 +159,7 @@ export const dashboardApi = {
           month: 'short',
           day: 'numeric',
         }),
-        icon: isIn ? 'arrow_downward' : 'arrow_upward',
+        direction: isIn ? ('in' as const) : ('out' as const),
         iconBg: isIn ? 'bg-green-100 dark:bg-green-500/20' : 'bg-red-100 dark:bg-red-500/20',
         iconColor: isIn ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400',
         isWarning: !isIn && t.status === 'diajukan',
