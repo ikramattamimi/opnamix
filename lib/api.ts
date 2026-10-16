@@ -348,12 +348,12 @@ export const api = {
     if (error) throw error;
   },
 
-  // HELPER: Generate unique transaction number
+  // HELPER: Generate unique transaction number from a database sequence
+  // (format IN-YYYYMMDD-000123 / OUT-YYYYMMDD-000123)
   generateTransactionNumber: async (type: 'masuk' | 'keluar'): Promise<string> => {
-    const prefix = type === 'masuk' ? 'IN' : 'OUT';
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `${prefix}-${timestamp}-${random}`;
+    const { data, error } = await supabase.rpc('next_transaction_number', { p_tipe: type });
+    if (error) throw new Error(error.message);
+    return data as string;
   },
 
   // HELPER: Upload receipt image to Supabase Storage with the user's session
