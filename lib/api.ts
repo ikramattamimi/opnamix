@@ -1117,13 +1117,15 @@ export const api = {
     return { success: true };
   },
 
-  // Get active opname lock status
+  // Get active opname lock status.
+  // Stok terkunci selama ada opname 'sedang_dilaksanakan' (semua langkah),
+  // sampai opname selesai atau dihapus. Database juga menolak perubahan
+  // stok selama itu (assert_no_active_opname), jadi ini hanya untuk UI.
   getActiveOpnameLock: async () => {
     const { data, error } = await supabase
       .from('opname')
       .select('id, current_step, created_at')
       .eq('status', 'sedang_dilaksanakan')
-      .eq('current_step', 2) // Lock ONLY at step 2; step 3 releases the lock automatically
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .limit(1)

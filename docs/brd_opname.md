@@ -215,6 +215,17 @@ Daftar status yang berlaku pada tabel `opname`:
 | `belum_dilaksanakan` | Opname terjadwal tapi belum dimulai |
 | `sedang_dilaksanakan` | Opname sudah dimulai tapi belum selesai (draft) |
 | `selesai` | Opname telah selesai seluruh tahapnya |
+| `dihapus` | Opname dibatalkan (soft delete, `deleted_at` terisi) |
+
+#### 9.1 Kunci Stok Selama Opname
+
+Selama ada opname berstatus `sedang_dilaksanakan` (belum dihapus), **semua transaksi yang mengubah stok ditolak**, di tahap mana pun opname itu berada. Status ini dipasang saat pilihan obat di Tahap 1 dikonfirmasi, yaitu saat `stok_sistem` di-snapshot. Kunci dilepas saat opname `selesai` atau dihapus, atau saat opname dikembalikan ke Tahap 1 (status kembali `belum_dilaksanakan` dan snapshot dihapus).
+
+- Kunci ditegakkan di database, bukan hanya di UI: `update_stock_atomic` dan trigger di `master_obat.qty` menolak perubahan dengan pesan "Stok sedang dikunci karena opname OPN-x sedang berjalan". Tab yang belum ter-redirect ke halaman kunci tetap tidak bisa mengubah stok.
+- Satu-satunya pengecualian adalah penyelesaian opname (`finish_opname`), yang menimpa stok dengan hasil hitung.
+- Permintaan stok keluar (`diajukan`) tetap boleh dibuat selama opname, tetapi baru bisa diproses setelah opname selesai.
+- Hanya boleh ada satu opname `sedang_dilaksanakan` dalam satu waktu.
+- Perubahan dari perilaku lama: dulu kunci hanya aktif di Tahap 2, dan Tahap 3 melepasnya.
 
 ---
 
