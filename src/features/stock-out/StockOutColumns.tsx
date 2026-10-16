@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ColumnDef, FilterFn } from '@tanstack/react-table';
+import { CircleCheck, Eye } from 'lucide-react';
 import { StockOutRequest } from './types';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
@@ -233,15 +234,20 @@ export const createStockOutColumns = ({
           <Button
             variant="ghost"
             size="sm"
-            className="text-primary hover:bg-primary/10"
+            className="text-primary hover:bg-primary/10 [&_svg]:size-5"
             onClick={() => onView(request)}
           >
-            <span className="material-icons-round text-base mr-1">visibility</span>
+            <Eye className="mr-1" aria-hidden />
             Detail
           </Button>
           {isPending && isFarmasi && (
-            <Button variant="default" size="sm" onClick={() => onProcess(request)}>
-              <span className="material-icons-round text-base mr-1">check_circle</span>
+            <Button
+              variant="default"
+              size="sm"
+              className="[&_svg]:size-5"
+              onClick={() => onProcess(request)}
+            >
+              <CircleCheck className="mr-1" aria-hidden />
               Proses
             </Button>
           )}
