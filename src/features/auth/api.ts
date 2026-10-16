@@ -11,8 +11,6 @@ import { supabase } from '@/lib/supabaseClient';
 // adalah role lama (satu nilai) dan hanya dipakai sebagai cadangan.
 export type UserProfile = Tables<'profiles'> & { roles: string[] };
 
-type AppRole = 'admin' | 'nakes' | 'apoteker' | 'farmasi';
-
 /**
  * Rate limiting storage key
  */
@@ -123,73 +121,6 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     userRolesData?.map((r: { role: string }) => r.role) || (data.role ? [data.role] : []);
 
   return { ...data, roles };
-}
-
-/**
- * Call the admin-users Edge Function (service role key stays server-side).
- * The function rejects callers who are not logged in as admin.
- */
-async function invokeAdminUsers<T = unknown>(body: Record<string, unknown>): Promise<T> {
-  const { data, error } = await supabase.functions.invoke('admin-users', { body });
-
-  if (error) {
-    // FunctionsHttpError carries the Response; surface the server's message
-    const response = (error as { context?: Response }).context;
-    if (response && typeof response.json === 'function') {
-      const payload = await response.json().catch(() => null);
-      if (payload?.error) throw new Error(payload.error);
-    }
-    throw error;
-  }
-
-  return data as T;
-}
-
-/**
- * Sign up new user (admin only)
- * Email is auto-confirmed by the admin-users Edge Function
- */
-export async function signUp(
-  email: string,
-  password: string,
-  fullName: string,
-  roleOrRoles: AppRole | AppRole[],
-) {
-  const roles = Array.from(new Set(Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles]));
-
-  return invokeAdminUsers<{ id: string }>({ action: 'create', email, password, fullName, roles });
-}
-
-/**
- * Delete user from auth.users (admin only)
- * Profile will be cascade-deleted by database trigger/policy
- */
-export async function deleteAuthUser(userId: string) {
-  await invokeAdminUsers({ action: 'delete', userId });
-}
-
-/**
- * Update user password directly (admin only)
- * Sets the password without the email reset flow
- */
-export async function adminUpdatePassword(userId: string, newPassword: string) {
-  await invokeAdminUsers({ action: 'set_password', userId, password: newPassword });
-}
-
-/**
- * Update user profile, login email and roles (admin only)
- */
-export async function updateUserProfileAdmin(
-  userId: string,
-  updates: { full_name: string; email: string; roles: string[] },
-) {
-  return invokeAdminUsers<UserProfile>({
-    action: 'update',
-    userId,
-    fullName: updates.full_name,
-    email: updates.email,
-    roles: updates.roles,
-  });
 }
 
 /**
