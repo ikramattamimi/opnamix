@@ -4,6 +4,7 @@ import { api } from '../../lib/api';
 import { OpnameItem } from '../../types';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
+import { calculateOpnameDifference } from '../../lib/opnameCalc';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../ui/toast';
 
@@ -252,8 +253,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
         // Validate: Reasons required for items with selisih !== 0
         const selectedItems = items.filter(item => selectedIds.has(item.productId));
         for (const item of selectedItems) {
-            const physicalStock = physicalCounts[item.id] || 0;
-            const diff = physicalStock - item.systemStock;
+            const diff = calculateOpnameDifference(physicalCounts[item.id], item.systemStock);
             if (diff !== 0 && (!reasons[item.id] || reasons[item.id].trim() === '')) {
                 showToast(`Alasan perbedaan wajib diisi untuk "${item.productName}" karena selisih stok ≠ 0.`, 'warning');
                 return;
@@ -535,7 +535,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
                                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                                         {selectedItems.map((item) => {
                                             const physical = physicalCounts[item.id] || 0;
-                                            const diff = physical - item.systemStock;
+                                            const diff = calculateOpnameDifference(physical, item.systemStock);
                                             const hasDiff = diff !== 0;
 
                                             return (
@@ -598,7 +598,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
                             <div className="md:hidden space-y-3 mb-6">
                                 {selectedItems.map((item) => {
                                     const physical = physicalCounts[item.id] || 0;
-                                    const diff = physical - item.systemStock;
+                                    const diff = calculateOpnameDifference(physical, item.systemStock);
                                     const hasDiff = diff !== 0;
 
                                     return (
