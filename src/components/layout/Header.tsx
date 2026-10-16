@@ -15,15 +15,15 @@ import {
 import { ROUTES } from '@/types/routes';
 import { APP_ROUTES } from '@/app/routes';
 import { getRouteTitle } from '@/app/routeUtils';
+import { useTheme } from '@/app/providers/ThemeProvider';
 
 interface HeaderProps {
-  isDarkMode: boolean;
-  onToggleDarkMode: () => void;
   onToggleSidebar?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isDarkMode, onToggleDarkMode, onToggleSidebar }) => {
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, userProfile, logout } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const viewName = getRouteTitle(pathname, APP_ROUTES);
@@ -371,7 +371,7 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, onToggleDarkMode, onToggleS
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={onToggleDarkMode}
+                      onClick={toggleDarkMode}
                       className="w-full text-left px-4 py-3 text-sm font-medium text-text-primary-light dark:text-white hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-start gap-2 h-auto"
                     >
                       <span className="material-icons-round text-[18px]">
@@ -443,7 +443,7 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, onToggleDarkMode, onToggleS
           <Button
             variant="ghost"
             size="icon"
-            onClick={onToggleDarkMode}
+            onClick={toggleDarkMode}
             className="text-text-secondary-light hover:text-primary transition-colors h-10 w-10"
           >
             <span className="material-icons-round">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>

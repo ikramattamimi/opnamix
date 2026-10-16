@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginPage from '@/features/auth/LoginPage';
@@ -6,6 +6,7 @@ import { ToastProvider } from '@/components/ui/toast';
 import { NotificationProvider } from '@/features/notifications/NotificationProvider';
 import { AuthProvider, useAuth } from '@/features/auth/useAuth';
 import { UserProfile } from '@/features/auth/api';
+import { ThemeProvider } from './providers/ThemeProvider';
 
 const AuthenticatedApp = React.lazy(() => import('./AuthenticatedApp'));
 
@@ -34,9 +35,11 @@ const App: React.FC = () => {
     <BrowserRouter>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <AppContentWrapper />
-          </ToastProvider>
+          <ThemeProvider>
+            <ToastProvider>
+              <AppContentWrapper />
+            </ToastProvider>
+          </ThemeProvider>
         </QueryClientProvider>
       </AuthProvider>
     </BrowserRouter>
@@ -45,20 +48,6 @@ const App: React.FC = () => {
 
 const AppContentWrapper: React.FC = () => {
   const { user, userProfile, isLoading: isAuthLoading } = useAuth();
-
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
 
   if (isAuthLoading) {
     return <LoadingScreen />;
@@ -71,11 +60,7 @@ const AppContentWrapper: React.FC = () => {
   return (
     <NotificationProvider>
       <Suspense fallback={<LoadingScreen />}>
-        <AuthenticatedApp
-          isDarkMode={isDarkMode}
-          setIsDarkMode={setIsDarkMode}
-          userProfile={userProfile as UserProfile | null}
-        />
+        <AuthenticatedApp userProfile={userProfile as UserProfile | null} />
       </Suspense>
     </NotificationProvider>
   );

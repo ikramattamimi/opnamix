@@ -14,8 +14,6 @@ import { canAccessRoute, getUserRoles } from './routeUtils';
 const OpnameLockPage = React.lazy(() => import('@/features/opname/OpnameLockPage'));
 
 interface AuthenticatedAppProps {
-  isDarkMode: boolean;
-  setIsDarkMode: (value: boolean) => void;
   userProfile: UserProfile | null;
 }
 
@@ -53,11 +51,7 @@ const NotFoundPage = () => (
   </div>
 );
 
-const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
-  isDarkMode,
-  setIsDarkMode,
-  userProfile,
-}) => {
+const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data: lock, isLoading } = useActiveOpnameLock();
@@ -84,11 +78,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
       <Sidebar isMobileOpen={isSidebarOpen} onCloseMobile={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-        <Header
-          isDarkMode={isDarkMode}
-          onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        />
+        <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
         <div className="p-6 md:p-8">
           <Suspense fallback={<LoadingSpinner />}>
