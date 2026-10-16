@@ -46,23 +46,32 @@ pnpm dev
 
 Perintah lain:
 
-| Perintah       | Fungsi                               |
-| -------------- | ------------------------------------ |
-| `pnpm build`   | Build produksi ke `dist/`            |
-| `pnpm preview` | Menjalankan hasil build secara lokal |
+| Perintah         | Fungsi                                                   |
+| ---------------- | -------------------------------------------------------- |
+| `pnpm build`     | Build produksi ke `dist/`                                |
+| `pnpm preview`   | Menjalankan hasil build secara lokal                     |
+| `pnpm typecheck` | Cek tipe TypeScript                                      |
+| `pnpm lint`      | ESLint                                                   |
+| `pnpm format`    | Format dengan Prettier (`format:check` untuk cek saja)   |
+| `pnpm test`      | Unit test (Vitest)                                       |
+| `pnpm db:types`  | Generate `src/lib/database.types.ts` dari project linked |
 
 ## Menyiapkan Supabase
 
-1. Buat project Supabase baru.
-2. Jalankan migration di `supabase/migrations/` (RLS + role policy, dan RPC `update_stock_atomic`).
-3. Deploy Edge Function untuk manajemen pengguna:
-   ```bash
-   supabase functions deploy admin-users
-   ```
-4. Buat bucket Storage publik bernama `bukti-stok-masuk`.
-5. Buat user admin pertama lewat Supabase Auth, lalu tambahkan barisnya di tabel `user_roles` dengan role `admin`.
+Seluruh schema, RLS, RPC, bucket Storage, dan realtime ada di `supabase/migrations/`, dimulai dari `20260101000000_baseline.sql`.
 
-> **Catatan:** skema tabel dasar belum tersedia sebagai migration. Rujukan strukturnya ada di [`docs/database_schema.md`](docs/database_schema.md) dan [`docs/database_documentation.md`](docs/database_documentation.md).
+```bash
+npx supabase login
+npx supabase link --project-ref <ref>
+npx supabase db push --include-seed
+npx supabase functions deploy admin-users
+```
+
+`--include-seed` menjalankan `supabase/seed.sql`: master data awal dan satu user admin dengan password yang tertulis di file itu. **Ganti password admin segera setelah login pertama.**
+
+Untuk project yang sudah berjalan sebelum baseline ada, jangan jalankan baseline. Tandai sebagai sudah diterapkan dengan `npx supabase migration repair --status applied 20260101000000`, lalu `db push` untuk migration sesudahnya.
+
+Jalankan `pnpm db:types` dari Git Bash, bukan PowerShell 5.1 (tanda `>` di PowerShell 5.1 menulis file dalam UTF-16).
 
 ## Struktur proyek
 
@@ -70,10 +79,9 @@ Perintah lain:
 src/
   app/             App, AuthenticatedApp (routing dan provider)
   components/      ui/ (shadcn), common/ (StatCard, modal, paginasi), layout/ (Header, Sidebar)
-  features/        Satu folder per fitur: halaman, komponen, hook, api.ts, mappers.ts, types.ts
+  features/        Satu folder per fitur: halaman, komponen, hook, api.ts, keys.ts, mappers.ts, types.ts
                    (opname/spec/ berisi spesifikasi modul opname)
-  hooks/           Hook umum (useSupabaseQuery)
-  lib/             Klien Supabase, database.types, utilitas
+  lib/             Klien Supabase, database.types, invalidasi query lintas fitur, utilitas
   types/           Tipe lintas fitur (paginasi, routes, ApiResult)
 supabase/          Migration SQL dan Edge Functions
 docs/              Analisis sistem, BRD, spesifikasi, dan dokumentasi database

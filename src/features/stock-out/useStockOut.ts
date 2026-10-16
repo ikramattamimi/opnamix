@@ -2,13 +2,15 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { useEffect } from 'react';
 import { transactionsApi, CreateTransactionPayload } from '@/features/transactions/api';
 import { stockOutApi } from './api';
-import { QUERY_KEYS } from '@/hooks/useSupabaseQuery';
+import { stockOutKeys } from './keys';
+import { dashboardKeys } from '@/features/dashboard/keys';
+import { invalidateStockChange } from '@/lib/invalidate';
 import { supabase } from '@/lib/supabaseClient';
 import { PaginationParams } from '@/types/pagination';
 
 export function useStockOutRequests(params?: PaginationParams) {
   return useQuery({
-    queryKey: [...QUERY_KEYS.stockOut, params],
+    queryKey: stockOutKeys.list(params),
     queryFn: () => stockOutApi.getStockOutRequests(params),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 30, // 30 seconds
@@ -27,10 +29,10 @@ export function useStockOutRealtime() {
     const channel = supabase
       .channel('transaksi-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaksi' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
+        queryClient.invalidateQueries({ queryKey: stockOutKeys.all });
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transaksi' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
+        queryClient.invalidateQueries({ queryKey: stockOutKeys.all });
       })
       .subscribe();
 
@@ -44,8 +46,14 @@ export function useCreateStockOutRequest() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateTransactionPayload) => transactionsApi.createTransaction(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
+    onSuccess: (_data, payload) => {
+      // Stok keluar manual langsung selesai (stok berubah); permintaan nakes
+      // masih diajukan (hanya daftar dan hitungan tertunda di dashboard).
+      if (payload.status === 'selesai') return invalidateStockChange(queryClient);
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: stockOutKeys.all }),
+        queryClient.invalidateQueries({ queryKey: dashboardKeys.all }),
+      ]);
     },
   });
 }
@@ -66,10 +74,7 @@ export function useProcessStockOutRequest() {
       total?: number;
       serviceFee?: number;
     }) => stockOutApi.updateTransactionStatus(number, status, diskon, total, serviceFee),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products }); // Stock updated
-    },
+    onSuccess: () => invalidateStockChange(queryClient),
   });
 }
 
@@ -100,8 +105,6 @@ export function useUpdateStockOutRequest() {
         }[];
       };
     }) => stockOutApi.updatePendingStockOutRequest(number, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stockOut });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: stockOutKeys.all }),
   });
 }
