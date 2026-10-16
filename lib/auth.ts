@@ -3,18 +3,13 @@
  * Handles login, logout, and user session management
  */
 
+import type { User } from '@supabase/supabase-js';
+import type { Tables } from './database.types';
 import { supabase } from './supabaseClient';
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  role: 'admin' | 'nakes' | 'apoteker' | 'farmasi';
-  roles: string[];
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+// Baris profiles ditambah daftar role dari user_roles. Kolom profiles.role
+// adalah role lama (satu nilai) dan hanya dipakai sebagai cadangan.
+export type UserProfile = Tables<'profiles'> & { roles: string[] };
 
 type AppRole = 'admin' | 'nakes' | 'apoteker' | 'farmasi';
 
@@ -73,12 +68,13 @@ export async function signIn(email: string, password: string) {
     delete rateLimit[email];
     localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(rateLimit));
     return data;
-  } catch (error: any) {
+  } catch (error) {
     // Translate common Supabase errors to Indonesian
-    if (error.message?.includes('Invalid login credentials')) {
+    const message = (error as { message?: string } | null)?.message;
+    if (message?.includes('Invalid login credentials')) {
       throw new Error('Email atau password salah', { cause: error });
     }
-    if (error.message?.includes('Email not confirmed')) {
+    if (message?.includes('Email not confirmed')) {
       throw new Error('Email belum dikonfirmasi', { cause: error });
     }
     throw error;
@@ -288,7 +284,7 @@ export async function resetPassword(email: string) {
 /**
  * Listen to auth state changes
  */
-export function onAuthStateChange(callback: (user: any) => void) {
+export function onAuthStateChange(callback: (user: User | null) => void) {
   return supabase.auth.onAuthStateChange((_event, session) => {
     callback(session?.user ?? null);
   });

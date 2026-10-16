@@ -9,11 +9,21 @@ import {
   StockInReceipt,
   PaginationParams,
   PaginatedResponse,
+  OpnameScheduleConfig,
+  OpnameSchedule,
+  OpnameStatus,
+  OpnameItem,
+  PengulanganOpname,
 } from '../types';
-import { getProductDisplayName, getProductDisplayNameFromDb } from './productDisplay';
+import type { Json, Tables } from './database.types';
+import {
+  getDisplayNameFromMasterObat,
+  getProductDisplayName,
+  getProductDisplayNameFromDb,
+} from './productDisplay';
 
 // Map DB types to Frontend types
-const mapProductFromDB = (item: any): Product => ({
+const mapProductFromDB = (item: Tables<'master_obat'>): Product => ({
   id: item.id.toString(),
   code: item.kode,
   name: getProductDisplayNameFromDb(item),
@@ -29,9 +39,11 @@ const mapProductFromDB = (item: any): Product => ({
   composition: item.kandungan || '',
 });
 
-const getDisplayNameFromMasterObat = (item: any) => getProductDisplayNameFromDb(item) || 'Unknown';
-const getTransactionEventTimestamp = (transaction: any) =>
-  transaction?.processed_at || transaction?.created_at || transaction?.tanggal;
+const getTransactionEventTimestamp = (transaction: {
+  processed_at?: string | null;
+  created_at?: string | null;
+  tanggal?: string | null;
+}) => transaction?.processed_at || transaction?.created_at || transaction?.tanggal;
 const STOCK_OUT_META_MARKER = '||META||';
 
 const extractTransactionNoteAndMeta = (rawNote?: string | null) => {
@@ -67,7 +79,9 @@ const extractTransactionNoteAndMeta = (rawNote?: string | null) => {
   }
 };
 
-const mapServiceFromDB = (item: any): Service => ({
+const mapServiceFromDB = (
+  item: Tables<'master_jasa'> & { service_categories?: { name: string } | null },
+): Service => ({
   id: item.id.toString(),
   code: item.kode,
   name: item.nama,
@@ -85,7 +99,7 @@ const mapServiceFromDB = (item: any): Service => ({
   iconBg: 'bg-blue-100',
 });
 
-const mapServiceCategoryFromDB = (item: any): ServiceCategoryType => ({
+const mapServiceCategoryFromDB = (item: Tables<'service_categories'>): ServiceCategoryType => ({
   id: item.id.toString(),
   name: item.name,
   code: item.code,
@@ -114,7 +128,7 @@ const generateUniqueServiceCategoryCode = async (name: string) => {
 
   if (error) throw error;
 
-  const existingCodes = new Set((data || []).map((item: any) => item.code));
+  const existingCodes = new Set((data || []).map((item) => item.code));
   if (!existingCodes.has(baseCode)) {
     return baseCode;
   }
@@ -128,6 +142,10 @@ const generateUniqueServiceCategoryCode = async (name: string) => {
 
   return candidate;
 };
+
+// Daftar id obat di kolom jsonb obat_ids / selected_obat_ids. Isinya bisa
+// string atau number tergantung asal datanya, jadi pemakai selalu map(String).
+type OpnameObatIds = (string | number)[];
 
 type OpnameDetailUpdate = {
   detailId: string;
@@ -219,7 +237,7 @@ export const api = {
         merek: product.brand,
         kandungan: product.composition,
       })
-      .eq('id', id)
+      .eq('id', parseInt(id))
       .select()
       .single();
 
@@ -232,7 +250,7 @@ export const api = {
     const { error } = await supabase
       .from('master_obat')
       .update({ deleted_at: new Date().toISOString(), is_active: false })
-      .eq('id', id);
+      .eq('id', parseInt(id));
 
     if (error) throw error;
   },
@@ -345,7 +363,7 @@ export const api = {
         updated_by: user?.id,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id)
+      .eq('id', parseInt(id))
       .select()
       .single();
 
@@ -357,7 +375,7 @@ export const api = {
     const { error } = await supabase
       .from('master_jasa')
       .update({ deleted_at: new Date().toISOString(), is_active: false })
-      .eq('id', id);
+      .eq('id', parseInt(id));
 
     if (error) throw error;
   },
@@ -485,7 +503,7 @@ export const api = {
     // If logic applied filtering after DB fetch, pagination counts would be wrong.
     // Assuming transactions are inserted correctly with details, we map what we get.
 
-    const createdByIds = [...new Set((data || []).map((t: any) => t.created_by).filter(Boolean))];
+    const createdByIds = [...new Set((data || []).map((t) => t.created_by).filter(Boolean))];
     const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
@@ -495,12 +513,12 @@ export const api = {
 
       if (profilesError) throw profilesError;
 
-      (profiles || []).forEach((profile: any) => {
+      (profiles || []).forEach((profile) => {
         profileMap[profile.id] = profile.full_name || '';
       });
     }
 
-    const validData = data.map((t: any) => {
+    const validData = data.map((t) => {
       const invoiceFromNote =
         typeof t.keterangan === 'string' && t.keterangan.startsWith('Invoice: ')
           ? t.keterangan.replace('Invoice: ', '').trim()
@@ -515,7 +533,7 @@ export const api = {
         receivedBy: (t.created_by && profileMap[t.created_by]) || 'Admin',
         evidenceUrl: t.bukti, // Map evidenceUrl
         items: t.transaksi_detail
-          ? t.transaksi_detail.map((d: any) => ({
+          ? t.transaksi_detail.map((d) => ({
               id: d.id.toString(),
               productId: d.obat_id?.toString() || '',
               productName: getDisplayNameFromMasterObat(d.master_obat),
@@ -578,7 +596,7 @@ export const api = {
     if (error) throw error;
 
     // Fetch profile names for created_by users
-    const createdByIds = [...new Set((data || []).map((t: any) => t.created_by).filter(Boolean))];
+    const createdByIds = [...new Set((data || []).map((t) => t.created_by).filter(Boolean))];
     const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles } = await supabase
@@ -586,13 +604,13 @@ export const api = {
         .select('id, full_name')
         .in('id', createdByIds);
       if (profiles) {
-        profiles.forEach((p: any) => {
+        profiles.forEach((p) => {
           profileMap[p.id] = p.full_name || '';
         });
       }
     }
 
-    const mappedData = data.map((t: any) => {
+    const mappedData = data.map((t) => {
       const transactionMeta = extractTransactionNoteAndMeta(t.keterangan);
       const normalizedServiceFee = Number(t.biaya_layanan ?? transactionMeta.meta.serviceFee ?? 0);
 
@@ -606,7 +624,7 @@ export const api = {
           diagnosis: '-', // Not stored
         },
         drugs: t.transaksi_detail
-          ? t.transaksi_detail.map((d: any) => ({
+          ? t.transaksi_detail.map((d) => ({
               id: d.id.toString(),
               productId: d.obat_id?.toString() || '',
               productName: getDisplayNameFromMasterObat(d.master_obat),
@@ -617,7 +635,7 @@ export const api = {
             }))
           : [],
         services: t.transaksi_jasa
-          ? t.transaksi_jasa.map((j: any) => ({
+          ? t.transaksi_jasa.map((j) => ({
               id: j.jasa_id.toString(),
               name: j.master_jasa?.nama || 'Unknown Service',
               price: j.harga_jasa || 0,
@@ -721,7 +739,7 @@ export const api = {
   },
 
   // OPNAME SCHEDULES
-  createOpnameSchedule: async (config: any) => {
+  createOpnameSchedule: async (config: OpnameScheduleConfig) => {
     const { error } = await supabase.from('opname_schedule').insert({
       nama: config.nama || 'Jadwal Rutin',
       tanggal_audit: config.dayOfMonth,
@@ -736,7 +754,7 @@ export const api = {
     return { success: true };
   },
 
-  getOpnameSchedules: async () => {
+  getOpnameSchedules: async (): Promise<OpnameSchedule[]> => {
     const { data, error } = await supabase
       .from('opname_schedule')
       .select('*')
@@ -745,20 +763,20 @@ export const api = {
 
     if (error) throw error;
 
-    return (data || []).map((s: any) => ({
+    return (data || []).map((s) => ({
       id: s.id.toString(),
       nama: s.nama,
       tanggalAudit: s.tanggal_audit,
       waktuJam: s.waktu_jam,
       waktuMenit: s.waktu_menit,
-      pengulangan: s.pengulangan,
-      obatIds: s.obat_ids,
+      pengulangan: s.pengulangan as PengulanganOpname,
+      obatIds: s.obat_ids as string[] | null,
       durasiPengerjaan: s.durasi_pengerjaan,
       isActive: s.is_active,
     }));
   },
 
-  updateOpnameSchedule: async (id: string, config: any) => {
+  updateOpnameSchedule: async (id: string, config: OpnameScheduleConfig) => {
     const { error } = await supabase
       .from('opname_schedule')
       .update({
@@ -770,7 +788,7 @@ export const api = {
         obat_ids: config.obatIds || null,
         durasi_pengerjaan: config.durasiPengerjaan || null,
       })
-      .eq('id', id);
+      .eq('id', parseInt(id));
 
     if (error) throw error;
     return { success: true };
@@ -780,7 +798,7 @@ export const api = {
     const { error } = await supabase
       .from('opname_schedule')
       .update({ deleted_at: new Date().toISOString(), is_active: false })
-      .eq('id', id);
+      .eq('id', parseInt(id));
 
     if (error) throw error;
   },
@@ -789,7 +807,7 @@ export const api = {
     const { error } = await supabase
       .from('opname_schedule')
       .update({ is_active: isActive })
-      .eq('id', id);
+      .eq('id', parseInt(id));
 
     if (error) throw error;
   },
@@ -806,7 +824,7 @@ export const api = {
     if (!data || data.length === 0) return [];
 
     const today = new Date();
-    return data.map((schedule: any) => {
+    return data.map((schedule) => {
       const nextDate = new Date(today.getFullYear(), today.getMonth(), schedule.tanggal_audit);
       if (nextDate <= today) {
         if (schedule.pengulangan === 'BULANAN') {
@@ -837,7 +855,7 @@ export const api = {
 
     if (error) throw error;
 
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item) => ({
       id: item.id.toString(),
       opnameNumber: `OPN-${item.id}`,
       scheduleDate: item.tanggal_jadwal,
@@ -857,7 +875,7 @@ export const api = {
 
     if (error) throw error;
 
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item) => ({
       id: item.id.toString(),
       opnameNumber: `OPN-${item.id}`,
       scheduleDate: item.tanggal_jadwal,
@@ -870,7 +888,7 @@ export const api = {
 
   startOpname: async (scheduleId: string | null, date: string) => {
     // Fetch schedule to get obat_ids if scheduleId is provided
-    let selectedObatIds: number[] | null = null;
+    let selectedObatIds: Json | null = null;
 
     if (scheduleId) {
       const { data: schedule, error: schedError } = await supabase
@@ -1009,7 +1027,7 @@ export const api = {
     type: string;
     title: string;
     message: string;
-    data?: any;
+    data?: Json;
     target_roles?: string[];
   }) => {
     const roles = notification.target_roles || [];
@@ -1070,7 +1088,7 @@ export const api = {
 
     if (error) throw error;
 
-    const createdByIds = [...new Set((data || []).map((t: any) => t.created_by).filter(Boolean))];
+    const createdByIds = [...new Set((data || []).map((t) => t.created_by).filter(Boolean))];
     const profileMap: Record<string, string> = {};
     if (createdByIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
@@ -1080,16 +1098,16 @@ export const api = {
 
       if (profilesError) throw profilesError;
 
-      (profiles || []).forEach((profile: any) => {
+      (profiles || []).forEach((profile) => {
         profileMap[profile.id] = profile.full_name || '';
       });
     }
 
     const mappedData = (data || [])
-      .map((t: any) => {
+      .map((t) => {
         const transactionMeta = extractTransactionNoteAndMeta(t.keterangan);
         const drugDetails =
-          t.transaksi_detail?.map((d: any) => {
+          t.transaksi_detail?.map((d) => {
             const unitPrice =
               Number(d.harga || 0) > 0 ? Number(d.harga || 0) : Number(d.master_obat?.harga || 0);
             const subtotal =
@@ -1105,7 +1123,7 @@ export const api = {
           }) || [];
 
         const serviceDetails =
-          t.transaksi_jasa?.map((j: any) => ({
+          t.transaksi_jasa?.map((j) => ({
             id: j.id?.toString?.() || `${t.nomor}-${j.jasa_id}`,
             name: j.master_jasa?.nama || 'Unknown Service',
             quantity: j.qty || 1,
@@ -1114,11 +1132,11 @@ export const api = {
           })) || [];
 
         const computedDrugTotal = drugDetails.reduce(
-          (sum: number, item: any) => sum + Number(item.subtotal || 0),
+          (sum: number, item) => sum + Number(item.subtotal || 0),
           0,
         );
         const computedServiceTotal = serviceDetails.reduce(
-          (sum: number, item: any) => sum + Number(item.subtotal || 0),
+          (sum: number, item) => sum + Number(item.subtotal || 0),
           0,
         );
         const serviceFee = Number(t.biaya_layanan ?? transactionMeta.meta.serviceFee ?? 0);
@@ -1140,11 +1158,11 @@ export const api = {
           nakes: t.nama_nakes || (t.created_by && profileMap[t.created_by]) || '-',
           items:
             t.transaksi_detail
-              ?.map((d: any) => `${getDisplayNameFromMasterObat(d.master_obat)} (${d.qty})`)
+              ?.map((d) => `${getDisplayNameFromMasterObat(d.master_obat)} (${d.qty})`)
               .join(', ') || '',
           services:
             t.transaksi_jasa
-              ?.map((j: any) => j.master_jasa?.nama)
+              ?.map((j) => j.master_jasa?.nama)
               .filter(Boolean)
               .join(', ') || '-',
           serviceFee,
@@ -1154,7 +1172,7 @@ export const api = {
           serviceDetails,
         };
       })
-      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     // Pagination applied AFTER all filtering and mapping so that totalPages
     // reflects the actual number of filtered records, not the raw DB count.
@@ -1182,7 +1200,7 @@ export const api = {
         opname_detail(*, master_obat(nama, satuan, jenis, merek, kandungan))
       `,
       )
-      .eq('id', opnameId)
+      .eq('id', parseInt(opnameId))
       .is('deleted_at', null)
       .single();
 
@@ -1192,14 +1210,15 @@ export const api = {
       id: data.id.toString(),
       opnameNumber: `OPN-${data.id}`,
       scheduleDate: data.tanggal_jadwal,
-      status: data.status,
-      auditor: data.profiles?.full_name || 'Admin',
+      status: data.status as OpnameStatus,
+      // Query ini tidak join ke profiles, jadi auditor selalu 'Admin'.
+      auditor: 'Admin',
       currentStep: data.current_step || 1,
-      selectedObatIds: data.selected_obat_ids,
+      selectedObatIds: data.selected_obat_ids as OpnameObatIds | null,
       completedAt: data.completed_at,
-      scheduleObatIds: data.opname_schedule?.obat_ids || [],
+      scheduleObatIds: (data.opname_schedule?.obat_ids as OpnameObatIds | null) || [],
       scheduleName: data.opname_schedule?.nama || 'Jadwal Opname',
-      items: (data.opname_detail || []).map((d: any) => ({
+      items: (data.opname_detail || []).map((d) => ({
         id: d.id.toString(),
         productId: d.obat_id.toString(),
         productName: getDisplayNameFromMasterObat(d.master_obat),
@@ -1210,7 +1229,7 @@ export const api = {
         difference: d.selisih,
         stokFinal: d.stok_final,
         reason: d.alasan,
-        detailStatus: d.status,
+        detailStatus: d.status as OpnameItem['detailStatus'],
       })),
     };
   },
@@ -1279,7 +1298,7 @@ export const api = {
     const { error } = await supabase
       .from('opname')
       .update({ deleted_at: new Date().toISOString(), status: 'dihapus' })
-      .eq('id', opnameId);
+      .eq('id', parseInt(opnameId));
 
     if (error) throw error;
     return { success: true };
@@ -1289,7 +1308,7 @@ export const api = {
     const { data: detail, error: fetchError } = await supabase
       .from('opname_detail')
       .select('opname_id')
-      .eq('id', detailId)
+      .eq('id', parseInt(detailId))
       .single();
     if (fetchError) throw fetchError;
 
@@ -1337,15 +1356,16 @@ export const api = {
 
     if (error) throw error;
 
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item) => ({
       id: item.id.toString(),
       opnameNumber: `OPN-${item.id}`,
       date: item.completed_at || item.created_at,
       scheduleDate: item.tanggal_jadwal,
       scheduleName: item.opname_schedule?.nama || 'Jadwal Opname',
-      auditor: item.profiles?.full_name || 'Admin',
+      // Query ini tidak join ke profiles, jadi auditor selalu 'Admin'.
+      auditor: 'Admin',
       itemsCount: item.opname_detail?.length || 0,
-      discrepancyCount: (item.opname_detail || []).filter((d: any) => d.selisih !== 0).length,
+      discrepancyCount: (item.opname_detail || []).filter((d) => d.selisih !== 0).length,
       status: 'selesai',
     }));
   },
@@ -1354,11 +1374,11 @@ export const api = {
     const { data, error } = await supabase
       .from('opname_detail')
       .select(`*, master_obat(nama, satuan, jenis, merek, kandungan)`)
-      .eq('opname_id', opnameId);
+      .eq('opname_id', parseInt(opnameId));
 
     if (error) throw error;
 
-    return (data || []).map((d: any) => ({
+    return (data || []).map((d) => ({
       id: d.id.toString(),
       productName: getDisplayNameFromMasterObat(d.master_obat),
       stokSistem: d.stok_sistem,
@@ -1466,7 +1486,7 @@ export const api = {
       stokKeluar: outCount || 0,
       tertunda: pendingCount || 0,
       recentTransactions: [],
-      lowStockItems: (lowStockItems || []).map((item: any) => ({
+      lowStockItems: (lowStockItems || []).map((item) => ({
         ...item,
         nama: getProductDisplayNameFromDb(item),
       })),
@@ -1494,12 +1514,11 @@ export const api = {
 
     if (error) throw error;
 
-    return data.map((t: any) => {
+    return data.map((t) => {
       const itemCount = t.transaksi_detail?.length || 0;
       const firstItemName =
         getDisplayNameFromMasterObat(t.transaksi_detail?.[0]?.master_obat) || 'Item';
-      const totalQty =
-        t.transaksi_detail?.reduce((acc: number, d: any) => acc + (d.qty || 0), 0) || 0;
+      const totalQty = t.transaksi_detail?.reduce((acc: number, d) => acc + (d.qty || 0), 0) || 0;
 
       let title = 'Pengeluaran Stok';
       if (t.tipe_sumber === 'KASIR_LANGSUNG') {
@@ -1607,7 +1626,7 @@ export const api = {
     const allRows: any[] = [];
     data.forEach((t) => {
       if (t.transaksi_detail && Array.isArray(t.transaksi_detail)) {
-        t.transaksi_detail.forEach((d: any) => {
+        t.transaksi_detail.forEach((d) => {
           allRows.push({
             date: getTransactionEventTimestamp(t),
             trxNumber: t.nomor,
@@ -1627,9 +1646,9 @@ export const api = {
     });
 
     // Flatten opname rows: one row per adjusted item
-    (opnameData || []).forEach((o: any) => {
+    (opnameData || []).forEach((o) => {
       if (o.opname_detail && Array.isArray(o.opname_detail)) {
-        o.opname_detail.forEach((d: any) => {
+        o.opname_detail.forEach((d) => {
           allRows.push({
             date: o.completed_at,
             trxNumber: `OPN-${o.id}`,
@@ -1673,7 +1692,7 @@ export const api = {
       .eq('user_roles.role', 'nakes')
       .order('full_name');
     if (error) throw error;
-    return (data || []).map((p: any) => ({ id: p.id, full_name: p.full_name }));
+    return (data || []).map((p) => ({ id: p.id, full_name: p.full_name }));
   },
 
   // Fetch distinct supplier names from past stock-in transactions
@@ -1684,7 +1703,7 @@ export const api = {
       .eq('tipe', 'masuk')
       .not('nama_pasien', 'is', null);
     if (error) throw error;
-    const unique = [...new Set((data || []).map((d: any) => d.nama_pasien).filter(Boolean))];
+    const unique = [...new Set((data || []).map((d) => d.nama_pasien).filter(Boolean))];
     return unique as string[];
   },
 
@@ -1713,7 +1732,7 @@ export const api = {
 
     if (error) throw error;
 
-    const formattedData = (data || []).map((t: any) => {
+    const formattedData = (data || []).map((t) => {
       const isIn = t.tipe === 'masuk';
       const details = t.transaksi_detail || [];
       const itemName =
@@ -1722,7 +1741,7 @@ export const api = {
           : 'Item Dihapus';
       const itemCategory = details.length > 0 ? details[0]?.master_obat?.jenis || '-' : '-';
       const itemCount = details.length;
-      const totalQty = details.reduce((acc: number, curr: any) => acc + (curr.qty || 0), 0);
+      const totalQty = details.reduce((acc: number, curr) => acc + (curr.qty || 0), 0);
 
       // Construct display name
       const displayName = itemCount > 1 ? `${itemName} +${itemCount - 1} lainnya` : itemName;

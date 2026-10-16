@@ -3,17 +3,12 @@ import { Button } from './ui/button';
 import { signUp, updateUserProfileAdmin, deleteAuthUser, adminUpdatePassword } from '../lib/auth';
 import { supabase } from '../lib/supabaseClient';
 import { useToast } from './ui/toast';
+import type { Tables } from '../lib/database.types';
 
-interface UserRow {
-  id: string;
-  email: string;
-  full_name: string | null;
-  role: 'admin' | 'nakes' | 'farmasi';
+type UserRow = Tables<'profiles'> & {
   roles: string[];
-  created_at: string;
-  updated_at: string;
   last_sign_in_at?: string | null;
-}
+};
 
 const ROLE_OPTIONS = [
   {
@@ -226,7 +221,7 @@ const UserManagement: React.FC = () => {
     const selectedRoles = (user.roles || []).filter(isRoleValue);
     setSelectedUser(user);
     setFormName(user.full_name || '');
-    setFormRoles(selectedRoles.length > 0 ? selectedRoles : [user.role || 'nakes']);
+    setFormRoles(selectedRoles.length > 0 ? selectedRoles : [(user.role || 'nakes') as RoleValue]);
     setEditEmail(user.email);
     setShowEditModal(true);
     setError(null);
