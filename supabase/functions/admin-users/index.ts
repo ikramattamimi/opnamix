@@ -1,6 +1,9 @@
 // Edge Function: operasi admin untuk manajemen user.
-// Service role key hanya ada di server (env bawaan Supabase), tidak pernah
+// Secret key hanya ada di server (env bawaan Supabase), tidak pernah
 // dikirim ke browser. Pemanggil wajib login dan punya role 'admin'.
+//
+// Deploy dengan verify_jwt = false: verifikasi JWT bawaan platform hanya
+// mengenali legacy key. Otorisasi dilakukan di requireAdmin().
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 type AppRole = 'admin' | 'nakes' | 'apoteker' | 'farmasi';
@@ -51,9 +54,22 @@ function requireString(value: unknown, field: string): string {
   return value.trim();
 }
 
+// Pakai secret key baru (sb_secret_...); legacy service_role hanya cadangan
+// selama project belum punya secret key bernama 'default'.
+function getAdminKey(): string {
+  const secretKeys = Deno.env.get('SUPABASE_SECRET_KEYS');
+  const secretKey = secretKeys ? JSON.parse(secretKeys)['default'] : undefined;
+  if (secretKey) {
+    console.log('admin-users: using secret key');
+    return secretKey;
+  }
+  console.warn('admin-users: SUPABASE_SECRET_KEYS default not found, falling back to legacy service_role key');
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+}
+
 const admin = createClient(
   Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  getAdminKey(),
   { auth: { persistSession: false, autoRefreshToken: false } },
 );
 
