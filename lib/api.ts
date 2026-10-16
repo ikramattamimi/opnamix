@@ -1488,43 +1488,13 @@ export const api = {
   },
 
   finishOpname: async (opnameId: string) => {
-    // 1. Get all detail rows
-    const { data: details, error: fetchError } = await supabase
-      .from('opname_detail')
-      .select('id, obat_id, stok_fisik, stok_final, selisih, alasan')
-      .eq('opname_id', opnameId);
+    // Satu transaksi di database: status detail, master_obat.qty, dan
+    // status opname berubah bersamaan atau tidak sama sekali.
+    const { error } = await supabase.rpc('finish_opname', {
+      p_opname_id: parseInt(opnameId)
+    });
 
-    if (fetchError) throw fetchError;
-
-    // 2. Mark items and update master stock
-    for (const d of (details || [])) {
-      const finalStock = d.stok_final !== null ? d.stok_final : d.stok_fisik;
-      const detailStatus = d.selisih === 0 ? 'sesuai' : 'disesuaikan';
-
-      // Update detail status
-      await supabase
-        .from('opname_detail')
-        .update({ status: detailStatus, stok_final: finalStock })
-        .eq('id', d.id);
-
-      // Update master_obat.qty
-      await supabase
-        .from('master_obat')
-        .update({ qty: finalStock })
-        .eq('id', d.obat_id);
-    }
-
-    // 3. Mark opname as complete
-    const { error } = await supabase
-      .from('opname')
-      .update({
-        status: 'selesai',
-        current_step: 3,
-        completed_at: new Date().toISOString()
-      })
-      .eq('id', opnameId);
-
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   },
 
   resolveOpnameDifference: async (detailId: string, reason: string) => {
