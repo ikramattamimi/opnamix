@@ -78,6 +78,7 @@ describe('buildSidebarNodes', () => {
       '# Laporan',
       'Laporan Stok',
       'Kelola Pengguna',
+      'Komponen UI',
       'Profil',
     ]);
   });
@@ -87,6 +88,7 @@ describe('buildSidebarNodes', () => {
     expect(labels).toContain('Data Produk');
     expect(labels).toContain('Laporan Stok');
     expect(labels).not.toContain('Kelola Pengguna');
+    expect(labels).not.toContain('Komponen UI');
   });
 
   it('nakes hanya melihat menu umum', () => {

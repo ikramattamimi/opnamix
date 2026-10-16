@@ -1,0 +1,52 @@
+import React from 'react';
+import CodeBlock from './CodeBlock';
+
+interface DocSectionProps {
+  id: string;
+  title: string;
+  description: string;
+  importPath: string;
+  children: React.ReactNode;
+}
+
+// Satu bagian dokumentasi: judul, deskripsi, path import, lalu contoh.
+export const DocSection: React.FC<DocSectionProps> = ({
+  id,
+  title,
+  description,
+  importPath,
+  children,
+}) => (
+  <section
+    id={id}
+    className="scroll-mt-24 rounded-[20px] bg-card-light p-6 shadow-soft dark:bg-card-dark"
+  >
+    <h2 className="text-lg font-bold text-text-primary-light dark:text-white">{title}</h2>
+    <p className="mt-1 text-sm text-text-secondary-light">{description}</p>
+    <p className="mt-3 inline-block rounded-lg bg-gray-100 px-2 py-1 font-mono text-xs text-text-secondary-light dark:bg-white/5">
+      {importPath}
+    </p>
+    <div className="mt-6 space-y-8">{children}</div>
+  </section>
+);
+
+interface DocExampleProps {
+  title: string;
+  code: string;
+  note?: string;
+  children: React.ReactNode;
+}
+
+// Contoh hidup beserta kode yang menghasilkannya.
+export const DocExample: React.FC<DocExampleProps> = ({ title, code, note, children }) => (
+  <div className="space-y-3">
+    <div>
+      <h3 className="text-sm font-bold text-text-primary-light dark:text-white">{title}</h3>
+      {note && <p className="mt-0.5 text-xs text-text-secondary-light">{note}</p>}
+    </div>
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-gray-200 p-5 dark:border-white/10">
+      {children}
+    </div>
+    <CodeBlock code={code} />
+  </div>
+);

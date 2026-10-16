@@ -8,6 +8,7 @@ import {
   CircleArrowDown,
   CircleArrowUp,
   ClipboardCheck,
+  Component,
   History,
   LayoutDashboard,
   Settings,
@@ -64,6 +65,7 @@ const StockReport = React.lazy(() => import('@/features/reports/StockReport'));
 const UserManagement = React.lazy(() => import('@/features/users/UserManagement'));
 const ProfilePage = React.lazy(() => import('@/features/profile/ProfilePage'));
 const NotificationsPage = React.lazy(() => import('@/features/notifications/NotificationsPage'));
+const UiDocsPage = React.lazy(() => import('@/features/ui-docs/UiDocsPage'));
 
 // Role staf yang boleh mengelola master data, stok masuk, opname, dan laporan
 export const STAFF_ROLES: readonly AppRole[] = ['admin', 'farmasi', 'apoteker'];
@@ -196,6 +198,16 @@ export const APP_ROUTES: readonly AppRoute[] = [
     errorName: 'Manajemen Pengguna',
     showInSidebar: true,
     sidebar: { label: 'Kelola Pengguna', icon: UserCog },
+  },
+  {
+    // Dokumentasi pengembang, jadi hanya untuk admin
+    path: ROUTES.UI_DOCS,
+    title: 'Dokumentasi Komponen UI',
+    roles: ['admin'],
+    element: UiDocsPage,
+    errorName: 'Dokumentasi Komponen UI',
+    showInSidebar: true,
+    sidebar: { label: 'Komponen UI', icon: Component },
   },
   {
     path: ROUTES.PROFIL,

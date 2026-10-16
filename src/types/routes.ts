@@ -22,5 +22,6 @@ export const ROUTES = {
   LAPORAN_STOK: '/laporan/stok',
   USER_MANAGEMENT: '/pengaturan/user-management',
   PROFIL: '/pengaturan/profil',
+  UI_DOCS: '/pengaturan/komponen-ui',
   NOTIFICATIONS: '/notifikasi',
 } as const;
