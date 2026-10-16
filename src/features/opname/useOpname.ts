@@ -106,11 +106,21 @@ export function useResolveOpnameDifference() {
   });
 }
 
-// Langkah 3 selesai: stok master_obat diperbarui dan kunci dilepas
+// Langkah 3 selesai: detail final disimpan, lalu stok master_obat diperbarui
+// dan kunci dilepas. Invalidasi sekali setelah keduanya.
 export function useFinishOpname() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (opnameId: string) => opnameApi.finishOpname(opnameId),
+    mutationFn: async ({
+      opnameId,
+      updates,
+    }: {
+      opnameId: string;
+      updates: OpnameDetailUpdates;
+    }) => {
+      await opnameApi.saveDraft(opnameId, 3, updates);
+      await opnameApi.finishOpname(opnameId);
+    },
     onSuccess: () => invalidateOpnameChange(queryClient),
   });
 }

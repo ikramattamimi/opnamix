@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { opnameApi, OpnameDetail } from './api';
-import { productsApi } from '@/features/products/api';
+import {
+  useBackwardOpnameToStepOne,
+  useCompleteOpnameStepOne,
+  useFetchOpname,
+  useFinishOpname,
+  useMoveOpnameStep,
+  useOpname,
+  useSaveOpnameDraft,
+} from './useOpname';
+import { useFetchOpnameProducts, useOpnameProducts } from './useOpnameProducts';
 import { createNotification } from '@/features/notifications/api';
 import { OpnameItem } from './types';
 import { Product } from '@/features/products/types';
@@ -11,20 +19,33 @@ import { calculateOpnameDifference } from './opnameCalc';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { useToast } from '@/components/ui/toast';
 
+const NO_PRODUCTS: Product[] = [];
+
 const PelaksanaanOpnamePage: React.FC = () => {
   const { opnameId } = useParams<{ opnameId: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const opnameQuery = useOpname(opnameId);
+  const productsQuery = useOpnameProducts();
+  const fetchOpname = useFetchOpname();
+  const fetchProducts = useFetchOpnameProducts();
+  const completeStepOne = useCompleteOpnameStepOne();
+  const backwardToStepOne = useBackwardOpnameToStepOne();
+  const moveStep = useMoveOpnameStep();
+  const saveDraft = useSaveOpnameDraft();
+  const finishOpname = useFinishOpname();
+  const opnameData = opnameQuery.data ?? null;
+  const allProducts = productsQuery.data?.data ?? NO_PRODUCTS;
   const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  // Opname yang sudah dimuat ke state form di bawah
+  const [loadedId, setLoadedId] = useState<string | null>(null);
+  const isLoading = loadedId !== opnameId;
   const [isSaving, setIsSaving] = useState(false);
-  const [opnameData, setOpnameData] = useState<OpnameDetail | null>(null);
   const [items, setItems] = useState<OpnameItem[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [physicalCounts, setPhysicalCounts] = useState<Record<string, number | undefined>>({});
   const [finalStocks, setFinalStocks] = useState<Record<string, number | undefined>>({});
   const [reasons, setReasons] = useState<Record<string, string>>({});
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [scheduleObatIds, setScheduleObatIds] = useState<string[]>([]);
 
   // Confirmation modal state
@@ -47,76 +68,71 @@ const PelaksanaanOpnamePage: React.FC = () => {
   // Backward navigation warning state
   const [showBackwardWarning, setShowBackwardWarning] = useState(false);
 
+  // Isi state form sekali per opname, dari data server terbaru. Refetch
+  // berikutnya (setelah mutasi) tidak menimpa isian yang belum disimpan.
+  const opnameError = opnameQuery.error ?? productsQuery.error;
+  const loadedOpname = opnameQuery.isFetching ? undefined : opnameQuery.data;
+  const loadedProducts = productsQuery.isFetching ? undefined : productsQuery.data?.data;
   useEffect(() => {
-    loadOpname();
-  }, [opnameId]);
+    if (!opnameId || loadedId === opnameId) return;
 
-  const loadOpname = async () => {
-    if (!opnameId) return;
-    try {
-      const data = await opnameApi.getOpnameById(opnameId);
-      setOpnameData(data);
-      setCurrentStep(data.currentStep || 1);
-      const scheduleObats: string[] = (data.scheduleObatIds || []).map(String);
-      setScheduleObatIds(scheduleObats);
-
-      // Always load all products for step 1 selection
-      const products = await productsApi.getProducts({ page: 1, perPage: 1000 });
-      setAllProducts(products.data || []);
-
-      if (data.items.length > 0) {
-        setItems(data.items);
-        const ids = new Set<string>(data.items.map((i: OpnameItem) => i.productId));
-        setSelectedIds(ids);
-
-        // Pre-fill existing data
-        const counts: Record<string, number> = {};
-        const finals: Record<string, number> = {};
-        const rsns: Record<string, string> = {};
-        data.items.forEach((item: OpnameItem) => {
-          // Load semua nilai stok_fisik, termasuk 0, agar tidak berulang kali
-          // dianggap "belum diisi" saat save draft berikutnya
-          if (item.physicalStock !== undefined && item.physicalStock !== null) {
-            counts[item.id] = item.physicalStock!;
-          }
-          if (item.stokFinal !== undefined && item.stokFinal !== null) {
-            finals[item.id] = item.stokFinal!;
-          }
-          if (item.reason) {
-            rsns[item.id] = item.reason;
-          }
-        });
-        setPhysicalCounts(counts);
-        setFinalStocks(finals);
-        setReasons(rsns);
-      } else {
-        // Pre-select: use selectedObatIds if already saved, otherwise use schedule's obat list
-        if (data.selectedObatIds && data.selectedObatIds.length > 0) {
-          const selectedIdSet = new Set(data.selectedObatIds.map(String));
-          const filteredProducts = (products.data || []).filter((p) =>
-            selectedIdSet.has(String(p.id)),
-          );
-          setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
-        } else if (scheduleObats.length > 0) {
-          // Pre-select all products from schedule
-          const scheduleIdSet = new Set(scheduleObats);
-          const filteredProducts = (products.data || []).filter((p) =>
-            scheduleIdSet.has(String(p.id)),
-          );
-          setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
-        } else {
-          // No schedule filter = select all
-          setSelectedIds(new Set((products.data || []).map((p) => String(p.id))));
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load opname:', error);
+    if (opnameError) {
+      console.error('Failed to load opname:', opnameError);
       showToast('Gagal memuat data opname.', 'error');
       navigate('/audit/stok-opname/riwayat');
-    } finally {
-      setIsLoading(false);
+      setLoadedId(opnameId);
+      return;
     }
-  };
+    if (!loadedOpname || !loadedProducts) return;
+
+    const data = loadedOpname;
+    setCurrentStep(data.currentStep || 1);
+    const scheduleObats: string[] = (data.scheduleObatIds || []).map(String);
+    setScheduleObatIds(scheduleObats);
+
+    if (data.items.length > 0) {
+      setItems(data.items);
+      const ids = new Set<string>(data.items.map((i: OpnameItem) => i.productId));
+      setSelectedIds(ids);
+
+      // Pre-fill existing data
+      const counts: Record<string, number> = {};
+      const finals: Record<string, number> = {};
+      const rsns: Record<string, string> = {};
+      data.items.forEach((item: OpnameItem) => {
+        // Load semua nilai stok_fisik, termasuk 0, agar tidak berulang kali
+        // dianggap "belum diisi" saat save draft berikutnya
+        if (item.physicalStock !== undefined && item.physicalStock !== null) {
+          counts[item.id] = item.physicalStock!;
+        }
+        if (item.stokFinal !== undefined && item.stokFinal !== null) {
+          finals[item.id] = item.stokFinal!;
+        }
+        if (item.reason) {
+          rsns[item.id] = item.reason;
+        }
+      });
+      setPhysicalCounts(counts);
+      setFinalStocks(finals);
+      setReasons(rsns);
+    } else {
+      // Pre-select: use selectedObatIds if already saved, otherwise use schedule's obat list
+      if (data.selectedObatIds && data.selectedObatIds.length > 0) {
+        const selectedIdSet = new Set(data.selectedObatIds.map(String));
+        const filteredProducts = loadedProducts.filter((p) => selectedIdSet.has(String(p.id)));
+        setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
+      } else if (scheduleObats.length > 0) {
+        // Pre-select all products from schedule
+        const scheduleIdSet = new Set(scheduleObats);
+        const filteredProducts = loadedProducts.filter((p) => scheduleIdSet.has(String(p.id)));
+        setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
+      } else {
+        // No schedule filter = select all
+        setSelectedIds(new Set(loadedProducts.map((p) => String(p.id))));
+      }
+    }
+    setLoadedId(opnameId);
+  }, [opnameId, loadedId, opnameError, loadedOpname, loadedProducts, showToast, navigate]);
 
   const handleSaveDraft = async () => {
     if (!opnameId) return;
@@ -133,7 +149,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
 
       // Gunakan saveDetailOnly agar current_step di DB TIDAK berubah saat simpan draft.
       // Perubahan step hanya boleh terjadi saat user klik "Lanjutkan" (handleNextStep).
-      await opnameApi.saveDetailOnly(opnameId, detailUpdates);
+      await saveDraft.mutateAsync({ opnameId, updates: detailUpdates });
       showToast('Draft tersimpan.', 'success');
     } catch (error) {
       console.error('Failed to save draft:', error);
@@ -151,11 +167,10 @@ const PelaksanaanOpnamePage: React.FC = () => {
         const selectedProductIds: string[] = Array.from(selectedIds);
 
         // Use completeStepOne to create detail rows
-        await opnameApi.completeStepOne(opnameId!, selectedProductIds);
+        await completeStepOne.mutateAsync({ opnameId: opnameId!, productIds: selectedProductIds });
 
-        // Reload opname data to get the newly created detail rows
-        const data = await opnameApi.getOpnameById(opnameId!);
-        setOpnameData(data);
+        // Data opname terbaru (sudah di-refresh oleh mutasi) untuk detail yang baru dibuat
+        const data = await fetchOpname(opnameId!);
         setItems(data.items);
         setSelectedIds(new Set(data.items.map((i: OpnameItem) => i.productId)));
         setPhysicalCounts({});
@@ -177,7 +192,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
           detailId: item.id,
           physicalStock: physicalCounts[item.id] || 0,
         }));
-      await opnameApi.saveDraft(opnameId!, 3, detailUpdates);
+      await moveStep.mutateAsync({ opnameId: opnameId!, step: 3, updates: detailUpdates });
       setCurrentStep(3);
 
       // Create notification for step 2→3 transition
@@ -213,29 +228,25 @@ const PelaksanaanOpnamePage: React.FC = () => {
     try {
       // Going back from step 2 to step 1:
       // Delete all detail rows and reset to step 1
-      await opnameApi.backwardToStepOne(opnameId!, scheduleObatIds);
+      await backwardToStepOne.mutateAsync({ opnameId: opnameId!, scheduleObatIds });
 
-      // Reload opname data
-      const data = await opnameApi.getOpnameById(opnameId!);
-      setOpnameData(data);
+      // Data opname terbaru (sudah di-refresh oleh mutasi)
+      const data = await fetchOpname(opnameId!);
       setItems([]);
       setPhysicalCounts({});
       setFinalStocks({});
       setReasons({});
 
       // Restore products and selection from schedule's obat_ids
-      const products = await productsApi.getProducts({ page: 1, perPage: 1000 });
-      setAllProducts(products.data || []);
+      const products = await fetchProducts();
 
       const scheduleObats = (data.scheduleObatIds || []).map(String);
       if (scheduleObats.length > 0) {
         const scheduleIdSet = new Set(scheduleObats);
-        const filteredProducts = (products.data || []).filter((p) =>
-          scheduleIdSet.has(String(p.id)),
-        );
+        const filteredProducts = products.data.filter((p) => scheduleIdSet.has(String(p.id)));
         setSelectedIds(new Set(filteredProducts.map((p) => String(p.id))));
       } else {
-        setSelectedIds(new Set((products.data || []).map((p) => String(p.id))));
+        setSelectedIds(new Set(products.data.map((p) => String(p.id))));
       }
 
       setCurrentStep(1);
@@ -302,8 +313,7 @@ const PelaksanaanOpnamePage: React.FC = () => {
         reason: reasons[item.id] || '',
       }));
 
-      await opnameApi.saveDraft(opnameId, 3, detailUpdates);
-      await opnameApi.finishOpname(opnameId);
+      await finishOpname.mutateAsync({ opnameId, updates: detailUpdates });
 
       // Create notification for opname completed
       await createNotification({
