@@ -1,5 +1,5 @@
 import React from 'react';
-import { StockInReceipt } from '@/types';
+import { StockInReceipt } from './types';
 
 interface StockInDetailProps {
   receipt: StockInReceipt;

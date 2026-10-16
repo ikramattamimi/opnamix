@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
-import { StockInReceipt, PaginationParams, PaginatedResponse } from '@/types';
+import { StockInReceipt } from './types';
+import { PaginationParams, PaginatedResponse } from '@/types/pagination';
 import { getProfileNames } from '@/lib/profiles';
 import { getDisplayNameFromMasterObat } from '@/features/products/productDisplay';
 

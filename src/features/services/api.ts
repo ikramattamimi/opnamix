@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
-import { Service, ServiceCategoryType, PaginationParams, PaginatedResponse } from '@/types';
+import { Service, ServiceCategoryType } from './types';
+import { PaginationParams, PaginatedResponse } from '@/types/pagination';
 import { mapServiceFromDB, mapServiceCategoryFromDB } from './mappers';
 
 // Kategori jasa opsional: '' dari pilihan "Pilih Kategori" disimpan sebagai null.

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Product } from '@/types';
+import { Product } from './types';
 import ProductForm from './ProductForm';
 import { useCreateProduct } from './useProducts';
 import { useToast } from '@/components/ui/toast';

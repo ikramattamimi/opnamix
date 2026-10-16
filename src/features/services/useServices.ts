@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { servicesApi } from './api';
-import { Service } from '@/types';
+import { Service } from './types';
 import { QUERY_KEYS } from '@/hooks/useSupabaseQuery';
 
 import { keepPreviousData } from '@tanstack/react-query';
-import { PaginationParams } from '@/types';
+import { PaginationParams } from '@/types/pagination';
 
 export function useServices(params?: PaginationParams) {
   return useQuery({

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Service } from '@/types';
+import { Service } from './types';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
 

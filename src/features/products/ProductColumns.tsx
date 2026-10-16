@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Product } from '@/types';
+import { Product } from './types';
 import { Button } from '@/components/ui/button';
 
 interface ProductColumnsProps {

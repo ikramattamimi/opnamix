@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { servicesApi } from './api';
-import { ServiceCategoryType } from '@/types';
+import { ServiceCategoryType } from './types';
 import { QUERY_KEYS } from '@/hooks/useSupabaseQuery';
 
 export function useServiceCategories() {

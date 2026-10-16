@@ -1,31 +1,17 @@
 import { supabase } from '@/lib/supabaseClient';
-import { PaginationParams, PaginatedResponse } from '@/types';
+import { PaginationParams, PaginatedResponse } from '@/types/pagination';
 import type { ApiResult } from '@/types/api';
 import { toDate } from '@/lib/utils';
 import { getProfileNames } from '@/lib/profiles';
 import { getDisplayNameFromMasterObat } from '@/features/products/productDisplay';
 import { extractTransactionNoteAndMeta } from '@/features/stock-out/mappers';
+import type { StockMutationRow } from './types';
 
 const getTransactionEventTimestamp = (transaction: {
   processed_at?: string | null;
   created_at?: string | null;
   tanggal?: string | null;
 }) => transaction?.processed_at || transaction?.created_at || transaction?.tanggal;
-
-// Satu baris laporan mutasi stok: item transaksi atau item opname.
-export interface StockMutationRow {
-  date: string | null | undefined;
-  trxNumber: string | null;
-  type: string | null;
-  source: string | null;
-  itemName: string;
-  qty: number;
-  status: string | null;
-  systemStock: number | null;
-  physicalStock: number | null;
-  finalStock: number | null;
-  reason: string | null;
-}
 
 export const reportsApi = {
   // REPORTING

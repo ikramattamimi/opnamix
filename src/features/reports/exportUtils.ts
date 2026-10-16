@@ -1,7 +1,11 @@
-import type { Product, Service, StockInReceipt, StockOutRequest } from '@/types';
+import type { Product } from '@/features/products/types';
+import type { Service } from '@/features/services/types';
+import type { StockInReceipt } from '@/features/stock-in/types';
+import type { StockOutRequest } from '@/features/stock-out/types';
 import { toDate } from '@/lib/utils';
 import type { RecentTransaction } from '@/features/dashboard/api';
-import type { StockMutationRow, TransactionReportRow } from './api';
+import type { TransactionReportRow } from './api';
+import type { StockMutationRow } from './types';
 
 type XLSXModule = typeof import('xlsx');
 type ExcelRow = Record<string, string | number>;

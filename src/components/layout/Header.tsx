@@ -8,7 +8,7 @@ import {
   getNotificationColor,
   formatNotificationTime,
 } from '@/features/notifications/api';
-import { ROUTES } from '@/types';
+import { ROUTES } from '@/types/routes';
 
 interface HeaderProps {
   isDarkMode: boolean;

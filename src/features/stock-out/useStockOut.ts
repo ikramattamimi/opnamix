@@ -4,7 +4,7 @@ import { transactionsApi, CreateTransactionPayload } from '@/features/transactio
 import { stockOutApi } from './api';
 import { QUERY_KEYS } from '@/hooks/useSupabaseQuery';
 import { supabase } from '@/lib/supabaseClient';
-import { PaginationParams } from '@/types';
+import { PaginationParams } from '@/types/pagination';
 
 export function useStockOutRequests(params?: PaginationParams) {
   return useQuery({

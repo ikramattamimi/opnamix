@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useNotifications } from './NotificationProvider';
 import { getNotificationIcon, getNotificationColor, formatNotificationTime } from './api';
-import { AppNotification } from '@/types';
+import { AppNotification } from './types';
 
 const TYPE_LABELS: Record<string, string> = {
   STOCK_OUT_REQUEST: 'Permintaan Stok Keluar',

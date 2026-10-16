@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StockInReceipt, StockInItem, Product } from '@/types';
+import { StockInReceipt, StockInItem } from './types';
+import { Product } from '@/features/products/types';
 import { compressImage, formatFileSize } from '@/lib/imageCompression';
 import ProductLookupModal from '@/features/products/ProductLookupModal';
 import { useProducts } from '@/features/products/useProducts';

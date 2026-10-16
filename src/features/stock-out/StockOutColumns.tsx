@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ColumnDef, FilterFn } from '@tanstack/react-table';
-import { StockOutRequest } from '@/types';
+import { StockOutRequest } from './types';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
 

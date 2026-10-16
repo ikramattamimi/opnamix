@@ -4,7 +4,7 @@ import { stockInApi } from './api';
 import { QUERY_KEYS } from '@/hooks/useSupabaseQuery';
 
 import { keepPreviousData } from '@tanstack/react-query';
-import { PaginationParams } from '@/types';
+import { PaginationParams } from '@/types/pagination';
 
 export function useStockInReceipts(params?: PaginationParams) {
   return useQuery({

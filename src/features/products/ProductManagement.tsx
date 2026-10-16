@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Product, Category } from '@/types';
+import { Product, Category } from './types';
 import StatCard from '@/components/common/StatCard';
 import ProductForm from './ProductForm';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from './useProducts';

@@ -1,4 +1,4 @@
-import { StockOutRequest } from '@/types';
+import { StockOutRequest } from './types';
 
 export interface StockOutTotals {
   totalDrugs: number;

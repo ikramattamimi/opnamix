@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { opnameApi } from './api';
 import { productsApi } from '@/features/products/api';
-import { OpnameSchedule, OpnameScheduleConfig, PengulanganOpname, Product } from '@/types';
+import { OpnameSchedule, OpnameScheduleConfig, PengulanganOpname } from './types';
+import { Product } from '@/features/products/types';
 import { Button } from '@/components/ui/button';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { useToast } from '@/components/ui/toast';

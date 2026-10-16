@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabaseClient';
-import { AppNotification } from '@/types';
+import { AppNotification } from './types';
 import type { Json } from '@/lib/database.types';
 
 const MAX_NOTIFICATIONS = 50;

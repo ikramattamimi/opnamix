@@ -1,4 +1,4 @@
-import { Product, Unit, Category } from '@/types';
+import { Product, Unit, Category } from './types';
 import type { Tables } from '@/lib/database.types';
 import { getProductDisplayNameFromDb } from './productDisplay';
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Product, Category, Unit } from '@/types';
+import { Product, Category, Unit } from './types';
 import { Button } from '@/components/ui/button';
 import { sanitizePriceInput } from '@/lib/utils';
 import { getProductDisplayName } from './productDisplay';

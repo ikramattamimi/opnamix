@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { stockOutApi, RecentStockOut } from './api';
 import { transactionsApi } from '@/features/transactions/api';
-import { StockOutRequest, StockOutManual, RequestedDrug } from '@/types';
+import { StockOutRequest, StockOutManual, RequestedDrug } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import {
   useStockOutRequests,

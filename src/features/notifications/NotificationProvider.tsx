@@ -22,7 +22,7 @@ import {
   markAllAsRead as apiMarkAllAsRead,
 } from './api';
 import { useToast } from '@/components/ui/toast';
-import { AppNotification } from '@/types';
+import { AppNotification } from './types';
 import { useAuth } from '@/features/auth/useAuth';
 
 interface NotificationContextType {

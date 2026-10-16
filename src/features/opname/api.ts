@@ -5,7 +5,7 @@ import {
   OpnameStatus,
   OpnameItem,
   PengulanganOpname,
-} from '@/types';
+} from './types';
 import type { ApiResult } from '@/types/api';
 import type { Json } from '@/lib/database.types';
 import { getProfileNames } from '@/lib/profiles';

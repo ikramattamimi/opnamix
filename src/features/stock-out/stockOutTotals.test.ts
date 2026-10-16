@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { calculateRequestTotals } from './stockOutTotals';
-import { RequestedDrug, RequestedService } from '@/types';
+import { RequestedDrug, RequestedService } from './types';
 
 const drug = (quantity: number, price?: number): RequestedDrug => ({
   id: `d-${quantity}-${price}`,

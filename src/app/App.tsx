@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ROUTES } from '@/types';
+import { ROUTES } from '@/types/routes';
 import LoginPage from '@/features/auth/LoginPage';
 import { ToastProvider } from '@/components/ui/toast';
 import { NotificationProvider } from '@/features/notifications/NotificationProvider';

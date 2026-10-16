@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Service } from '@/types';
+import { Service } from './types';
 import { useServices, useCreateService, useUpdateService, useDeleteService } from './useServices';
 import { useCreateServiceCategory, useServiceCategories } from './useServiceCategories';
 import StatCard from '@/components/common/StatCard';

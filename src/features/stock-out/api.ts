@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
-import { StockOutRequest, PaginationParams, PaginatedResponse } from '@/types';
+import { StockOutRequest } from './types';
+import { PaginationParams, PaginatedResponse } from '@/types/pagination';
 import type { ApiResult } from '@/types/api';
 import { toDate } from '@/lib/utils';
 import { getDisplayNameFromMasterObat } from '@/features/products/productDisplay';

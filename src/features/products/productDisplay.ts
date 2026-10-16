@@ -1,4 +1,4 @@
-import { Category, Product } from '@/types';
+import { Category, Product } from './types';
 
 type ProductNameSource = Partial<Pick<Product, 'name' | 'brand' | 'composition' | 'category'>>;
 

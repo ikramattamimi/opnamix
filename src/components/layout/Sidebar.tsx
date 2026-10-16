@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ROUTES } from '@/types';
+import { ROUTES } from '@/types/routes';
 import { useAuth } from '@/features/auth/useAuth';
 
 interface SidebarProps {

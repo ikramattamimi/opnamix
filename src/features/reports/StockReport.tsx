@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Category } from '@/types';
+import { Category } from '@/features/products/types';
 import { useProducts } from '@/features/products/useProducts';
 import StatCard from '@/components/common/StatCard';
 import { DataTable } from '@/components/ui/data-table';
@@ -9,7 +9,8 @@ import { stockMutationColumns } from './StockMutationColumns';
 import { exportTransactionReportToExcel, exportStockMutationToExcel } from './exportUtils';
 import { toDate } from '@/lib/utils';
 
-import { reportsApi, StockMutationRow, TransactionReportRow } from './api';
+import { reportsApi, TransactionReportRow } from './api';
+import type { StockMutationRow } from './types';
 
 type ReportPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
 

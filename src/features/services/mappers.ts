@@ -1,4 +1,4 @@
-import { Service, ServiceCategoryType } from '@/types';
+import { Service, ServiceCategoryType } from './types';
 import type { Tables } from '@/lib/database.types';
 
 export const mapServiceFromDB = (

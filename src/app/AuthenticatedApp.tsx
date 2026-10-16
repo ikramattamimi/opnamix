@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { ROUTES } from '@/types';
+import { ROUTES } from '@/types/routes';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import ErrorBoundary from '@/components/common/ErrorBoundary';

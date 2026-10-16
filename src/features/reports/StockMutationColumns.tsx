@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
-import type { StockMutationRow } from './api';
+import type { StockMutationRow } from './types';
 
 // Type options for filter
 const typeOptions = [

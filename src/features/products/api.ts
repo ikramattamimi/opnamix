@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
-import { Product, PaginationParams, PaginatedResponse } from '@/types';
+import { Product } from './types';
+import { PaginationParams, PaginatedResponse } from '@/types/pagination';
 import { getProductDisplayName } from './productDisplay';
 import { mapProductFromDB } from './mappers';
 

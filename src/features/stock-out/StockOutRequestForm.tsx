@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StockOutRequest, RequestedDrug } from '@/types';
+import { StockOutRequest, RequestedDrug } from './types';
 import ProductLookupModal from '@/features/products/ProductLookupModal';
 import { useProducts } from '@/features/products/useProducts';
 import { useServices } from '@/features/services/useServices';

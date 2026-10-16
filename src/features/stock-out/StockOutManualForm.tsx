@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Product, StockOutManual, StockOutManualItem } from '@/types';
+import { Product } from '@/features/products/types';
+import { StockOutManual, StockOutManualItem } from './types';
 import ProductLookupModal from '@/features/products/ProductLookupModal';
 import { useProducts } from '@/features/products/useProducts';
 import { Button } from '@/components/ui/button';

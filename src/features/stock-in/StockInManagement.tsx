@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StockInReceipt, Product } from '@/types';
+import { StockInReceipt } from './types';
+import { Product } from '@/features/products/types';
 import { transactionsApi } from '@/features/transactions/api';
 import { stockInApi } from './api';
 import { exportStockInToExcel } from '@/features/reports/exportUtils';
