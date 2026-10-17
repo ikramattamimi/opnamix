@@ -68,7 +68,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
           size="lg"
           onClick={onFinish}
           disabled={isSaving}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 disabled:bg-gray-300"
+          className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-lg shadow-emerald-700/20 disabled:bg-gray-300"
         >
           <BadgeCheck className="mr-2" aria-hidden />
           {isSaving ? 'Memproses...' : 'Selesaikan Opname'}
@@ -103,7 +103,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
       <Button
         variant="ghost"
         onClick={onExit}
-        className="w-full font-bold text-red-700 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+        className="w-full font-bold text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10"
       >
         <LogOut className="mr-2" aria-hidden />
         Keluar
@@ -140,7 +140,7 @@ export const OpnameActionsBar: React.FC<OpnameActionsProps> = ({
           size="lg"
           onClick={onFinish}
           disabled={isSaving}
-          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 disabled:bg-gray-300"
+          className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-lg shadow-emerald-700/20 disabled:bg-gray-300"
         >
           <BadgeCheck className="mr-1.5" aria-hidden />
           {isSaving ? 'Memproses...' : 'Selesaikan Opname'}

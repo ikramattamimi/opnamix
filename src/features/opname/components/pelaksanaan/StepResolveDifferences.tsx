@@ -41,7 +41,7 @@ const RequiredMark: React.FC<{ className: string }> = ({ className }) => (
 );
 
 const MatchedMark: React.FC = () => (
-  <span className="text-xs font-bold text-emerald-500 flex items-center gap-1">
+  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
     <BadgeCheck className="size-3" aria-hidden /> Sesuai
   </span>
 );
@@ -158,7 +158,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="bg-card rounded-xl py-2">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase">Sistem</p>
-                <p className="text-sm font-bold opacity-60">{item.systemStock}</p>
+                <p className="text-sm font-bold text-muted-foreground">{item.systemStock}</p>
               </div>
               <div className="bg-card rounded-xl py-2">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase">Fisik</p>
