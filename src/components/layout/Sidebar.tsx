@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
       {/* Sidebar */}
       <aside
         className={cn(
-          'bg-card-light dark:bg-card-dark flex flex-col border-r border-gray-100 dark:border-none relative',
+          'bg-card flex flex-col border-r border-gray-100 dark:border-none relative',
           // Desktop
           'transition-all duration-300',
           isCollapsed ? 'md:w-24' : 'md:w-72',
@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
           size="icon"
           onClick={() => setIsCollapsed(!isCollapsed)}
           aria-label={isCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-          className="absolute -right-3 top-9 bg-white dark:bg-card-dark border border-gray-100 dark:border-gray-700 rounded-full p-1.5 shadow-sm hover:text-primary hover:scale-110 active:scale-95 transition-all duration-200 z-30 h-7 w-7 hidden md:flex"
+          className="absolute -right-3 top-9 bg-card border border-gray-100 dark:border-gray-700 rounded-full p-1.5 shadow-sm hover:text-primary hover:scale-110 active:scale-95 transition-all duration-200 z-30 h-7 w-7 hidden md:flex"
         >
           {isCollapsed ? (
             <ChevronRight className="size-4" aria-hidden />
@@ -89,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
               )}
             />
             {!effectiveCollapsed && (
-              <div className="text-xl font-bold uppercase tracking-wide text-text-primary-light dark:text-white whitespace-nowrap">
+              <div className="text-xl font-bold uppercase tracking-wide text-foreground whitespace-nowrap">
                 Opna<span className="text-primary font-bold">mix</span>
               </div>
             )}
@@ -103,7 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
                 <div key={`group-${node.label}`} className="h-4"></div>
               ) : (
                 <div key={`group-${node.label}`} className="px-4 pt-4 pb-2">
-                  <p className="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                     {node.label}
                   </p>
                 </div>
@@ -161,7 +161,7 @@ const NavParent: React.FC<NavParentProps> = ({ parent, items, collapsed, onClose
           collapsed ? 'justify-center px-2' : 'justify-start px-4',
           isActivePath
             ? 'text-primary font-bold'
-            : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-white font-medium',
+            : 'text-muted-foreground hover:text-foreground dark:hover:text-white font-medium',
         )}
       >
         <Icon
@@ -237,7 +237,7 @@ const NavItem: React.FC<NavItemProps> = ({ route, collapsed, onCloseMobile }) =>
           collapsed ? 'justify-center px-2' : 'justify-start px-4',
           isActive
             ? 'bg-primary/10 text-primary font-bold hover:bg-primary/15 hover:text-primary'
-            : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-white font-medium hover:bg-transparent',
+            : 'text-muted-foreground hover:text-foreground dark:hover:text-white font-medium hover:bg-transparent',
         )
       }
     >

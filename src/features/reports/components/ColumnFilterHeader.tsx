@@ -16,7 +16,7 @@ const ColumnFilterHeader = <TData,>({
   options,
 }: ColumnFilterHeaderProps<TData>) => (
   <div className="space-y-2">
-    <div className="font-bold text-text-primary-light dark:text-white">{label}</div>
+    <div className="font-bold text-foreground">{label}</div>
     <DataTableColumnFilter column={column} title={title} options={options} />
   </div>
 );

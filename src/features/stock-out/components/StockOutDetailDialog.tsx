@@ -60,16 +60,16 @@ const StockOutDetailDialog: React.FC<StockOutDetailDialogProps> = ({
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       {/* Tombol tutup bawaan DialogContent disembunyikan; header punya tombol tutup sendiri */}
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-3xl p-0 gap-0 border-none bg-white dark:bg-card-dark shadow-2xl flex flex-col [&>button:last-child]:hidden">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-3xl p-0 gap-0 border-none bg-card shadow-2xl flex flex-col [&>button:last-child]:hidden">
         <div className="p-6 border-b border-gray-100 dark:border-white/10 flex justify-between items-center bg-gray-50/50 dark:bg-white/5 sticky top-0 backdrop-blur-md z-10">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <ReceiptText className="size-6 text-primary" aria-hidden />
-              <DialogTitle className="text-xl font-bold leading-normal text-text-primary-light dark:text-white">
+              <DialogTitle className="text-xl font-bold leading-normal text-foreground">
                 {title}
               </DialogTitle>
             </div>
-            <DialogDescription className="text-sm text-text-secondary-light">
+            <DialogDescription className="text-sm text-muted-foreground">
               {request.requestId} • {formatDateTimeForDisplay(request.date)}
             </DialogDescription>
           </div>

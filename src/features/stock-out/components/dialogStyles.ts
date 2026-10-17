@@ -8,4 +8,4 @@ export const PRIMARY_BUTTON =
   'h-auto px-6 py-2.5 rounded-xl font-bold text-sm bg-none bg-primary text-white shadow-lg shadow-primary/30 hover:bg-blue-700 hover:-translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed';
 
 export const GHOST_BUTTON =
-  'h-auto px-6 py-2.5 rounded-xl font-bold text-sm text-text-secondary-light hover:text-text-secondary-light hover:bg-gray-200 dark:hover:bg-white/10';
+  'h-auto px-6 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:text-muted-foreground hover:bg-gray-200 dark:hover:bg-white/10';

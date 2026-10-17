@@ -77,7 +77,7 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                   <th className="px-5 py-3 w-16 text-center"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-card-dark">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-card">
                 {fields.map((field, index) => {
                   const drug = drugs[index] ?? field;
                   const product = products.find((p) => p.id === drug.productId);
@@ -96,7 +96,7 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                           onClick={() => setActiveRow(index)}
                         >
                           <input
-                            className="w-full bg-transparent border-none font-bold text-brand-dark dark:text-white focus:ring-0 p-0 cursor-pointer placeholder-gray-400"
+                            className="w-full bg-transparent border-none font-bold text-foreground focus:ring-0 p-0 cursor-pointer placeholder-gray-400"
                             value={drug.productName || ''}
                             placeholder="Pilih Obat..."
                             aria-label="Nama obat"
@@ -122,7 +122,7 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                           aria-label="Jumlah"
                           aria-invalid={!!drugError?.quantity}
                           className={cn(
-                            'w-16 h-auto mx-auto rounded-lg border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm md:text-sm py-1 px-2 focus:border-primary focus-visible:ring-primary dark:text-white text-center',
+                            'w-16 h-auto mx-auto rounded-lg border-gray-200 dark:border-gray-700 bg-background text-sm md:text-sm py-1 px-2 focus:border-primary focus-visible:ring-primary dark:text-white text-center',
                             drugError?.quantity && 'border-red-500 focus:border-red-500',
                           )}
                           {...register(`drugs.${index}.quantity`, { valueAsNumber: true })}

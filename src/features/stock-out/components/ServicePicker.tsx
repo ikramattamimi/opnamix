@@ -44,9 +44,9 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
   };
 
   return (
-    <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft h-auto">
+    <div className="bg-card rounded-[20px] p-6 shadow-soft h-auto">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-lg text-brand-dark dark:text-white flex items-center gap-2">
+        <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-600">
             <BriefcaseMedical className="size-5" aria-hidden />
           </span>
@@ -73,9 +73,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
               >
                 <div className="flex items-center gap-2">
                   <Folder className="text-purple-500" aria-hidden />
-                  <span className="font-bold text-sm text-brand-dark dark:text-white">
-                    {categoryName}
-                  </span>
+                  <span className="font-bold text-sm text-foreground">{categoryName}</span>
                   {selectedCount > 0 && (
                     <span className="text-[10px] font-bold bg-primary text-white rounded-full px-1.5 py-0.5">
                       {selectedCount}
@@ -111,7 +109,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
                           type="checkbox"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-brand-dark dark:text-white truncate">
+                          <p className="font-semibold text-sm text-foreground truncate">
                             {service.name}
                           </p>
                         </div>

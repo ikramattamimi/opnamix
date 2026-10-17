@@ -25,7 +25,7 @@ const AmountInput: React.FC<{
     value={value === 0 ? '' : value}
     onChange={(e) => onChange(toAmount(e.target.value))}
     className={cn(
-      'h-auto w-32 px-3 py-1.5 text-right text-sm md:text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark text-text-primary-light dark:text-white focus-visible:ring-primary focus:border-primary font-bold',
+      'h-auto w-32 px-3 py-1.5 text-right text-sm md:text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-card text-foreground focus-visible:ring-primary focus:border-primary font-bold',
       className,
     )}
     placeholder="0"
@@ -39,20 +39,20 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({
   onDiscountChange,
 }) => (
   <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-5 border border-dashed border-gray-200 dark:border-white/10 space-y-3">
-    <div className="flex justify-between text-sm text-text-secondary-light">
+    <div className="flex justify-between text-sm text-muted-foreground">
       <span>Total Harga Obat</span>
-      <span className="font-bold text-text-primary-light dark:text-white">
+      <span className="font-bold text-foreground">
         Rp {totals.totalDrugs.toLocaleString('id-ID')}
       </span>
     </div>
-    <div className="flex justify-between text-sm text-text-secondary-light">
+    <div className="flex justify-between text-sm text-muted-foreground">
       <span>Total Harga Jasa</span>
-      <span className="font-bold text-text-primary-light dark:text-white">
+      <span className="font-bold text-foreground">
         Rp {totals.totalServices.toLocaleString('id-ID')}
       </span>
     </div>
     {onServiceFeeChange ? (
-      <div className="flex justify-between items-center text-sm text-text-secondary-light">
+      <div className="flex justify-between items-center text-sm text-muted-foreground">
         <span>Biaya Layanan</span>
         <div className="flex items-center gap-2">
           <span>Rp</span>
@@ -66,16 +66,16 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({
       </div>
     ) : (
       totals.serviceFee > 0 && (
-        <div className="flex justify-between text-sm text-text-secondary-light">
+        <div className="flex justify-between text-sm text-muted-foreground">
           <span>Biaya Layanan</span>
-          <span className="font-bold text-text-primary-light dark:text-white">
+          <span className="font-bold text-foreground">
             Rp {totals.serviceFee.toLocaleString('id-ID')}
           </span>
         </div>
       )
     )}
     {onDiscountChange ? (
-      <div className="flex justify-between items-center text-sm text-text-secondary-light">
+      <div className="flex justify-between items-center text-sm text-muted-foreground">
         <span>Diskon</span>
         <div className="flex items-center gap-2">
           <span>- Rp</span>
@@ -89,7 +89,7 @@ const RequestSummary: React.FC<RequestSummaryProps> = ({
       </div>
     ) : (
       totals.discount > 0 && (
-        <div className="flex justify-between text-sm text-text-secondary-light">
+        <div className="flex justify-between text-sm text-muted-foreground">
           <span>Diskon</span>
           <span className="font-bold text-red-500">
             - Rp {totals.discount.toLocaleString('id-ID')}

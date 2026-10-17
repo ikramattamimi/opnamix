@@ -81,18 +81,18 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         {/* z-[80] supaya tetap di atas modal lain (z-[60]/z-[70]) */}
         <AlertDialogOverlay className="z-[80] bg-black/60 backdrop-blur-sm animate-fadeIn" />
         <AlertDialogPrimitive.Content className="fixed inset-0 z-[80] flex items-center justify-center p-4 focus:outline-none">
-          <div className="bg-white dark:bg-card-dark w-full max-w-md rounded-3xl shadow-2xl p-6 animate-scaleUp text-center">
+          <div className="bg-card w-full max-w-md rounded-3xl shadow-2xl p-6 animate-scaleUp text-center">
             <div
               className={`w-20 h-20 ${styles.iconBg} rounded-full flex items-center justify-center mx-auto mb-4 ${styles.iconColor}`}
             >
               <TypeIcon className="size-10" aria-hidden />
             </div>
 
-            <AlertDialogTitle className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
+            <AlertDialogTitle className="text-2xl font-bold text-foreground mb-2">
               {title}
             </AlertDialogTitle>
 
-            <AlertDialogDescription className="text-base text-text-secondary-light dark:text-text-secondary-dark mb-6">
+            <AlertDialogDescription className="text-base text-muted-foreground mb-6">
               {message}
             </AlertDialogDescription>
 
@@ -102,7 +102,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 className={cn(
                   'mt-0 sm:mt-0 border-0 bg-transparent shadow-none',
                   buttonVariants({ variant: 'ghost' }),
-                  'flex-1 py-6 text-text-secondary-light font-bold hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors h-auto',
+                  'flex-1 py-6 text-muted-foreground font-bold hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors h-auto',
                 )}
               >
                 {cancelText}

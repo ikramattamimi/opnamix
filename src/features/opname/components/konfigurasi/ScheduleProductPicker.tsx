@@ -43,7 +43,7 @@ const ScheduleProductPicker: React.FC<ScheduleProductPickerProps> = ({ products 
 
   return (
     <div className="px-4 sm:px-6 py-4 space-y-4 overflow-y-auto max-h-[60vh]">
-      <div className="flex items-center justify-between bg-background-light dark:bg-background-dark rounded-xl p-3">
+      <div className="flex items-center justify-between bg-background rounded-xl p-3">
         <label className="flex items-center gap-3 cursor-pointer">
           {/* Belum ada komponen checkbox di components/ui */}
           <input
@@ -54,7 +54,7 @@ const ScheduleProductPicker: React.FC<ScheduleProductPickerProps> = ({ products 
           />
           <span className="text-sm font-bold">Semua Obat</span>
         </label>
-        <span className="text-xs text-text-secondary-light">
+        <span className="text-xs text-muted-foreground">
           {selectAll ? `${products.length} obat` : `${selected.size} dipilih`}
         </span>
       </div>
@@ -63,7 +63,7 @@ const ScheduleProductPicker: React.FC<ScheduleProductPickerProps> = ({ products 
         <>
           <div className="relative">
             <Search
-              className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary-light"
+              className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               aria-hidden
             />
             <Input
@@ -72,12 +72,12 @@ const ScheduleProductPicker: React.FC<ScheduleProductPickerProps> = ({ products 
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari obat..."
               aria-label="Cari obat"
-              className="h-auto w-full bg-background-light dark:bg-background-dark border-none rounded-xl pl-9 pr-4 py-2.5 text-sm md:text-sm font-medium"
+              className="h-auto w-full bg-background border-none rounded-xl pl-9 pr-4 py-2.5 text-sm md:text-sm font-medium"
             />
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-xs text-text-secondary-light">
+            <span className="text-xs text-muted-foreground">
               {filteredProducts.length} obat ditemukan
             </span>
             <Button
@@ -104,14 +104,14 @@ const ScheduleProductPicker: React.FC<ScheduleProductPickerProps> = ({ products 
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate">{product.name}</p>
-                  <p className="text-xs text-text-secondary-light">
+                  <p className="text-xs text-muted-foreground">
                     {product.category} · {product.unit} · Stok: {product.stock}
                   </p>
                 </div>
               </label>
             ))}
             {filteredProducts.length === 0 && (
-              <p className="text-center text-sm text-text-secondary-light py-4 italic">
+              <p className="text-center text-sm text-muted-foreground py-4 italic">
                 Tidak ada obat ditemukan.
               </p>
             )}

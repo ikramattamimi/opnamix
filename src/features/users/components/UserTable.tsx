@@ -35,7 +35,7 @@ const formatCreatedAt = (value: string | null) =>
       })
     : '-';
 
-const actionButtonClass = 'h-8 w-8 text-text-secondary-light transition-colors';
+const actionButtonClass = 'h-8 w-8 text-muted-foreground transition-colors';
 
 // Filter cari/role dan tabel pengguna
 const UserTable: React.FC<UserTableProps> = ({
@@ -77,10 +77,10 @@ const UserTable: React.FC<UserTableProps> = ({
   return (
     <>
       {/* Filter Bar */}
-      <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 shadow-soft flex flex-wrap items-center gap-4">
+      <div className="bg-card rounded-2xl p-4 shadow-soft flex flex-wrap items-center gap-4">
         <div className="relative flex-1 min-w-[200px]">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary-light size-5"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-5"
             aria-hidden
           />
           <Input
@@ -88,13 +88,13 @@ const UserTable: React.FC<UserTableProps> = ({
             placeholder="Cari nama atau email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-auto pl-10 pr-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm md:text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
+            className="h-auto pl-10 pr-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background text-sm md:text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
           />
         </div>
         <Select value={filterRole} onValueChange={setFilterRole}>
           <SelectTrigger
             aria-label="Filter role"
-            className="w-auto h-auto gap-2 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background-dark text-sm px-4 py-2.5 focus:ring-2 focus:ring-primary/30"
+            className="w-auto h-auto gap-2 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background text-sm px-4 py-2.5 focus:ring-2 focus:ring-primary/30"
           >
             <SelectValue />
           </SelectTrigger>
@@ -110,11 +110,11 @@ const UserTable: React.FC<UserTableProps> = ({
       </div>
 
       {/* User Table */}
-      <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft overflow-hidden">
+      <div className="bg-card rounded-2xl shadow-soft overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-gray-50 dark:bg-white/5">
-              <tr className="text-xs uppercase font-bold text-text-secondary-light dark:text-text-secondary-dark">
+              <tr className="text-xs uppercase font-bold text-muted-foreground">
                 <th className="px-6 py-4">Pengguna</th>
                 <th className="px-6 py-4">Role</th>
                 <th className="px-6 py-4">Dibuat</th>
@@ -132,19 +132,15 @@ const UserTable: React.FC<UserTableProps> = ({
                       <div className="flex items-center gap-3">
                         <UserAvatar user={user} />
                         <div>
-                          <p className="font-bold text-text-primary-light dark:text-white">
-                            {user.full_name || '-'}
-                          </p>
-                          <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                            {user.email}
-                          </p>
+                          <p className="font-bold text-foreground">{user.full_name || '-'}</p>
+                          <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <RoleBadges roles={user.roles} />
                     </td>
-                    <td className="px-6 py-4 text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
                       {formatCreatedAt(user.created_at)}
                     </td>
                     <td className="px-6 py-4">

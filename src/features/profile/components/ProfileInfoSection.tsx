@@ -32,13 +32,11 @@ const ProfileInfoSection: React.FC<ProfileInfoSectionProps> = ({
   const RoleIcon = roleInfo.icon;
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft p-6 md:p-8">
+    <div className="bg-card rounded-2xl shadow-soft p-6 md:p-8">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <CircleUserRound className="text-primary size-6" aria-hidden />
-          <h3 className="text-lg font-bold text-text-primary-light dark:text-white">
-            Informasi Profil
-          </h3>
+          <h3 className="text-lg font-bold text-foreground">Informasi Profil</h3>
         </div>
         {!editMode ? (
           <Button
@@ -89,27 +87,27 @@ const ProfileInfoSection: React.FC<ProfileInfoSectionProps> = ({
               className={FIELD_INPUT_CLASS}
             />
           ) : (
-            <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
+            <p className="text-sm font-medium text-foreground px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
               {profile.full_name || '-'}
             </p>
           )}
         </div>
         <div className="space-y-1.5">
           <Label className={FIELD_LABEL_CLASS}>Email</Label>
-          <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
+          <p className="text-sm font-medium text-foreground px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
             {profile.email}
           </p>
         </div>
         <div className="space-y-1.5">
           <Label className={FIELD_LABEL_CLASS}>Role</Label>
-          <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center gap-2">
+          <p className="text-sm font-medium text-foreground px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl flex items-center gap-2">
             <RoleIcon className={`size-5 ${roleIconColor}`} aria-hidden />
             {roleInfo.label}
           </p>
         </div>
         <div className="space-y-1.5">
           <Label className={FIELD_LABEL_CLASS}>Terakhir Diperbarui</Label>
-          <p className="text-sm font-medium text-text-primary-light dark:text-white px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
+          <p className="text-sm font-medium text-foreground px-4 py-2.5 bg-gray-50 dark:bg-white/5 rounded-xl">
             {profile.updated_at
               ? new Date(profile.updated_at).toLocaleDateString('id-ID', {
                   year: 'numeric',

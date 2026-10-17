@@ -29,7 +29,7 @@ const STATUS_OPTIONS = [
 ];
 
 const analyticsSelectClass =
-  'w-auto min-w-0 bg-background-light dark:bg-background-dark rounded-xl px-4 py-2 text-sm font-bold text-inherit dark:text-inherit';
+  'w-auto min-w-0 bg-background rounded-xl px-4 py-2 text-sm font-bold text-inherit dark:text-inherit';
 
 // Tab analisis: ringkasan nilai inventaris, grafik, dan status stok per produk.
 const StockAnalytics: React.FC = () => {
@@ -87,17 +87,17 @@ const StockAnalytics: React.FC = () => {
       />
 
       {/* Filters Bar */}
-      <div className="bg-card-light dark:bg-card-dark rounded-3xl p-4 shadow-soft flex flex-wrap items-center gap-4">
+      <div className="bg-card rounded-3xl p-4 shadow-soft flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-[200px] relative">
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-text-secondary-light"
+            className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground"
             aria-hidden
           />
           <Input
             type="text"
             placeholder="Cari produk atau SKU..."
             aria-label="Cari produk atau SKU"
-            className="h-auto w-full pl-12 pr-4 py-3 bg-background-light dark:bg-background-dark border-none rounded-2xl text-sm md:text-sm font-medium shadow-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            className="h-auto w-full pl-12 pr-4 py-3 bg-background border-none rounded-2xl text-sm md:text-sm font-medium shadow-none focus-visible:ring-2 focus-visible:ring-primary/20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -106,7 +106,7 @@ const StockAnalytics: React.FC = () => {
         <div className="flex items-center gap-2">
           <Label
             htmlFor={`${id}-category`}
-            className="text-xs font-bold text-text-secondary-light uppercase ml-2"
+            className="text-xs font-bold text-muted-foreground uppercase ml-2"
           >
             Kategori:
           </Label>
@@ -122,7 +122,7 @@ const StockAnalytics: React.FC = () => {
         <div className="flex items-center gap-2">
           <Label
             htmlFor={`${id}-status`}
-            className="text-xs font-bold text-text-secondary-light uppercase ml-2"
+            className="text-xs font-bold text-muted-foreground uppercase ml-2"
           >
             Status:
           </Label>
@@ -143,7 +143,7 @@ const StockAnalytics: React.FC = () => {
             setFilterCategory('Semua');
             setFilterStatus('Semua');
           }}
-          className="p-3 text-text-secondary-light hover:text-red-500 transition-colors h-auto w-auto [&_svg]:size-6"
+          className="p-3 text-muted-foreground hover:text-red-500 transition-colors h-auto w-auto [&_svg]:size-6"
           title="Reset Filter"
           aria-label="Reset Filter"
         >

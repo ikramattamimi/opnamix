@@ -34,10 +34,8 @@ const ProtectedRoute: React.FC<{
 const NotFoundPage = () => (
   <div className="flex flex-col items-center justify-center h-64 text-center">
     <SearchX className="size-12 text-gray-300 dark:text-gray-600 mb-4" aria-hidden />
-    <h2 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
-      Halaman Tidak Ditemukan
-    </h2>
-    <p className="text-text-secondary-light mb-6">Halaman yang Anda cari tidak tersedia.</p>
+    <h2 className="text-2xl font-bold text-foreground mb-2">Halaman Tidak Ditemukan</h2>
+    <p className="text-muted-foreground mb-6">Halaman yang Anda cari tidak tersedia.</p>
     <Button onClick={() => (window.location.href = '/')}>Kembali ke Dashboard</Button>
   </div>
 );
@@ -65,7 +63,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-300 font-body">
+    <div className="flex h-screen overflow-hidden bg-background text-foreground transition-colors duration-300 font-body">
       <Sidebar isMobileOpen={isSidebarOpen} onCloseMobile={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
@@ -97,7 +95,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
           </Suspense>
         </div>
 
-        <footer className="mt-auto py-6 px-8 text-sm text-text-secondary-light flex flex-col md:flex-row justify-between items-center bg-transparent">
+        <footer className="mt-auto py-6 px-8 text-sm text-muted-foreground flex flex-col md:flex-row justify-between items-center bg-transparent">
           <p>© {new Date().getFullYear()} Opnamix. Hak Cipta Dilindungi.</p>
         </footer>
       </main>

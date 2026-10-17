@@ -38,7 +38,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
           {filteredHistory.map((opname) => (
             <div
               key={opname.id}
-              className="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-soft hover:shadow-md transition-shadow"
+              className="bg-card rounded-2xl p-5 shadow-soft hover:shadow-md transition-shadow"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
@@ -53,10 +53,8 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                       </span>
                     )}
                   </div>
-                  <p className="font-bold text-text-primary-light dark:text-white">
-                    {opname.scheduleName}
-                  </p>
-                  <div className="flex items-center gap-4 text-xs text-text-secondary-light flex-wrap">
+                  <p className="font-bold text-foreground">{opname.scheduleName}</p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                     <span>Dilaksanakan: {formatDate(opname.date || opname.scheduleDate)}</span>
                     <span className="hidden sm:inline">
                       Jadwal: {formatDate(opname.scheduleDate)}
@@ -76,7 +74,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   <Button
                     onClick={() => onDelete(opname.id)}
                     variant="ghost"
-                    className="rounded-xl font-bold px-4 text-sm h-auto py-2.5 text-red-400 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="rounded-xl font-bold px-4 text-sm h-auto py-2.5 text-red-600 hover:text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                   >
                     <Trash2 className="mr-1.5" aria-hidden />

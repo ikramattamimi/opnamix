@@ -14,7 +14,7 @@ const reportTabClass = (active: boolean) =>
   `px-6 py-3 text-sm font-bold rounded-xl transition-all shadow-none h-auto ${
     active
       ? 'bg-primary text-white shadow-md hover:bg-primary/90'
-      : 'text-text-secondary-light hover:bg-white dark:hover:bg-white/5 bg-transparent'
+      : 'text-muted-foreground hover:bg-white dark:hover:bg-white/5 bg-transparent'
   }`;
 
 // Halaman laporan dengan tiga tab. Isi tab tetap ter-mount (forceMount) supaya
@@ -32,11 +32,11 @@ const StockReport: React.FC = () => {
       {/* Top Action Bar */}
       <div className="flex flex-col md:flex-row justify-end items-start md:items-center gap-4">
         <div className="flex gap-3">
-          <TabsList className="flex h-auto items-stretch justify-start bg-gray-100 dark:bg-card-dark rounded-xl p-1 text-inherit">
+          <TabsList className="flex h-auto items-stretch justify-start bg-gray-100 dark:bg-card rounded-xl p-1 text-inherit">
             <TabsTrigger value="analysis" asChild>
               <Button
                 variant={activeTab === 'analysis' ? 'default' : 'ghost'}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-none ${activeTab === 'analysis' ? 'bg-white shadow text-primary hover:bg-white hover:text-primary' : 'text-text-secondary-light hover:text-primary bg-transparent'}`}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-none ${activeTab === 'analysis' ? 'bg-white shadow text-primary hover:bg-white hover:text-primary' : 'text-muted-foreground hover:text-primary bg-transparent'}`}
               >
                 Analisis
               </Button>

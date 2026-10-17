@@ -23,7 +23,7 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Tanggal</div>
+          <div className="font-bold text-foreground">Tanggal</div>
           <DataTableColumnFilter column={column} title="Tanggal" />
         </div>
       );
@@ -31,7 +31,7 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
     cell: ({ row }) => {
       const date = new Date(row.getValue('date'));
       return (
-        <div className="text-text-primary-light dark:text-white">
+        <div className="text-foreground">
           {date.toLocaleString('id-ID', {
             year: 'numeric',
             month: '2-digit',
@@ -49,15 +49,13 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">No. Transaksi</div>
+          <div className="font-bold text-foreground">No. Transaksi</div>
           <DataTableColumnFilter column={column} title="Nomor" />
         </div>
       );
     },
     cell: ({ row }) => (
-      <div className="font-medium text-text-primary-light dark:text-white">
-        {row.getValue('trxNumber')}
-      </div>
+      <div className="font-medium text-foreground">{row.getValue('trxNumber')}</div>
     ),
   },
   {
@@ -65,7 +63,7 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Tipe</div>
+          <div className="font-bold text-foreground">Tipe</div>
           <DataTableColumnFilter column={column} title="Tipe" options={typeOptions} />
         </div>
       );
@@ -116,52 +114,38 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Item Obat</div>
+          <div className="font-bold text-foreground">Item Obat</div>
           <DataTableColumnFilter column={column} title="Item" />
         </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">
-        {row.getValue('itemName') || '-'}
-      </div>
-    ),
+    cell: ({ row }) => <div className="text-foreground">{row.getValue('itemName') || '-'}</div>,
   },
   {
     accessorKey: 'qty',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">
-        Qty / Selisih
-      </div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Qty / Selisih</div>,
     cell: ({ row }) => {
       const type = row.original.type;
       const qty = row.getValue('qty') as number;
       if (type === 'penyesuaian') {
         return (
           <div
-            className={`text-center font-bold ${qty > 0 ? 'text-green-600 dark:text-green-400' : qty < 0 ? 'text-red-600 dark:text-red-400' : 'text-text-primary-light dark:text-white'}`}
+            className={`text-center font-bold ${qty > 0 ? 'text-green-600 dark:text-green-400' : qty < 0 ? 'text-red-600 dark:text-red-400' : 'text-foreground'}`}
           >
             {qty > 0 ? `+${qty}` : qty}
           </div>
         );
       }
-      return (
-        <div className="text-center font-medium text-text-primary-light dark:text-white">{qty}</div>
-      );
+      return <div className="text-center font-medium text-foreground">{qty}</div>;
     },
   },
   {
     accessorKey: 'systemStock',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">
-        Stok Sistem
-      </div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Stok Sistem</div>,
     cell: ({ row }) => {
       const val = row.original.systemStock;
       return (
-        <div className="text-center text-text-primary-light dark:text-white">
+        <div className="text-center text-foreground">
           {val !== null && val !== undefined ? val : '-'}
         </div>
       );
@@ -169,15 +153,11 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
   },
   {
     accessorKey: 'physicalStock',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">
-        Stok Fisik
-      </div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Stok Fisik</div>,
     cell: ({ row }) => {
       const val = row.original.physicalStock;
       return (
-        <div className="text-center text-text-primary-light dark:text-white">
+        <div className="text-center text-foreground">
           {val !== null && val !== undefined ? val : '-'}
         </div>
       );
@@ -185,15 +165,11 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
   },
   {
     accessorKey: 'finalStock',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">
-        Stok Final
-      </div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Stok Final</div>,
     cell: ({ row }) => {
       const val = row.original.finalStock;
       return (
-        <div className="text-center font-bold text-text-primary-light dark:text-white">
+        <div className="text-center font-bold text-foreground">
           {val !== null && val !== undefined ? val : '-'}
         </div>
       );
@@ -204,7 +180,7 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Status</div>
+          <div className="font-bold text-foreground">Status</div>
           <DataTableColumnFilter column={column} title="Status" options={statusOptions} />
         </div>
       );

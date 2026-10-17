@@ -63,23 +63,23 @@ const StockOutTable: React.FC<StockOutTableProps> = ({
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-[20px] shadow-soft overflow-hidden p-6">
+    <div className="bg-card rounded-[20px] shadow-soft overflow-hidden p-6">
       <div className="ps-0 pt-0 p-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-background-light dark:bg-background-dark rounded-xl">
+          <div className="p-2 bg-background rounded-xl">
             <ClipboardClock className="size-6 text-primary" aria-hidden />
           </div>
-          <h3 className="font-bold text-xl text-text-primary-light dark:text-white tracking-tight">
+          <h3 className="font-bold text-xl text-foreground tracking-tight">
             {isNakes ? 'Riwayat Permintaan Saya' : 'Antrean Permintaan Obat'}
           </h3>
         </div>
         <Tabs value={filterStatus} onValueChange={onFilterChange}>
-          <TabsList className="h-auto p-1 bg-background-light dark:bg-background-dark rounded-xl">
+          <TabsList className="h-auto p-1 bg-background rounded-xl">
             {STATUS_FILTERS.map((status) => (
               <TabsTrigger
                 key={status}
                 value={status}
-                className="px-5 py-2 text-sm font-bold rounded-lg text-text-secondary-light hover:text-text-primary-light dark:hover:text-white data-[state=active]:bg-white dark:data-[state=active]:bg-card-light data-[state=active]:shadow-sm data-[state=active]:text-text-primary-light dark:data-[state=active]:text-text-primary-dark"
+                className="px-5 py-2 text-sm font-bold rounded-lg text-muted-foreground hover:text-foreground data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:text-foreground"
               >
                 {status}
               </TabsTrigger>

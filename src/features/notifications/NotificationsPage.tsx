@@ -33,7 +33,7 @@ const ALL_TYPES = ['Semua', ...Object.keys(TYPE_LABELS)];
 
 const FILTER_CHIP_CLASS = 'h-auto px-3 py-1.5 rounded-lg text-xs font-bold transition-colors';
 const FILTER_CHIP_IDLE_CLASS =
-  'bg-background-light dark:bg-background-dark text-text-secondary-light hover:bg-background-light dark:hover:bg-background-dark hover:text-text-primary-light dark:hover:text-white';
+  'bg-background text-muted-foreground hover:bg-background dark:hover:bg-background hover:text-foreground dark:hover:text-white';
 
 const NotificationsPage: React.FC = () => {
   const { user } = useAuth();
@@ -65,8 +65,8 @@ const NotificationsPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary-light dark:text-white">Notifikasi</h1>
-          <p className="text-sm text-text-secondary-light mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Notifikasi</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {unreadCount > 0
               ? `${unreadCount} notifikasi belum dibaca`
               : 'Semua notifikasi sudah dibaca'}
@@ -85,7 +85,7 @@ const NotificationsPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 shadow-soft space-y-3">
+      <div className="bg-card rounded-2xl p-4 shadow-soft space-y-3">
         {/* Read filter */}
         <div className="flex gap-2 flex-wrap">
           {(['all', 'unread', 'read'] as const).map((opt) => (
@@ -130,7 +130,7 @@ const NotificationsPage: React.FC = () => {
       </div>
 
       {/* Notification List */}
-      <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft overflow-hidden">
+      <div className="bg-card rounded-2xl shadow-soft overflow-hidden">
         {isLoading ? (
           <LoadingState label="Memuat notifikasi..." className="py-16" />
         ) : isError && !data ? (
@@ -172,24 +172,22 @@ const NotificationsPage: React.FC = () => {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm leading-snug ${!notif.is_read ? 'font-bold text-text-primary-light dark:text-white' : 'font-medium text-text-secondary-light dark:text-text-secondary-dark'}`}
+                        className={`text-sm leading-snug ${!notif.is_read ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}`}
                       >
                         {notif.title}
                       </p>
-                      <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-                        {notif.message}
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       {!notif.is_read && <span className="w-2.5 h-2.5 bg-primary rounded-full" />}
-                      <span className="text-[10px] text-text-secondary-light/60 dark:text-text-secondary-dark/60 whitespace-nowrap">
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">
                         {formatNotificationTime(notif.created_at)}
                       </span>
                     </div>
                   </div>
 
                   {/* Type badge */}
-                  <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">
+                  <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-white/5 text-muted-foreground uppercase tracking-wide">
                     {TYPE_LABELS[notif.type] || notif.type}
                   </span>
                 </div>
@@ -201,7 +199,7 @@ const NotificationsPage: React.FC = () => {
 
       {/* Footer count */}
       {filtered.length > 0 && (
-        <p className="text-center text-xs text-text-secondary-light/60">
+        <p className="text-center text-xs text-muted-foreground">
           Menampilkan {filtered.length} dari {notifications.length} notifikasi
         </p>
       )}

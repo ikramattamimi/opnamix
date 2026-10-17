@@ -50,8 +50,7 @@ export function getRoleIconColor(userRoles: string[]): string {
   return 'text-green-500';
 }
 
-export const FIELD_LABEL_CLASS =
-  'text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark';
+export const FIELD_LABEL_CLASS = 'text-xs font-bold uppercase text-muted-foreground';
 // Ukuran, warna, dan fokus mengikuti input manual sebelumnya
 export const FIELD_INPUT_CLASS =
-  'h-auto w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 transition-all';
+  'h-auto w-full px-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-background text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 transition-all';

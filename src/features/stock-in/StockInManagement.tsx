@@ -112,11 +112,9 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
           <StatCard label="Growth Stok" value="-" icon={TrendingUp} color="green-500" />
         </div>
 
-        <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
+        <div className="bg-card rounded-[20px] p-6 shadow-soft">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h2 className="text-xl font-bold text-text-primary-light dark:text-white">
-              Daftar Penerimaan Stok
-            </h2>
+            <h2 className="text-xl font-bold text-foreground">Daftar Penerimaan Stok</h2>
             <div className="flex gap-2">
               <Button
                 onClick={() => setIsFormOpen(true)}

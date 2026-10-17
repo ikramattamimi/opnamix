@@ -158,15 +158,15 @@ const StockOutManagement: React.FC = () => {
   return (
     <>
       <div className="space-y-6">
-        <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div className="bg-card rounded-3xl p-6 shadow-soft flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full bg-primary"></span>
-              <h4 className="text-sm font-bold text-text-primary-light dark:text-white uppercase tracking-wider">
+              <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">
                 {isNakes ? 'Permintaan Obat' : 'Pusat Kendali Pengeluaran'}
               </h4>
             </div>
-            <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm max-w-xl">
+            <p className="text-muted-foreground text-sm max-w-xl">
               {isNakes
                 ? 'Ajukan permintaan obat dan alkes untuk pasien melalui formulir di sini.'
                 : 'Kelola pengeluaran stok melalui formulir permintaan medis terintegrasi atau lakukan pencatatan manual cepat.'}
@@ -189,7 +189,7 @@ const StockOutManagement: React.FC = () => {
               <Button
                 onClick={() => setIsManualModalOpen(true)}
                 variant="outline"
-                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm shadow-sm hover:shadow-md transition-all bg-white dark:bg-card-dark text-primary border-primary/20 hover:border-primary/50 [&_svg]:size-4 sm:[&_svg]:size-5"
+                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm shadow-sm hover:shadow-md transition-all bg-card text-primary border-primary/20 hover:border-primary/50 [&_svg]:size-4 sm:[&_svg]:size-5"
               >
                 <NotebookPen aria-hidden />
                 <span>Stok Manual</span>

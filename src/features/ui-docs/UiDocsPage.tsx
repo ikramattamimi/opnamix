@@ -28,8 +28,8 @@ const TOC_ITEMS = SECTIONS.map(({ id, label }) => ({ id, label }));
 const UiDocsPage: React.FC = () => (
   <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-8">
     <div className="min-w-0 space-y-6">
-      <div className="rounded-[20px] bg-card-light p-6 shadow-soft dark:bg-card-dark">
-        <p className="text-sm text-text-secondary-light">
+      <div className="rounded-[20px] bg-card p-6 shadow-soft">
+        <p className="text-sm text-muted-foreground">
           Komponen bersama di <code className="font-mono text-xs">src/components/ui</code>{' '}
           (shadcn/ui) dan <code className="font-mono text-xs">src/components/common</code>. Pakai
           komponen ini sebelum membuat versi sendiri. Konvensi lengkap ada di{' '}

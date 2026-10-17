@@ -15,9 +15,7 @@ export const createProductColumns = ({
 }: ProductColumnsProps): ColumnDef<Product>[] => [
   {
     accessorKey: 'name',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white">Nama Produk</div>
-    ),
+    header: () => <div className="font-bold text-foreground">Nama Produk</div>,
     cell: ({ row }) => {
       const product = row.original;
       return (
@@ -28,11 +26,9 @@ export const createProductColumns = ({
             {product.name.substring(0, 2).toUpperCase()}
           </div>
           <div>
-            <div className="font-bold text-text-primary-light dark:text-white">{product.name}</div>
+            <div className="font-bold text-foreground">{product.name}</div>
             {product.description && (
-              <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-                {product.description}
-              </div>
+              <div className="text-xs text-muted-foreground">{product.description}</div>
             )}
           </div>
         </div>
@@ -41,23 +37,17 @@ export const createProductColumns = ({
   },
   {
     accessorKey: 'category',
-    header: () => <div className="font-bold text-text-primary-light dark:text-white">Kategori</div>,
-    cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">{row.getValue('category')}</div>
-    ),
+    header: () => <div className="font-bold text-foreground">Kategori</div>,
+    cell: ({ row }) => <div className="text-foreground">{row.getValue('category')}</div>,
   },
   {
     accessorKey: 'unit',
-    header: () => <div className="font-bold text-text-primary-light dark:text-white">Satuan</div>,
-    cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">{row.getValue('unit')}</div>
-    ),
+    header: () => <div className="font-bold text-foreground">Satuan</div>,
+    cell: ({ row }) => <div className="text-foreground">{row.getValue('unit')}</div>,
   },
   {
     accessorKey: 'sellingPrice',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white">Harga Jual</div>
-    ),
+    header: () => <div className="font-bold text-foreground">Harga Jual</div>,
     cell: ({ row }) => {
       const price = parseFloat(row.getValue('sellingPrice'));
       const formatted = new Intl.NumberFormat('id-ID', {
@@ -65,14 +55,12 @@ export const createProductColumns = ({
         currency: 'IDR',
         minimumFractionDigits: 0,
       }).format(price);
-      return <div className="font-bold text-text-primary-light dark:text-white">{formatted}</div>;
+      return <div className="font-bold text-foreground">{formatted}</div>;
     },
   },
   {
     accessorKey: 'stock',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">Stok</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Stok</div>,
     cell: ({ row }) => {
       const stock = parseInt(row.getValue('stock'));
       const minStock = row.original.minStock || 0;
@@ -96,9 +84,7 @@ export const createProductColumns = ({
   },
   {
     id: 'actions',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">Aksi</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Aksi</div>,
     cell: ({ row }) => {
       const product = row.original;
 

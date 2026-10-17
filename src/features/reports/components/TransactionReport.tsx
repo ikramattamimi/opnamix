@@ -57,7 +57,7 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-3xl p-6 shadow-soft">
       <DateRangeFilter value={range} onChange={setRange}>
         <FilterField label="Status" htmlFor={`${id}-status`}>
           <FilterSelect

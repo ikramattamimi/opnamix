@@ -127,11 +127,9 @@ export function DataTable<TData, TValue>({
 
       {hasPagination && (
         <div className="flex items-center justify-between px-2 py-3">
-          <span className="text-sm text-text-secondary-light dark:text-gray-400">
-            Hal.{' '}
-            <span className="font-bold text-text-primary-light dark:text-white">{currentPage}</span>{' '}
-            dari{' '}
-            <span className="font-bold text-text-primary-light dark:text-white">{totalPages}</span>{' '}
+          <span className="text-sm text-muted-foreground dark:text-gray-400">
+            Hal. <span className="font-bold text-foreground">{currentPage}</span> dari{' '}
+            <span className="font-bold text-foreground">{totalPages}</span>{' '}
             <span className="text-xs">({filteredTotal} data)</span>
           </span>
           <div className="flex items-center gap-2">

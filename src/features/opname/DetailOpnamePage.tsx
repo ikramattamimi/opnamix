@@ -33,13 +33,13 @@ const DetailOpnamePage: React.FC = () => {
           size="icon"
           onClick={() => navigate('/audit/stok-opname/riwayat')}
           aria-label="Kembali ke riwayat opname"
-          className="h-auto w-auto p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition-colors bg-card-light dark:bg-card-dark shadow-soft text-text-secondary-light [&_svg]:size-6"
+          className="h-auto w-auto p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition-colors bg-card shadow-soft text-muted-foreground [&_svg]:size-6"
         >
           <ArrowLeft aria-hidden />
         </Button>
         <div>
           <h2 className="text-xl font-bold">Detail Opname</h2>
-          <p className="text-sm text-text-secondary-light">{opnameInfo?.opnameNumber || ''}</p>
+          <p className="text-sm text-muted-foreground">{opnameInfo?.opnameNumber || ''}</p>
         </div>
         <span className="ml-auto text-xs font-bold px-3 py-1.5 bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-xl flex items-center gap-1">
           <CircleCheck className="size-3" aria-hidden />

@@ -88,7 +88,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   return (
     <div className="h-full">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-bold text-text-primary-light dark:text-white">
+        <h2 className="text-lg font-bold text-foreground">
           {editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}
         </h2>
         <div className="flex items-center gap-2">
@@ -106,7 +106,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             size="icon"
             onClick={onCancel}
             aria-label="Tutup"
-            className="h-auto w-auto p-2 text-current hover:text-current bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
+            className="h-auto w-auto p-2 text-current hover:text-current bg-background dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
           >
             <X aria-hidden />
           </Button>

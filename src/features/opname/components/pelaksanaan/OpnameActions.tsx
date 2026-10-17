@@ -31,7 +31,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
   onBackward,
   onExit,
 }) => (
-  <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+  <div className="bg-card rounded-3xl p-6 shadow-soft">
     <h3 className="text-base font-bold mb-2 flex items-center gap-2">
       <Zap className="size-5 text-primary" aria-hidden />
       Tindakan
@@ -120,7 +120,7 @@ export const OpnameActionsBar: React.FC<OpnameActionsProps> = ({
   onBackward,
   onExit,
 }) => (
-  <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card-light dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 space-y-2.5">
+  <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-gray-100 dark:border-gray-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 space-y-2.5">
     <div className="flex gap-2">
       {currentStep < 3 ? (
         <Button
@@ -159,7 +159,7 @@ export const OpnameActionsBar: React.FC<OpnameActionsProps> = ({
         <Button
           variant="ghost"
           onClick={onExit}
-          className="font-bold rounded-xl px-3 h-auto py-2 text-xs text-text-secondary-light"
+          className="font-bold rounded-xl px-3 h-auto py-2 text-xs text-muted-foreground"
         >
           Keluar
         </Button>

@@ -9,7 +9,7 @@ import type { Product } from '@/features/products/types';
 import { useProducts } from '@/features/products/useProducts';
 import { emptyManualItem, type StockOutManualValues } from '../schemas';
 
-const TH = 'px-4 py-3 text-xs font-bold text-text-secondary-light dark:text-gray-400 uppercase';
+const TH = 'px-4 py-3 text-xs font-bold text-muted-foreground dark:text-gray-400 uppercase';
 
 // Tabel item obat di form stok keluar manual (baris bisa ditambah, dihapus, dan dipilih produknya)
 const ManualItemsTable: React.FC = () => {
@@ -41,7 +41,7 @@ const ManualItemsTable: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-background-dark/50 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5">
+    <div className="bg-white dark:bg-background/50 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5">
       <table className="w-full">
         <thead className="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5">
           <tr>
@@ -78,8 +78,8 @@ const ManualItemsTable: React.FC = () => {
                       className={cn(
                         'w-full text-left cursor-pointer px-3 py-2 rounded-xl border border-transparent hover:border-primary/30 hover:bg-white dark:hover:bg-black/20 transition-all flex items-center justify-between',
                         item.productId
-                          ? 'font-bold text-text-primary-light dark:text-white'
-                          : 'text-text-secondary-light italic bg-gray-50/50 dark:bg-white/5',
+                          ? 'font-bold text-foreground'
+                          : 'text-muted-foreground italic bg-gray-50/50 dark:bg-white/5',
                         itemError?.productId && 'border-red-500 bg-red-50/50',
                       )}
                     >
@@ -118,13 +118,13 @@ const ManualItemsTable: React.FC = () => {
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-sm text-center text-text-secondary-light dark:text-gray-400">
+                <td className="px-4 py-3 text-sm text-center text-muted-foreground dark:text-gray-400">
                   {item.unit || '-'}
                 </td>
-                <td className="px-4 py-3 text-sm text-right text-text-secondary-light dark:text-gray-400">
+                <td className="px-4 py-3 text-sm text-right text-muted-foreground dark:text-gray-400">
                   {price > 0 ? `Rp ${price.toLocaleString('id-ID')}` : '-'}
                 </td>
-                <td className="px-4 py-3 text-sm text-right font-bold text-text-primary-light dark:text-white">
+                <td className="px-4 py-3 text-sm text-right font-bold text-foreground">
                   {total > 0 ? `Rp ${total.toLocaleString('id-ID')}` : '-'}
                 </td>
                 <td className="px-2 py-3 text-center">

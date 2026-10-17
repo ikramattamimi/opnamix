@@ -27,11 +27,11 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft p-6 md:p-8">
+    <div className="bg-card rounded-2xl shadow-soft p-6 md:p-8">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Lock className="text-primary size-6" aria-hidden />
-          <h3 className="text-lg font-bold text-text-primary-light dark:text-white">Keamanan</h3>
+          <h3 className="text-lg font-bold text-foreground">Keamanan</h3>
         </div>
         {!showPasswordSection && (
           <Button
@@ -93,7 +93,7 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
       )}
 
       {!showPasswordSection && (
-        <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-3">
+        <p className="text-sm text-muted-foreground mt-3">
           Pastikan menggunakan password yang kuat dan unik untuk menjaga keamanan akun Anda.
         </p>
       )}

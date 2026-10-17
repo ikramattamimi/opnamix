@@ -19,21 +19,17 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
           size="icon"
           onClick={onBack}
           aria-label="Kembali"
-          className="h-auto w-auto p-2 text-current bg-white dark:bg-card-dark hover:bg-white dark:hover:bg-card-dark rounded-full shadow-soft hover:text-primary transition-colors [&_svg]:size-6"
+          className="h-auto w-auto p-2 text-current bg-card hover:bg-white dark:hover:bg-card rounded-full shadow-soft hover:text-primary transition-colors [&_svg]:size-6"
         >
           <ArrowLeft aria-hidden />
         </Button>
-        <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
-          Detail Penerimaan Stok
-        </h2>
+        <h2 className="text-2xl font-bold text-foreground">Detail Penerimaan Stok</h2>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
-            <h3 className="text-lg font-bold text-text-primary-light dark:text-white mb-4">
-              Informasi Transaksi
-            </h3>
+          <div className="bg-card rounded-[20px] p-6 shadow-soft">
+            <h3 className="text-lg font-bold text-foreground mb-4">Informasi Transaksi</h3>
             <div className="space-y-4">
               <InfoRow label="No. Invoice" value={receipt.invoiceNumber} />
               <InfoRow label="Supplier" value={receipt.supplierName} />
@@ -62,10 +58,8 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
           </div>
 
           {receipt.evidenceUrl ? (
-            <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
-              <h3 className="text-lg font-bold text-text-primary-light dark:text-white mb-4">
-                Bukti Nota
-              </h3>
+            <div className="bg-card rounded-[20px] p-6 shadow-soft">
+              <h3 className="text-lg font-bold text-foreground mb-4">Bukti Nota</h3>
               <div className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 group relative">
                 <img
                   src={receipt.evidenceUrl}
@@ -89,10 +83,8 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
               </div>
             </div>
           ) : (
-            <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
-              <h3 className="text-lg font-bold text-text-primary-light dark:text-white mb-4">
-                Bukti Nota
-              </h3>
+            <div className="bg-card rounded-[20px] p-6 shadow-soft">
+              <h3 className="text-lg font-bold text-foreground mb-4">Bukti Nota</h3>
               <EmptyState
                 icon={ReceiptText}
                 title="Tidak ada bukti nota yang diunggah"
@@ -103,14 +95,12 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
         </div>
 
         <div className="lg:col-span-2">
-          <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft h-full">
-            <h3 className="text-lg font-bold text-text-primary-light dark:text-white mb-6">
-              Daftar Barang
-            </h3>
+          <div className="bg-card rounded-[20px] p-6 shadow-soft h-full">
+            <h3 className="text-lg font-bold text-foreground mb-6">Daftar Barang</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-xs uppercase tracking-wide text-text-secondary-light font-bold border-b border-gray-100 dark:border-gray-800">
+                  <tr className="text-xs uppercase tracking-wide text-muted-foreground font-bold border-b border-gray-100 dark:border-gray-800">
                     <th className="pb-4 pl-2">Produk</th>
                     <th className="pb-4">Kategori</th>
                     <th className="pb-4">Kadaluarsa</th>
@@ -124,13 +114,11 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
                       className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                     >
                       <td className="py-4 pl-2">
-                        <p className="font-bold text-text-primary-light dark:text-white">
-                          {item.productName}
-                        </p>
-                        <p className="text-xs text-text-secondary-light">ID: {item.productId}</p>
+                        <p className="font-bold text-foreground">{item.productName}</p>
+                        <p className="text-xs text-muted-foreground">ID: {item.productId}</p>
                       </td>
-                      <td className="py-4 text-text-secondary-light">{item.category}</td>
-                      <td className="py-4 text-text-primary-light dark:text-white font-medium">
+                      <td className="py-4 text-muted-foreground">{item.category}</td>
+                      <td className="py-4 text-foreground font-medium">
                         {new Date(item.expiryDate).toLocaleDateString('id-ID', {
                           dateStyle: 'medium',
                         })}
@@ -156,16 +144,14 @@ const InfoRow: React.FC<{ label: string; value: string; isStatus?: boolean }> = 
   isStatus,
 }) => (
   <div>
-    <p className="text-xs text-text-secondary-light font-medium uppercase tracking-wider">
-      {label}
-    </p>
+    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
     {isStatus ? (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 mt-1 rounded-full text-xs font-bold bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400">
         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
         {value}
       </span>
     ) : (
-      <p className="text-base font-bold text-text-primary-light dark:text-white mt-0.5">{value}</p>
+      <p className="text-base font-bold text-foreground mt-0.5">{value}</p>
     )}
   </div>
 );

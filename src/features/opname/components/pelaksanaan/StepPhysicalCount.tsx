@@ -31,10 +31,10 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-3xl p-6 shadow-soft">
       <div className="mb-6">
         <h3 className="text-lg font-bold">Tahap 2: Input Stok Fisik</h3>
-        <p className="text-sm text-text-secondary-light">
+        <p className="text-sm text-muted-foreground">
           Masukkan jumlah stok fisik hasil penghitungan di gudang.
         </p>
       </div>
@@ -50,7 +50,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
       <div className="hidden md:block overflow-x-auto mb-6">
         <table className="w-full text-left">
           <thead className="border-b border-gray-100 dark:border-gray-800">
-            <tr className="text-xs uppercase font-bold text-text-secondary-light tracking-wider">
+            <tr className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
               <th className="px-4 py-3">Nama Produk</th>
               <th className="px-4 py-3 w-48 text-center bg-primary/5 rounded-t-xl">
                 Jumlah Stok Fisik
@@ -65,7 +65,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
               >
                 <td className="px-4 py-4">
                   <p className="font-bold text-sm">{item.productName}</p>
-                  <p className="text-xs text-text-secondary-light">
+                  <p className="text-xs text-muted-foreground">
                     {item.category} · {item.unit}
                   </p>
                 </td>
@@ -77,7 +77,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
                     onChange={(e) => setCount(item.id, e.target.value)}
                     placeholder="0"
                     aria-label={`Stok fisik ${item.productName}`}
-                    className="h-auto w-full bg-white dark:bg-card-dark border-2 border-primary/20 focus:border-primary focus-visible:ring-0 rounded-xl text-center font-bold text-lg md:text-lg py-3 shadow-sm placeholder:text-gray-300"
+                    className="h-auto w-full bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-0 rounded-xl text-center font-bold text-lg md:text-lg py-3 shadow-sm placeholder:text-gray-300"
                   />
                 </td>
               </tr>
@@ -91,18 +91,18 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
         {items.map((item) => (
           <div
             key={item.id}
-            className="bg-background-light dark:bg-background-dark rounded-xl pt-1 pb-3 px-3 space-y-2 flex gap-2 items-center justify-between"
+            className="bg-background rounded-xl pt-1 pb-3 px-3 space-y-2 flex gap-2 items-center justify-between"
           >
             <div>
               <p className="font-bold text-sm">{item.productName}</p>
-              <p className="text-xs text-text-secondary-light">
+              <p className="text-xs text-muted-foreground">
                 {item.category} · {item.unit}
               </p>
             </div>
             <div>
               <Label
                 htmlFor={`fisik-${item.id}`}
-                className="text-xs font-bold text-text-secondary-light tracking-wider mb-1.5 block"
+                className="text-xs font-bold text-muted-foreground tracking-wider mb-1.5 block"
               >
                 Stok Fisik
               </Label>
@@ -113,7 +113,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
                 value={physicalCounts[item.id] ?? ''}
                 onChange={(e) => setCount(item.id, e.target.value)}
                 placeholder="0"
-                className="h-auto w-20 text-sm bg-white dark:bg-card-dark border-2 border-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 rounded-md text-center font-bold px-0 py-1 shadow-sm placeholder:text-gray-300"
+                className="h-auto w-20 text-sm bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 rounded-md text-center font-bold px-0 py-1 shadow-sm placeholder:text-gray-300"
               />
             </div>
           </div>

@@ -113,7 +113,7 @@ export const ActiveSchedulesSidebar: React.FC<{
 
       <Button
         onClick={onAddOpname}
-        className="w-full bg-white hover:bg-primary/90 text-primary font-bold rounded-xl px-4 h-auto py-3 text-sm shadow-lg shadow-primary/20"
+        className="w-full bg-white hover:bg-primary/90 text-blue-600 font-bold rounded-xl px-4 h-auto py-3 text-sm shadow-lg shadow-primary/20"
       >
         <CirclePlus className="mr-1.5" aria-hidden />
         Tambah Opname

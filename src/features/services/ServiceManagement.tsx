@@ -90,7 +90,7 @@ const ServiceManagement: React.FC = () => {
         </div>
 
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-text-primary-light dark:text-white">Daftar Jasa</h2>
+          <h2 className="text-xl font-bold text-foreground">Daftar Jasa</h2>
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -121,7 +121,7 @@ const ServiceManagement: React.FC = () => {
 
         {/* Table */}
         <div className="w-full">
-          <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft h-full">
+          <div className="bg-card rounded-[20px] p-6 shadow-soft h-full">
             {isPending ? (
               <LoadingState label="Memuat jasa..." />
             ) : isError ? (

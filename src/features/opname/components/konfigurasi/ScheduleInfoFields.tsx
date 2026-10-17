@@ -12,7 +12,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import type { ScheduleFormValues } from './scheduleForm';
 
 const fieldClass =
-  'h-auto w-full bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-3 text-sm md:text-sm font-medium';
+  'h-auto w-full bg-background border-none rounded-xl px-4 py-3 text-sm md:text-sm font-medium';
 const labelClass = 'text-xs sm:text-sm font-bold opacity-60';
 
 // Langkah 1 dialog jadwal: nama, frekuensi, dan tanggal audit

@@ -22,7 +22,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     role="status"
     className={cn(
       'flex flex-col items-center justify-center gap-3 py-12 text-center',
-      fullScreen && 'min-h-screen bg-background-light dark:bg-background-dark',
+      fullScreen && 'min-h-screen bg-background',
       className,
     )}
   >
@@ -30,7 +30,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
       className={cn('animate-spin text-primary', fullScreen ? 'size-12' : 'size-8')}
       aria-hidden
     />
-    <p className="text-sm text-text-secondary-light">{label}</p>
+    <p className="text-sm text-muted-foreground">{label}</p>
   </div>
 );
 
@@ -53,8 +53,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     className={cn('flex flex-col items-center justify-center gap-2 py-12 text-center', className)}
   >
     <Icon className="size-10 text-gray-300 dark:text-gray-600" aria-hidden />
-    <p className="font-medium text-text-primary-light dark:text-text-primary-dark">{title}</p>
-    {description && <p className="max-w-sm text-sm text-text-secondary-light">{description}</p>}
+    <p className="font-medium text-foreground">{title}</p>
+    {description && <p className="max-w-sm text-sm text-muted-foreground">{description}</p>}
     {action && <div className="mt-2">{action}</div>}
   </div>
 );
@@ -78,8 +78,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
     className={cn('flex flex-col items-center justify-center gap-2 py-12 text-center', className)}
   >
     <CircleAlert className="size-10 text-red-500" aria-hidden />
-    <p className="font-medium text-text-primary-light dark:text-text-primary-dark">{title}</p>
-    <p className="max-w-sm text-sm text-text-secondary-light">{message}</p>
+    <p className="font-medium text-foreground">{title}</p>
+    <p className="max-w-sm text-sm text-muted-foreground">{message}</p>
     {onRetry && (
       <Button variant="outline" size="sm" className="mt-2" onClick={onRetry}>
         Coba lagi

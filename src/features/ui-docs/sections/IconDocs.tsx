@@ -54,18 +54,16 @@ export const IconDocs: React.FC = () => (
           >
             <Icon className="size-5 shrink-0 text-primary" aria-hidden />
             <div className="min-w-0">
-              <p className="truncate font-mono text-xs text-text-primary-light dark:text-white">
-                {name}
-              </p>
-              <p className="text-xs text-text-secondary-light">{usage}</p>
+              <p className="truncate font-mono text-xs text-foreground">{name}</p>
+              <p className="text-xs text-muted-foreground">{usage}</p>
             </div>
           </div>
         ))}
         <div className="flex items-center gap-3 rounded-xl border border-gray-100 p-3 dark:border-white/10">
           <Loader2 className="size-5 shrink-0 animate-spin text-primary" aria-hidden />
           <div>
-            <p className="font-mono text-xs text-text-primary-light dark:text-white">Loader2</p>
-            <p className="text-xs text-text-secondary-light">Spinner</p>
+            <p className="font-mono text-xs text-foreground">Loader2</p>
+            <p className="text-xs text-muted-foreground">Spinner</p>
           </div>
         </div>
       </div>

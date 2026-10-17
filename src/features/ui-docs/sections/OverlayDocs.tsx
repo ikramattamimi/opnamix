@@ -57,7 +57,7 @@ export const DialogDocs: React.FC = () => {
               <DialogTitle>Detail Transaksi</DialogTitle>
               <DialogDescription>OUT-20261017-000123</DialogDescription>
             </DialogHeader>
-            <p className="text-sm text-text-secondary-light">
+            <p className="text-sm text-muted-foreground">
               Isi dialog: ringkasan item, jasa, dan total.
             </p>
             <DialogFooter>

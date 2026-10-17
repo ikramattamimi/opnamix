@@ -19,7 +19,7 @@ export const createServiceColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Nama Jasa</div>
+          <div className="font-bold text-foreground">Nama Jasa</div>
           <DataTableColumnFilter column={column} title="Nama" />
         </div>
       );
@@ -28,11 +28,9 @@ export const createServiceColumns = ({
       const service = row.original;
       return (
         <div>
-          <div className="font-bold text-text-primary-light dark:text-white">{service.name}</div>
+          <div className="font-bold text-foreground">{service.name}</div>
           {service.description && (
-            <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-              {service.description}
-            </div>
+            <div className="text-xs text-muted-foreground">{service.description}</div>
           )}
         </div>
       );
@@ -43,20 +41,16 @@ export const createServiceColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Kategori</div>
+          <div className="font-bold text-foreground">Kategori</div>
           <DataTableColumnFilter column={column} title="Kategori" />
         </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">
-        {row.getValue('categoryName') || '-'}
-      </div>
-    ),
+    cell: ({ row }) => <div className="text-foreground">{row.getValue('categoryName') || '-'}</div>,
   },
   {
     accessorKey: 'price',
-    header: () => <div className="font-bold text-text-primary-light dark:text-white">Harga</div>,
+    header: () => <div className="font-bold text-foreground">Harga</div>,
     cell: ({ row }) => {
       const price = parseFloat(row.getValue('price'));
       const formatted = new Intl.NumberFormat('id-ID', {
@@ -64,14 +58,12 @@ export const createServiceColumns = ({
         currency: 'IDR',
         minimumFractionDigits: 0,
       }).format(price);
-      return <div className="font-bold text-text-primary-light dark:text-white">{formatted}</div>;
+      return <div className="font-bold text-foreground">{formatted}</div>;
     },
   },
   {
     accessorKey: 'isActive',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">Status</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Status</div>,
     cell: ({ row }) => {
       const isActive = row.getValue('isActive') !== false;
 
@@ -95,9 +87,7 @@ export const createServiceColumns = ({
   },
   {
     id: 'actions',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">Aksi</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Aksi</div>,
     cell: ({ row }) => {
       const service = row.original;
 

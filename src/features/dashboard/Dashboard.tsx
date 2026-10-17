@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Metrics Row */}
       {statsError && !stats ? (
-        <div className="bg-card-light dark:bg-card-dark rounded-DEFAULT shadow-soft">
+        <div className="bg-card rounded-DEFAULT shadow-soft">
           <ErrorState title="Gagal memuat ringkasan stok" onRetry={() => void refetchStats()} />
         </div>
       ) : (

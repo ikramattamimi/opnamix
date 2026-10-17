@@ -79,7 +79,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-lg sm:text-xl font-bold">Konfigurasi Jadwal Opname</h2>
-            <p className="text-xs sm:text-sm text-text-secondary-light">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Kelola jadwal audit stok berkala.
             </p>
           </div>
@@ -102,7 +102,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
       />
 
       {schedulesQuery.isError ? (
-        <div className="bg-card-light dark:bg-card-dark rounded-3xl shadow-soft">
+        <div className="bg-card rounded-3xl shadow-soft">
           <ErrorState
             title="Gagal memuat jadwal opname"
             onRetry={() => void schedulesQuery.refetch()}

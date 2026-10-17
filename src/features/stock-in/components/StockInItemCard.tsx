@@ -9,7 +9,7 @@ import type { Product } from '@/features/products/types';
 import { FieldErrorMessage } from '@/features/products/components/FieldErrorMessage';
 import type { StockInFormInput } from '../stockInSchema';
 
-const labelClassName = 'text-sm font-bold text-text-primary-light dark:text-white ml-1';
+const labelClassName = 'text-sm font-bold text-foreground ml-1';
 
 interface StockInItemCardProps {
   index: number;
@@ -29,7 +29,7 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
   const { control } = useFormContext<StockInFormInput>();
 
   return (
-    <div className="bg-background-light dark:bg-background-dark rounded-2xl p-6 relative">
+    <div className="bg-background rounded-2xl p-6 relative">
       {canRemove && (
         <Button
           type="button"
@@ -59,10 +59,10 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
                     variant="ghost"
                     onClick={onOpenLookup}
                     className={cn(
-                      'group h-auto w-full bg-white dark:bg-card-dark hover:bg-white dark:hover:bg-card-dark border-none rounded-2xl px-4 py-3.5 text-sm font-medium shadow-sm transition-all flex items-center justify-between active:scale-100 [&_svg]:size-6',
+                      'group h-auto w-full bg-card hover:bg-white dark:hover:bg-card border-none rounded-2xl px-4 py-3.5 text-sm font-medium shadow-sm transition-all flex items-center justify-between active:scale-100 [&_svg]:size-6',
                       field.value
-                        ? 'text-text-primary-light dark:text-white hover:text-text-primary-light'
-                        : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-text-secondary-light',
+                        ? 'text-foreground hover:text-foreground'
+                        : 'text-muted-foreground hover:text-muted-foreground',
                     )}
                   >
                     <span>{productName}</span>
@@ -85,7 +85,7 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
               <FormLabel className={labelClassName}>Tanggal Kedaluwarsa</FormLabel>
               <FormControl>
                 <Input
-                  className="h-auto w-full bg-white dark:bg-card-dark border-none rounded-2xl px-4 py-3.5 text-sm font-medium text-text-primary-light dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
+                  className="h-auto w-full bg-card border-none rounded-2xl px-4 py-3.5 text-sm font-medium text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
                   type="date"
                   {...field}
                 />
@@ -100,12 +100,12 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
           render={({ field }) => (
             <FormItem className="space-y-2">
               <FormLabel className={labelClassName}>Jumlah</FormLabel>
-              <div className="flex items-center bg-white dark:bg-card-dark rounded-2xl p-1 shadow-sm">
+              <div className="flex items-center bg-card rounded-2xl p-1 shadow-sm">
                 <FormControl>
                   <Input
                     ref={field.ref}
                     name={field.name}
-                    className="h-auto flex-1 w-full border-none bg-transparent text-center text-sm font-bold text-text-primary-light dark:text-white shadow-none focus:ring-0 focus-visible:ring-0 p-0"
+                    className="h-auto flex-1 w-full border-none bg-transparent text-center text-sm font-bold text-foreground shadow-none focus:ring-0 focus-visible:ring-0 p-0"
                     type="number"
                     value={field.value ?? ''}
                     onChange={(e) =>

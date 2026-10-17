@@ -50,10 +50,8 @@ const UserManagement: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
-              Manajemen Pengguna
-            </h2>
-            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+            <h2 className="text-2xl font-bold text-foreground">Manajemen Pengguna</h2>
+            <p className="text-sm text-muted-foreground">
               Kelola akun pengguna dan hak akses sistem.
             </p>
           </div>

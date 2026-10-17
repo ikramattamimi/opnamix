@@ -22,10 +22,10 @@ const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
 
   return (
     <>
-      <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+      <div className="bg-card rounded-3xl p-6 shadow-soft">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-lg font-bold">Opname — {opnameData?.scheduleName || 'Opname'}</h2>
-          <span className="text-xs font-bold text-text-secondary-light">
+          <span className="text-xs font-bold text-muted-foreground">
             {opnameData?.opnameNumber}
           </span>
         </div>
@@ -40,8 +40,7 @@ const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
                     currentStep === step.num && 'bg-primary text-white shadow-lg shadow-primary/20',
                     currentStep > step.num &&
                       'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-                    currentStep < step.num &&
-                      'bg-background-light dark:bg-background-dark text-text-secondary-light',
+                    currentStep < step.num && 'bg-background text-muted-foreground',
                   )}
                 >
                   <Icon className="size-4" aria-hidden />

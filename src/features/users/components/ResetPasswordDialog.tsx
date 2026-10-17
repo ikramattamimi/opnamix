@@ -68,10 +68,8 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
         <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 flex items-center gap-3">
           <UserAvatar user={user} />
           <div>
-            <p className="font-bold text-sm text-text-primary-light dark:text-white">
-              {user.full_name || '-'}
-            </p>
-            <p className="text-xs text-text-secondary-light">{user.email}</p>
+            <p className="font-bold text-sm text-foreground">{user.full_name || '-'}</p>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
         </div>
 
@@ -98,12 +96,12 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
                       size="icon"
                       onClick={() => setShowPassword(!showPassword)}
                       aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 h-auto w-auto p-0 hover:bg-transparent dark:hover:bg-transparent text-text-secondary-light hover:text-primary transition-colors active:scale-100 [&_svg]:size-5"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-auto w-auto p-0 hover:bg-transparent dark:hover:bg-transparent text-muted-foreground hover:text-primary transition-colors active:scale-100 [&_svg]:size-5"
                     >
                       {showPassword ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
                     </Button>
                   </div>
-                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Harus mengandung huruf besar, huruf kecil, dan angka.
                   </p>
                   <FormMessage />

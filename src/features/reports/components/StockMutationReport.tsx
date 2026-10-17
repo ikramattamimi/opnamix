@@ -39,11 +39,9 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-[20px] shadow-soft p-6">
+    <div className="bg-card rounded-[20px] shadow-soft p-6">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-lg text-text-primary-light dark:text-white">
-          Laporan Mutasi Stok
-        </h3>
+        <h3 className="font-bold text-lg text-foreground">Laporan Mutasi Stok</h3>
         <Button
           onClick={handleExportMutations}
           variant="outline"
