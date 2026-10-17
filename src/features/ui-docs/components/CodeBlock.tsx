@@ -27,10 +27,10 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code }) => {
       </pre>
       <Button
         variant="ghost"
-        size="sm"
+        size="icon-sm"
         onClick={handleCopy}
         aria-label={copied ? 'Kode tersalin' : 'Salin kode'}
-        className="absolute right-2 top-2 h-8 w-8 p-0 text-slate-300 hover:bg-white/10 hover:text-white"
+        className="absolute right-2 top-2 text-slate-300 hover:bg-white/10 hover:text-white"
       >
         {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
       </Button>

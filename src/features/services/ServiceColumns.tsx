@@ -95,8 +95,8 @@ export const createServiceColumns = ({
         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-8 w-8 [&_svg]:size-5"
+            size="icon-sm"
+            className="[&_svg]:size-5"
             onClick={() => onEdit(service)}
             aria-label="Edit jasa"
           >
@@ -104,8 +104,8 @@ export const createServiceColumns = ({
           </Button>
           <Button
             variant="ghost"
-            size="icon"
-            className="h-8 w-8 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/20 dark:hover:text-red-400 [&_svg]:size-5"
+            size="icon-sm"
+            className="hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/20 dark:hover:text-red-400 [&_svg]:size-5"
             onClick={() => onDelete(service.id)}
             aria-label="Hapus jasa"
           >

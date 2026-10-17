@@ -9,7 +9,7 @@ import type { StockInFormInput } from '../stockInSchema';
 
 const labelClassName = 'text-sm font-bold text-foreground ml-1';
 const inputClassName =
-  'h-auto w-full bg-transparent border border-gray-200 dark:border-white/10 rounded-2xl pl-4 pr-10 py-3.5 text-sm font-medium text-foreground focus:ring-0 focus-visible:ring-0 focus:border-primary transition-all';
+  'w-full bg-transparent border border-gray-200 dark:border-white/10 pl-4 pr-10 text-sm font-medium text-foreground focus:ring-0 focus-visible:ring-0 focus:border-primary transition-all';
 const inputIconClassName =
   'absolute right-4 top-3.5 size-5 text-muted-foreground pointer-events-none';
 

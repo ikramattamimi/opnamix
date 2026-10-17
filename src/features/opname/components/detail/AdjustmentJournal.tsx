@@ -24,7 +24,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
   const emptyTitle = search ? 'Tidak ada produk yang cocok.' : 'Tidak ada data.';
 
   return (
-    <div className="bg-card rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-2xl p-6 shadow-soft">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <h3 className="text-lg font-bold flex items-center gap-2">
           <Sheet className="size-5 text-primary" aria-hidden />
@@ -41,7 +41,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
             aria-label="Cari produk"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-auto w-full bg-background border-none rounded-xl pl-9 pr-4 py-2.5 text-sm md:text-sm font-medium placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-primary/20"
+            className="w-full bg-background border-none pl-9 pr-4 text-sm md:text-sm font-medium placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-primary/20"
           />
         </div>
       </div>

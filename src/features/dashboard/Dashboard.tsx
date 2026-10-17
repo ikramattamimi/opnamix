@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ErrorState, LoadingState } from '@/components/common/QueryState';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 import type { DashboardStats } from './api';
 import { useDashboardStats, useRecentTransactions } from './useDashboard';
 import DashboardMetrics from './components/DashboardMetrics';
@@ -45,10 +47,12 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <PageLayout>
+      <PageHeader title="Ringkasan Stok" description="Ikhtisar stok dan transaksi terbaru." />
+
       {/* Metrics Row */}
       {statsError && !stats ? (
-        <div className="bg-card rounded-DEFAULT shadow-soft">
+        <div className="bg-card rounded-2xl shadow-soft">
           <ErrorState title="Gagal memuat ringkasan stok" onRetry={() => void refetchStats()} />
         </div>
       ) : (
@@ -59,7 +63,7 @@ const Dashboard: React.FC = () => {
       {/* <DashboardCharts stats={safeStats} /> */}
 
       <RecentTransactionsCard page={trxPage} onPageChange={setTrxPage} query={trxQuery} />
-    </div>
+    </PageLayout>
   );
 };
 

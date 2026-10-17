@@ -42,7 +42,7 @@ const StockStatusTable: React.FC<StockStatusTableProps> = ({
   isError,
   onRetry,
 }) => (
-  <div className="bg-card rounded-3xl p-6 shadow-soft">
+  <div className="bg-card rounded-2xl p-6 shadow-soft">
     <div className="flex justify-between items-center mb-6">
       <h3 className="text-xl font-bold">Detail Status Stok</h3>
       <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">

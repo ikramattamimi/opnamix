@@ -56,7 +56,7 @@ export const ScheduleTable: React.FC<ScheduleListProps> = ({
   onDelete,
   onToggle,
 }) => (
-  <div className="hidden lg:block bg-card rounded-3xl p-6 shadow-soft">
+  <div className="hidden lg:block bg-card rounded-2xl p-6 shadow-soft">
     <div className="overflow-x-auto">
       <table className="w-full text-left">
         <thead className="border-b border-gray-100 dark:border-gray-800">
@@ -102,7 +102,7 @@ export const ScheduleTable: React.FC<ScheduleListProps> = ({
                       size="icon"
                       onClick={() => onEdit(schedule)}
                       aria-label={`Edit ${schedule.nama}`}
-                      className="h-auto w-auto p-2 hover:bg-primary/10 dark:hover:bg-primary/10 rounded-lg transition-colors text-muted-foreground hover:text-primary [&_svg]:size-5"
+                      className="w-auto p-2 hover:bg-primary/10 dark:hover:bg-primary/10 transition-colors text-muted-foreground hover:text-primary [&_svg]:size-5"
                     >
                       <Pencil aria-hidden />
                     </Button>
@@ -111,7 +111,7 @@ export const ScheduleTable: React.FC<ScheduleListProps> = ({
                       size="icon"
                       onClick={() => onDelete(schedule.id)}
                       aria-label={`Hapus ${schedule.nama}`}
-                      className="h-auto w-auto p-2 hover:bg-red-500/10 dark:hover:bg-red-500/10 rounded-lg transition-colors text-muted-foreground hover:text-red-500 [&_svg]:size-5"
+                      className="w-auto p-2 hover:bg-red-500/10 dark:hover:bg-red-500/10 transition-colors text-muted-foreground hover:text-red-500 [&_svg]:size-5"
                     >
                       <Trash2 aria-hidden />
                     </Button>
@@ -181,7 +181,7 @@ export const ScheduleCards: React.FC<ScheduleListProps> = ({
             <Button
               variant="ghost"
               onClick={() => onEdit(schedule)}
-              className="flex-1 h-auto flex items-center justify-center gap-2 py-2.5 px-4 bg-primary/10 hover:bg-primary/20 dark:hover:bg-primary/20 text-primary hover:text-primary rounded-xl transition-colors font-bold text-sm active:scale-95 [&_svg]:size-5"
+              className="flex-1 flex items-center justify-center gap-2 px-4 bg-primary/10 hover:bg-primary/20 dark:hover:bg-primary/20 text-primary hover:text-primary transition-colors font-bold text-sm active:scale-95 [&_svg]:size-5"
             >
               <Pencil aria-hidden />
               Edit
@@ -189,7 +189,7 @@ export const ScheduleCards: React.FC<ScheduleListProps> = ({
             <Button
               variant="ghost"
               onClick={() => onDelete(schedule.id)}
-              className="flex-1 h-auto flex items-center justify-center gap-2 py-2.5 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-700 dark:text-red-400 hover:text-red-500 rounded-xl transition-colors font-bold text-sm active:scale-95 [&_svg]:size-5"
+              className="flex-1 flex items-center justify-center gap-2 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-700 dark:text-red-400 hover:text-red-500 transition-colors font-bold text-sm active:scale-95 [&_svg]:size-5"
             >
               <Trash2 aria-hidden />
               Hapus

@@ -45,7 +45,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
     <SelectTrigger
       id={id}
       className={cn(
-        'h-auto min-w-[160px] gap-2 rounded-xl border-0 bg-white px-4 py-2 text-base text-foreground shadow-none dark:bg-card',
+        'min-w-[160px] gap-2 border-0 bg-white px-4 text-base text-foreground shadow-none dark:bg-card',
         className,
       )}
     >

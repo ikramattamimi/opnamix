@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/common/QueryState';
 import OpnameInfoPanel from './components/detail/OpnameInfoPanel';
 import AdjustmentJournal from './components/detail/AdjustmentJournal';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 const DetailOpnamePage: React.FC = () => {
   const { opnameId } = useParams<{ opnameId: string }>();
@@ -26,26 +28,28 @@ const DetailOpnamePage: React.FC = () => {
   const matched = totalItems - discrepancies;
 
   return (
-    <div className="space-y-6 mx-auto">
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/audit/stok-opname/riwayat')}
-          aria-label="Kembali ke riwayat opname"
-          className="h-auto w-auto p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition-colors bg-card shadow-soft text-muted-foreground [&_svg]:size-6"
-        >
-          <ArrowLeft aria-hidden />
-        </Button>
-        <div>
-          <h2 className="text-xl font-bold">Detail Opname</h2>
-          <p className="text-sm text-muted-foreground">{opnameInfo?.opnameNumber || ''}</p>
-        </div>
-        <span className="ml-auto text-xs font-bold px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 rounded-xl flex items-center gap-1">
-          <CircleCheck className="size-3" aria-hidden />
-          Selesai
-        </span>
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Detail Opname"
+        description={opnameInfo?.opnameNumber || undefined}
+        leading={
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/audit/stok-opname/riwayat')}
+            aria-label="Kembali ke riwayat opname"
+            className="shrink-0 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors bg-card shadow-soft text-muted-foreground [&_svg]:size-6"
+          >
+            <ArrowLeft aria-hidden />
+          </Button>
+        }
+        actions={
+          <span className="text-xs font-bold px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 rounded-xl flex items-center gap-1">
+            <CircleCheck className="size-3" aria-hidden />
+            Selesai
+          </span>
+        }
+      />
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="lg:w-[30%] space-y-4">
@@ -64,7 +68,7 @@ const DetailOpnamePage: React.FC = () => {
           />
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

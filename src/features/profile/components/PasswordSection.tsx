@@ -37,7 +37,7 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
           <Button
             variant="outline"
             onClick={() => setShowPasswordSection(true)}
-            className="rounded-xl text-sm h-auto py-2 px-4 font-bold flex items-center gap-1.5"
+            className="text-sm px-4 font-bold flex items-center gap-1.5"
           >
             <KeyRound className="size-4" aria-hidden />
             Ubah Password
@@ -74,17 +74,13 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
             />
           </div>
           <div className="flex gap-3 pt-2">
-            <Button
-              variant="outline"
-              onClick={closeSection}
-              className="rounded-xl font-bold h-auto py-2.5 px-6"
-            >
+            <Button variant="outline" onClick={closeSection} className="font-bold px-6">
               Batal
             </Button>
             <Button
               onClick={() => void handleSubmit()}
               disabled={isSubmitting}
-              className="bg-primary text-white rounded-xl font-bold shadow-lg hover:bg-primary/90 h-auto py-2.5 px-6"
+              className="bg-primary text-white font-bold shadow-lg hover:bg-primary/90 px-6"
             >
               {isSubmitting ? 'Menyimpan...' : 'Ubah Password'}
             </Button>

@@ -57,7 +57,7 @@ const StockOutProcessDialog: React.FC<StockOutProcessDialogProps> = ({ draft, on
 
   return (
     <AlertDialog open onOpenChange={(open) => !open && !processTransaction.isPending && onClose()}>
-      <AlertDialogContent className="block max-w-md rounded-3xl sm:rounded-3xl border-none bg-card shadow-2xl p-6 text-center">
+      <AlertDialogContent className="block max-w-md rounded-2xl sm:rounded-2xl border-none bg-card shadow-2xl p-6 text-center">
         <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
           <Package className="size-10" aria-hidden />
         </div>
@@ -132,14 +132,14 @@ const StockOutProcessDialog: React.FC<StockOutProcessDialogProps> = ({ draft, on
         <div className="flex gap-3">
           <AlertDialogCancel
             disabled={processTransaction.isPending}
-            className="flex-1 mt-0 h-auto py-3 border-none shadow-none bg-transparent text-muted-foreground font-bold hover:text-muted-foreground hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl"
+            className="flex-1 mt-0 border-none shadow-none bg-transparent text-muted-foreground font-bold hover:text-muted-foreground hover:bg-gray-100 dark:hover:bg-white/5"
           >
             Batal
           </AlertDialogCancel>
           <Button
             onClick={processRequest}
             disabled={processTransaction.isPending}
-            className={cn(PRIMARY_BUTTON, 'flex-1 py-3 text-base [&_svg]:size-5')}
+            className={cn(PRIMARY_BUTTON, 'flex-1 text-base [&_svg]:size-5')}
           >
             {processTransaction.isPending ? (
               <>

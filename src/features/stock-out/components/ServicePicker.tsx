@@ -44,7 +44,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
   };
 
   return (
-    <div className="bg-card rounded-[20px] p-6 shadow-soft h-auto">
+    <div className="bg-card rounded-2xl p-6 shadow-soft">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-700">
@@ -69,7 +69,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
                 variant="ghost"
                 onClick={() => toggleCategory(categoryName)}
                 aria-expanded={isExpanded}
-                className="w-full h-auto justify-between rounded-none px-4 py-3 font-normal bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 active:scale-100 [&_svg]:size-5"
+                className="w-full justify-between rounded-none px-4 font-normal bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 active:scale-100 [&_svg]:size-5"
               >
                 <div className="flex items-center gap-2">
                   <Folder className="text-purple-500" aria-hidden />

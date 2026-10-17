@@ -19,7 +19,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
           size="icon"
           onClick={onBack}
           aria-label="Kembali"
-          className="h-auto w-auto p-2 text-current bg-card hover:bg-white dark:hover:bg-card rounded-full shadow-soft hover:text-primary transition-colors [&_svg]:size-6"
+          className="w-auto p-2 text-current bg-card hover:bg-white dark:hover:bg-card rounded-full shadow-soft hover:text-primary transition-colors [&_svg]:size-6"
         >
           <ArrowLeft aria-hidden />
         </Button>
@@ -28,7 +28,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-card rounded-[20px] p-6 shadow-soft">
+          <div className="bg-card rounded-2xl p-6 shadow-soft">
             <h3 className="text-lg font-bold text-foreground mb-4">Informasi Transaksi</h3>
             <div className="space-y-4">
               <InfoRow label="No. Invoice" value={receipt.invoiceNumber} />
@@ -42,7 +42,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
             </div>
           </div>
 
-          <div className="bg-primary text-white rounded-3xl p-6 shadow-xl shadow-primary/30 relative overflow-hidden h-[200px] flex flex-col justify-center">
+          <div className="bg-primary text-white rounded-2xl p-6 shadow-xl shadow-primary/30 relative overflow-hidden h-[200px] flex flex-col justify-center">
             <div className="relative z-10">
               <span className="text-sm font-medium opacity-80 uppercase tracking-widest">
                 Total Item Diterima
@@ -58,7 +58,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
           </div>
 
           {receipt.evidenceUrl ? (
-            <div className="bg-card rounded-[20px] p-6 shadow-soft">
+            <div className="bg-card rounded-2xl p-6 shadow-soft">
               <h3 className="text-lg font-bold text-foreground mb-4">Bukti Nota</h3>
               <div className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 group relative">
                 <img
@@ -83,7 +83,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
               </div>
             </div>
           ) : (
-            <div className="bg-card rounded-[20px] p-6 shadow-soft">
+            <div className="bg-card rounded-2xl p-6 shadow-soft">
               <h3 className="text-lg font-bold text-foreground mb-4">Bukti Nota</h3>
               <EmptyState
                 icon={ReceiptText}
@@ -95,7 +95,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
         </div>
 
         <div className="lg:col-span-2">
-          <div className="bg-card rounded-[20px] p-6 shadow-soft h-full">
+          <div className="bg-card rounded-2xl p-6 shadow-soft h-full">
             <h3 className="text-lg font-bold text-foreground mb-6">Daftar Barang</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left">

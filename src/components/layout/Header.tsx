@@ -371,7 +371,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       variant="ghost"
                       size="icon"
                       onClick={toggleDarkMode}
-                      className="w-full text-left px-4 py-3 text-sm font-medium text-foreground hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-start gap-2 h-auto"
+                      className="w-full text-left px-4 text-sm font-medium text-foreground hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-start gap-2"
                     >
                       {isDarkMode ? (
                         <Sun className="size-[18px]" aria-hidden />
@@ -385,7 +385,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     variant="ghost"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-full px-4 py-3 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
+                    className="w-full px-4 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 disabled:opacity-50"
                   >
                     {isLoggingOut ? (
                       <>
@@ -426,7 +426,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
-              className="text-muted-foreground hover:text-primary transition-colors relative h-10 w-10"
+              className="text-muted-foreground hover:text-primary transition-colors relative"
             >
               <Bell className="size-6" aria-hidden />
               {unreadCount > 0 && (
@@ -443,7 +443,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             size="icon"
             onClick={toggleDarkMode}
             aria-label={isDarkMode ? 'Mode terang' : 'Mode gelap'}
-            className="text-muted-foreground hover:text-primary transition-colors h-10 w-10"
+            className="text-muted-foreground hover:text-primary transition-colors"
           >
             {isDarkMode ? (
               <Sun className="size-6" aria-hidden />
@@ -476,7 +476,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   variant="ghost"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="w-full px-4 py-3 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
+                  className="w-full px-4 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 disabled:opacity-50"
                 >
                   {isLoggingOut ? (
                     <>

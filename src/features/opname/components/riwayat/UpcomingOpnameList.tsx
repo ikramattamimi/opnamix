@@ -66,7 +66,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => openPelaksanaan(opname.id)}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-6 h-auto py-2.5 shadow-lg shadow-primary/20"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 shadow-lg shadow-primary/20"
                   >
                     <Play className="mr-1.5" aria-hidden />
                     Lanjutkan
@@ -74,7 +74,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                   <Button
                     variant="ghost"
                     onClick={() => onDelete(opname.id)}
-                    className="px-4 p-2.5 font-bold h-auto text-sm rounded-xl text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="px-4 p-2.5 font-bold text-sm text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                   >
                     <Trash2 className="mr-1.5" aria-hidden />
@@ -107,7 +107,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => openPelaksanaan(opname.id)}
-                    className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-auto py-2.5 shadow-lg shadow-primary/20"
+                    className="bg-primary hover:bg-primary/90 text-white font-bold px-6 shadow-lg shadow-primary/20"
                   >
                     <Zap className="mr-1.5" aria-hidden />
                     Mulai Opname
@@ -116,7 +116,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(opname.id)}
-                    className="h-auto w-auto p-2.5 rounded-xl text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="w-auto p-2.5 text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                     aria-label="Hapus Opname"
                   >

@@ -88,13 +88,13 @@ const UserTable: React.FC<UserTableProps> = ({
             placeholder="Cari nama atau email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-auto pl-10 pr-4 py-2.5 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background text-sm md:text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
+            className="pl-10 pr-4 border-gray-200 dark:border-gray-700 dark:bg-background text-sm md:text-sm focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
           />
         </div>
         <Select value={filterRole} onValueChange={setFilterRole}>
           <SelectTrigger
             aria-label="Filter role"
-            className="w-auto h-auto gap-2 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-background text-sm px-4 py-2.5 focus:ring-2 focus:ring-primary/30"
+            className="w-auto gap-2 border-gray-200 dark:border-gray-700 dark:bg-background text-sm px-4 focus:ring-2 focus:ring-primary/30"
           >
             <SelectValue />
           </SelectTrigger>

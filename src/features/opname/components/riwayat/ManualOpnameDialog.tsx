@@ -86,7 +86,7 @@ const ManualOpnameDialog: React.FC<ManualOpnameDialogProps> = ({ open, onClose }
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="sm:max-w-[500px] bg-card rounded-3xl border-none shadow-2xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[500px] bg-card rounded-2xl border-none shadow-2xl p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-2">
           <DialogTitle className="text-lg font-bold">Buat Opname Manual</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ const ManualOpnameDialog: React.FC<ManualOpnameDialogProps> = ({ open, onClose }
             <Select value={selectedScheduleId} onValueChange={setSelectedScheduleId}>
               <SelectTrigger
                 id="manual-schedule"
-                className="h-auto w-full bg-background border-none rounded-xl px-4 py-3 text-sm font-medium"
+                className="w-full bg-background border-none px-4 text-sm font-medium"
               >
                 <SelectValue placeholder="— Pilih jadwal —" />
               </SelectTrigger>
@@ -127,7 +127,7 @@ const ManualOpnameDialog: React.FC<ManualOpnameDialogProps> = ({ open, onClose }
               type="date"
               value={manualDate}
               onChange={(e) => setManualDate(e.target.value)}
-              className="h-auto w-full bg-background border-none rounded-xl px-4 py-3 text-sm md:text-sm font-medium"
+              className="w-full bg-background border-none px-4 text-sm md:text-sm font-medium"
             />
             <p className="text-xs text-muted-foreground">
               Anda dapat memilih tanggal di luar jadwal yang sudah ditentukan.
@@ -166,11 +166,7 @@ const ManualOpnameDialog: React.FC<ManualOpnameDialogProps> = ({ open, onClose }
         </div>
 
         <DialogFooter className="px-6 pb-6 pt-2 gap-3">
-          <Button
-            variant="ghost"
-            onClick={onClose}
-            className="font-bold rounded-xl px-4 h-auto py-2.5"
-          >
+          <Button variant="ghost" onClick={onClose} className="font-bold px-4">
             Batal
           </Button>
           <Button
@@ -178,7 +174,7 @@ const ManualOpnameDialog: React.FC<ManualOpnameDialogProps> = ({ open, onClose }
             disabled={
               !selectedScheduleId || !manualDate || scheduleProducts.length === 0 || isCreating
             }
-            className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-auto py-2.5 shadow-lg shadow-primary/20 disabled:opacity-50"
+            className="bg-primary hover:bg-primary/90 text-white font-bold px-6 shadow-lg shadow-primary/20 disabled:opacity-50"
           >
             {isCreating ? (
               <>

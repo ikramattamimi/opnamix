@@ -59,7 +59,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-card w-full max-w-lg rounded-[28px] shadow-soft p-6">
+      <div className="bg-card w-full max-w-lg rounded-2xl shadow-soft p-6">
         <div className="flex items-center justify-between gap-3 mb-5">
           <div>
             <h3 className="text-lg font-bold text-foreground">Tambah Kategori Jasa</h3>
@@ -73,7 +73,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
             size="icon"
             onClick={onClose}
             aria-label="Tutup"
-            className="h-auto w-auto p-2 text-current hover:text-current rounded-full bg-background dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors [&_svg]:size-6"
+            className="w-auto p-2 text-current hover:text-current rounded-full bg-background dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors [&_svg]:size-6"
           >
             <X aria-hidden />
           </Button>
@@ -118,7 +118,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
                   <FormControl>
                     <Textarea
                       rows={3}
-                      className={`${serviceInputClassName} resize-none shadow-none`}
+                      className={`${serviceInputClassName} py-3 resize-none shadow-none`}
                       placeholder="Opsional"
                       {...field}
                     />

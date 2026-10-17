@@ -16,7 +16,7 @@ const StepSelectProducts: React.FC<StepSelectProductsProps> = ({
   onToggle,
   onToggleAll,
 }) => (
-  <div className="bg-card rounded-3xl p-6 shadow-soft">
+  <div className="bg-card rounded-2xl p-6 shadow-soft">
     <div className="flex items-center justify-between mb-6">
       <div>
         <h3 className="text-lg font-bold">Tahap 1: Pemilihan Obat</h3>
@@ -27,7 +27,7 @@ const StepSelectProducts: React.FC<StepSelectProductsProps> = ({
       <Button
         variant="link"
         onClick={onToggleAll}
-        className="h-auto p-0 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline transition-colors"
+        className="p-0 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline transition-colors"
       >
         {selectedIds.size === products.length ? 'Batalkan Semua' : 'Pilih Semua'}
       </Button>

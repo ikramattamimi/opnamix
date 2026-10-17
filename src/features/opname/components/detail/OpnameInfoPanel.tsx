@@ -59,7 +59,7 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
   matched,
   discrepancies,
 }) => (
-  <div className="bg-card rounded-3xl p-6 shadow-soft sticky top-6">
+  <div className="bg-card rounded-2xl p-6 shadow-soft sticky top-6">
     <h3 className="text-base font-bold mb-5 flex items-center gap-2">
       <Info className="size-5 text-primary" aria-hidden />
       Informasi Opname

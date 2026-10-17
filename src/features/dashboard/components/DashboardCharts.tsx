@@ -35,7 +35,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div className="bg-card p-6 rounded-DEFAULT shadow-soft h-full">
+      <div className="bg-card p-6 rounded-2xl shadow-soft h-full">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-xl font-bold text-foreground">Pengeluaran 7 Hari Terakhir</h3>
@@ -72,7 +72,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
       </div>
 
       <div className="grid grid-rows-2 gap-5">
-        <div className="bg-card p-6 rounded-DEFAULT shadow-soft flex flex-col justify-center">
+        <div className="bg-card p-6 rounded-2xl shadow-soft flex flex-col justify-center">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h3 className="text-xl font-bold text-foreground">Peringatan Stok Rendah</h3>
@@ -95,7 +95,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
           </div>
         </div>
 
-        <div className="bg-card p-6 rounded-DEFAULT shadow-soft flex items-center justify-between">
+        <div className="bg-card p-6 rounded-2xl shadow-soft flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold text-foreground mb-1">Pembagian Inventaris</h3>
             <p className="text-sm text-muted-foreground mb-4">Berdasarkan Kategori</p>

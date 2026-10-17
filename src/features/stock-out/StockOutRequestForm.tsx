@@ -40,9 +40,9 @@ const DEFAULT_AVATAR =
 
 const LABEL = 'block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 ml-1 leading-normal';
 const INPUT =
-  'h-auto rounded-xl border-gray-100 dark:border-gray-700 bg-background px-4 py-3 text-sm md:text-sm focus:border-primary focus-visible:ring-primary dark:text-white aria-[invalid=true]:border-red-500';
+  'border-gray-100 dark:border-gray-700 bg-background px-4 text-sm md:text-sm focus:border-primary focus-visible:ring-primary dark:text-white aria-[invalid=true]:border-red-500';
 const MESSAGE = 'text-xs font-normal text-red-500 mt-1 ml-1';
-const CARD = 'bg-card rounded-[20px] p-6 shadow-soft';
+const CARD = 'bg-card rounded-2xl p-6 shadow-soft';
 const CARD_TITLE = 'font-bold text-lg text-foreground flex items-center gap-2';
 
 const RequiredMark = () => <span className="text-red-500">*</span>;
@@ -130,7 +130,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-background w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-[40px] shadow-soft p-4 md:p-8 lg:p-10 font-display">
+      <div className="bg-background w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-2xl shadow-soft p-4 md:p-8 lg:p-10 font-display">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-foreground tracking-tight">
             Formulir Permintaan Obat
@@ -231,7 +231,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
                         <FormControl>
                           <SelectTrigger
                             aria-label="Nama Nakes"
-                            className="h-auto rounded-xl border-gray-100 dark:border-gray-700 bg-background px-4 py-3 text-sm focus:border-primary focus:ring-primary dark:text-white"
+                            className="border-gray-100 dark:border-gray-700 bg-background px-4 text-sm focus:border-primary focus:ring-primary dark:text-white"
                           >
                             <SelectValue placeholder="Memuat data nakes..." />
                           </SelectTrigger>

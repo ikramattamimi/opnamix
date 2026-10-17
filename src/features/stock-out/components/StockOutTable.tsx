@@ -63,7 +63,7 @@ const StockOutTable: React.FC<StockOutTableProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-[20px] shadow-soft overflow-hidden p-6">
+    <div className="bg-card rounded-2xl shadow-soft overflow-hidden p-6">
       <div className="ps-0 pt-0 p-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-background rounded-xl">

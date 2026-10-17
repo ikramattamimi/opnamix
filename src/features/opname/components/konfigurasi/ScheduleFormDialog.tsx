@@ -96,7 +96,7 @@ const ScheduleFormDialog: React.FC<ScheduleFormDialogProps> = ({
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] bg-card rounded-2xl sm:rounded-3xl border-none shadow-2xl p-0 overflow-hidden">
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] bg-card rounded-2xl sm:rounded-2xl border-none shadow-2xl p-0 overflow-hidden">
         <Form {...form}>
           <form onSubmit={(e) => e.preventDefault()} noValidate>
             <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
@@ -133,7 +133,7 @@ const ScheduleFormDialog: React.FC<ScheduleFormDialogProps> = ({
                   type="button"
                   variant="ghost"
                   onClick={() => setModalStep(1)}
-                  className="font-bold rounded-xl px-4 h-auto py-3 sm:py-2.5 w-full sm:w-auto sm:mr-auto order-1 sm:order-none"
+                  className="font-bold px-4 w-full sm:w-auto sm:mr-auto order-1 sm:order-none"
                 >
                   <ArrowLeft className="mr-1" aria-hidden />
                   Kembali
@@ -143,7 +143,7 @@ const ScheduleFormDialog: React.FC<ScheduleFormDialogProps> = ({
                 type="button"
                 variant="ghost"
                 onClick={onClose}
-                className="font-bold rounded-xl px-4 h-auto py-3 sm:py-2.5 w-full sm:w-auto order-3 sm:order-none"
+                className="font-bold px-4 w-full sm:w-auto order-3 sm:order-none"
               >
                 Batal
               </Button>
@@ -152,7 +152,7 @@ const ScheduleFormDialog: React.FC<ScheduleFormDialogProps> = ({
                   type="button"
                   onClick={goToProducts}
                   disabled={!nama?.trim()}
-                  className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-auto py-3 sm:py-2.5 shadow-lg shadow-primary/20 disabled:opacity-50 w-full sm:w-auto order-2 sm:order-none"
+                  className="bg-primary hover:bg-primary/90 text-white font-bold px-6 shadow-lg shadow-primary/20 disabled:opacity-50 w-full sm:w-auto order-2 sm:order-none"
                 >
                   Lanjutkan
                   <ArrowRight className="ml-1.5" aria-hidden />
@@ -162,7 +162,7 @@ const ScheduleFormDialog: React.FC<ScheduleFormDialogProps> = ({
                   type="button"
                   onClick={handleSave}
                   disabled={(!selectAll && obatIds.length === 0) || isSaving}
-                  className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-auto py-3 sm:py-2.5 shadow-lg shadow-primary/20 disabled:opacity-50 w-full sm:w-auto order-2 sm:order-none"
+                  className="bg-primary hover:bg-primary/90 text-white font-bold px-6 shadow-lg shadow-primary/20 disabled:opacity-50 w-full sm:w-auto order-2 sm:order-none"
                 >
                   {isSaving ? (
                     <>

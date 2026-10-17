@@ -31,7 +31,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-2xl p-6 shadow-soft">
       <div className="mb-6">
         <h3 className="text-lg font-bold">Tahap 2: Input Stok Fisik</h3>
         <p className="text-sm text-muted-foreground">
@@ -77,7 +77,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
                     onChange={(e) => setCount(item.id, e.target.value)}
                     placeholder="0"
                     aria-label={`Stok fisik ${item.productName}`}
-                    className="h-auto w-full bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-0 rounded-xl text-center font-bold text-lg md:text-lg py-3 shadow-sm placeholder:text-gray-300"
+                    className="w-full bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-0 text-center font-bold text-lg md:text-lg shadow-sm placeholder:text-gray-300"
                   />
                 </td>
               </tr>
@@ -113,7 +113,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
                 value={physicalCounts[item.id] ?? ''}
                 onChange={(e) => setCount(item.id, e.target.value)}
                 placeholder="0"
-                className="h-auto w-20 text-sm bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 rounded-md text-center font-bold px-0 py-1 shadow-sm placeholder:text-gray-300"
+                className="w-20 text-sm bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 text-center font-bold px-0 shadow-sm placeholder:text-gray-300"
               />
             </div>
           </div>

@@ -50,13 +50,16 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
           <Button
             type="button"
             variant="ghost"
+            size="lg"
             onClick={() => append(emptyRequestDrug())}
-            className="w-full h-auto border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-8 flex flex-col items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group [&_svg]:size-8"
+            className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group [&_svg]:size-6"
           >
             <CirclePlus className="group-hover:scale-110 transition-transform" aria-hidden />
             <span className="font-bold text-sm">Tambah Obat / Alkes</span>
-            <span className="text-xs font-normal text-slate-500">Lewati jika hanya ada jasa</span>
           </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Lewati jika hanya ada jasa
+          </p>
         </>
       ) : (
         <>
@@ -122,7 +125,7 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                           aria-label="Jumlah"
                           aria-invalid={!!drugError?.quantity}
                           className={cn(
-                            'w-16 h-auto mx-auto rounded-lg border-gray-200 dark:border-gray-700 bg-background text-sm md:text-sm py-1 px-2 focus:border-primary focus-visible:ring-primary dark:text-white text-center',
+                            'w-16 mx-auto border-gray-200 dark:border-gray-700 bg-background text-sm md:text-sm px-2 focus:border-primary focus-visible:ring-primary dark:text-white text-center',
                             drugError?.quantity && 'border-red-500 focus:border-red-500',
                           )}
                           {...register(`drugs.${index}.quantity`, { valueAsNumber: true })}
@@ -145,9 +148,9 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                           type="button"
                           onClick={() => remove(index)}
                           variant="ghost"
-                          size="icon"
+                          size="icon-sm"
                           aria-label="Hapus obat"
-                          className="text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 h-8 w-8 rounded-lg [&_svg]:size-5"
+                          className="text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 [&_svg]:size-5"
                         >
                           <Trash2 aria-hidden />
                         </Button>
@@ -162,7 +165,7 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
             type="button"
             onClick={() => append(emptyRequestDrug())}
             variant="ghost"
-            className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-6 flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group h-auto [&_svg]:size-6"
+            className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group [&_svg]:size-6"
           >
             <CirclePlus className="group-hover:scale-110 transition-transform" aria-hidden />
             <span className="font-bold text-sm">Tambah Obat Lain</span>

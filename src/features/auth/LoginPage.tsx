@@ -13,7 +13,7 @@ interface LoginPageProps {
 // Gaya input sebelum memakai ui/input; ukuran teks, fokus, dan disabled ditimpa
 // supaya tampilan tidak berubah.
 const LOGIN_INPUT_CLASS =
-  'h-auto w-full bg-gray-50/50 dark:bg-white/5 border-gray-200 dark:border-white/10 rounded-2xl pl-12 pr-4 py-4 text-base md:text-base text-slate-800 dark:text-white font-semibold placeholder:font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/10 focus:border-primary focus-visible:ring-4 focus-visible:ring-primary/10 outline-none transition-all disabled:cursor-default disabled:opacity-100';
+  'w-full bg-gray-50/50 dark:bg-white/5 border-gray-200 dark:border-white/10 pl-12 pr-4 text-base md:text-base text-slate-800 dark:text-white font-semibold placeholder:font-normal placeholder:text-slate-400 focus:ring-4 focus:ring-primary/10 focus:border-primary focus-visible:ring-4 focus-visible:ring-primary/10 outline-none transition-all disabled:cursor-default disabled:opacity-100';
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
@@ -65,7 +65,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
       <div className="w-full max-w-lg relative z-10 perspective-1000">
         {/* Main Card */}
-        <div className="bg-white/85 dark:bg-black/45 backdrop-blur-md rounded-[40px] shadow-2xl border border-white/50 dark:border-white/10 p-8 md:p-12 transition-all hover:shadow-primary/10 hover:border-primary/20 group">
+        <div className="bg-white/85 dark:bg-black/45 backdrop-blur-md rounded-2xl shadow-2xl border border-white/50 dark:border-white/10 p-8 md:p-12 transition-all hover:shadow-primary/10 hover:border-primary/20 group">
           {/* Header Section */}
           <div className="text-center mb-10 group-hover:transform group-hover:scale-105 transition-transform duration-500">
             <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center p-2">
@@ -153,9 +153,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </div>
 
               <Button
+                size="lg"
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-auto group relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/30 transition-all transform hover:-translate-y-1 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed border-none [&_svg]:size-6"
+                className="w-full group relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white font-bold shadow-xl shadow-primary/30 transition-all transform hover:-translate-y-1 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed border-none [&_svg]:size-6"
               >
                 <div className="relative z-10 flex items-center justify-center gap-3">
                   {isLoading ? (

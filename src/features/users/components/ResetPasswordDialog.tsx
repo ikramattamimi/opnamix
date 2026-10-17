@@ -96,7 +96,7 @@ const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
                       size="icon"
                       onClick={() => setShowPassword(!showPassword)}
                       aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 h-auto w-auto p-0 hover:bg-transparent dark:hover:bg-transparent text-muted-foreground hover:text-primary transition-colors active:scale-100 [&_svg]:size-5"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-auto p-0 hover:bg-transparent dark:hover:bg-transparent text-muted-foreground hover:text-primary transition-colors active:scale-100 [&_svg]:size-5"
                     >
                       {showPassword ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
                     </Button>

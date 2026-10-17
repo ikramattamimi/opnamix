@@ -15,6 +15,8 @@ import {
   ActiveSchedulesSidebar,
   ActiveSchedulesStrip,
 } from './components/riwayat/ActiveSchedulesPanel';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 const NO_CARDS: OpnameCard[] = [];
 const NO_SCHEDULE_INFO: ScheduleInfo[] = [];
@@ -66,8 +68,13 @@ const RiwayatOpnamePage: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto">
-      <div className="md:hidden mb-4">
+    <PageLayout>
+      <PageHeader
+        title="Riwayat Opname"
+        description="Opname yang dijadwalkan, masih berupa draf, dan sudah selesai."
+      />
+
+      <div className="md:hidden">
         <ActiveSchedulesStrip schedules={activeSchedules} />
       </div>
 
@@ -101,9 +108,9 @@ const RiwayatOpnamePage: React.FC = () => {
 
       {/* Tombol tambah opname melayang (mobile) */}
       <Button
-        size="icon"
+        size="icon-lg"
         onClick={openManualModal}
-        className="md:hidden fixed bottom-6 right-6 bg-primary hover:bg-primary/90 text-white rounded-full w-14 h-14 shadow-lg shadow-primary/30 flex items-center justify-center z-50 active:scale-95 transition-transform [&_svg]:size-6"
+        className="md:hidden fixed bottom-6 right-6 bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center z-50 active:scale-95 transition-transform [&_svg]:size-6"
         title="Tambah Opname"
         aria-label="Tambah Opname"
       >
@@ -125,7 +132,7 @@ const RiwayatOpnamePage: React.FC = () => {
         onConfirm={doDeleteOpname}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </PageLayout>
   );
 };
 

@@ -34,7 +34,7 @@ const StockOutTimeline: React.FC = () => {
   };
 
   return (
-    <div className="bg-card rounded-[20px] shadow-soft p-6 mt-6">
+    <div className="bg-card rounded-2xl shadow-soft p-6 mt-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h3 className="font-bold text-xl text-foreground">Riwayat Pengeluaran</h3>
         <div className="flex items-center gap-2">
@@ -51,7 +51,7 @@ const StockOutTimeline: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={() => void refetch()}
-            className="h-auto w-auto p-2 rounded-full text-primary hover:text-primary hover:bg-gray-100 dark:hover:bg-white/5"
+            className="w-auto p-2 rounded-full text-primary hover:text-primary hover:bg-gray-100 dark:hover:bg-white/5"
             title="Refresh Timeline"
             aria-label="Refresh Timeline"
           >

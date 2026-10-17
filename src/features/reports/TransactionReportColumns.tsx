@@ -233,7 +233,7 @@ export const createTransactionReportColumns = ({
         <Button
           type="button"
           variant="ghost"
-          className="h-9 px-3 text-xs font-bold"
+          className="px-3 text-xs font-bold"
           onClick={() => onViewDetail(row.original)}
         >
           Detail

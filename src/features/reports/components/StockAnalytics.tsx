@@ -87,7 +87,7 @@ const StockAnalytics: React.FC = () => {
       />
 
       {/* Filters Bar */}
-      <div className="bg-card rounded-3xl p-4 shadow-soft flex flex-wrap items-center gap-4">
+      <div className="bg-card rounded-2xl p-4 shadow-soft flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-[200px] relative">
           <Search
             className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground"
@@ -97,7 +97,7 @@ const StockAnalytics: React.FC = () => {
             type="text"
             placeholder="Cari produk atau SKU..."
             aria-label="Cari produk atau SKU"
-            className="h-auto w-full pl-12 pr-4 py-3 bg-background border-none rounded-2xl text-sm md:text-sm font-medium shadow-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            className="w-full pl-12 pr-4 bg-background border-none text-sm md:text-sm font-medium shadow-none focus-visible:ring-2 focus-visible:ring-primary/20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -143,7 +143,7 @@ const StockAnalytics: React.FC = () => {
             setFilterCategory('Semua');
             setFilterStatus('Semua');
           }}
-          className="p-3 text-muted-foreground hover:text-red-500 transition-colors h-auto w-auto [&_svg]:size-6"
+          className="text-muted-foreground hover:text-red-500 transition-colors [&_svg]:size-6"
           title="Reset Filter"
           aria-label="Reset Filter"
         >

@@ -66,7 +66,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
-        <div className="bg-card rounded-3xl p-8 md:p-12 shadow-soft text-center space-y-6">
+        <div className="bg-card rounded-2xl p-8 md:p-12 shadow-soft text-center space-y-6">
           {/* Icon */}
           <div className="flex justify-center">
             {isNakes ? (
@@ -119,8 +119,9 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
           <div className="space-y-3">
             {(isAdmin || isFarmasi) && (
               <Button
+                size="lg"
                 onClick={handleContinueOpname}
-                className="w-full font-bold rounded-xl h-auto py-4 text-base [&_svg]:size-6"
+                className="w-full font-bold text-base [&_svg]:size-6"
               >
                 <Play className="mr-2" aria-hidden />
                 Lanjutkan Opname
@@ -130,10 +131,11 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
             {isNakes && (
               <>
                 <Button
+                  size="lg"
                   onClick={handleCheckStatus}
                   disabled={isChecking}
                   variant="outline"
-                  className="w-full font-bold rounded-xl h-auto py-4 text-base [&_svg]:size-6"
+                  className="w-full font-bold text-base [&_svg]:size-6"
                 >
                   {isChecking ? (
                     <>
@@ -159,7 +161,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
                     </p>
                     <Button
                       onClick={handleReload}
-                      className="w-full font-bold rounded-xl h-auto py-3 bg-emerald-500 hover:bg-emerald-600"
+                      className="w-full font-bold bg-emerald-500 hover:bg-emerald-600"
                     >
                       Muat Ulang Aplikasi
                     </Button>

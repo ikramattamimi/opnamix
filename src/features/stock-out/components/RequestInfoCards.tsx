@@ -32,7 +32,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
               onChange={(e) =>
                 onChange({ ...request, patient: { ...request.patient, fullName: e.target.value } })
               }
-              className="h-auto rounded-xl border border-blue-200 dark:border-blue-500/20 bg-card px-4 py-3 text-sm md:text-sm font-semibold text-foreground"
+              className="border border-blue-200 dark:border-blue-500/20 bg-card px-4 text-sm md:text-sm font-semibold text-foreground"
               placeholder="Nama pasien"
               aria-label="Nama pasien"
             />
@@ -43,7 +43,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
               onChange={(e) =>
                 onChange({ ...request, patient: { ...request.patient, birthDate: e.target.value } })
               }
-              className="h-auto rounded-xl border border-blue-200 dark:border-blue-500/20 bg-card px-4 py-3 text-sm md:text-sm text-foreground"
+              className="border border-blue-200 dark:border-blue-500/20 bg-card px-4 text-sm md:text-sm text-foreground"
             />
           </div>
         ) : (
@@ -88,7 +88,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
               value={request.requestedBy}
               onChange={(e) => onChange({ ...request, requestedBy: e.target.value })}
               aria-label="Diajukan oleh"
-              className="h-auto w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-card px-3 py-2 text-sm md:text-sm font-bold text-foreground"
+              className="w-full border border-gray-200 dark:border-gray-700 bg-card px-3 text-sm md:text-sm font-bold text-foreground"
             />
           ) : (
             <span className="font-bold">{request.requestedBy}</span>

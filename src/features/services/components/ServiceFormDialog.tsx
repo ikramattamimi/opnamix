@@ -89,7 +89,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
   return (
     <>
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm m-0">
-        <div className="bg-card w-full max-w-2xl rounded-[32px] shadow-soft p-8 overflow-y-auto max-h-[90vh] relative">
+        <div className="bg-card w-full max-w-2xl rounded-2xl shadow-soft p-8 overflow-y-auto max-h-[90vh] relative">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold text-foreground">
               {editingService ? 'Edit Jasa' : 'Tambah Jasa Baru'}
@@ -101,7 +101,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
                 size="icon"
                 onClick={onClose}
                 aria-label="Tutup"
-                className="h-auto w-auto p-2 text-current hover:text-current bg-background dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
+                className="w-auto p-2 text-current hover:text-current bg-background dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
               >
                 <X aria-hidden />
               </Button>
@@ -163,7 +163,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
                       type="button"
                       variant="link"
                       onClick={() => setIsCategoryDialogOpen(true)}
-                      className="mt-2 h-auto p-0 gap-1 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline"
+                      className="mt-2 p-0 gap-1 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline"
                     >
                       <Plus aria-hidden />
                       Tambah kategori baru
@@ -194,7 +194,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
                     <FormLabel className={serviceLabelClassName}>Deskripsi</FormLabel>
                     <FormControl>
                       <Textarea
-                        className={`${serviceInputClassName} resize-none shadow-none`}
+                        className={`${serviceInputClassName} py-3 resize-none shadow-none`}
                         placeholder="Deskripsi singkat layanan..."
                         rows={3}
                         {...field}

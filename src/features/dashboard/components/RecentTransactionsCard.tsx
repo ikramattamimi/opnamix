@@ -27,7 +27,7 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
   const loading = isPending || isPlaceholderData;
 
   return (
-    <div className="bg-card p-6 rounded-DEFAULT shadow-soft">
+    <div className="bg-card p-6 rounded-2xl shadow-soft">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <h3 className="text-xl font-bold text-foreground">Transaksi Terbaru</h3>
         <div className="flex gap-2">
@@ -42,10 +42,10 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
           <div className="flex items-center bg-background rounded-xl p-1">
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-sm"
               onClick={() => onPageChange((p) => Math.max(1, p - 1))}
               disabled={page === 1 || loading}
-              className="h-8 w-8 [&_svg]:size-5"
+              className="[&_svg]:size-5"
               aria-label="Halaman sebelumnya"
             >
               <ChevronLeft aria-hidden />
@@ -55,10 +55,10 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
             </span>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-sm"
               onClick={() => onPageChange((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages || loading}
-              className="h-8 w-8 [&_svg]:size-5"
+              className="[&_svg]:size-5"
               aria-label="Halaman berikutnya"
             >
               <ChevronRight aria-hidden />

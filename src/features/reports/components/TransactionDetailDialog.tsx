@@ -21,7 +21,7 @@ const TransactionDetailDialog: React.FC<TransactionDetailDialogProps> = ({
 }) => (
   <Dialog open onOpenChange={(open) => !open && onClose()}>
     {/* Tombol tutup bawaan DialogContent disembunyikan; dipakai tombol di header. */}
-    <DialogContent className="block w-[calc(100%-2rem)] max-w-4xl max-h-[90vh] overflow-y-auto border-none bg-card rounded-[32px] sm:rounded-[32px] shadow-soft p-8 [&>button:last-child]:hidden">
+    <DialogContent className="block w-[calc(100%-2rem)] max-w-4xl max-h-[90vh] overflow-y-auto border-none bg-card rounded-2xl sm:rounded-2xl shadow-soft p-8 [&>button:last-child]:hidden">
       <div className="flex justify-between items-center mb-6">
         <div>
           <DialogTitle className="text-xl font-bold leading-normal tracking-normal text-foreground">

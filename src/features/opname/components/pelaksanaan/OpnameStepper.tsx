@@ -18,18 +18,12 @@ interface OpnameStepperProps {
 
 // Penanda langkah opname dan isi langkah yang sedang aktif
 const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
-  const { opnameData, currentStep, selectedItems } = execution;
+  const { currentStep, selectedItems } = execution;
 
   return (
     <>
-      <div className="bg-card rounded-3xl p-6 shadow-soft">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-lg font-bold">Opname — {opnameData?.scheduleName || 'Opname'}</h2>
-          <span className="text-xs font-bold text-muted-foreground">
-            {opnameData?.opnameNumber}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 mt-4">
+      <div className="bg-card rounded-2xl p-6 shadow-soft">
+        <div className="flex items-center gap-2">
           {STEPS.map((step, index) => {
             const Icon = currentStep > step.num ? CircleCheck : step.icon;
             return (

@@ -55,10 +55,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }
         {/* Toggle Button — hidden on mobile */}
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-sm"
           onClick={() => setIsCollapsed(!isCollapsed)}
           aria-label={isCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-          className="absolute -right-3 top-9 bg-card border border-gray-100 dark:border-gray-700 rounded-full p-1.5 shadow-sm hover:text-primary hover:scale-110 active:scale-95 transition-all duration-200 z-30 h-7 w-7 hidden md:flex"
+          className="absolute -right-3 top-9 bg-card border border-gray-100 dark:border-gray-700 rounded-full p-1.5 shadow-sm hover:text-primary hover:scale-110 active:scale-95 transition-all duration-200 z-30 hidden md:flex"
         >
           {isCollapsed ? (
             <ChevronRight className="size-4" aria-hidden />

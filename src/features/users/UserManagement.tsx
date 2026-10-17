@@ -8,6 +8,8 @@ import UserTable from './components/UserTable';
 import UserFormDialog from './components/UserFormDialog';
 import ResetPasswordDialog from './components/ResetPasswordDialog';
 import DeleteUserDialog from './components/DeleteUserDialog';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 type ActiveDialog =
   { type: 'create' } | { type: 'edit' | 'resetPassword' | 'delete'; user: UserRow } | null;
@@ -46,23 +48,20 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">Manajemen Pengguna</h2>
-            <p className="text-sm text-muted-foreground">
-              Kelola akun pengguna dan hak akses sistem.
-            </p>
-          </div>
-          <Button
-            onClick={() => openDialog({ type: 'create' })}
-            className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-primary/90 transition-all h-auto flex items-center gap-2"
-          >
-            <UserPlus className="size-5" aria-hidden />
-            Tambah Pengguna
-          </Button>
-        </div>
+      <PageLayout>
+        <PageHeader
+          title="Daftar Pengguna"
+          description="Kelola akun pengguna dan hak akses sistem."
+          actions={
+            <Button
+              onClick={() => openDialog({ type: 'create' })}
+              className="bg-primary text-white px-6 font-bold shadow-lg hover:bg-primary/90 transition-all flex items-center gap-2"
+            >
+              <UserPlus className="size-5" aria-hidden />
+              Tambah Pengguna
+            </Button>
+          }
+        />
 
         {/* Toast Messages - Fixed Position */}
         {error && (
@@ -89,7 +88,7 @@ const UserManagement: React.FC = () => {
           onResetPassword={(user) => openDialog({ type: 'resetPassword', user })}
           onDelete={(user) => setDialog({ type: 'delete', user })}
         />
-      </div>
+      </PageLayout>
 
       {dialog?.type === 'create' && <UserFormDialog {...dialogProps} />}
       {dialog?.type === 'edit' && <UserFormDialog user={dialog.user} {...dialogProps} />}

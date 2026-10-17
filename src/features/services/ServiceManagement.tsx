@@ -13,6 +13,8 @@ import { useToast } from '@/components/ui/toast';
 import { exportServicesToExcel } from '@/features/reports/exportUtils';
 import { ServiceFormDialog } from './components/ServiceFormDialog';
 import { ServiceCategoryDialog } from './components/ServiceCategoryDialog';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 // Form jasa: tertutup, tambah baru, atau edit jasa tertentu
 type ServiceFormState = { isOpen: false } | { isOpen: true; service?: Service };
@@ -68,7 +70,40 @@ const ServiceManagement: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
+      <PageLayout>
+        <PageHeader
+          title="Daftar Jasa"
+          description="Kelola jasa layanan dan kategorinya."
+          actions={
+            <>
+              <Button
+                variant="outline"
+                className="shadow-md flex items-center gap-2 [&_svg]:size-6"
+                onClick={() => setIsCategoryModalOpen(true)}
+              >
+                <ListPlus aria-hidden />
+                Tambah Kategori
+              </Button>
+              <Button
+                variant="outline"
+                className="shadow-md flex items-center gap-2 [&_svg]:size-6"
+                onClick={() => void exportServicesToExcel(services)}
+                disabled={services.length === 0}
+              >
+                <Download aria-hidden />
+                Ekspor Excel
+              </Button>
+              <Button
+                onClick={() => handleOpenModal()}
+                className="shadow-md flex items-center gap-2 [&_svg]:size-6"
+              >
+                <Plus aria-hidden />
+                Tambah Jasa Baru
+              </Button>
+            </>
+          }
+        />
+
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           <StatCard
@@ -89,39 +124,9 @@ const ServiceManagement: React.FC = () => {
           />
         </div>
 
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-foreground">Daftar Jasa</h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-              onClick={() => setIsCategoryModalOpen(true)}
-            >
-              <ListPlus aria-hidden />
-              Tambah Kategori
-            </Button>
-            <Button
-              variant="outline"
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-              onClick={() => void exportServicesToExcel(services)}
-              disabled={services.length === 0}
-            >
-              <Download aria-hidden />
-              Ekspor Excel
-            </Button>
-            <Button
-              onClick={() => handleOpenModal()}
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-            >
-              <Plus aria-hidden />
-              Tambah Jasa Baru
-            </Button>
-          </div>
-        </div>
-
         {/* Table */}
         <div className="w-full">
-          <div className="bg-card rounded-[20px] p-6 shadow-soft h-full">
+          <div className="bg-card rounded-2xl p-6 shadow-soft h-full">
             {isPending ? (
               <LoadingState label="Memuat jasa..." />
             ) : isError ? (
@@ -146,7 +151,7 @@ const ServiceManagement: React.FC = () => {
             />
           </div>
         </div>
-      </div>
+      </PageLayout>
 
       {serviceForm.isOpen && (
         <ServiceFormDialog

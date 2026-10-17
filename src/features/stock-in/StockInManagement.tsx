@@ -16,6 +16,8 @@ import { DataTable } from '@/components/ui/data-table';
 import { createStockInColumns } from './StockInColumns';
 import { useToast } from '@/components/ui/toast';
 import { withErrorDetail, getErrorMessage } from '@/lib/utils';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 interface StockInManagementProps {
   products?: Product[]; // Optional now, or removed
@@ -104,18 +106,12 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
 
   return (
     <>
-      <div className="space-y-6">
-        {/* Top Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <StatCard label="Total Stok Masuk" value={totalReceipts} icon={Archive} color="primary" />
-          <StatCard label="Masuk Hari Ini" value="-" icon={CircleArrowDown} color="blue-500" />
-          <StatCard label="Growth Stok" value="-" icon={TrendingUp} color="green-500" />
-        </div>
-
-        <div className="bg-card rounded-[20px] p-6 shadow-soft">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h2 className="text-xl font-bold text-foreground">Daftar Penerimaan Stok</h2>
-            <div className="flex gap-2">
+      <PageLayout>
+        <PageHeader
+          title="Daftar Penerimaan Stok"
+          description="Catat dan telusuri stok yang masuk dari pemasok."
+          actions={
+            <>
               <Button
                 onClick={() => setIsFormOpen(true)}
                 className="shadow-lg shadow-primary/30 flex items-center gap-2 [&_svg]:size-5"
@@ -130,9 +126,18 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
               >
                 <Download aria-hidden /> Ekspor
               </Button>
-            </div>
-          </div>
+            </>
+          }
+        />
 
+        {/* Top Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <StatCard label="Total Stok Masuk" value={totalReceipts} icon={Archive} color="primary" />
+          <StatCard label="Masuk Hari Ini" value="-" icon={CircleArrowDown} color="blue-500" />
+          <StatCard label="Growth Stok" value="-" icon={TrendingUp} color="green-500" />
+        </div>
+
+        <div className="bg-card rounded-2xl p-6 shadow-soft">
           <div className="overflow-x-auto">
             {isPending ? (
               <LoadingState label="Memuat penerimaan stok..." />
@@ -155,7 +160,7 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
             />
           </div>
         </div>
-      </div>
+      </PageLayout>
       {isFormOpen && (
         <StockInForm
           onSave={handleSaveReceipt}

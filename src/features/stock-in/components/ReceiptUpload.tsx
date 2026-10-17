@@ -26,7 +26,7 @@ export const ReceiptUpload: React.FC<ReceiptUploadProps> = ({ file, onFileSelect
             inputRef.current?.click();
           }
         }}
-        className="border-2 border-dashed border-gray-200 dark:border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-background dark:hover:bg-white/5 transition-colors group bg-background/30"
+        className="border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-background dark:hover:bg-white/5 transition-colors group bg-background/30"
       >
         <div className="bg-primary/10 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform duration-200">
           <CloudUpload className="size-8 text-primary" aria-hidden />

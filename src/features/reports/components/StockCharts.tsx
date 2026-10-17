@@ -13,7 +13,7 @@ interface StockChartsProps {
 const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, totalSku }) => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
     {/* Bar Chart: Stock Levels */}
-    <div className="bg-card rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-2xl p-6 shadow-soft">
       <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
         <ChartColumn className="size-6 text-primary" aria-hidden />
         Level Stok Produk Teratas
@@ -46,7 +46,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
     </div>
 
     {/* Donut Chart: Category Distribution */}
-    <div className="bg-card rounded-3xl p-6 shadow-soft flex flex-col md:flex-row items-center gap-8">
+    <div className="bg-card rounded-2xl p-6 shadow-soft flex flex-col md:flex-row items-center gap-8">
       <div className="flex-1">
         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
           <ChartPie className="size-6 text-secondary" aria-hidden />

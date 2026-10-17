@@ -25,7 +25,7 @@ const AmountInput: React.FC<{
     value={value === 0 ? '' : value}
     onChange={(e) => onChange(toAmount(e.target.value))}
     className={cn(
-      'h-auto w-32 px-3 py-1.5 text-right text-sm md:text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-card text-foreground focus-visible:ring-primary focus:border-primary font-bold',
+      'w-32 px-3 text-right text-sm md:text-sm border border-gray-200 dark:border-gray-700 bg-card text-foreground focus-visible:ring-primary focus:border-primary font-bold',
       className,
     )}
     placeholder="0"

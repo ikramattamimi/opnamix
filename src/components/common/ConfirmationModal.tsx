@@ -81,7 +81,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         {/* z-[80] supaya tetap di atas modal lain (z-[60]/z-[70]) */}
         <AlertDialogOverlay className="z-[80] bg-black/60 backdrop-blur-sm animate-fadeIn" />
         <AlertDialogPrimitive.Content className="fixed inset-0 z-[80] flex items-center justify-center p-4 focus:outline-none">
-          <div className="bg-card w-full max-w-md rounded-3xl shadow-2xl p-6 animate-scaleUp text-center">
+          <div className="bg-card w-full max-w-md rounded-2xl shadow-2xl p-6 animate-scaleUp text-center">
             <div
               className={`w-20 h-20 ${styles.iconBg} rounded-full flex items-center justify-center mx-auto mb-4 ${styles.iconColor}`}
             >
@@ -102,7 +102,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 className={cn(
                   'mt-0 sm:mt-0 border-0 bg-transparent shadow-none',
                   buttonVariants({ variant: 'ghost' }),
-                  'flex-1 py-6 text-muted-foreground font-bold hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors h-auto',
+                  'flex-1 h-11 text-muted-foreground font-bold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors',
                 )}
               >
                 {cancelText}
@@ -112,7 +112,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   e.preventDefault();
                   onConfirm();
                 }}
-                className={`flex-1 py-6 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 h-auto [&_svg]:size-5 ${styles.confirmBg}`}
+                className={`flex-1 h-11 text-white font-bold shadow-lg transition-colors flex items-center justify-center gap-2 [&_svg]:size-5 ${styles.confirmBg}`}
               >
                 <CircleCheck aria-hidden />
                 {confirmText}

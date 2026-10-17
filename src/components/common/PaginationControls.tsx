@@ -9,7 +9,7 @@ interface PaginationControlsProps {
 }
 
 const PAGE_BUTTON_CLASS =
-  'h-auto px-4 py-2 bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 rounded-xl text-sm font-bold text-muted-foreground hover:bg-white dark:hover:bg-white/5 hover:text-primary hover:border-primary transition-all shadow-sm';
+  'px-4 bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-sm font-bold text-muted-foreground hover:bg-white dark:hover:bg-white/5 hover:text-primary hover:border-primary transition-all shadow-sm';
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,

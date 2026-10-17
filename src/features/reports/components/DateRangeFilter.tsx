@@ -17,7 +17,7 @@ interface DateRangeFilterProps {
 }
 
 const dateInputClass =
-  'h-auto rounded-xl border-0 bg-white px-4 py-2 text-base md:text-base text-foreground shadow-none dark:bg-card';
+  'border-0 bg-white px-4 text-base md:text-base text-foreground shadow-none dark:bg-card';
 
 // Filter periode + rentang tanggal yang dipakai bersama oleh laporan transaksi dan mutasi stok.
 const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ value, onChange, children }) => {

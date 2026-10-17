@@ -11,6 +11,8 @@ import {
 } from './useNotifications';
 import { getNotificationLucideIcon, getNotificationColor, formatNotificationTime } from './format';
 import { AppNotification } from './types';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 const TYPE_LABELS: Record<string, string> = {
   STOCK_OUT_REQUEST: 'Permintaan Stok Keluar',
@@ -31,7 +33,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const ALL_TYPES = ['Semua', ...Object.keys(TYPE_LABELS)];
 
-const FILTER_CHIP_CLASS = 'h-auto px-3 py-1.5 rounded-lg text-xs font-bold transition-colors';
+const FILTER_CHIP_CLASS = 'px-3 text-xs font-bold transition-colors';
 const FILTER_CHIP_IDLE_CLASS =
   'bg-background text-muted-foreground hover:bg-background dark:hover:bg-background hover:text-foreground dark:hover:text-white';
 
@@ -61,28 +63,27 @@ const NotificationsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Notifikasi</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {unreadCount > 0
-              ? `${unreadCount} notifikasi belum dibaca`
-              : 'Semua notifikasi sudah dibaca'}
-          </p>
-        </div>
-        {unreadCount > 0 && (
-          <Button
-            variant="ghost"
-            onClick={markAllAsRead}
-            className="text-sm font-bold text-primary hover:text-primary/80 border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 h-auto"
-          >
-            <CheckCheck className="size-4 mr-1.5" aria-hidden />
-            Tandai semua dibaca
-          </Button>
-        )}
-      </div>
+    <PageLayout maxWidth="narrow">
+      <PageHeader
+        title="Kotak Masuk"
+        description={
+          unreadCount > 0
+            ? `${unreadCount} notifikasi belum dibaca`
+            : 'Semua notifikasi sudah dibaca'
+        }
+        actions={
+          unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              onClick={markAllAsRead}
+              className="text-sm font-bold text-primary hover:text-primary/80 border border-primary/20 hover:border-primary/40 px-4"
+            >
+              <CheckCheck className="size-4 mr-1.5" aria-hidden />
+              Tandai semua dibaca
+            </Button>
+          )
+        }
+      />
 
       {/* Filters */}
       <div className="bg-card rounded-2xl p-4 shadow-soft space-y-3">
@@ -203,7 +204,7 @@ const NotificationsPage: React.FC = () => {
           Menampilkan {filtered.length} dari {notifications.length} notifikasi
         </p>
       )}
-    </div>
+    </PageLayout>
   );
 };
 

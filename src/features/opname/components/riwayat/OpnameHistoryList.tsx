@@ -66,7 +66,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   <Button
                     variant="ghost"
                     onClick={() => navigate(`/audit/stok-opname/detail/${opname.id}`)}
-                    className="text-primary font-bold rounded-xl px-4 h-auto py-2.5 hover:bg-primary/10"
+                    className="text-primary font-bold px-4 hover:bg-primary/10"
                   >
                     <Eye className="mr-1.5" aria-hidden />
                     Lihat Detail
@@ -74,7 +74,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   <Button
                     onClick={() => onDelete(opname.id)}
                     variant="ghost"
-                    className="rounded-xl font-bold px-4 text-sm h-auto py-2.5 text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="font-bold px-4 text-sm text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                   >
                     <Trash2 className="mr-1.5" aria-hidden />

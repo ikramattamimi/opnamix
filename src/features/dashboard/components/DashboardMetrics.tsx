@@ -30,7 +30,7 @@ const DashboardMetrics: React.FC<{ stats: DashboardStats }> = ({ stats }) => (
       color="primary"
     />
 
-    <div className="bg-card p-4 rounded-DEFAULT shadow-soft flex items-center col-span-1 md:col-span-2 xl:col-span-2">
+    <div className="bg-card p-4 rounded-2xl shadow-soft flex items-center col-span-1 md:col-span-2 xl:col-span-2">
       <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mr-4">
         <Wallet className="text-primary size-6" aria-hidden />
       </div>

@@ -32,7 +32,7 @@ export const OpnameSearchInput: React.FC<{
       aria-label={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-auto w-full bg-card border-none rounded-xl pl-9 pr-4 py-2.5 text-sm md:text-sm font-medium placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-primary/20 shadow-soft"
+      className="w-full bg-card border-none pl-9 pr-4 text-sm md:text-sm font-medium placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-primary/20 shadow-soft"
     />
   </div>
 );

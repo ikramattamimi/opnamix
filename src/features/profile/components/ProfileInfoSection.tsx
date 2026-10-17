@@ -45,7 +45,7 @@ const ProfileInfoSection: React.FC<ProfileInfoSectionProps> = ({
               onEditModeChange(true);
               onFormNameChange(profile.full_name || '');
             }}
-            className="rounded-xl text-sm h-auto py-2 px-4 font-bold flex items-center gap-1.5"
+            className="text-sm px-4 font-bold flex items-center gap-1.5"
           >
             <Pencil className="size-4" aria-hidden />
             Edit
@@ -58,14 +58,14 @@ const ProfileInfoSection: React.FC<ProfileInfoSectionProps> = ({
                 onEditModeChange(false);
                 onFormNameChange(profile.full_name || '');
               }}
-              className="rounded-xl text-sm h-auto py-2 px-4 font-bold"
+              className="text-sm px-4 font-bold"
             >
               Batal
             </Button>
             <Button
               onClick={onSave}
               disabled={isSubmitting}
-              className="rounded-xl text-sm h-auto py-2 px-4 font-bold bg-primary text-white hover:bg-primary/90"
+              className="text-sm px-4 font-bold bg-primary text-white hover:bg-primary/90"
             >
               {isSubmitting ? 'Menyimpan...' : 'Simpan'}
             </Button>

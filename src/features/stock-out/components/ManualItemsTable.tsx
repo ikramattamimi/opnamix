@@ -106,7 +106,7 @@ const ManualItemsTable: React.FC = () => {
                       aria-label="Jumlah"
                       aria-invalid={!!itemError?.quantity}
                       className={cn(
-                        'h-auto w-full bg-transparent border border-transparent shadow-none hover:border-gray-200 dark:hover:border-white/10 focus:border-primary focus-visible:ring-0 rounded-xl text-center font-bold text-sm md:text-sm py-1 px-1',
+                        'w-full bg-transparent border border-transparent shadow-none hover:border-gray-200 dark:hover:border-white/10 focus:border-primary focus-visible:ring-0 text-center font-bold text-sm md:text-sm px-1',
                         itemError?.quantity && 'border-red-500',
                       )}
                       {...register(`items.${index}.quantity`, { valueAsNumber: true })}
@@ -132,8 +132,8 @@ const ManualItemsTable: React.FC = () => {
                     type="button"
                     onClick={() => handleRemove(index)}
                     variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 h-8 w-8 [&_svg]:size-5"
+                    size="icon-sm"
+                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 [&_svg]:size-5"
                     title="Hapus Baris"
                     aria-label="Hapus Baris"
                   >
@@ -149,7 +149,7 @@ const ManualItemsTable: React.FC = () => {
         type="button"
         onClick={() => append(emptyManualItem())}
         variant="ghost"
-        className="w-full h-auto py-3 text-sm font-bold text-primary hover:bg-primary/5 hover:text-primary transition-colors flex items-center justify-center gap-2 border-t border-dashed border-gray-200 dark:border-white/10 rounded-t-none [&_svg]:size-5"
+        className="w-full text-sm font-bold text-primary hover:bg-primary/5 hover:text-primary transition-colors flex items-center justify-center gap-2 border-t border-dashed border-gray-200 dark:border-white/10 rounded-t-none [&_svg]:size-5"
       >
         <Plus aria-hidden />
         Tambah Baris Baru

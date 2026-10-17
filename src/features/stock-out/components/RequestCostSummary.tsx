@@ -30,7 +30,7 @@ const RequestCostSummary: React.FC<RequestCostSummaryProps> = ({
   const { control } = useFormContext<StockOutRequestValues>();
 
   return (
-    <div className="bg-gradient-to-br from-primary to-blue-600 rounded-[20px] p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden">
+    <div className="bg-gradient-to-br from-primary to-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
       <h3 className="font-bold text-lg mb-4 relative z-10">Ringkasan Biaya</h3>
       <div className="flex flex-col gap-3 relative z-10 mb-6">
@@ -62,7 +62,7 @@ const RequestCostSummary: React.FC<RequestCostSummaryProps> = ({
                       onBlur={field.onBlur}
                       value={field.value === 0 ? '' : field.value}
                       onChange={(e) => field.onChange(toAmount(e.target.value))}
-                      className="h-auto rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm md:text-sm font-bold text-white placeholder:text-white/90 focus:border-white/40 focus-visible:ring-white/40"
+                      className="border border-white/20 bg-white/10 px-3 text-sm md:text-sm font-bold text-white placeholder:text-white/90 focus:border-white/40 focus-visible:ring-white/40"
                     />
                   </FormControl>
                 </div>
@@ -79,7 +79,7 @@ const RequestCostSummary: React.FC<RequestCostSummaryProps> = ({
       <Button
         type="submit"
         size="lg"
-        className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold py-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-lg h-auto [&_svg]:size-6"
+        className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-lg [&_svg]:size-6"
         disabled={isLoading}
       >
         {isLoading ? (

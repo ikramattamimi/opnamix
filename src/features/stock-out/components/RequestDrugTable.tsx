@@ -25,7 +25,7 @@ interface RequestDrugTableProps {
 }
 
 const EDIT_FIELD =
-  'h-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-card px-3 py-2 text-sm md:text-sm text-foreground';
+  'border border-gray-200 dark:border-gray-700 bg-card px-3 text-sm md:text-sm text-foreground';
 
 // Daftar item obat & alkes di detail permintaan
 const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
@@ -112,7 +112,7 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                       size="icon"
                       onClick={() => edit.onRemove(drug.id)}
                       aria-label="Hapus item"
-                      className="h-auto w-auto p-2 text-red-700 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg"
+                      className="w-auto p-2 text-red-700 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
                     >
                       <Trash2 aria-hidden />
                     </Button>

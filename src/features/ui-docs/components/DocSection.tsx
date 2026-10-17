@@ -17,7 +17,7 @@ export const DocSection: React.FC<DocSectionProps> = ({
   importPath,
   children,
 }) => (
-  <section id={id} className="scroll-mt-36 rounded-[20px] bg-card p-6 shadow-soft">
+  <section id={id} className="scroll-mt-36 rounded-2xl bg-card p-6 shadow-soft">
     <h2 className="text-lg font-bold text-foreground">{title}</h2>
     <p className="mt-1 text-sm text-muted-foreground">{description}</p>
     <p className="mt-3 inline-block rounded-lg bg-gray-100 px-2 py-1 font-mono text-xs text-muted-foreground dark:bg-white/5">

@@ -60,7 +60,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
   });
 
   return (
-    <div className="bg-card rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-2xl p-6 shadow-soft">
       <div className="mb-6">
         <h3 className="text-lg font-bold">Tahap 3: Penyesuaian Stok</h3>
         <p className="text-sm text-muted-foreground">
@@ -115,7 +115,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                     value={finalValue(item.id)}
                     onChange={(e) => setFinal(item.id, e.target.value)}
                     aria-label={`Stok final ${item.productName}`}
-                    className="h-auto w-full bg-background border-none rounded-xl px-3 py-2 text-center text-sm md:text-sm font-bold"
+                    className="w-full bg-background border-none px-3 text-center text-sm md:text-sm font-bold"
                   />
                 </td>
                 <td className="px-3 py-4">
@@ -127,7 +127,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                         onChange={(e) => setReason(item.id, e.target.value)}
                         rows={2}
                         aria-label={`Alasan perbedaan ${item.productName}`}
-                        className="min-h-0 w-full bg-background border-none shadow-none rounded-xl px-3 py-2 text-sm md:text-sm font-medium resize-none"
+                        className="min-h-0 w-full bg-background border-none shadow-none px-3 text-sm md:text-sm font-medium resize-none"
                       />
                       {!reasons[item.id] && <RequiredMark className="top-2" />}
                     </div>
@@ -193,7 +193,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                 min="0"
                 value={finalValue(item.id)}
                 onChange={(e) => setFinal(item.id, e.target.value)}
-                className="h-auto w-full bg-card border-none rounded-xl px-3 py-2.5 text-center text-sm font-bold"
+                className="w-full bg-card border-none px-3 text-center text-sm font-bold"
               />
             </div>
 
@@ -211,7 +211,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                   value={reasons[item.id] || ''}
                   onChange={(e) => setReason(item.id, e.target.value)}
                   rows={2}
-                  className="min-h-0 w-full bg-card border-none shadow-none rounded-xl px-3 py-2 text-sm font-medium resize-none"
+                  className="min-h-0 w-full bg-card border-none shadow-none px-3 text-sm font-medium resize-none"
                 />
                 {!reasons[item.id] && <RequiredMark className="top-8" />}
               </div>

@@ -35,9 +35,9 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
           type="button"
           onClick={onRemove}
           variant="destructive"
-          size="icon"
+          size="icon-sm"
           aria-label="Hapus item"
-          className="absolute -top-2 -right-2 h-6 w-6 rounded-full shadow-lg [&_svg]:size-3"
+          className="absolute -top-2 -right-2 rounded-full shadow-lg [&_svg]:size-3"
         >
           <X aria-hidden />
         </Button>
@@ -59,7 +59,7 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
                     variant="ghost"
                     onClick={onOpenLookup}
                     className={cn(
-                      'group h-auto w-full bg-card hover:bg-white dark:hover:bg-card border-none rounded-2xl px-4 py-3.5 text-sm font-medium shadow-sm transition-all flex items-center justify-between active:scale-100 [&_svg]:size-6',
+                      'group w-full bg-card hover:bg-white dark:hover:bg-card border-none px-4 text-sm font-medium shadow-sm transition-all flex items-center justify-between active:scale-100 [&_svg]:size-6',
                       field.value
                         ? 'text-foreground hover:text-foreground'
                         : 'text-muted-foreground hover:text-muted-foreground',
@@ -85,7 +85,7 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
               <FormLabel className={labelClassName}>Tanggal Kedaluwarsa</FormLabel>
               <FormControl>
                 <Input
-                  className="h-auto w-full bg-card border-none rounded-2xl px-4 py-3.5 text-sm font-medium text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
+                  className="w-full bg-card border-none px-4 text-sm font-medium text-foreground shadow-sm focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
                   type="date"
                   {...field}
                 />
@@ -100,12 +100,12 @@ export const StockInItemCard: React.FC<StockInItemCardProps> = ({
           render={({ field }) => (
             <FormItem className="space-y-2">
               <FormLabel className={labelClassName}>Jumlah</FormLabel>
-              <div className="flex items-center bg-card rounded-2xl p-1 shadow-sm">
+              <div className="flex items-center bg-card rounded-lg shadow-sm">
                 <FormControl>
                   <Input
                     ref={field.ref}
                     name={field.name}
-                    className="h-auto flex-1 w-full border-none bg-transparent text-center text-sm font-bold text-foreground shadow-none focus:ring-0 focus-visible:ring-0 p-0"
+                    className="flex-1 w-full border-none bg-transparent text-center text-sm font-bold text-foreground shadow-none focus:ring-0 focus-visible:ring-0 p-0"
                     type="number"
                     value={field.value ?? ''}
                     onChange={(e) =>

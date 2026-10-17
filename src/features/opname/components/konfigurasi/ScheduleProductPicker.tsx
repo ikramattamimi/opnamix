@@ -72,7 +72,7 @@ const ScheduleProductPicker: React.FC<ScheduleProductPickerProps> = ({ products 
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari obat..."
               aria-label="Cari obat"
-              className="h-auto w-full bg-background border-none rounded-xl pl-9 pr-4 py-2.5 text-sm md:text-sm font-medium"
+              className="w-full bg-background border-none pl-9 pr-4 text-sm md:text-sm font-medium"
             />
           </div>
 
@@ -84,7 +84,7 @@ const ScheduleProductPicker: React.FC<ScheduleProductPickerProps> = ({ products 
               type="button"
               variant="link"
               onClick={toggleAllFiltered}
-              className="h-auto p-0 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline"
+              className="p-0 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline"
             >
               {selected.size === filteredProducts.length ? 'Batalkan Semua' : 'Pilih Semua'}
             </Button>

@@ -121,7 +121,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-card w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[32px] shadow-soft p-8">
+      <div className="bg-card w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-soft p-8">
         <div className="flex justify-between items-center mb-8">
           <h3 className="text-2xl font-bold text-foreground">Formulir Penerimaan Stok</h3>
           <Button
@@ -149,7 +149,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
                   type="button"
                   onClick={() => append(emptyStockInItem())}
                   variant="ghost"
-                  className="text-primary hover:text-primary/80 font-bold p-0 h-auto hover:bg-transparent [&_svg]:size-5"
+                  className="text-primary hover:text-primary/80 font-bold p-0 hover:bg-transparent [&_svg]:size-5"
                 >
                   <Plus className="mr-1" aria-hidden /> Tambah Item Lain
                 </Button>
@@ -177,7 +177,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
                 onClick={onClose}
                 variant="secondary"
                 size="lg"
-                className="rounded-2xl font-bold"
+                className="font-bold"
                 disabled={isCompressing || isLoading}
               >
                 Batal
@@ -185,7 +185,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
               <Button
                 type="submit"
                 size="lg"
-                className="rounded-2xl font-bold shadow-lg shadow-primary/40 gap-2 [&_svg]:size-5"
+                className="font-bold shadow-lg shadow-primary/40 gap-2 [&_svg]:size-5"
                 disabled={isCompressing || isLoading}
               >
                 {isCompressing ? (

@@ -23,7 +23,7 @@ export const ActiveSchedulesStrip: React.FC<{ schedules: ScheduleInfo[] }> = ({ 
         </div>
         <Button
           onClick={() => navigate(KONFIGURASI_PATH)}
-          className="bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl px-3 py-2 h-auto [&_svg]:size-3"
+          className="bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 [&_svg]:size-3"
         >
           <Plus className="mr-1" aria-hidden />
           Buat Jadwal
@@ -38,7 +38,7 @@ export const ActiveSchedulesStrip: React.FC<{ schedules: ScheduleInfo[] }> = ({ 
         variant="ghost"
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
-        className="w-full h-auto flex items-center justify-between px-4 py-3 text-white hover:text-white hover:bg-transparent dark:hover:bg-transparent rounded-none active:scale-100 [&_svg]:size-6"
+        className="w-full flex items-center justify-between px-4 text-white hover:text-white hover:bg-transparent dark:hover:bg-transparent rounded-none active:scale-100 [&_svg]:size-6"
       >
         <div className="flex items-center gap-2">
           <CalendarDays className="!size-5 text-white/90" aria-hidden />
@@ -61,7 +61,7 @@ export const ActiveSchedulesStrip: React.FC<{ schedules: ScheduleInfo[] }> = ({ 
           ))}
           <Button
             onClick={() => navigate(KONFIGURASI_PATH)}
-            className="w-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl px-3 py-2.5 h-auto mt-1 [&_svg]:size-3"
+            className="w-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 mt-1 [&_svg]:size-3"
           >
             <Settings className="mr-1" aria-hidden />
             Ubah Konfigurasi
@@ -105,7 +105,7 @@ export const ActiveSchedulesSidebar: React.FC<{
 
       <Button
         onClick={() => navigate(KONFIGURASI_PATH)}
-        className="w-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl px-3 py-2.5 h-auto [&_svg]:size-3"
+        className="w-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 [&_svg]:size-3"
       >
         <Settings className="mr-1" aria-hidden />
         Konfigurasi Jadwal
@@ -113,7 +113,7 @@ export const ActiveSchedulesSidebar: React.FC<{
 
       <Button
         onClick={onAddOpname}
-        className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-xl px-4 h-auto py-3 text-sm shadow-lg shadow-primary/20"
+        className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold px-4 text-sm shadow-lg shadow-primary/20"
       >
         <CirclePlus className="mr-1.5" aria-hidden />
         Tambah Opname
