@@ -157,7 +157,7 @@ const NavParent: React.FC<NavParentProps> = ({ parent, items, collapsed, onClose
         onClick={() => setExpanded(!expanded)}
         title={collapsed ? parent.label : ''}
         className={cn(
-          'w-full flex items-center py-3 transition-all duration-200 group rounded-xl relative h-auto hover:scale-[1.02] active:scale-[0.98]',
+          'w-full flex items-center h-11 transition-all duration-200 group rounded-lg relative hover:scale-[1.02] active:scale-[0.98]',
           collapsed ? 'justify-center px-2' : 'justify-start px-4',
           isActivePath
             ? 'text-primary font-bold'
@@ -233,7 +233,7 @@ const NavItem: React.FC<NavItemProps> = ({ route, collapsed, onCloseMobile }) =>
       onClick={handleClick}
       className={({ isActive }) =>
         cn(
-          'w-full flex items-center py-3 transition-all duration-200 group rounded-xl relative h-auto hover:scale-[1.02] active:scale-[0.98]',
+          'w-full flex items-center h-11 transition-all duration-200 group rounded-lg relative hover:scale-[1.02] active:scale-[0.98]',
           collapsed ? 'justify-center px-2' : 'justify-start px-4',
           isActive
             ? 'bg-primary/10 text-primary font-bold hover:bg-primary/15 hover:text-primary'
