@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus, Save, X } from 'lucide-react';
+import { Loader2, Plus, Save } from 'lucide-react';
 import { StockInReceipt } from './types';
 import { Product } from '@/features/products/types';
 import { compressImage } from '@/lib/imageCompression';
@@ -9,6 +9,7 @@ import ProductLookupModal from '@/features/products/ProductLookupModal';
 import { useProducts } from '@/features/products/useProducts';
 import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
 import { useToast } from '@/components/ui/toast';
 import {
@@ -22,7 +23,6 @@ import {
 import { StockInItemCard } from './components/StockInItemCard';
 import { ReceiptUpload } from './components/ReceiptUpload';
 import { TransactionDetailsFields } from './components/TransactionDetailsFields';
-import { Card } from '@/components/ui/card';
 
 interface StockInFormProps {
   onSave: (receipt: StockInReceipt, file?: Blob) => void;
@@ -121,19 +121,10 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-2xl font-bold text-foreground">Formulir Penerimaan Stok</h3>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            aria-label="Tutup"
-            className="rounded-full hover:bg-gray-200 dark:hover:bg-white/5 [&_svg]:size-6"
-          >
-            <X aria-hidden />
-          </Button>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="block max-w-4xl p-8" aria-describedby={undefined}>
+        <div className="mb-8 pr-10">
+          <DialogTitle className="text-2xl">Formulir Penerimaan Stok</DialogTitle>
         </div>
 
         <Form {...form}>
@@ -172,7 +163,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
 
             <ReceiptUpload file={file} onFileSelected={handleFileSelected} />
 
-            <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-100 dark:border-white/5">
+            <div className="flex items-center justify-end gap-4 pt-4 border-t border-border">
               <Button
                 type="button"
                 onClick={onClose}
@@ -219,8 +210,8 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
             allowAddProduct={true}
           />
         )}
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

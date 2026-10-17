@@ -77,10 +77,10 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
               <TableHeader>
                 <TableRow>
                   <TableHead>
-                    Nama Obat <span className="text-red-500">*</span>
+                    Nama Obat <span className="text-red-600 dark:text-red-400">*</span>
                   </TableHead>
                   <TableHead className="w-24 text-center">
-                    Jumlah <span className="text-red-500">*</span>
+                    Jumlah <span className="text-red-600 dark:text-red-400">*</span>
                   </TableHead>
                   <TableHead>Satuan</TableHead>
                   <TableHead className="text-right">Harga</TableHead>

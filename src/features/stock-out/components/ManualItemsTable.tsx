@@ -54,10 +54,10 @@ const ManualItemsTable: React.FC = () => {
         <TableHeader>
           <TableRow>
             <TableHead className={cn(TH, 'text-left')}>
-              Nama Obat <span className="text-red-500">*</span>
+              Nama Obat <span className="text-red-600 dark:text-red-400">*</span>
             </TableHead>
             <TableHead className={cn(TH, 'text-center w-24')}>
-              Jml <span className="text-red-500">*</span>
+              Jml <span className="text-red-600 dark:text-red-400">*</span>
             </TableHead>
             <TableHead className={cn(TH, 'text-center w-24')}>Satuan</TableHead>
             <TableHead className={cn(TH, 'text-right')}>Harga</TableHead>

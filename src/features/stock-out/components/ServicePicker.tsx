@@ -128,7 +128,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
 
         <div className="mt-2 pt-4 border-t border-dashed border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-slate-600 font-medium">Subtotal Jasa</span>
+            <span className="text-sm text-muted-foreground font-medium">Subtotal Jasa</span>
             <span className="font-bold text-slate-800 dark:text-white">
               Rp {totalServices.toLocaleString('id-ID')}
             </span>

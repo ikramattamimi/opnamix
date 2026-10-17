@@ -16,6 +16,7 @@ import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } fro
 import PaginationControls from '@/components/common/PaginationControls';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -279,16 +280,17 @@ const ProductManagement: React.FC = () => {
 
       {/* Product Form Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <Card className="w-full max-w-2xl p-8 overflow-y-auto max-h-[90vh] relative">
+        <Dialog open onOpenChange={(open) => !open && handleCloseModal()}>
+          <DialogContent className="max-w-2xl p-8" aria-describedby={undefined}>
             <ProductForm
+              inDialog
               onSave={handleSave}
               editingProduct={editingProduct}
               onCancel={handleCloseModal}
               isLoading={createMutation.isPending || updateMutation.isPending}
             />
-          </Card>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Delete Confirmation Modal */}

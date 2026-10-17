@@ -1,10 +1,11 @@
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { BriefcaseMedical, Loader2, Send, X } from 'lucide-react';
+import { BriefcaseMedical, Loader2, Send } from 'lucide-react';
 import { StockOutManual } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -33,7 +34,7 @@ const INPUT =
   'border-gray-100 dark:border-gray-700 bg-background px-4 text-sm md:text-sm focus:border-primary focus-visible:ring-primary text-foreground aria-[invalid=true]:border-red-500';
 const MESSAGE = 'text-xs font-normal text-red-500 ml-1';
 
-const RequiredMark = () => <span className="text-red-500">*</span>;
+const RequiredMark = () => <span className="text-red-600 dark:text-red-400">*</span>;
 
 const toRecord = (values: StockOutManualValues): StockOutManual => ({
   id: randomId(),
@@ -79,19 +80,13 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
   }, 0);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-background w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-2xl shadow-soft p-4 md:p-8 lg:p-10 font-display">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-2xl font-bold text-foreground">Catat Stok Keluar Manual</h3>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            aria-label="Tutup"
-            className="rounded-full hover:bg-gray-200 dark:hover:bg-white/5 [&_svg]:size-6"
-          >
-            <X aria-hidden />
-          </Button>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="block max-h-[95vh] max-w-6xl bg-background p-4 md:p-8 lg:p-10 font-display"
+        aria-describedby={undefined}
+      >
+        <div className="mb-8 pr-10">
+          <DialogTitle className="text-2xl">Catat Stok Keluar Manual</DialogTitle>
         </div>
 
         <Form {...form}>
@@ -247,8 +242,8 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
             </div>
           </form>
         </Form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
