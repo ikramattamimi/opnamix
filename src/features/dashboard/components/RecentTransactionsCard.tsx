@@ -27,27 +27,25 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
   const loading = isPending || isPlaceholderData;
 
   return (
-    <div className="bg-card-light dark:bg-card-dark p-6 rounded-DEFAULT shadow-soft">
+    <div className="bg-card p-6 rounded-2xl shadow-soft">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-        <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
-          Transaksi Terbaru
-        </h3>
+        <h3 className="text-xl font-bold text-foreground">Transaksi Terbaru</h3>
         <div className="flex gap-2">
           <Button
             variant="secondary"
-            className="bg-background-light dark:bg-background-dark text-primary font-bold hover:shadow-md"
+            className="bg-background text-primary font-bold hover:shadow-md"
             onClick={() => void exportRecentTransactionsToExcel(recentTrx)}
             disabled={recentTrx.length === 0}
           >
             Ekspor Excel
           </Button>
-          <div className="flex items-center bg-background-light dark:bg-background-dark rounded-xl p-1">
+          <div className="flex items-center bg-background rounded-xl p-1">
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-sm"
               onClick={() => onPageChange((p) => Math.max(1, p - 1))}
               disabled={page === 1 || loading}
-              className="h-8 w-8 [&_svg]:size-5"
+              className="[&_svg]:size-5"
               aria-label="Halaman sebelumnya"
             >
               <ChevronLeft aria-hidden />
@@ -57,10 +55,10 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
             </span>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-sm"
               onClick={() => onPageChange((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages || loading}
-              className="h-8 w-8 [&_svg]:size-5"
+              className="[&_svg]:size-5"
               aria-label="Halaman berikutnya"
             >
               <ChevronRight aria-hidden />
@@ -82,24 +80,24 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
           <table className="w-full">
             <thead>
               <tr className="text-left border-b border-gray-100 dark:border-gray-800">
-                <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium pl-2">
+                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium pl-2">
                   Nama Obat
                 </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
                   Status
                 </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
                   Kategori
                 </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
                   Jumlah
                 </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-text-secondary-light font-medium">
+                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
                   Tanggal
                 </th>
               </tr>
             </thead>
-            <tbody className="text-sm font-medium text-text-primary-light dark:text-white">
+            <tbody className="text-sm font-medium text-foreground">
               {recentTrx.map((trx) => (
                 <TransactionRow key={trx.id} trx={trx} />
               ))}
@@ -132,7 +130,7 @@ const TransactionRow: React.FC<{ trx: RecentTransaction }> = ({ trx }) => (
     </td>
     <td className="py-4">{trx.category}</td>
     <td className="py-4 font-bold">{trx.amount}</td>
-    <td className="py-4 text-text-secondary-light">{trx.date}</td>
+    <td className="py-4 text-muted-foreground">{trx.date}</td>
   </tr>
 );
 

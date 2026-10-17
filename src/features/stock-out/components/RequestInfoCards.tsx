@@ -21,7 +21,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
         <User className="size-8 text-primary" aria-hidden />
       </div>
       <div className="flex-1">
-        <p className="text-sm text-text-secondary-light uppercase tracking-wider font-bold mb-1">
+        <p className="text-sm text-muted-foreground uppercase tracking-wider font-bold mb-1">
           Nama Pasien
         </p>
         {onChange ? (
@@ -32,7 +32,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
               onChange={(e) =>
                 onChange({ ...request, patient: { ...request.patient, fullName: e.target.value } })
               }
-              className="h-auto rounded-xl border border-blue-200 dark:border-blue-500/20 bg-white dark:bg-card-dark px-4 py-3 text-sm md:text-sm font-semibold text-text-primary-light dark:text-white"
+              className="border border-blue-200 dark:border-blue-500/20 bg-card px-4 text-sm md:text-sm font-semibold text-foreground"
               placeholder="Nama pasien"
               aria-label="Nama pasien"
             />
@@ -43,7 +43,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
               onChange={(e) =>
                 onChange({ ...request, patient: { ...request.patient, birthDate: e.target.value } })
               }
-              className="h-auto rounded-xl border border-blue-200 dark:border-blue-500/20 bg-white dark:bg-card-dark px-4 py-3 text-sm md:text-sm text-text-primary-light dark:text-white"
+              className="border border-blue-200 dark:border-blue-500/20 bg-card px-4 text-sm md:text-sm text-foreground"
             />
           </div>
         ) : (
@@ -51,7 +51,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
             <h4 className="font-bold text-xl text-primary dark:text-blue-300">
               {request.patient.fullName}
             </h4>
-            <p className="text-sm text-text-secondary-light mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Tanggal Lahir: {formatDateForDisplay(request.patient.birthDate)}
             </p>
           </>
@@ -61,9 +61,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
 
     <div className="flex gap-4">
       <div className="flex-1 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800">
-        <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">
-          Status Permintaan
-        </p>
+        <p className="text-xs uppercase font-bold text-muted-foreground mb-2">Status Permintaan</p>
         <div className="flex items-center gap-2">
           {request.status === 'Menunggu' ? (
             <Clock className="size-6 text-amber-500" aria-hidden />
@@ -74,7 +72,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
         </div>
       </div>
       <div className="flex-1 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800">
-        <p className="text-xs uppercase font-bold text-text-secondary-light mb-2">Diajukan Oleh</p>
+        <p className="text-xs uppercase font-bold text-muted-foreground mb-2">Diajukan Oleh</p>
         <div className="flex items-center gap-2">
           <img
             src={avatarUrl}
@@ -90,7 +88,7 @@ const RequestInfoCards: React.FC<RequestInfoCardsProps> = ({ request, avatarUrl,
               value={request.requestedBy}
               onChange={(e) => onChange({ ...request, requestedBy: e.target.value })}
               aria-label="Diajukan oleh"
-              className="h-auto w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm md:text-sm font-bold text-text-primary-light dark:text-white"
+              className="w-full border border-gray-200 dark:border-gray-700 bg-card px-3 text-sm md:text-sm font-bold text-foreground"
             />
           ) : (
             <span className="font-bold">{request.requestedBy}</span>

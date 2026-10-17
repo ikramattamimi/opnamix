@@ -8,6 +8,8 @@ import { getRoleIconColor, getRoleInfo } from './components/profileUi';
 import ProfileHeaderCard from './components/ProfileHeaderCard';
 import ProfileInfoSection from './components/ProfileInfoSection';
 import PasswordSection from './components/PasswordSection';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 const ProfilePage: React.FC = () => {
   const { userProfile } = useAuth();
@@ -139,16 +141,21 @@ const ProfilePage: React.FC = () => {
   const roleInfo = getRoleInfo(userRoles);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <PageLayout maxWidth="narrow">
+      <PageHeader
+        title="Akun Saya"
+        description="Lihat dan perbarui data profil serta kata sandi Anda."
+      />
+
       {/* Messages */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
           <CircleAlert className="size-5" aria-hidden />
           {error}
         </div>
       )}
       {success && (
-        <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
+        <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
           <CircleCheck className="size-5" aria-hidden />
           {success}
         </div>
@@ -174,7 +181,7 @@ const ProfilePage: React.FC = () => {
       />
 
       <PasswordSection isSubmitting={isSubmitting} onChangePassword={handleChangePassword} />
-    </div>
+    </PageLayout>
   );
 };
 

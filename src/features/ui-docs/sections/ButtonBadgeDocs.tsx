@@ -32,16 +32,25 @@ export const ButtonDocs: React.FC = () => (
 
     <DocExample
       title="Ukuran"
+      note="Tinggi tetap: sm 32px, default 40px (sama dengan Input dan Select), lg 44px; icon 40x40, icon-sm 32x32, icon-lg 44x44. Jangan menimpa tinggi dengan h-auto/py-* atau radius dengan rounded-*."
       code={`
 <Button size="sm">Kecil</Button>
 <Button>Default</Button>
 <Button size="lg">Besar</Button>
-<Button size="icon" aria-label="Tambah"><Plus /></Button>`}
+<Button size="icon-sm" aria-label="Tambah"><Plus /></Button>
+<Button size="icon" aria-label="Tambah"><Plus /></Button>
+<Button size="icon-lg" aria-label="Tambah"><Plus /></Button>`}
     >
       <Button size="sm">Kecil</Button>
       <Button>Default</Button>
       <Button size="lg">Besar</Button>
+      <Button size="icon-sm" aria-label="Tambah">
+        <Plus aria-hidden />
+      </Button>
       <Button size="icon" aria-label="Tambah">
+        <Plus aria-hidden />
+      </Button>
+      <Button size="icon-lg" aria-label="Tambah">
         <Plus aria-hidden />
       </Button>
     </DocExample>

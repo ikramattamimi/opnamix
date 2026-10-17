@@ -30,7 +30,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft overflow-hidden">
+    <div className="bg-card rounded-2xl shadow-soft overflow-hidden">
       {/* Banner dengan Avatar di dalamnya */}
       <div className="h-40 bg-gradient-to-br from-primary via-blue-500 to-indigo-600 relative">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-40"></div>
@@ -38,7 +38,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         {/* Avatar di dalam banner */}
         <div className="absolute bottom-0 left-6 md:left-8 transform translate-y-1/2">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-2xl border-4 border-white dark:border-card-dark shadow-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+            <div className="w-24 h-24 rounded-2xl border-4 border-white dark:border-border shadow-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
@@ -75,7 +75,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               className="hidden"
             />
             {isUploading && (
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white dark:bg-card-dark shadow flex items-center justify-center">
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-card shadow flex items-center justify-center">
                 <Loader2 className="text-primary size-3 animate-spin" aria-hidden />
               </div>
             )}
@@ -87,12 +87,10 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       <div className="px-6 md:px-8 pt-16 pb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
+            <h2 className="text-2xl font-bold text-foreground">
               {profile.full_name || 'Belum diatur'}
             </h2>
-            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-              {profile.email}
-            </p>
+            <p className="text-sm text-muted-foreground">{profile.email}</p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${roleInfo.color}`}
@@ -100,7 +98,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
                 <RoleIcon className="size-3" aria-hidden />
                 {roleInfo.label}
               </span>
-              <span className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+              <span className="text-xs text-muted-foreground">
                 Bergabung{' '}
                 {toDate(profile.created_at).toLocaleDateString('id-ID', {
                   year: 'numeric',

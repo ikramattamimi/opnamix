@@ -27,17 +27,17 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft p-6 md:p-8">
+    <div className="bg-card rounded-2xl shadow-soft p-6 md:p-8">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Lock className="text-primary size-6" aria-hidden />
-          <h3 className="text-lg font-bold text-text-primary-light dark:text-white">Keamanan</h3>
+          <h3 className="text-lg font-bold text-foreground">Keamanan</h3>
         </div>
         {!showPasswordSection && (
           <Button
             variant="outline"
             onClick={() => setShowPasswordSection(true)}
-            className="rounded-xl text-sm h-auto py-2 px-4 font-bold flex items-center gap-1.5"
+            className="text-sm px-4 font-bold flex items-center gap-1.5"
           >
             <KeyRound className="size-4" aria-hidden />
             Ubah Password
@@ -74,17 +74,13 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
             />
           </div>
           <div className="flex gap-3 pt-2">
-            <Button
-              variant="outline"
-              onClick={closeSection}
-              className="rounded-xl font-bold h-auto py-2.5 px-6"
-            >
+            <Button variant="outline" onClick={closeSection} className="font-bold px-6">
               Batal
             </Button>
             <Button
               onClick={() => void handleSubmit()}
               disabled={isSubmitting}
-              className="bg-primary text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 h-auto py-2.5 px-6"
+              className="bg-primary text-white font-bold shadow-lg hover:bg-primary/90 px-6"
             >
               {isSubmitting ? 'Menyimpan...' : 'Ubah Password'}
             </Button>
@@ -93,7 +89,7 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
       )}
 
       {!showPasswordSection && (
-        <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-3">
+        <p className="text-sm text-muted-foreground mt-3">
           Pastikan menggunakan password yang kuat dan unik untuk menjaga keamanan akun Anda.
         </p>
       )}

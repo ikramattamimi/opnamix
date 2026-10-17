@@ -18,18 +18,12 @@ interface OpnameStepperProps {
 
 // Penanda langkah opname dan isi langkah yang sedang aktif
 const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
-  const { opnameData, currentStep, selectedItems } = execution;
+  const { currentStep, selectedItems } = execution;
 
   return (
     <>
-      <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-lg font-bold">Opname — {opnameData?.scheduleName || 'Opname'}</h2>
-          <span className="text-xs font-bold text-text-secondary-light">
-            {opnameData?.opnameNumber}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 mt-4">
+      <div className="bg-card rounded-2xl p-6 shadow-soft">
+        <div className="flex items-center gap-2">
           {STEPS.map((step, index) => {
             const Icon = currentStep > step.num ? CircleCheck : step.icon;
             return (
@@ -39,9 +33,8 @@ const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
                     'flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all',
                     currentStep === step.num && 'bg-primary text-white shadow-lg shadow-primary/20',
                     currentStep > step.num &&
-                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-                    currentStep < step.num &&
-                      'bg-background-light dark:bg-background-dark text-text-secondary-light',
+                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+                    currentStep < step.num && 'bg-background text-muted-foreground',
                   )}
                 >
                   <Icon className="size-4" aria-hidden />

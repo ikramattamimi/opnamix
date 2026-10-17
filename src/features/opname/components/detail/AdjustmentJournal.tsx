@@ -24,7 +24,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
   const emptyTitle = search ? 'Tidak ada produk yang cocok.' : 'Tidak ada data.';
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-2xl p-6 shadow-soft">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <h3 className="text-lg font-bold flex items-center gap-2">
           <Sheet className="size-5 text-primary" aria-hidden />
@@ -32,7 +32,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
         </h3>
         <div className="relative w-full sm:w-72">
           <Search
-            className="size-4 text-text-secondary-light absolute left-3 top-1/2 -translate-y-1/2"
+            className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
             aria-hidden
           />
           <Input
@@ -41,7 +41,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
             aria-label="Cari produk"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-auto w-full bg-background-light dark:bg-background-dark border-none rounded-xl pl-9 pr-4 py-2.5 text-sm md:text-sm font-medium placeholder:text-text-secondary-light/50 focus-visible:ring-2 focus-visible:ring-primary/20"
+            className="w-full bg-background border-none pl-9 pr-4 text-sm md:text-sm font-medium placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-primary/20"
           />
         </div>
       </div>
@@ -56,7 +56,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left">
               <thead className="border-b border-gray-100 dark:border-gray-800">
-                <tr className="text-xs uppercase font-bold text-text-secondary-light tracking-wider">
+                <tr className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
                   <th className="px-4 py-3">Nama Produk</th>
                   <th className="px-4 py-3 text-center">Stok Sistem</th>
                   <th className="px-4 py-3 text-center">Stok Fisik</th>
@@ -84,10 +84,10 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
                         className={cn(
                           'font-bold px-2 py-1 rounded-full text-xs',
                           (row.selisih ?? 0) > 0
-                            ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
                             : (row.selisih ?? 0) < 0
-                              ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400'
-                              : 'bg-gray-100 text-text-secondary-light dark:bg-gray-500/20',
+                              ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
+                              : 'bg-gray-100 text-muted-foreground dark:bg-gray-500/20',
                         )}
                       >
                         {formatDiff(row.selisih)}
@@ -109,7 +109,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
               <div
                 key={row.id}
                 className={cn(
-                  'bg-background-light dark:bg-background-dark rounded-2xl p-4 space-y-3',
+                  'bg-background rounded-2xl p-4 space-y-3',
                   row.selisih !== 0 && 'ring-2 ring-amber-300/30',
                 )}
               >
@@ -132,15 +132,12 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
                           ? 'text-green-600 dark:text-green-400'
                           : (row.selisih ?? 0) < 0
                             ? 'text-red-600 dark:text-red-400'
-                            : 'text-text-secondary-light',
+                            : 'text-muted-foreground',
                     },
                     { label: 'Final', value: row.stokFinal !== null ? row.stokFinal : '-' },
                   ].map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="bg-card-light dark:bg-card-dark rounded-xl p-3 text-center"
-                    >
-                      <p className="text-[10px] font-bold text-text-secondary-light uppercase mb-1">
+                    <div key={stat.label} className="bg-card rounded-xl p-3 text-center">
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">
                         {stat.label}
                       </p>
                       <p className={cn('text-base font-bold', stat.className)}>{stat.value}</p>
@@ -149,14 +146,12 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
                 </div>
 
                 {row.alasan && (
-                  <div className="bg-card-light dark:bg-card-dark rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-text-secondary-light uppercase mb-1.5 flex items-center gap-1">
+                  <div className="bg-card rounded-xl p-3">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1.5 flex items-center gap-1">
                       <MessageSquare className="size-3" aria-hidden />
                       Alasan
                     </p>
-                    <p className="text-xs text-text-primary-light dark:text-white leading-relaxed">
-                      {row.alasan}
-                    </p>
+                    <p className="text-xs text-foreground leading-relaxed">{row.alasan}</p>
                   </div>
                 )}
               </div>

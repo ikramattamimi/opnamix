@@ -9,7 +9,7 @@ interface PaginationControlsProps {
 }
 
 const PAGE_BUTTON_CLASS =
-  'h-auto px-4 py-2 bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 rounded-xl text-sm font-bold text-text-secondary-light hover:bg-white dark:hover:bg-white/5 hover:text-primary hover:border-primary transition-all shadow-sm';
+  'px-4 bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-sm font-bold text-muted-foreground hover:bg-white dark:hover:bg-white/5 hover:text-primary hover:border-primary transition-all shadow-sm';
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
@@ -19,10 +19,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
 }) => {
   return (
     <div className="flex justify-between items-center mt-6 py-4 border-t border-gray-100 dark:border-gray-800">
-      <span className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">
-        Hal.{' '}
-        <span className="font-bold text-text-primary-light dark:text-white">{currentPage}</span>{' '}
-        dari <span className="font-bold text-text-primary-light dark:text-white">{totalPages}</span>
+      <span className="text-sm font-medium text-muted-foreground">
+        Hal. <span className="font-bold text-foreground">{currentPage}</span> dari{' '}
+        <span className="font-bold text-foreground">{totalPages}</span>
       </span>
       <div className="flex gap-2">
         <Button

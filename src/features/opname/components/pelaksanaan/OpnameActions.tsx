@@ -31,7 +31,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
   onBackward,
   onExit,
 }) => (
-  <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+  <div className="bg-card rounded-2xl p-6 shadow-soft">
     <h3 className="text-base font-bold mb-2 flex items-center gap-2">
       <Zap className="size-5 text-primary" aria-hidden />
       Tindakan
@@ -54,18 +54,20 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
 
       {currentStep < 3 ? (
         <Button
+          size="lg"
           onClick={onNext}
           disabled={!canContinue || isSaving}
-          className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-xl h-auto py-3.5 shadow-lg shadow-primary/20 disabled:bg-gray-300"
+          className="w-full bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 disabled:bg-gray-300"
         >
           <ArrowRight className="mr-2" aria-hidden />
           {isSaving ? 'Memproses...' : 'Lanjutkan'}
         </Button>
       ) : (
         <Button
+          size="lg"
           onClick={onFinish}
           disabled={isSaving}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl h-auto py-3.5 shadow-lg shadow-emerald-600/20 disabled:bg-gray-300"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 disabled:bg-gray-300"
         >
           <BadgeCheck className="mr-2" aria-hidden />
           {isSaving ? 'Memproses...' : 'Selesaikan Opname'}
@@ -76,7 +78,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
         variant="ghost"
         onClick={onSaveDraft}
         disabled={isSaving}
-        className="w-full font-bold rounded-xl h-auto py-3 border-2 border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-primary"
+        className="w-full font-bold border-2 border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-primary"
       >
         <Save className="mr-2" aria-hidden />
         {isSaving ? 'Menyimpan...' : 'Simpan Draft'}
@@ -90,7 +92,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
           variant="ghost"
           onClick={onBackward}
           disabled={isSaving}
-          className="w-full font-bold rounded-xl h-auto py-3 hover:bg-gray-50 dark:hover:bg-white/5"
+          className="w-full font-bold hover:bg-gray-50 dark:hover:bg-white/5"
         >
           <ArrowLeft className="mr-2" aria-hidden />
           Kembali
@@ -100,7 +102,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
       <Button
         variant="ghost"
         onClick={onExit}
-        className="w-full font-bold rounded-xl h-auto py-3 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+        className="w-full font-bold text-red-700 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
       >
         <LogOut className="mr-2" aria-hidden />
         Keluar
@@ -120,22 +122,24 @@ export const OpnameActionsBar: React.FC<OpnameActionsProps> = ({
   onBackward,
   onExit,
 }) => (
-  <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card-light dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 space-y-2.5">
+  <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-gray-100 dark:border-gray-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 space-y-2.5">
     <div className="flex gap-2">
       {currentStep < 3 ? (
         <Button
+          size="lg"
           onClick={onNext}
           disabled={!canContinue || isSaving}
-          className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl h-auto py-3 shadow-lg shadow-primary/20 disabled:bg-gray-300"
+          className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 disabled:bg-gray-300"
         >
           {isSaving ? 'Memproses...' : 'Lanjutkan'}
           <ArrowRight className="ml-1.5" aria-hidden />
         </Button>
       ) : (
         <Button
+          size="lg"
           onClick={onFinish}
           disabled={isSaving}
-          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl h-auto py-3 shadow-lg shadow-emerald-600/20 disabled:bg-gray-300"
+          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/20 disabled:bg-gray-300"
         >
           <BadgeCheck className="mr-1.5" aria-hidden />
           {isSaving ? 'Memproses...' : 'Selesaikan Opname'}
@@ -150,7 +154,7 @@ export const OpnameActionsBar: React.FC<OpnameActionsProps> = ({
             variant="ghost"
             onClick={onBackward}
             disabled={isSaving}
-            className="font-bold rounded-xl px-3 h-auto py-2 text-xs"
+            className="font-bold px-3 text-xs"
           >
             <ArrowLeft className="mr-0.5" aria-hidden />
             Kembali
@@ -159,7 +163,7 @@ export const OpnameActionsBar: React.FC<OpnameActionsProps> = ({
         <Button
           variant="ghost"
           onClick={onExit}
-          className="font-bold rounded-xl px-3 h-auto py-2 text-xs text-text-secondary-light"
+          className="font-bold px-3 text-xs text-muted-foreground"
         >
           Keluar
         </Button>
@@ -168,7 +172,7 @@ export const OpnameActionsBar: React.FC<OpnameActionsProps> = ({
         variant="ghost"
         onClick={onSaveDraft}
         disabled={isSaving}
-        className="font-bold rounded-xl px-3 h-auto py-2 text-xs border border-gray-200 dark:border-gray-700"
+        className="font-bold px-3 text-xs border border-gray-200 dark:border-gray-700"
       >
         <Save className="mr-1" aria-hidden />
         {isSaving ? 'Menyimpan...' : 'Draft'}

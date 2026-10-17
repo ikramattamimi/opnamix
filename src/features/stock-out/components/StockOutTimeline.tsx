@@ -24,7 +24,7 @@ const StockOutTimeline: React.FC = () => {
           <TimelineItem
             key={i}
             title={item.title}
-            desc={<span className="text-text-primary-light dark:text-white">{item.desc}</span>}
+            desc={<span className="text-foreground">{item.desc}</span>}
             time={item.time}
             dotColor={item.dotColor}
           />
@@ -34,11 +34,9 @@ const StockOutTimeline: React.FC = () => {
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-[20px] shadow-soft p-6 mt-6">
+    <div className="bg-card rounded-2xl shadow-soft p-6 mt-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h3 className="font-bold text-xl text-text-primary-light dark:text-white">
-          Riwayat Pengeluaran
-        </h3>
+        <h3 className="font-bold text-xl text-foreground">Riwayat Pengeluaran</h3>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -53,7 +51,7 @@ const StockOutTimeline: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={() => void refetch()}
-            className="h-auto w-auto p-2 rounded-full text-primary hover:text-primary hover:bg-gray-100 dark:hover:bg-white/5"
+            className="w-auto p-2 rounded-full text-primary hover:text-primary hover:bg-gray-100 dark:hover:bg-white/5"
             title="Refresh Timeline"
             aria-label="Refresh Timeline"
           >
@@ -75,18 +73,14 @@ const TimelineItem: React.FC<{
 }> = ({ title, desc, time, dotColor }) => (
   <div className="relative pl-6">
     <div
-      className={`absolute -left-[9px] top-0.5 size-4 ${dotColor} rounded-full border-[3px] border-white dark:border-card-dark shadow-sm`}
+      className={`absolute -left-[9px] top-0.5 size-4 ${dotColor} rounded-full border-[3px] border-white dark:border-border shadow-sm`}
     ></div>
     <div className="flex flex-col gap-0.5">
-      <p className="text-sm font-bold text-text-primary-light dark:text-white leading-tight">
-        {title}
-      </p>
-      <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark leading-relaxed">
-        {desc}
-      </div>
+      <p className="text-sm font-bold text-foreground leading-tight">{title}</p>
+      <div className="text-xs text-muted-foreground leading-relaxed">{desc}</div>
       <div className="flex items-center gap-1 mt-1">
-        <Clock className="size-2.5 text-text-secondary-light" aria-hidden />
-        <p className="text-[10px] text-text-secondary-light font-medium uppercase tracking-wider">
+        <Clock className="size-2.5 text-muted-foreground" aria-hidden />
+        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
           {time}
         </p>
       </div>

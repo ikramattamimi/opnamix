@@ -57,7 +57,7 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+    <div className="bg-card rounded-2xl p-6 shadow-soft">
       <DateRangeFilter value={range} onChange={setRange}>
         <FilterField label="Status" htmlFor={`${id}-status`}>
           <FilterSelect
@@ -69,7 +69,7 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
         </FilterField>
         <Button
           onClick={() => void txQuery.refetch()}
-          className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2 [&_svg]:size-5"
+          className="bg-primary text-white px-6 font-bold shadow-lg hover:bg-primary/90 transition-colors flex items-center gap-2 [&_svg]:size-5"
         >
           <Search className="size-5" aria-hidden />
           Tampilkan Laporan
@@ -78,7 +78,7 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
           onClick={handleExportTransactions}
           variant="outline"
           disabled={allTxData.length === 0}
-          className="px-6 py-2.5 rounded-xl font-bold h-auto flex items-center gap-2 [&_svg]:size-5"
+          className="px-6 font-bold flex items-center gap-2 [&_svg]:size-5"
         >
           <Download className="size-5" aria-hidden />
           Export Excel

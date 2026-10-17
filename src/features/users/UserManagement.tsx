@@ -8,6 +8,8 @@ import UserTable from './components/UserTable';
 import UserFormDialog from './components/UserFormDialog';
 import ResetPasswordDialog from './components/ResetPasswordDialog';
 import DeleteUserDialog from './components/DeleteUserDialog';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 type ActiveDialog =
   { type: 'create' } | { type: 'edit' | 'resetPassword' | 'delete'; user: UserRow } | null;
@@ -46,35 +48,30 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
-              Manajemen Pengguna
-            </h2>
-            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-              Kelola akun pengguna dan hak akses sistem.
-            </p>
-          </div>
-          <Button
-            onClick={() => openDialog({ type: 'create' })}
-            className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all h-auto flex items-center gap-2"
-          >
-            <UserPlus className="size-5" aria-hidden />
-            Tambah Pengguna
-          </Button>
-        </div>
+      <PageLayout>
+        <PageHeader
+          title="Daftar Pengguna"
+          description="Kelola akun pengguna dan hak akses sistem."
+          actions={
+            <Button
+              onClick={() => openDialog({ type: 'create' })}
+              className="bg-primary text-white px-6 font-bold shadow-lg hover:bg-primary/90 transition-all flex items-center gap-2"
+            >
+              <UserPlus className="size-5" aria-hidden />
+              Tambah Pengguna
+            </Button>
+          }
+        />
 
         {/* Toast Messages - Fixed Position */}
         {error && (
-          <div className="fixed top-4 right-4 z-[60] bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
+          <div className="fixed top-4 right-4 z-[60] bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
             <CircleAlert className="size-5 shrink-0" aria-hidden />
             {error}
           </div>
         )}
         {success && (
-          <div className="fixed top-4 right-4 z-[60] bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
+          <div className="fixed top-4 right-4 z-[60] bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
             <CircleCheck className="size-5 shrink-0" aria-hidden />
             {success}
           </div>
@@ -91,7 +88,7 @@ const UserManagement: React.FC = () => {
           onResetPassword={(user) => openDialog({ type: 'resetPassword', user })}
           onDelete={(user) => setDialog({ type: 'delete', user })}
         />
-      </div>
+      </PageLayout>
 
       {dialog?.type === 'create' && <UserFormDialog {...dialogProps} />}
       {dialog?.type === 'edit' && <UserFormDialog user={dialog.user} {...dialogProps} />}

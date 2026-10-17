@@ -10,14 +10,14 @@ const StatItem: React.FC<{
   value: number;
   label: string;
 }> = ({ icon: Icon, iconBg, iconColor, value, label }) => (
-  <div className="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-soft">
+  <div className="bg-card rounded-2xl p-5 shadow-soft">
     <div className="flex items-center gap-3">
       <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
         <Icon className={`size-6 ${iconColor}`} aria-hidden />
       </div>
       <div>
-        <p className="text-2xl font-bold text-text-primary-light dark:text-white">{value}</p>
-        <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{label}</p>
+        <p className="text-2xl font-bold text-foreground">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
       </div>
     </div>
   </div>

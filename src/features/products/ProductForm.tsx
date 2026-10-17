@@ -88,7 +88,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   return (
     <div className="h-full">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-bold text-text-primary-light dark:text-white">
+        <h2 className="text-lg font-bold text-foreground">
           {editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}
         </h2>
         <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             type="button"
             variant="ghost"
             onClick={handleReset}
-            className="h-auto text-primary hover:text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
+            className="text-primary hover:text-primary bg-primary/10 hover:bg-primary/20 px-3 transition-colors text-sm font-medium"
           >
             Reset
           </Button>
@@ -106,7 +106,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             size="icon"
             onClick={onCancel}
             aria-label="Tutup"
-            className="h-auto w-auto p-2 text-current hover:text-current bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
+            className="w-auto p-2 text-current hover:text-current bg-background dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
           >
             <X aria-hidden />
           </Button>
@@ -181,7 +181,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </>
               }
               labelClassName={productLabelClassName}
-              inputClassName={`${productInputClassName} pl-10 pr-4 py-3`}
+              inputClassName={`${productInputClassName} pl-10 pr-4`}
               prefix="Rp"
               onBlur={revalidate}
             />
@@ -215,7 +215,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 <FormLabel className={productLabelClassName}>Deskripsi / Dosis</FormLabel>
                 <FormControl>
                   <Textarea
-                    className={`${productInputClassName} resize-none shadow-none`}
+                    className={`${productInputClassName} py-3 resize-none shadow-none`}
                     placeholder="Tambahkan keterangan..."
                     rows={3}
                     {...field}

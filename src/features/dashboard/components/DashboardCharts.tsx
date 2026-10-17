@@ -35,18 +35,16 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div className="bg-card-light dark:bg-card-dark p-6 rounded-DEFAULT shadow-soft h-full">
+      <div className="bg-card p-6 rounded-2xl shadow-soft h-full">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
-              Pengeluaran 7 Hari Terakhir
-            </h3>
-            <p className="text-sm text-text-secondary-light">Jumlah transaksi keluar per hari</p>
+            <h3 className="text-xl font-bold text-foreground">Pengeluaran 7 Hari Terakhir</h3>
+            <p className="text-sm text-muted-foreground">Jumlah transaksi keluar per hari</p>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="bg-background-light dark:bg-background-dark text-primary hover:bg-gray-200 dark:hover:bg-gray-700 [&_svg]:size-5"
+            className="bg-background text-primary hover:bg-gray-200 dark:hover:bg-gray-700 [&_svg]:size-5"
             aria-label="Grafik pengeluaran"
           >
             <ChartColumn aria-hidden />
@@ -60,13 +58,13 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
                 <span className="text-xs font-bold text-primary mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   {item.count}
                 </span>
-                <div className="relative w-3 rounded-full bg-background-light dark:bg-background-dark h-48 overflow-hidden">
+                <div className="relative w-3 rounded-full bg-background h-48 overflow-hidden">
                   <div
                     className="absolute bottom-0 w-full bg-primary group-hover:bg-blue-600 transition-all duration-300 rounded-full"
                     style={{ height: `${pct}%` }}
                   ></div>
                 </div>
-                <span className="text-xs text-text-secondary-light mt-2">{item.day}</span>
+                <span className="text-xs text-muted-foreground mt-2">{item.day}</span>
               </div>
             );
           })}
@@ -74,15 +72,13 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
       </div>
 
       <div className="grid grid-rows-2 gap-5">
-        <div className="bg-card-light dark:bg-card-dark p-6 rounded-DEFAULT shadow-soft flex flex-col justify-center">
+        <div className="bg-card p-6 rounded-2xl shadow-soft flex flex-col justify-center">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
-                Peringatan Stok Rendah
-              </h3>
-              <p className="text-sm text-text-secondary-light">Item di bawah ambang batas</p>
+              <h3 className="text-xl font-bold text-foreground">Peringatan Stok Rendah</h3>
+              <p className="text-sm text-muted-foreground">Item di bawah ambang batas</p>
             </div>
-            <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-lg">
+            <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-2 rounded-lg">
               <TriangleAlert className="size-6" aria-hidden />
             </div>
           </div>
@@ -99,19 +95,17 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
           </div>
         </div>
 
-        <div className="bg-card-light dark:bg-card-dark p-6 rounded-DEFAULT shadow-soft flex items-center justify-between">
+        <div className="bg-card p-6 rounded-2xl shadow-soft flex items-center justify-between">
           <div>
-            <h3 className="text-xl font-bold text-text-primary-light dark:text-white mb-1">
-              Pembagian Inventaris
-            </h3>
-            <p className="text-sm text-text-secondary-light mb-4">Berdasarkan Kategori</p>
+            <h3 className="text-xl font-bold text-foreground mb-1">Pembagian Inventaris</h3>
+            <p className="text-sm text-muted-foreground mb-4">Berdasarkan Kategori</p>
             <div className="space-y-2">
               {categories.slice(0, 3).map((cat, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <div
                     className={`w-3 h-3 rounded-full ${CATEGORY_COLORS[cat] || 'bg-gray-400'}`}
                   ></div>
-                  <span className="text-xs text-text-secondary-light">
+                  <span className="text-xs text-muted-foreground">
                     {cat} ({Math.round((stats.categoryDistribution[cat] / safeTotalItems) * 100)}%)
                   </span>
                 </div>
@@ -123,7 +117,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
               className="w-full h-full rounded-full"
               style={{ background: `conic-gradient(${gradients.join(', ')})` }}
             ></div>
-            <div className="absolute inset-0 m-auto w-16 h-16 bg-card-light dark:bg-card-dark rounded-full"></div>
+            <div className="absolute inset-0 m-auto w-16 h-16 bg-card rounded-full"></div>
           </div>
         </div>
       </div>
@@ -139,10 +133,10 @@ const LowStockItem: React.FC<{ name: string; count: number; color: string }> = (
   <div className="flex items-center justify-between">
     <div className="flex items-center gap-3">
       <div className={`w-2 h-2 rounded-full ${color}`}></div>
-      <span className="text-sm font-medium text-text-primary-light dark:text-white">{name}</span>
+      <span className="text-sm font-medium text-foreground">{name}</span>
     </div>
     <span
-      className={`text-xs font-bold ${color === 'bg-red-500' ? 'text-red-500 bg-red-50' : 'text-orange-500 bg-orange-50'} dark:bg-opacity-10 px-2 py-1 rounded`}
+      className={`text-xs font-bold ${color === 'bg-red-500' ? 'text-red-700 bg-red-50' : 'text-orange-700 bg-orange-50'} dark:bg-opacity-10 px-2 py-1 rounded`}
     >
       Sisa {count}
     </span>

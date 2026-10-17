@@ -16,18 +16,18 @@ const StepSelectProducts: React.FC<StepSelectProductsProps> = ({
   onToggle,
   onToggleAll,
 }) => (
-  <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+  <div className="bg-card rounded-2xl p-6 shadow-soft">
     <div className="flex items-center justify-between mb-6">
       <div>
         <h3 className="text-lg font-bold">Tahap 1: Pemilihan Obat</h3>
-        <p className="text-sm text-text-secondary-light">
+        <p className="text-sm text-muted-foreground">
           Pilih obat yang akan di-opname. {selectedIds.size} dari {products.length} dipilih.
         </p>
       </div>
       <Button
         variant="link"
         onClick={onToggleAll}
-        className="h-auto p-0 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline transition-colors"
+        className="p-0 text-xs font-bold text-primary hover:text-primary/80 hover:no-underline transition-colors"
       >
         {selectedIds.size === products.length ? 'Batalkan Semua' : 'Pilih Semua'}
       </Button>
@@ -36,7 +36,7 @@ const StepSelectProducts: React.FC<StepSelectProductsProps> = ({
     <div className="overflow-x-auto mb-6">
       <table className="w-full text-left">
         <thead className="border-b border-gray-100 dark:border-gray-800">
-          <tr className="text-xs uppercase font-bold text-text-secondary-light tracking-wider">
+          <tr className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
             <th className="px-4 py-3 w-12"></th>
             <th className="px-4 py-3 w-full text-center">Nama Produk</th>
           </tr>
@@ -60,7 +60,7 @@ const StepSelectProducts: React.FC<StepSelectProductsProps> = ({
               </td>
               <td className="px-4 py-3.5">
                 <p className="font-bold text-sm">{product.name}</p>
-                <p className="text-xs text-text-secondary-light">
+                <p className="text-xs text-muted-foreground">
                   {product.category} · {product.unit}
                 </p>
               </td>

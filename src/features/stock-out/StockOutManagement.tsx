@@ -13,6 +13,8 @@ import StockOutTable from './components/StockOutTable';
 import StockOutTimeline from './components/StockOutTimeline';
 import StockOutDetailDialog, { type DetailMode } from './components/StockOutDetailDialog';
 import StockOutProcessDialog, { type ProcessDraft } from './components/StockOutProcessDialog';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
 
 const StockOutManagement: React.FC = () => {
   const { showToast } = useToast();
@@ -157,46 +159,39 @@ const StockOutManagement: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-primary"></span>
-              <h4 className="text-sm font-bold text-text-primary-light dark:text-white uppercase tracking-wider">
-                {isNakes ? 'Permintaan Obat' : 'Pusat Kendali Pengeluaran'}
-              </h4>
-            </div>
-            <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm max-w-xl">
-              {isNakes
-                ? 'Ajukan permintaan obat dan alkes untuk pasien melalui formulir di sini.'
-                : 'Kelola pengeluaran stok melalui formulir permintaan medis terintegrasi atau lakukan pencatatan manual cepat.'}
-            </p>
-          </div>
+      <PageLayout>
+        <PageHeader
+          title={isNakes ? 'Permintaan Obat' : 'Pusat Kendali Pengeluaran'}
+          description={
+            isNakes
+              ? 'Ajukan permintaan obat dan alkes untuk pasien melalui formulir di sini.'
+              : 'Kelola pengeluaran stok melalui formulir permintaan medis terintegrasi atau lakukan pencatatan manual cepat.'
+          }
+          actions={
+            <>
+              {canCreateRequest && (
+                <Button
+                  onClick={() => setIsRequestFormOpen(true)}
+                  className="flex items-center gap-2 [&_svg]:size-5"
+                >
+                  <Pill aria-hidden />
+                  <span>Buat Permintaan</span>
+                </Button>
+              )}
 
-          <div className="flex gap-2 sm:gap-3 shrink-0">
-            {canCreateRequest && (
-              <Button
-                onClick={() => setIsRequestFormOpen(true)}
-                size="sm"
-                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm transition-all w-auto [&_svg]:size-5"
-              >
-                <Pill aria-hidden />
-                <span>Buat Permintaan</span>
-              </Button>
-            )}
-
-            {canManualStock && (
-              <Button
-                onClick={() => setIsManualModalOpen(true)}
-                variant="outline"
-                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 text-sm shadow-sm hover:shadow-md transition-all bg-white dark:bg-card-dark text-primary border-primary/20 hover:border-primary/50 [&_svg]:size-4 sm:[&_svg]:size-5"
-              >
-                <NotebookPen aria-hidden />
-                <span>Stok Manual</span>
-              </Button>
-            )}
-          </div>
-        </div>
+              {canManualStock && (
+                <Button
+                  onClick={() => setIsManualModalOpen(true)}
+                  variant="outline"
+                  className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all bg-card text-primary border-primary/20 hover:border-primary/50 [&_svg]:size-5"
+                >
+                  <NotebookPen aria-hidden />
+                  <span>Stok Manual</span>
+                </Button>
+              )}
+            </>
+          }
+        />
 
         <StockOutTable
           requests={requests}
@@ -212,7 +207,7 @@ const StockOutManagement: React.FC = () => {
         />
 
         <StockOutTimeline />
-      </div>
+      </PageLayout>
 
       {isManualModalOpen && (
         <StockOutManualForm

@@ -59,13 +59,11 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-card-dark w-full max-w-lg rounded-[28px] shadow-soft p-6">
+      <div className="bg-card w-full max-w-lg rounded-2xl shadow-soft p-6">
         <div className="flex items-center justify-between gap-3 mb-5">
           <div>
-            <h3 className="text-lg font-bold text-text-primary-light dark:text-white">
-              Tambah Kategori Jasa
-            </h3>
-            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+            <h3 className="text-lg font-bold text-foreground">Tambah Kategori Jasa</h3>
+            <p className="text-sm text-muted-foreground">
               Kategori baru akan langsung tersedia di form jasa.
             </p>
           </div>
@@ -75,7 +73,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
             size="icon"
             onClick={onClose}
             aria-label="Tutup"
-            className="h-auto w-auto p-2 text-current hover:text-current rounded-full bg-background-light dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors [&_svg]:size-6"
+            className="w-auto p-2 text-current hover:text-current rounded-full bg-background dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors [&_svg]:size-6"
           >
             <X aria-hidden />
           </Button>
@@ -120,7 +118,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
                   <FormControl>
                     <Textarea
                       rows={3}
-                      className={`${serviceInputClassName} resize-none shadow-none`}
+                      className={`${serviceInputClassName} py-3 resize-none shadow-none`}
                       placeholder="Opsional"
                       {...field}
                     />
@@ -129,11 +127,11 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
               )}
             />
 
-            <div className="rounded-xl bg-background-light dark:bg-background-dark px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark mb-1">
+            <div className="rounded-xl bg-background px-4 py-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
                 Kode Otomatis
               </p>
-              <p className="text-sm font-bold text-text-primary-light dark:text-white">
+              <p className="text-sm font-bold text-foreground">
                 {generateCategoryCodePreview(categoryName)}
               </p>
             </div>
@@ -141,7 +139,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
             {categoryError && (
               <div
                 role="alert"
-                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
               >
                 {categoryError}
               </div>

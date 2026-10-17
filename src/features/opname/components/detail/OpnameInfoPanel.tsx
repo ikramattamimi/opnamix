@@ -22,7 +22,7 @@ const InfoRow: React.FC<{
   value: string;
 }> = ({ icon: Icon, iconClassName, label, value }) => (
   <div>
-    <p className="text-xs font-bold text-text-secondary-light uppercase tracking-wider mb-1 flex items-center gap-1.5">
+    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5">
       <Icon className={`size-4 ${iconClassName}`} aria-hidden />
       {label}
     </p>
@@ -37,7 +37,7 @@ const StatRow: React.FC<{
   value: number;
 }> = ({ icon: Icon, colorClassName, label, value }) => (
   <div className="flex items-center justify-between">
-    <span className="text-sm text-text-secondary-light flex items-center gap-2">
+    <span className="text-sm text-muted-foreground flex items-center gap-2">
       <Icon className={`size-4 ${colorClassName}`} aria-hidden />
       {label}
     </span>
@@ -59,7 +59,7 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
   matched,
   discrepancies,
 }) => (
-  <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft sticky top-6">
+  <div className="bg-card rounded-2xl p-6 shadow-soft sticky top-6">
     <h3 className="text-base font-bold mb-5 flex items-center gap-2">
       <Info className="size-5 text-primary" aria-hidden />
       Informasi Opname

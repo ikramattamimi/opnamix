@@ -98,9 +98,9 @@ export const ProductNameFields: React.FC<ProductNameFieldsProps> = ({
         />
       ))}
       <div className="col-span-2">
-        <p className="text-xs text-text-secondary-light">
+        <p className="text-xs text-muted-foreground">
           Nama produk otomatis:{' '}
-          <span className="font-bold text-text-primary-light dark:text-white">
+          <span className="font-bold text-foreground">
             {previewProductName || values.name || '-'}
           </span>
         </p>

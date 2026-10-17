@@ -47,16 +47,12 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-card-dark w-full max-w-2xl max-h-[80vh] flex flex-col rounded-3xl shadow-2xl animate-scaleUp">
+      <div className="bg-card w-full max-w-2xl max-h-[80vh] flex flex-col rounded-2xl shadow-2xl animate-scaleUp">
         {/* Header */}
         <div className="p-6 border-b border-gray-100 dark:border-white/10 flex justify-between items-center">
           <div>
-            <h3 className="text-xl font-bold text-text-primary-light dark:text-white">
-              Pilih Obat / Alkes
-            </h3>
-            <p className="text-sm text-text-secondary-light">
-              Cari dan pilih item dari daftar master.
-            </p>
+            <h3 className="text-xl font-bold text-foreground">Pilih Obat / Alkes</h3>
+            <p className="text-sm text-muted-foreground">Cari dan pilih item dari daftar master.</p>
           </div>
           <Button
             variant="ghost"
@@ -79,14 +75,14 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
             <div className="p-4 border-b border-gray-100 dark:border-white/10 bg-gray-50/50 dark:bg-white/5 flex gap-3">
               <div className="relative flex-1">
                 <Search
-                  className="absolute left-4 top-3 size-6 text-text-secondary-light pointer-events-none"
+                  className="absolute left-4 top-3 size-6 text-muted-foreground pointer-events-none"
                   aria-hidden
                 />
                 <Input
                   type="text"
                   placeholder="Cari nama obat atau kode..."
                   aria-label="Cari produk"
-                  className="h-auto w-full pl-12 pr-4 py-3 rounded-xl border-none bg-white dark:bg-black/20 focus:ring-2 focus:ring-primary focus-visible:ring-2 focus-visible:ring-primary text-base text-text-primary-light dark:text-white"
+                  className="w-full pl-12 pr-4 border-none bg-white dark:bg-black/20 focus:ring-2 focus:ring-primary focus-visible:ring-2 focus-visible:ring-primary text-base text-foreground"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   autoFocus
@@ -96,7 +92,7 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
                 <Button
                   variant="ghost"
                   onClick={() => setIsAddingNew(true)}
-                  className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl font-bold text-sm transition-colors whitespace-nowrap flex items-center gap-2 h-auto [&_svg]:size-6"
+                  className="px-4 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-sm transition-colors whitespace-nowrap flex items-center gap-2 [&_svg]:size-6"
                 >
                   <Plus aria-hidden />
                   Baru
@@ -119,7 +115,7 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
                     >
                       <div className="flex items-center gap-4">
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${product.stock > 0 ? 'bg-blue-50 text-primary dark:bg-blue-500/20 dark:text-blue-300' : 'bg-red-50 text-red-500 dark:bg-red-500/20'}`}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${product.stock > 0 ? 'bg-blue-50 text-primary dark:bg-blue-500/20 dark:text-blue-300' : 'bg-red-50 text-red-700 dark:bg-red-500/20'}`}
                         >
                           {product.stock > 0 ? (
                             <Pill className="size-6" aria-hidden />
@@ -128,21 +124,19 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-text-primary-light dark:text-white">
-                            {product.name}
-                          </p>
-                          <p className="text-xs text-text-secondary-light">
+                          <p className="font-bold text-foreground">{product.name}</p>
+                          <p className="text-xs text-muted-foreground">
                             {product.code} • {product.category}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p
-                          className={`font-bold ${product.stock > 0 ? 'text-text-primary-light dark:text-white' : 'text-red-500'}`}
+                          className={`font-bold ${product.stock > 0 ? 'text-foreground' : 'text-red-500'}`}
                         >
                           Stok: {product.stock} {product.unit}
                         </p>
-                        <p className="text-xs text-text-secondary-light">
+                        <p className="text-xs text-muted-foreground">
                           Rp {product.sellingPrice.toLocaleString('id-ID')}
                         </p>
                       </div>

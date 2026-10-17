@@ -181,9 +181,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-2xl">
             <div className="flex items-center gap-2">
               <Bell className="size-5 text-primary" aria-hidden />
-              <h3 className="font-bold text-sm text-text-primary-light dark:text-white">
-                Notifikasi
-              </h3>
+              <h3 className="font-bold text-sm text-foreground">Notifikasi</h3>
               {unreadCount > 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                   {unreadCount > 99 ? '99+' : unreadCount}
@@ -205,7 +203,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   aria-label="Tutup notifikasi"
                   className="p-1 -mr-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                 >
-                  <X className="size-5 text-text-secondary-light" aria-hidden />
+                  <X className="size-5 text-muted-foreground" aria-hidden />
                 </button>
               )}
             </div>
@@ -216,9 +214,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
                 <BellOff className="size-10 text-gray-300 dark:text-gray-600 mb-2" aria-hidden />
-                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                  Belum ada notifikasi
-                </p>
+                <p className="text-sm text-muted-foreground">Belum ada notifikasi</p>
               </div>
             ) : (
               notifications.map((notif) => (
@@ -241,7 +237,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <p
-                        className={`text-sm leading-snug ${!notif.is_read ? 'font-bold text-text-primary-light dark:text-white' : 'font-medium text-text-secondary-light dark:text-text-secondary-dark'}`}
+                        className={`text-sm leading-snug ${!notif.is_read ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}`}
                       >
                         {notif.title}
                       </p>
@@ -249,10 +245,10 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                         <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1.5" />
                       )}
                     </div>
-                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-0.5 line-clamp-2">
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                       {notif.message}
                     </p>
-                    <p className="text-[10px] text-text-secondary-light/60 dark:text-text-secondary-dark/60 mt-1">
+                    <p className="text-[10px] text-muted-foreground mt-1">
                       {formatNotificationTime(notif.created_at)}
                     </p>
                   </div>
@@ -288,7 +284,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             {/* Modal */}
             <div
               ref={ref}
-              className="fixed inset-x-0 top-[5%] bottom-[5%] mx-auto w-[90%] max-w-md bg-white dark:bg-card-dark rounded-2xl shadow-2xl overflow-hidden z-[70] border border-gray-100 dark:border-white/10 flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-200"
+              className="fixed inset-x-0 top-[5%] bottom-[5%] mx-auto w-[90%] max-w-md bg-card rounded-2xl shadow-2xl overflow-hidden z-[70] border border-gray-100 dark:border-white/10 flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-200"
             >
               {notifContent}
             </div>
@@ -300,7 +296,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
       return (
         <div
           ref={ref}
-          className="absolute right-0 mt-2 w-96 bg-white dark:bg-card-dark rounded-2xl shadow-2xl overflow-hidden z-50 border border-gray-100 dark:border-white/10 flex flex-col"
+          className="absolute right-0 mt-2 w-96 bg-card rounded-2xl shadow-2xl overflow-hidden z-50 border border-gray-100 dark:border-white/10 flex flex-col"
           style={{ maxHeight: '480px' }}
         >
           {notifContent}
@@ -319,7 +315,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             <button
               onClick={onToggleSidebar}
               aria-label="Buka menu"
-              className="p-2 -ml-2 text-text-primary-light dark:text-white hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 -ml-2 text-foreground hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-colors"
             >
               <Menu className="size-7" aria-hidden />
             </button>
@@ -327,9 +323,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
           {/* Center: Title */}
           <div className="flex-1 text-center px-2">
-            <h1 className="text-lg font-bold text-text-primary-light dark:text-white truncate">
-              {viewName}
-            </h1>
+            <h1 className="text-lg font-bold text-foreground truncate">{viewName}</h1>
           </div>
 
           {/* Right: Notification Bell + Profile Icon */}
@@ -340,11 +334,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 ref={mobileNotifButtonRef}
                 aria-label="Notifikasi"
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-text-primary-light dark:text-white hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-colors relative"
+                className="p-2 text-foreground hover:bg-white/50 dark:hover:bg-white/10 rounded-lg transition-colors relative"
               >
                 <Bell className="size-[22px]" aria-hidden />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-purple-50 dark:border-gray-900">
+                  <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-600 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-purple-50 dark:border-gray-900">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
@@ -363,11 +357,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               </button>
 
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden z-50">
+                <div className="absolute right-0 mt-2 w-64 bg-card rounded-2xl shadow-lg overflow-hidden z-50">
                   <div className="p-4 border-b border-gray-100 dark:border-white/10">
-                    <p className="text-sm font-bold text-text-primary-light dark:text-white">
-                      {userProfile?.full_name}
-                    </p>
+                    <p className="text-sm font-bold text-foreground">{userProfile?.full_name}</p>
                     <span
                       className={`inline-block mt-1 px-2 py-1 text-xs font-bold text-white rounded-full ${roleBadge.color}`}
                     >
@@ -379,7 +371,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                       variant="ghost"
                       size="icon"
                       onClick={toggleDarkMode}
-                      className="w-full text-left px-4 py-3 text-sm font-medium text-text-primary-light dark:text-white hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-start gap-2 h-auto"
+                      className="w-full text-left px-4 text-sm font-medium text-foreground hover:bg-gray-50 dark:hover:bg-white/10 transition-colors flex items-center justify-start gap-2"
                     >
                       {isDarkMode ? (
                         <Sun className="size-[18px]" aria-hidden />
@@ -393,7 +385,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     variant="ghost"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
+                    className="w-full px-4 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 disabled:opacity-50"
                   >
                     {isLoggingOut ? (
                       <>
@@ -415,19 +407,17 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
       </header>
 
       {/* Desktop Header - Original Design */}
-      <header className="hidden md:flex sticky top-0 z-10 bg-background-light/50 dark:bg-background-dark/50 backdrop-blur-xl px-6 md:px-8 pt-8 pb-4 flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <header className="hidden md:flex sticky top-0 z-10 bg-background/50 dark:bg-background/50 backdrop-blur-xl px-6 md:px-8 pt-8 pb-4 flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <nav className="flex text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">
+          <nav className="flex text-sm text-muted-foreground mb-1">
             <span className="hover:text-primary transition-colors cursor-pointer">Halaman</span>
             <span className="mx-2">/</span>
-            <span className="text-text-primary-light dark:text-text-primary-dark font-medium">
-              {viewName}
-            </span>
+            <span className="text-foreground font-medium">{viewName}</span>
           </nav>
-          <h1 className="text-3xl font-bold text-text-primary-light dark:text-white">{viewName}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{viewName}</h1>
         </div>
 
-        <div className="flex items-center bg-white dark:bg-card-dark p-2 rounded-full shadow-sm gap-2">
+        <div className="flex items-center bg-card p-2 rounded-full shadow-sm gap-2">
           {/* Notification Bell (Desktop) */}
           <div className="relative">
             <Button
@@ -436,11 +426,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
-              className="text-text-secondary-light hover:text-primary transition-colors relative h-10 w-10"
+              className="text-muted-foreground hover:text-primary transition-colors relative"
             >
               <Bell className="size-6" aria-hidden />
               {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-white dark:border-card-dark">
+                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 bg-red-600 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-white dark:border-border">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -453,7 +443,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             size="icon"
             onClick={toggleDarkMode}
             aria-label={isDarkMode ? 'Mode terang' : 'Mode gelap'}
-            className="text-text-secondary-light hover:text-primary transition-colors h-10 w-10"
+            className="text-muted-foreground hover:text-primary transition-colors"
           >
             {isDarkMode ? (
               <Sun className="size-6" aria-hidden />
@@ -473,11 +463,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             </button>
 
             {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden z-50">
+              <div className="absolute right-0 mt-2 w-64 bg-card rounded-2xl shadow-lg overflow-hidden z-50">
                 <div className="p-4 border-b border-gray-100 dark:border-white/10">
-                  <p className="text-sm font-bold text-text-primary-light dark:text-white">
-                    {userProfile?.full_name}
-                  </p>
+                  <p className="text-sm font-bold text-foreground">{userProfile?.full_name}</p>
                   <span
                     className={`inline-block mt-1 px-2 py-1 text-xs font-bold text-white rounded-full ${roleBadge.color}`}
                   >
@@ -488,7 +476,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   variant="ghost"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
+                  className="w-full px-4 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 disabled:opacity-50"
                 >
                   {isLoggingOut ? (
                     <>
