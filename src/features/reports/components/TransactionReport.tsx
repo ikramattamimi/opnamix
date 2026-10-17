@@ -11,6 +11,7 @@ import { useTransactionReport } from '../useReports';
 import DateRangeFilter from './DateRangeFilter';
 import { FilterField, FilterSelect } from './FilterSelect';
 import TransactionDetailDialog from './TransactionDetailDialog';
+import { Card } from '@/components/ui/card';
 
 const EMPTY_TX_ROWS: TransactionReportRow[] = [];
 
@@ -57,7 +58,7 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
   };
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-soft">
+    <Card className="p-6">
       <DateRangeFilter value={range} onChange={setRange}>
         <FilterField label="Status" htmlFor={`${id}-status`}>
           <FilterSelect
@@ -99,7 +100,7 @@ const TransactionReport: React.FC<TransactionReportProps> = ({ active }) => {
           onClose={() => setSelectedTransaction(null)}
         />
       )}
-    </div>
+    </Card>
   );
 };
 

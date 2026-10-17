@@ -16,6 +16,7 @@ import ScheduleFormDialog from './components/konfigurasi/ScheduleFormDialog';
 import { ScheduleCards, ScheduleTable } from './components/konfigurasi/ScheduleList';
 import PageLayout from '@/components/layout/PageLayout';
 import PageHeader from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 const NO_SCHEDULES: OpnameSchedule[] = [];
 const NO_PRODUCTS: Product[] = [];
@@ -97,12 +98,12 @@ const KonfigurasiOpnamePage: React.FC = () => {
       />
 
       {schedulesQuery.isError ? (
-        <div className="bg-card rounded-2xl shadow-soft">
+        <Card>
           <ErrorState
             title="Gagal memuat jadwal opname"
             onRetry={() => void schedulesQuery.refetch()}
           />
-        </div>
+        </Card>
       ) : (
         <>
           <ScheduleTable {...listProps} />

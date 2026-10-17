@@ -8,6 +8,7 @@ import { exportStockOutToExcel } from '@/features/reports/exportUtils';
 import { getErrorMessage } from '@/lib/utils';
 import { createStockOutColumns } from '../StockOutColumns';
 import { StockOutRequest } from '../types';
+import { Card } from '@/components/ui/card';
 
 const STATUS_FILTERS = ['Semua', 'Menunggu', 'Selesai'] as const;
 
@@ -63,7 +64,7 @@ const StockOutTable: React.FC<StockOutTableProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-soft overflow-hidden p-6">
+    <Card className="overflow-hidden p-6">
       <div className="ps-0 pt-0 p-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-background rounded-xl">
@@ -99,7 +100,7 @@ const StockOutTable: React.FC<StockOutTableProps> = ({
       </div>
 
       <div className="overflow-x-auto">{renderContent()}</div>
-    </div>
+    </Card>
   );
 };
 

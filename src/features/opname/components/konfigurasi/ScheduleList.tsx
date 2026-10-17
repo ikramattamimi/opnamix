@@ -4,6 +4,15 @@ import { OpnameSchedule } from '../../types';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/common/QueryState';
 import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 const pengulanganLabel: Record<string, string> = {
   BULANAN: 'Setiap Bulan',
@@ -56,29 +65,26 @@ export const ScheduleTable: React.FC<ScheduleListProps> = ({
   onDelete,
   onToggle,
 }) => (
-  <div className="hidden lg:block bg-card rounded-2xl p-6 shadow-soft">
+  <Card className="hidden lg:block p-6">
     <div className="overflow-x-auto">
-      <table className="w-full text-left">
-        <thead className="border-b border-gray-100 dark:border-gray-800">
-          <tr className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-            <th className="px-4 py-4">Nama Jadwal</th>
-            <th className="px-4 py-4 text-center">Tanggal Audit</th>
-            <th className="px-4 py-4 text-center">Jumlah Obat</th>
-            <th className="px-4 py-4 text-center">Status</th>
-            <th className="px-4 py-4 text-center">Pengulangan</th>
-            <th className="px-4 py-4 text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+      <Table>
+        <TableHeader>
+          <TableRow className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+            <TableHead>Nama Jadwal</TableHead>
+            <TableHead className="text-center">Tanggal Audit</TableHead>
+            <TableHead className="text-center">Jumlah Obat</TableHead>
+            <TableHead className="text-center">Status</TableHead>
+            <TableHead className="text-center">Pengulangan</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {schedules.length > 0 ? (
             schedules.map((schedule) => (
-              <tr
-                key={schedule.id}
-                className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-              >
-                <td className="px-4 py-4 font-bold text-foreground">{schedule.nama}</td>
-                <td className="px-4 py-4 text-center text-sm">Tanggal {schedule.tanggalAudit}</td>
-                <td className="px-4 py-4 text-center text-sm">
+              <TableRow key={schedule.id}>
+                <TableCell className="font-bold text-foreground">{schedule.nama}</TableCell>
+                <TableCell className="text-center">Tanggal {schedule.tanggalAudit}</TableCell>
+                <TableCell className="text-center">
                   {schedule.obatIds === null ? (
                     <span className="px-2 py-1 bg-primary/10 text-primary rounded-lg text-xs font-bold">
                       Semua Obat
@@ -86,16 +92,16 @@ export const ScheduleTable: React.FC<ScheduleListProps> = ({
                   ) : (
                     <span>{obatCount(schedule)} obat</span>
                   )}
-                </td>
-                <td className="px-4 py-4 text-center">
+                </TableCell>
+                <TableCell className="text-center">
                   <ActiveSwitch schedule={schedule} onToggle={onToggle} />
-                </td>
-                <td className="px-4 py-4 text-center">
+                </TableCell>
+                <TableCell className="text-center">
                   <span className="px-2 py-1 bg-background rounded-lg text-xs font-bold">
                     {pengulanganLabel[schedule.pengulangan] || schedule.pengulangan}
                   </span>
-                </td>
-                <td className="px-4 py-4 text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
                     <Button
                       variant="ghost"
@@ -116,24 +122,24 @@ export const ScheduleTable: React.FC<ScheduleListProps> = ({
                       <Trash2 aria-hidden />
                     </Button>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))
           ) : (
-            <tr>
-              <td colSpan={6}>
+            <TableRow>
+              <TableCell colSpan={6}>
                 <EmptyState
                   icon={CalendarX}
                   title="Belum ada jadwal opname."
                   description='Klik "Tambah Jadwal" untuk membuat jadwal baru.'
                 />
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
-  </div>
+  </Card>
 );
 
 // Kartu jadwal (mobile dan tablet)
@@ -146,7 +152,7 @@ export const ScheduleCards: React.FC<ScheduleListProps> = ({
   <div className="lg:hidden space-y-3">
     {schedules.length > 0 ? (
       schedules.map((schedule) => (
-        <div key={schedule.id} className="bg-card rounded-2xl p-4 shadow-soft">
+        <Card key={schedule.id} className="p-4">
           <div className="flex items-start justify-between gap-3 mb-2">
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-base truncate mb-1">{schedule.nama}</h3>
@@ -195,16 +201,16 @@ export const ScheduleCards: React.FC<ScheduleListProps> = ({
               Hapus
             </Button>
           </div>
-        </div>
+        </Card>
       ))
     ) : (
-      <div className="bg-card rounded-2xl shadow-soft">
+      <Card>
         <EmptyState
           icon={CalendarX}
           title="Belum ada jadwal opname."
           description='Klik tombol "Tambah Jadwal" untuk membuat jadwal baru.'
         />
-      </div>
+      </Card>
     )}
   </div>
 );

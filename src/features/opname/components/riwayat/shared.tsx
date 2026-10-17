@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, type LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 export const SectionHeader: React.FC<{
   icon: LucideIcon;
@@ -39,5 +40,5 @@ export const OpnameSearchInput: React.FC<{
 
 // Wadah kartu untuk status kosong/gagal di daftar opname
 export const ListStateCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="bg-card rounded-2xl shadow-soft">{children}</div>
+  <Card>{children}</Card>
 );

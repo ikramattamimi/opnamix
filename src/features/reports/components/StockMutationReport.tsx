@@ -9,6 +9,7 @@ import { createInitialDateRange, type ReportDateRange } from '../reportPeriod';
 import type { StockMutationRow } from '../types';
 import { useStockMutationReport } from '../useReports';
 import DateRangeFilter from './DateRangeFilter';
+import { Card } from '@/components/ui/card';
 
 const EMPTY_MUTATION_ROWS: StockMutationRow[] = [];
 
@@ -39,7 +40,7 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-soft p-6">
+    <Card className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-bold text-lg text-foreground">Laporan Mutasi Stok</h3>
         <Button
@@ -75,7 +76,7 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
           pageSize={10}
         />
       )}
-    </div>
+    </Card>
   );
 };
 

@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState } from '@/components/common/QueryState';
 import { filterOpnames, formatDate, OpnameCard } from './format';
 import { ListStateCard, OpnameSearchInput, SectionHeader } from './shared';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface OpnameHistoryListProps {
   history: OpnameCard[];
@@ -36,21 +38,16 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
       {filteredHistory.length > 0 ? (
         <div className="space-y-3">
           {filteredHistory.map((opname) => (
-            <div
-              key={opname.id}
-              className="bg-card rounded-2xl p-5 shadow-soft hover:shadow-md transition-shadow"
-            >
+            <Card key={opname.id} className="p-5 hover:shadow-md transition-shadow">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 rounded-lg flex items-center gap-1">
+                    <Badge variant="success">
                       <CircleCheck className="size-3" aria-hidden />
                       Selesai
-                    </span>
+                    </Badge>
                     {(opname.discrepancyCount || 0) > 0 && (
-                      <span className="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300 rounded-lg">
-                        {opname.discrepancyCount} Selisih
-                      </span>
+                      <Badge variant="danger">{opname.discrepancyCount} Selisih</Badge>
                     )}
                   </div>
                   <p className="font-bold text-foreground">{opname.scheduleName}</p>
@@ -82,7 +79,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       ) : isError ? (

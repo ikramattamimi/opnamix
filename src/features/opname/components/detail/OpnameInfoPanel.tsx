@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { OpnameDetail } from '../../api';
+import { Card } from '@/components/ui/card';
 
 const formatDate = (dateStr: string) =>
   new Date(dateStr).toLocaleDateString('id-ID', { dateStyle: 'long' });
@@ -59,7 +60,7 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
   matched,
   discrepancies,
 }) => (
-  <div className="bg-card rounded-2xl p-6 shadow-soft sticky top-6">
+  <Card className="p-6 sticky top-6">
     <h3 className="text-base font-bold mb-5 flex items-center gap-2">
       <Info className="size-5 text-primary" aria-hidden />
       Informasi Opname
@@ -102,7 +103,7 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
         value={discrepancies}
       />
     </div>
-  </div>
+  </Card>
 );
 
 export default OpnameInfoPanel;

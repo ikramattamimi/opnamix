@@ -32,6 +32,7 @@ import { exportProductsToExcel } from '@/features/reports/exportUtils';
 import { useDashboardStats } from '@/features/dashboard/useDashboard';
 import PageLayout from '@/components/layout/PageLayout';
 import PageHeader from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 const ProductManagement: React.FC = () => {
   const { showToast } = useToast();
@@ -180,7 +181,7 @@ const ProductManagement: React.FC = () => {
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-card rounded-2xl p-4 shadow-soft flex flex-wrap items-center gap-4">
+        <Card className="p-4 flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px] relative">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground pointer-events-none"
@@ -241,11 +242,11 @@ const ProductManagement: React.FC = () => {
           >
             <FunnelX aria-hidden />
           </Button>
-        </div>
+        </Card>
 
         {/* Table */}
         <div className="w-full">
-          <div className="bg-card rounded-2xl p-6 shadow-soft">
+          <Card className="p-6">
             {isPending ? (
               <LoadingState label="Memuat produk..." />
             ) : isError ? (
@@ -266,7 +267,7 @@ const ProductManagement: React.FC = () => {
                 searchable={false}
               />
             )}
-          </div>
+          </Card>
           <PaginationControls
             currentPage={page}
             totalPages={totalPages}
@@ -279,14 +280,14 @@ const ProductManagement: React.FC = () => {
       {/* Product Form Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-card w-full max-w-2xl rounded-2xl shadow-soft p-8 overflow-y-auto max-h-[90vh] relative">
+          <Card className="w-full max-w-2xl p-8 overflow-y-auto max-h-[90vh] relative">
             <ProductForm
               onSave={handleSave}
               editingProduct={editingProduct}
               onCancel={handleCloseModal}
               isLoading={createMutation.isPending || updateMutation.isPending}
             />
-          </div>
+          </Card>
         </div>
       )}
 

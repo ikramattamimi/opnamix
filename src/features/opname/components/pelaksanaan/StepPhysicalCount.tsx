@@ -4,6 +4,15 @@ import { OpnameItem } from '../../types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { StockInputs } from './useOpnameExecution';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface StepPhysicalCountProps {
   items: OpnameItem[];
@@ -31,7 +40,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-soft">
+    <Card className="p-6">
       <div className="mb-6">
         <h3 className="text-lg font-bold">Tahap 2: Input Stok Fisik</h3>
         <p className="text-sm text-muted-foreground">
@@ -48,28 +57,23 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
 
       {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto mb-6">
-        <table className="w-full text-left">
-          <thead className="border-b border-gray-100 dark:border-gray-800">
-            <tr className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-              <th className="px-4 py-3">Nama Produk</th>
-              <th className="px-4 py-3 w-48 text-center bg-primary/5 rounded-t-xl">
-                Jumlah Stok Fisik
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+        <Table>
+          <TableHeader>
+            <TableRow className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+              <TableHead>Nama Produk</TableHead>
+              <TableHead className="w-48 text-center rounded-t-xl">Jumlah Stok Fisik</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {items.map((item) => (
-              <tr
-                key={item.id}
-                className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-              >
-                <td className="px-4 py-4">
+              <TableRow key={item.id}>
+                <TableCell>
                   <p className="font-bold text-sm">{item.productName}</p>
                   <p className="text-xs text-muted-foreground">
                     {item.category} · {item.unit}
                   </p>
-                </td>
-                <td className="px-4 py-4 bg-primary/5">
+                </TableCell>
+                <TableCell className="bg-primary/5">
                   <Input
                     type="number"
                     min="0"
@@ -79,11 +83,11 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
                     aria-label={`Stok fisik ${item.productName}`}
                     className="w-full bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-0 text-center font-bold text-lg md:text-lg shadow-sm placeholder:text-gray-300"
                   />
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Mobile cards */}
@@ -119,7 +123,7 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 

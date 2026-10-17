@@ -6,7 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import type { StockInputs } from './useOpnameExecution';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface StepResolveDifferencesProps {
   items: OpnameItem[];
@@ -60,7 +70,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
   });
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-soft">
+    <Card className="p-6">
       <div className="mb-6">
         <h3 className="text-lg font-bold">Tahap 3: Penyesuaian Stok</h3>
         <p className="text-sm text-muted-foreground">
@@ -70,45 +80,36 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
 
       {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto mb-6">
-        <table className="w-full text-left">
-          <thead className="border-b border-gray-100 dark:border-gray-800">
-            <tr className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-              <th className="px-3 py-3">Nama Produk</th>
-              <th className="px-3 py-3 text-center">Stok Sistem</th>
-              <th className="px-3 py-3 text-center">Stok Fisik</th>
-              <th className="px-3 py-3 text-center">Selisih</th>
-              <th className="px-3 py-3 text-center w-32">Stok Final</th>
-              <th className="px-3 py-3 w-64">Alasan Perbedaan</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+        <Table>
+          <TableHeader>
+            <TableRow className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+              <TableHead>Nama Produk</TableHead>
+              <TableHead className="text-center">Stok Sistem</TableHead>
+              <TableHead className="text-center">Stok Fisik</TableHead>
+              <TableHead className="text-center">Selisih</TableHead>
+              <TableHead className="text-center w-32">Stok Final</TableHead>
+              <TableHead className="w-64">Alasan Perbedaan</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map(({ item, physical, diff, hasDiff }) => (
-              <tr
+              <TableRow
                 key={item.id}
                 className={cn('transition-colors', hasDiff && 'bg-amber-500/[0.03]')}
               >
-                <td className="px-3 py-4">
+                <TableCell>
                   <p className="font-bold text-sm">{item.productName}</p>
-                </td>
-                <td className="px-3 py-4 text-center font-medium text-sm opacity-60">
+                </TableCell>
+                <TableCell className="text-center font-medium text-muted-foreground">
                   {item.systemStock}
-                </td>
-                <td className="px-3 py-4 text-center font-bold text-sm text-primary">{physical}</td>
-                <td className="px-3 py-4 text-center">
-                  <span
-                    className={cn(
-                      'font-bold px-2 py-1 rounded-full text-xs',
-                      diff > 0
-                        ? 'bg-green-100 text-green-700'
-                        : diff < 0
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-gray-100 text-muted-foreground',
-                    )}
-                  >
+                </TableCell>
+                <TableCell className="text-center font-bold text-primary">{physical}</TableCell>
+                <TableCell className="text-center">
+                  <Badge variant={diff > 0 ? 'success' : diff < 0 ? 'danger' : 'neutral'}>
                     {formatDiff(diff)}
-                  </span>
-                </td>
-                <td className="px-3 py-4">
+                  </Badge>
+                </TableCell>
+                <TableCell>
                   <Input
                     type="number"
                     min="0"
@@ -117,8 +118,8 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                     aria-label={`Stok final ${item.productName}`}
                     className="w-full bg-background border-none px-3 text-center text-sm md:text-sm font-bold"
                   />
-                </td>
-                <td className="px-3 py-4">
+                </TableCell>
+                <TableCell>
                   {hasDiff ? (
                     <div className="relative">
                       <Textarea
@@ -134,11 +135,11 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                   ) : (
                     <MatchedMark />
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Mobile cards */}
@@ -221,7 +222,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 

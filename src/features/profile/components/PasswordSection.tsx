@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FIELD_INPUT_CLASS, FIELD_LABEL_CLASS } from './profileUi';
+import { Card } from '@/components/ui/card';
 
 interface PasswordSectionProps {
   isSubmitting: boolean;
@@ -27,7 +28,7 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-soft p-6 md:p-8">
+    <Card className="p-6 md:p-8">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Lock className="text-primary size-6" aria-hidden />
@@ -93,7 +94,7 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
           Pastikan menggunakan password yang kuat dan unik untuk menjaga keamanan akun Anda.
         </p>
       )}
-    </div>
+    </Card>
   );
 };
 

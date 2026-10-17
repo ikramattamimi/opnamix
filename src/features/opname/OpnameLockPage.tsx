@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { OpnameLockInfo, useActiveOpnameLock } from './useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
 import { toDate } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 interface OpnameLockPageProps {
   opname: OpnameLockInfo;
@@ -66,7 +67,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
-        <div className="bg-card rounded-2xl p-8 md:p-12 shadow-soft text-center space-y-6">
+        <Card className="p-8 md:p-12 text-center space-y-6">
           {/* Icon */}
           <div className="flex justify-center">
             {isNakes ? (
@@ -205,7 +206,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

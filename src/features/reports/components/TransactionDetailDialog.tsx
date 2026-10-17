@@ -9,6 +9,14 @@ import {
 } from '@/components/ui/dialog';
 import { toDate } from '@/lib/utils';
 import type { TransactionReportRow } from '../api';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface TransactionDetailDialogProps {
   transaction: TransactionReportRow;
@@ -101,76 +109,76 @@ const TransactionDetailDialog: React.FC<TransactionDetailDialogProps> = ({
         <div>
           <h4 className="font-bold text-lg text-foreground mb-3">Detail Obat</h4>
           <div className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-white/5 text-muted-foreground font-bold border-b border-gray-100 dark:border-gray-800 uppercase text-xs">
-                <tr>
-                  <th className="px-4 py-3">Nama Obat</th>
-                  <th className="px-4 py-3 text-center">Qty</th>
-                  <th className="px-4 py-3 text-right">Harga</th>
-                  <th className="px-4 py-3 text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nama Obat</TableHead>
+                  <TableHead className="text-center">Qty</TableHead>
+                  <TableHead className="text-right">Harga</TableHead>
+                  <TableHead className="text-right">Subtotal</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {transaction.drugDetails?.length > 0 ? (
                   transaction.drugDetails.map((drug) => (
-                    <tr key={drug.id}>
-                      <td className="px-4 py-3 font-medium text-foreground">{drug.name}</td>
-                      <td className="px-4 py-3 text-center">{drug.quantity}</td>
-                      <td className="px-4 py-3 text-right">
+                    <TableRow key={drug.id}>
+                      <TableCell className="font-medium text-foreground">{drug.name}</TableCell>
+                      <TableCell className="text-center">{drug.quantity}</TableCell>
+                      <TableCell className="text-right">
                         Rp {Number(drug.price || 0).toLocaleString('id-ID')}
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-foreground">
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-foreground">
                         Rp {Number(drug.subtotal || 0).toLocaleString('id-ID')}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))
                 ) : (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
                       Tidak ada detail obat.
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
 
         <div>
           <h4 className="font-bold text-lg text-foreground mb-3">Detail Jasa</h4>
           <div className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-white/5 text-muted-foreground font-bold border-b border-gray-100 dark:border-gray-800 uppercase text-xs">
-                <tr>
-                  <th className="px-4 py-3">Nama Jasa</th>
-                  <th className="px-4 py-3 text-center">Qty</th>
-                  <th className="px-4 py-3 text-right">Harga</th>
-                  <th className="px-4 py-3 text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nama Jasa</TableHead>
+                  <TableHead className="text-center">Qty</TableHead>
+                  <TableHead className="text-right">Harga</TableHead>
+                  <TableHead className="text-right">Subtotal</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {transaction.serviceDetails?.length > 0 ? (
                   transaction.serviceDetails.map((service) => (
-                    <tr key={service.id}>
-                      <td className="px-4 py-3 font-medium text-foreground">{service.name}</td>
-                      <td className="px-4 py-3 text-center">{service.quantity}</td>
-                      <td className="px-4 py-3 text-right">
+                    <TableRow key={service.id}>
+                      <TableCell className="font-medium text-foreground">{service.name}</TableCell>
+                      <TableCell className="text-center">{service.quantity}</TableCell>
+                      <TableCell className="text-right">
                         Rp {Number(service.price || 0).toLocaleString('id-ID')}
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-foreground">
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-foreground">
                         Rp {Number(service.subtotal || 0).toLocaleString('id-ID')}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))
                 ) : (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
                       Tidak ada detail jasa.
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
 

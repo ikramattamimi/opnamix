@@ -18,6 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { emptyManualItem, stockOutManualSchema, type StockOutManualValues } from './schemas';
 import ManualItemsTable from './components/ManualItemsTable';
+import { Card } from '@/components/ui/card';
 
 interface StockOutManualFormProps {
   onSave: (record: StockOutManual) => void;
@@ -100,7 +101,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
             className="grid grid-cols-1 lg:grid-cols-3 gap-6"
           >
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-card rounded-2xl p-6 shadow-soft space-y-4">
+              <Card className="p-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -169,9 +170,9 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                     )}
                   />
                 </div>
-              </div>
+              </Card>
 
-              <div className="bg-card rounded-2xl p-6 shadow-soft">
+              <Card className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/20 text-secondary">
                     <BriefcaseMedical className="size-5" aria-hidden />
@@ -179,11 +180,11 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                   <h4 className="text-base font-bold text-foreground">Permintaan Obat & Alkes</h4>
                 </div>
                 <ManualItemsTable />
-              </div>
+              </Card>
             </div>
 
             <div className="lg:col-span-1 space-y-6">
-              <div className="bg-card rounded-2xl p-6 shadow-soft space-y-4">
+              <Card className="p-6 space-y-4">
                 <FormField
                   control={form.control}
                   name="reason"
@@ -203,7 +204,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                     </FormItem>
                   )}
                 />
-              </div>
+              </Card>
 
               <div className="bg-gradient-to-br from-primary to-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>

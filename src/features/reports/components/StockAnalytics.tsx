@@ -15,6 +15,7 @@ import {
 import { FilterSelect } from './FilterSelect';
 import StockCharts from './StockCharts';
 import StockStatusTable from './StockStatusTable';
+import { Card } from '@/components/ui/card';
 
 const CATEGORY_OPTIONS = [
   { value: 'Semua', label: 'Semua' },
@@ -87,7 +88,7 @@ const StockAnalytics: React.FC = () => {
       />
 
       {/* Filters Bar */}
-      <div className="bg-card rounded-2xl p-4 shadow-soft flex flex-wrap items-center gap-4">
+      <Card className="p-4 flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-[200px] relative">
           <Search
             className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground"
@@ -149,7 +150,7 @@ const StockAnalytics: React.FC = () => {
         >
           <FunnelX className="size-6" aria-hidden />
         </Button>
-      </div>
+      </Card>
 
       <StockStatusTable
         products={filteredProducts}

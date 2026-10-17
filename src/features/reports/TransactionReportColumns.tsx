@@ -3,6 +3,7 @@ import type { ColumnDef, FilterFn } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import type { TransactionReportRow } from './api';
 import ColumnFilterHeader from './components/ColumnFilterHeader';
+import { Badge } from '@/components/ui/badge';
 
 // Type options for filter
 const typeOptions = [
@@ -74,15 +75,9 @@ export const createTransactionReportColumns = ({
       const type = row.getValue('type') as string;
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              type === 'masuk'
-                ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
-                : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
-            }`}
-          >
+          <Badge variant={type === 'masuk' ? 'success' : 'danger'}>
             {type === 'masuk' ? 'Masuk' : 'Keluar'}
-          </span>
+          </Badge>
         </div>
       );
     },
@@ -123,18 +118,12 @@ export const createTransactionReportColumns = ({
       const isPending = status === 'Menunggu';
 
       return (
-        <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
-            isPending
-              ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300'
-              : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
-          }`}
-        >
+        <Badge variant={isPending ? 'warning' : 'success'}>
           <span
             className={`h-1.5 w-1.5 rounded-full ${isPending ? 'bg-yellow-500' : 'bg-green-500'}`}
           ></span>
           {status}
-        </span>
+        </Badge>
       );
     },
     filterFn: exactMatchFilter,

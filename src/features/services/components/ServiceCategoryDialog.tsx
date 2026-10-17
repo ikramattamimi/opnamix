@@ -16,6 +16,7 @@ import {
   type ServiceCategoryFormValues,
 } from '../serviceSchema';
 import { serviceInputClassName, serviceLabelClassName } from './serviceFormStyles';
+import { Card } from '@/components/ui/card';
 
 interface ServiceCategoryDialogProps {
   onClose: () => void;
@@ -59,7 +60,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-card w-full max-w-lg rounded-2xl shadow-soft p-6">
+      <Card className="w-full max-w-lg p-6">
         <div className="flex items-center justify-between gap-3 mb-5">
           <div>
             <h3 className="text-lg font-bold text-foreground">Tambah Kategori Jasa</h3>
@@ -160,7 +161,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
             </div>
           </form>
         </Form>
-      </div>
+      </Card>
     </div>
   );
 };
