@@ -81,13 +81,13 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
       />
       <InfoRow
         icon={CalendarDays}
-        iconClassName="text-amber-500"
+        iconClassName="text-amber-600 dark:text-amber-400"
         label="Tanggal Jadwal"
         value={opname?.scheduleDate ? formatDate(opname.scheduleDate) : '-'}
       />
       <InfoRow
         icon={CircleCheck}
-        iconClassName="text-emerald-500"
+        iconClassName="text-emerald-600 dark:text-emerald-400"
         label="Tanggal Dilaksanakan"
         value={opname?.completedAt ? formatDate(opname.completedAt) : '-'}
       />
@@ -95,10 +95,15 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
 
     <div className="border-t border-gray-100 dark:border-gray-800 mt-5 pt-5 space-y-3">
       <StatRow icon={Archive} colorClassName="text-primary" label="Total Item" value={totalItems} />
-      <StatRow icon={BadgeCheck} colorClassName="text-emerald-500" label="Sesuai" value={matched} />
+      <StatRow
+        icon={BadgeCheck}
+        colorClassName="text-emerald-700 dark:text-emerald-400"
+        label="Sesuai"
+        value={matched}
+      />
       <StatRow
         icon={TriangleAlert}
-        colorClassName="text-amber-500"
+        colorClassName="text-amber-700 dark:text-amber-400"
         label="Selisih"
         value={discrepancies}
       />
