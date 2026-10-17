@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +22,6 @@ import {
   type ServiceCategoryFormValues,
 } from '../serviceSchema';
 import { serviceInputClassName, serviceLabelClassName } from './serviceFormStyles';
-import { Card } from '@/components/ui/card';
 
 interface ServiceCategoryDialogProps {
   onClose: () => void;
@@ -59,26 +64,12 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
   const categoryError = form.formState.errors.name?.message || serverError;
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <Card className="w-full max-w-lg p-6">
-        <div className="flex items-center justify-between gap-3 mb-5">
-          <div>
-            <h3 className="text-lg font-bold text-foreground">Tambah Kategori Jasa</h3>
-            <p className="text-sm text-muted-foreground">
-              Kategori baru akan langsung tersedia di form jasa.
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Tutup"
-            className="w-auto p-2 text-current hover:text-current rounded-full bg-background dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors [&_svg]:size-6"
-          >
-            <X aria-hidden />
-          </Button>
-        </div>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader className="mb-1 pr-8">
+          <DialogTitle>Tambah Kategori Jasa</DialogTitle>
+          <DialogDescription>Kategori baru akan langsung tersedia di form jasa.</DialogDescription>
+        </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleCreateCategory)} className="space-y-4" noValidate>
@@ -88,7 +79,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
               render={({ field }) => (
                 <FormItem className="space-y-0">
                   <FormLabel className={serviceLabelClassName}>
-                    Nama Kategori <span className="text-red-500">*</span>
+                    Nama Kategori <span className="text-red-600 dark:text-red-400">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -140,7 +131,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
             {categoryError && (
               <div
                 role="alert"
-                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
               >
                 {categoryError}
               </div>
@@ -161,7 +152,7 @@ export const ServiceCategoryDialog: React.FC<ServiceCategoryDialogProps> = ({
             </div>
           </form>
         </Form>
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

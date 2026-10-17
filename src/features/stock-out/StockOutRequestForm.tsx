@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IdCard, Pill, User, X } from 'lucide-react';
+import { IdCard, Pill, User } from 'lucide-react';
 import { StockOutRequest } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import { useServices } from '@/features/services/useServices';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   Form,
@@ -45,7 +45,7 @@ const MESSAGE = 'text-xs font-normal text-red-500 mt-1 ml-1';
 const CARD = 'bg-card rounded-2xl p-6 shadow-soft';
 const CARD_TITLE = 'font-bold text-lg text-foreground flex items-center gap-2';
 
-const RequiredMark = () => <span className="text-red-500">*</span>;
+const RequiredMark = () => <span className="text-red-600 dark:text-red-400">*</span>;
 
 // Nilai select nakes; profil tanpa nama memakai id karena item select tidak boleh kosong
 const nakesValue = (n: { id: string; full_name: string | null }) => n.full_name || n.id;
@@ -129,21 +129,13 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-background w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-2xl shadow-soft p-4 md:p-8 lg:p-10 font-display">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-foreground tracking-tight">
-            Formulir Permintaan Obat
-          </h2>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            aria-label="Tutup"
-            className="rounded-full hover:bg-gray-200 dark:hover:bg-white/5 shadow-sm [&_svg]:size-6"
-          >
-            <X aria-hidden />
-          </Button>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="block max-h-[95vh] max-w-6xl bg-background p-4 md:p-8 lg:p-10 font-display"
+        aria-describedby={undefined}
+      >
+        <div className="mb-8 pr-10">
+          <DialogTitle className="text-3xl tracking-tight">Formulir Permintaan Obat</DialogTitle>
         </div>
 
         <Form {...form}>
@@ -276,8 +268,8 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
             </div>
           </form>
         </Form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -33,7 +33,7 @@ export const ProductNameFields: React.FC<ProductNameFieldsProps> = ({
         render={({ field, fieldState, formState }) => (
           <FormItem className="space-y-0">
             <FormLabel className={productLabelClassName}>
-              Nama Produk <span className="text-red-500">*</span>
+              Nama Produk <span className="text-red-600 dark:text-red-400">*</span>
             </FormLabel>
             <FormControl>
               <Input

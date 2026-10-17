@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus, X } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -32,7 +33,6 @@ import {
 } from '../serviceSchema';
 import { ServiceCategoryDialog } from './ServiceCategoryDialog';
 import { serviceInputClassName, serviceLabelClassName } from './serviceFormStyles';
-import { Card } from '@/components/ui/card';
 
 interface ServiceFormDialogProps {
   editingService?: Service;
@@ -89,25 +89,11 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm m-0">
-        <Card className="w-full max-w-2xl p-8 overflow-y-auto max-h-[90vh] relative">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-foreground">
-              {editingService ? 'Edit Jasa' : 'Tambah Jasa Baru'}
-            </h2>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                aria-label="Tutup"
-                className="w-auto p-2 text-current hover:text-current bg-background dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
-              >
-                <X aria-hidden />
-              </Button>
-            </div>
-          </div>
+      <Dialog open onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="max-w-2xl p-8" aria-describedby={undefined}>
+          <DialogHeader className="mb-2">
+            <DialogTitle>{editingService ? 'Edit Jasa' : 'Tambah Jasa Baru'}</DialogTitle>
+          </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4" noValidate>
               <FormField
@@ -116,7 +102,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
                 render={({ field, fieldState, formState }) => (
                   <FormItem className="space-y-0">
                     <FormLabel className={serviceLabelClassName}>
-                      Nama Jasa <span className="text-red-500">*</span>
+                      Nama Jasa <span className="text-red-600 dark:text-red-400">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -144,7 +130,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
                 render={({ field }) => (
                   <FormItem className="space-y-0">
                     <FormLabel className={serviceLabelClassName}>
-                      Kategori <span className="text-red-500">*</span>
+                      Kategori <span className="text-red-600 dark:text-red-400">*</span>
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
@@ -178,7 +164,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
                 name="price"
                 label={
                   <>
-                    Harga (Rp) <span className="text-red-500">*</span>
+                    Harga (Rp) <span className="text-red-600 dark:text-red-400">*</span>
                   </>
                 }
                 labelClassName={serviceLabelClassName}
@@ -225,8 +211,8 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
               </div>
             </form>
           </Form>
-        </Card>
-      </div>
+        </DialogContent>
+      </Dialog>
 
       {isCategoryDialogOpen && (
         <ServiceCategoryDialog
