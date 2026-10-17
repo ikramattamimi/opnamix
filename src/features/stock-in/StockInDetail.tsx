@@ -3,6 +3,16 @@ import { ArrowLeft, Eye, ReceiptText } from 'lucide-react';
 import { StockInReceipt } from './types';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/common/QueryState';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 interface StockInDetailProps {
   receipt: StockInReceipt;
@@ -28,7 +38,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-card rounded-2xl p-6 shadow-soft">
+          <Card className="p-6">
             <h3 className="text-lg font-bold text-foreground mb-4">Informasi Transaksi</h3>
             <div className="space-y-4">
               <InfoRow label="No. Invoice" value={receipt.invoiceNumber} />
@@ -40,7 +50,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
               <InfoRow label="Status" value={receipt.status} isStatus />
               <InfoRow label="Penerima" value={receipt.receivedBy} />
             </div>
-          </div>
+          </Card>
 
           <div className="bg-primary text-white rounded-2xl p-6 shadow-xl shadow-primary/30 relative overflow-hidden h-[200px] flex flex-col justify-center">
             <div className="relative z-10">
@@ -58,7 +68,7 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
           </div>
 
           {receipt.evidenceUrl ? (
-            <div className="bg-card rounded-2xl p-6 shadow-soft">
+            <Card className="p-6">
               <h3 className="text-lg font-bold text-foreground mb-4">Bukti Nota</h3>
               <div className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 group relative">
                 <img
@@ -81,57 +91,54 @@ const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
                   Lihat Full
                 </a>
               </div>
-            </div>
+            </Card>
           ) : (
-            <div className="bg-card rounded-2xl p-6 shadow-soft">
+            <Card className="p-6">
               <h3 className="text-lg font-bold text-foreground mb-4">Bukti Nota</h3>
               <EmptyState
                 icon={ReceiptText}
                 title="Tidak ada bukti nota yang diunggah"
                 className="rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-white/5 p-8"
               />
-            </div>
+            </Card>
           )}
         </div>
 
         <div className="lg:col-span-2">
-          <div className="bg-card rounded-2xl p-6 shadow-soft h-full">
+          <Card className="p-6 h-full">
             <h3 className="text-lg font-bold text-foreground mb-6">Daftar Barang</h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-xs uppercase tracking-wide text-muted-foreground font-bold border-b border-gray-100 dark:border-gray-800">
-                    <th className="pb-4 pl-2">Produk</th>
-                    <th className="pb-4">Kategori</th>
-                    <th className="pb-4">Kadaluarsa</th>
-                    <th className="pb-4 text-right">Jumlah</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow className="text-xs uppercase tracking-wide text-muted-foreground font-bold">
+                    <TableHead>Produk</TableHead>
+                    <TableHead>Kategori</TableHead>
+                    <TableHead>Kadaluarsa</TableHead>
+                    <TableHead className="text-right">Jumlah</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="text-sm">
                   {receipt.items.map((item, idx) => (
-                    <tr
-                      key={idx}
-                      className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                    >
-                      <td className="py-4 pl-2">
+                    <TableRow key={idx}>
+                      <TableCell>
                         <p className="font-bold text-foreground">{item.productName}</p>
                         <p className="text-xs text-muted-foreground">ID: {item.productId}</p>
-                      </td>
-                      <td className="py-4 text-muted-foreground">{item.category}</td>
-                      <td className="py-4 text-foreground font-medium">
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{item.category}</TableCell>
+                      <TableCell className="text-foreground font-medium">
                         {new Date(item.expiryDate).toLocaleDateString('id-ID', {
                           dateStyle: 'medium',
                         })}
-                      </td>
-                      <td className="py-4 text-right">
+                      </TableCell>
+                      <TableCell className="text-right">
                         <span className="font-bold text-primary">{item.quantity}</span> {item.unit}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>
@@ -146,10 +153,10 @@ const InfoRow: React.FC<{ label: string; value: string; isStatus?: boolean }> = 
   <div>
     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
     {isStatus ? (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 mt-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300">
+      <Badge variant="success" className="mt-1">
         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
         {value}
-      </span>
+      </Badge>
     ) : (
       <p className="text-base font-bold text-foreground mt-0.5">{value}</p>
     )}

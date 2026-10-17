@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState } from '@/components/common/QueryState';
 import { filterOpnames, formatDate, OpnameCard, stepLabel } from './format';
 import { ListStateCard, OpnameSearchInput, SectionHeader } from './shared';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface UpcomingOpnameListProps {
   drafts: OpnameCard[];
@@ -44,16 +46,11 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
       {filteredDrafts.length > 0 && (
         <div className="space-y-3 mb-4">
           {filteredDrafts.map((opname) => (
-            <div
-              key={opname.id}
-              className="bg-card rounded-2xl p-5 shadow-soft border-l-4 border-blue-500"
-            >
+            <Card key={opname.id} className="p-5 border-l-4 border-blue-500">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 rounded-lg">
-                      Sedang Dilaksanakan
-                    </span>
+                    <Badge variant="info">Sedang Dilaksanakan</Badge>
                     <span className="text-xs text-muted-foreground">
                       Tahap {opname.currentStep}: {stepLabel[opname.currentStep || 1]}
                     </span>
@@ -82,7 +79,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                   </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
@@ -90,15 +87,10 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
       {filteredUpcoming.length > 0 ? (
         <div className="space-y-3">
           {filteredUpcoming.map((opname) => (
-            <div
-              key={opname.id}
-              className="bg-card rounded-2xl p-5 shadow-soft border-l-4 border-amber-400"
-            >
+            <Card key={opname.id} className="p-5 border-l-4 border-amber-400">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <span className="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300 rounded-lg">
-                    Belum Dilaksanakan
-                  </span>
+                  <Badge variant="warning">Belum Dilaksanakan</Badge>
                   <p className="font-bold text-foreground">{opname.scheduleName}</p>
                   <p className="text-xs text-muted-foreground">
                     Target: {formatDate(opname.scheduleDate)}
@@ -124,7 +116,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                   </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       ) : isError ? (

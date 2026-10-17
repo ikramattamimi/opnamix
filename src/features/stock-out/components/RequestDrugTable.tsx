@@ -12,6 +12,14 @@ import {
 import type { Product } from '@/features/products/types';
 import type { DrugField } from '../requestItems';
 import { RequestedDrug } from '../types';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface RequestDrugTableProps {
   drugs: RequestedDrug[];
@@ -49,21 +57,21 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
       )}
     </div>
     <div className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-gray-50 dark:bg-white/5 text-muted-foreground font-bold border-b border-gray-100 dark:border-gray-800 uppercase text-xs">
-          <tr>
-            <th className="px-4 py-3">Nama Produk</th>
-            <th className="px-4 py-3 text-center">Jumlah</th>
-            <th className="px-4 py-3 text-right">Harga Satuan</th>
-            <th className="px-4 py-3 text-right">Total</th>
-            {edit && <th className="px-4 py-3 text-center">Aksi</th>}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Nama Produk</TableHead>
+            <TableHead className="text-center">Jumlah</TableHead>
+            <TableHead className="text-right">Harga Satuan</TableHead>
+            <TableHead className="text-right">Total</TableHead>
+            {edit && <TableHead className="text-center">Aksi</TableHead>}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {drugs.length > 0 ? (
             drugs.map((drug, i) => (
-              <tr key={i}>
-                <td className="px-4 py-3 font-medium text-foreground">
+              <TableRow key={i}>
+                <TableCell className="font-medium text-foreground">
                   {edit ? (
                     <Select
                       value={drug.productId}
@@ -83,8 +91,8 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                   ) : (
                     drug.productName
                   )}
-                </td>
-                <td className="px-4 py-3 text-center font-bold">
+                </TableCell>
+                <TableCell className="text-center font-bold">
                   {edit ? (
                     <Input
                       type="number"
@@ -97,15 +105,15 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                   ) : (
                     drug.quantity
                   )}
-                </td>
-                <td className="px-4 py-3 text-right text-muted-foreground">
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground">
                   Rp {(drug.price || 0).toLocaleString('id-ID')}
-                </td>
-                <td className="px-4 py-3 text-right font-bold text-foreground">
+                </TableCell>
+                <TableCell className="text-right font-bold text-foreground">
                   Rp {((drug.price || 0) * drug.quantity).toLocaleString('id-ID')}
-                </td>
+                </TableCell>
                 {edit && (
-                  <td className="px-4 py-3 text-center">
+                  <TableCell className="text-center">
                     <Button
                       type="button"
                       variant="ghost"
@@ -116,19 +124,19 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                     >
                       <Trash2 aria-hidden />
                     </Button>
-                  </td>
+                  </TableCell>
                 )}
-              </tr>
+              </TableRow>
             ))
           ) : (
-            <tr>
-              <td colSpan={edit ? 5 : 4} className="px-4 py-6 text-center text-muted-foreground">
+            <TableRow>
+              <TableCell colSpan={edit ? 5 : 4} className="text-center text-muted-foreground">
                 Tidak ada item obat. Permintaan ini hanya berisi jasa.
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   </div>
 );

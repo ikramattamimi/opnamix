@@ -22,6 +22,7 @@ import {
 import { StockInItemCard } from './components/StockInItemCard';
 import { ReceiptUpload } from './components/ReceiptUpload';
 import { TransactionDetailsFields } from './components/TransactionDetailsFields';
+import { Card } from '@/components/ui/card';
 
 interface StockInFormProps {
   onSave: (receipt: StockInReceipt, file?: Blob) => void;
@@ -121,7 +122,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-card w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-soft p-8">
+      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
         <div className="flex justify-between items-center mb-8">
           <h3 className="text-2xl font-bold text-foreground">Formulir Penerimaan Stok</h3>
           <Button
@@ -218,7 +219,7 @@ const StockInForm: React.FC<StockInFormProps> = ({ onSave, onClose, isLoading = 
             allowAddProduct={true}
           />
         )}
-      </div>
+      </Card>
     </div>
   );
 };

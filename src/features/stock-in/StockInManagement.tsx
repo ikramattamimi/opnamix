@@ -18,6 +18,7 @@ import { useToast } from '@/components/ui/toast';
 import { withErrorDetail, getErrorMessage } from '@/lib/utils';
 import PageLayout from '@/components/layout/PageLayout';
 import PageHeader from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 interface StockInManagementProps {
   products?: Product[]; // Optional now, or removed
@@ -137,7 +138,7 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
           <StatCard label="Growth Stok" value="-" icon={TrendingUp} color="green-500" />
         </div>
 
-        <div className="bg-card rounded-2xl p-6 shadow-soft">
+        <Card className="p-6">
           <div className="overflow-x-auto">
             {isPending ? (
               <LoadingState label="Memuat penerimaan stok..." />
@@ -159,7 +160,7 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
               isPlaceholderData={isPlaceholderData}
             />
           </div>
-        </div>
+        </Card>
       </PageLayout>
       {isFormOpen && (
         <StockInForm

@@ -13,6 +13,7 @@ import { getNotificationLucideIcon, getNotificationColor, formatNotificationTime
 import { AppNotification } from './types';
 import PageLayout from '@/components/layout/PageLayout';
 import PageHeader from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 const TYPE_LABELS: Record<string, string> = {
   STOCK_OUT_REQUEST: 'Permintaan Stok Keluar',
@@ -86,7 +87,7 @@ const NotificationsPage: React.FC = () => {
       />
 
       {/* Filters */}
-      <div className="bg-card rounded-2xl p-4 shadow-soft space-y-3">
+      <Card className="p-4 space-y-3">
         {/* Read filter */}
         <div className="flex gap-2 flex-wrap">
           {(['all', 'unread', 'read'] as const).map((opt) => (
@@ -128,10 +129,10 @@ const NotificationsPage: React.FC = () => {
             </Button>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Notification List */}
-      <div className="bg-card rounded-2xl shadow-soft overflow-hidden">
+      <Card className="overflow-hidden">
         {isLoading ? (
           <LoadingState label="Memuat notifikasi..." className="py-16" />
         ) : isError && !data ? (
@@ -196,7 +197,7 @@ const NotificationsPage: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Footer count */}
       {filtered.length > 0 && (

@@ -8,6 +8,7 @@ import OpnameInfoPanel from './components/detail/OpnameInfoPanel';
 import AdjustmentJournal from './components/detail/AdjustmentJournal';
 import PageLayout from '@/components/layout/PageLayout';
 import PageHeader from '@/components/layout/PageHeader';
+import { Badge } from '@/components/ui/badge';
 
 const DetailOpnamePage: React.FC = () => {
   const { opnameId } = useParams<{ opnameId: string }>();
@@ -44,10 +45,10 @@ const DetailOpnamePage: React.FC = () => {
           </Button>
         }
         actions={
-          <span className="text-xs font-bold px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 rounded-xl flex items-center gap-1">
+          <Badge variant="success">
             <CircleCheck className="size-3" aria-hidden />
             Selesai
-          </span>
+          </Badge>
         }
       />
 

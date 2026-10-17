@@ -2,6 +2,7 @@ import React from 'react';
 import { ChartColumn, ChartPie } from 'lucide-react';
 import type { Product } from '@/features/products/types';
 import type { CategoryStat } from '../stockAnalytics';
+import { Card } from '@/components/ui/card';
 
 interface StockChartsProps {
   topProducts: Product[];
@@ -13,7 +14,7 @@ interface StockChartsProps {
 const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, totalSku }) => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
     {/* Bar Chart: Stock Levels */}
-    <div className="bg-card rounded-2xl p-6 shadow-soft">
+    <Card className="p-6">
       <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
         <ChartColumn className="size-6 text-primary" aria-hidden />
         Level Stok Produk Teratas
@@ -43,10 +44,10 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
       <p className="text-[10px] text-muted-foreground mt-4 text-center italic">
         *Garis merah menunjukkan batas minimum stok
       </p>
-    </div>
+    </Card>
 
     {/* Donut Chart: Category Distribution */}
-    <div className="bg-card rounded-2xl p-6 shadow-soft flex flex-col md:flex-row items-center gap-8">
+    <Card className="p-6 flex flex-col md:flex-row items-center gap-8">
       <div className="flex-1">
         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
           <ChartPie className="size-6 text-secondary" aria-hidden />
@@ -108,7 +109,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
           </span>
         </div>
       </div>
-    </div>
+    </Card>
   </div>
 );
 

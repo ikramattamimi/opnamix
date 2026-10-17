@@ -8,6 +8,14 @@ import ProductLookupModal from '@/features/products/ProductLookupModal';
 import type { Product } from '@/features/products/types';
 import { useProducts } from '@/features/products/useProducts';
 import { emptyManualItem, type StockOutManualValues } from '../schemas';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 const TH = 'px-4 py-3 text-xs font-bold text-muted-foreground dark:text-gray-400 uppercase';
 
@@ -42,22 +50,22 @@ const ManualItemsTable: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-background/50 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5">
-      <table className="w-full">
-        <thead className="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5">
-          <tr>
-            <th className={cn(TH, 'text-left')}>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className={cn(TH, 'text-left')}>
               Nama Obat <span className="text-red-500">*</span>
-            </th>
-            <th className={cn(TH, 'text-center w-24')}>
+            </TableHead>
+            <TableHead className={cn(TH, 'text-center w-24')}>
               Jml <span className="text-red-500">*</span>
-            </th>
-            <th className={cn(TH, 'text-center w-24')}>Satuan</th>
-            <th className={cn(TH, 'text-right')}>Harga</th>
-            <th className={cn(TH, 'text-right')}>Total</th>
-            <th className="px-4 py-3 text-center w-12"></th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+            </TableHead>
+            <TableHead className={cn(TH, 'text-center w-24')}>Satuan</TableHead>
+            <TableHead className={cn(TH, 'text-right')}>Harga</TableHead>
+            <TableHead className={cn(TH, 'text-right')}>Total</TableHead>
+            <TableHead className="text-center w-12"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {fields.map((field, index) => {
             const item = items[index] ?? field;
             const product = products.find((p) => p.id === item.productId);
@@ -66,11 +74,8 @@ const ManualItemsTable: React.FC = () => {
             const itemError = errors.items?.[index];
 
             return (
-              <tr
-                key={field.id}
-                className="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-              >
-                <td className="px-4 py-3">
+              <TableRow key={field.id} className="group">
+                <TableCell>
                   <div className="flex flex-col">
                     <button
                       type="button"
@@ -97,8 +102,8 @@ const ManualItemsTable: React.FC = () => {
                       </span>
                     )}
                   </div>
-                </td>
-                <td className="px-2 py-3">
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col items-center">
                     <Input
                       type="number"
@@ -117,17 +122,17 @@ const ManualItemsTable: React.FC = () => {
                       </span>
                     )}
                   </div>
-                </td>
-                <td className="px-4 py-3 text-sm text-center text-muted-foreground dark:text-gray-400">
+                </TableCell>
+                <TableCell className="text-center text-muted-foreground dark:text-gray-400">
                   {item.unit || '-'}
-                </td>
-                <td className="px-4 py-3 text-sm text-right text-muted-foreground dark:text-gray-400">
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground dark:text-gray-400">
                   {price > 0 ? `Rp ${price.toLocaleString('id-ID')}` : '-'}
-                </td>
-                <td className="px-4 py-3 text-sm text-right font-bold text-foreground">
+                </TableCell>
+                <TableCell className="text-right font-bold text-foreground">
                   {total > 0 ? `Rp ${total.toLocaleString('id-ID')}` : '-'}
-                </td>
-                <td className="px-2 py-3 text-center">
+                </TableCell>
+                <TableCell className="text-center">
                   <Button
                     type="button"
                     onClick={() => handleRemove(index)}
@@ -139,12 +144,12 @@ const ManualItemsTable: React.FC = () => {
                   >
                     <X aria-hidden />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <Button
         type="button"
         onClick={() => append(emptyManualItem())}

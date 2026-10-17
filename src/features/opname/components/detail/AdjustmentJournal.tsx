@@ -4,6 +4,16 @@ import type { OpnameDetailViewRow } from '../../api';
 import { Input } from '@/components/ui/input';
 import { EmptyState, ErrorState } from '@/components/common/QueryState';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 const formatDiff = (selisih: number | null) => ((selisih ?? 0) > 0 ? `+${selisih}` : selisih);
 
@@ -24,7 +34,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
   const emptyTitle = search ? 'Tidak ada produk yang cocok.' : 'Tidak ada data.';
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-soft">
+    <Card className="p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <h3 className="text-lg font-bold flex items-center gap-2">
           <Sheet className="size-5 text-primary" aria-hidden />
@@ -54,53 +64,54 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
         <>
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="border-b border-gray-100 dark:border-gray-800">
-                <tr className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-                  <th className="px-4 py-3">Nama Produk</th>
-                  <th className="px-4 py-3 text-center">Stok Sistem</th>
-                  <th className="px-4 py-3 text-center">Stok Fisik</th>
-                  <th className="px-4 py-3 text-center">Selisih</th>
-                  <th className="px-4 py-3 text-center">Stok Final</th>
-                  <th className="px-4 py-3">Alasan</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            <Table>
+              <TableHeader>
+                <TableRow className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+                  <TableHead>Nama Produk</TableHead>
+                  <TableHead className="text-center">Stok Sistem</TableHead>
+                  <TableHead className="text-center">Stok Fisik</TableHead>
+                  <TableHead className="text-center">Selisih</TableHead>
+                  <TableHead className="text-center">Stok Final</TableHead>
+                  <TableHead>Alasan</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filtered.map((row) => (
-                  <tr
+                  <TableRow
                     key={row.id}
                     className={cn(
                       'hover:bg-gray-50 dark:hover:bg-white/5 transition-colors',
                       row.selisih !== 0 && 'bg-amber-500/[0.03]',
                     )}
                   >
-                    <td className="px-4 py-4 font-bold text-sm">{row.productName}</td>
-                    <td className="px-4 py-4 text-center text-sm opacity-60">{row.stokSistem}</td>
-                    <td className="px-4 py-4 text-center text-sm font-bold text-primary">
+                    <TableCell className="font-bold">{row.productName}</TableCell>
+                    <TableCell className="text-center text-muted-foreground">
+                      {row.stokSistem}
+                    </TableCell>
+                    <TableCell className="text-center font-bold text-primary">
                       {row.stokFisik}
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <span
-                        className={cn(
-                          'font-bold px-2 py-1 rounded-full text-xs',
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge
+                        variant={
                           (row.selisih ?? 0) > 0
-                            ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
+                            ? 'success'
                             : (row.selisih ?? 0) < 0
-                              ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
-                              : 'bg-gray-100 text-muted-foreground dark:bg-gray-500/20',
-                        )}
+                              ? 'danger'
+                              : 'neutral'
+                        }
                       >
                         {formatDiff(row.selisih)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-center text-sm font-bold">
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center font-bold">
                       {row.stokFinal !== null ? row.stokFinal : '-'}
-                    </td>
-                    <td className="px-4 py-4 text-sm">{row.alasan || '-'}</td>
-                  </tr>
+                    </TableCell>
+                    <TableCell>{row.alasan || '-'}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
           {/* Mobile Cards */}
@@ -159,7 +170,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
           </div>
         </>
       )}
-    </div>
+    </Card>
   );
 };
 

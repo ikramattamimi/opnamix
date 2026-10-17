@@ -3,6 +3,7 @@ import { Camera, Hourglass, Loader2 } from 'lucide-react';
 import type { UserProfile } from '@/features/auth/api';
 import { toDate } from '@/lib/utils';
 import type { RoleInfo } from './profileUi';
+import { Card } from '@/components/ui/card';
 
 interface ProfileHeaderCardProps {
   profile: UserProfile;
@@ -30,7 +31,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-soft overflow-hidden">
+    <Card className="overflow-hidden">
       {/* Banner dengan Avatar di dalamnya */}
       <div className="h-40 bg-gradient-to-br from-primary via-blue-500 to-indigo-600 relative">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-40"></div>
@@ -110,7 +111,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { ChartColumn, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { DashboardStats } from '../api';
+import { Card } from '@/components/ui/card';
 
 // Baris grafik dashboard. Belum dirender di Dashboard (dulu berupa blok yang
 // dikomentari); dipindah ke sini supaya Dashboard tetap ringkas.
@@ -35,7 +36,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div className="bg-card p-6 rounded-2xl shadow-soft h-full">
+      <Card className="p-6 h-full">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-xl font-bold text-foreground">Pengeluaran 7 Hari Terakhir</h3>
@@ -69,10 +70,10 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
             );
           })}
         </div>
-      </div>
+      </Card>
 
       <div className="grid grid-rows-2 gap-5">
-        <div className="bg-card p-6 rounded-2xl shadow-soft flex flex-col justify-center">
+        <Card className="p-6 flex flex-col justify-center">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h3 className="text-xl font-bold text-foreground">Peringatan Stok Rendah</h3>
@@ -93,9 +94,9 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
               </p>
             )}
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-card p-6 rounded-2xl shadow-soft flex items-center justify-between">
+        <Card className="p-6 flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold text-foreground mb-1">Pembagian Inventaris</h3>
             <p className="text-sm text-muted-foreground mb-4">Berdasarkan Kategori</p>
@@ -119,7 +120,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
             ></div>
             <div className="absolute inset-0 m-auto w-16 h-16 bg-card rounded-full"></div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

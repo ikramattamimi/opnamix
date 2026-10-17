@@ -5,6 +5,7 @@ import StepSelectProducts from './StepSelectProducts';
 import StepPhysicalCount from './StepPhysicalCount';
 import StepResolveDifferences from './StepResolveDifferences';
 import type { OpnameExecution } from './useOpnameExecution';
+import { Card } from '@/components/ui/card';
 
 const STEPS: { num: number; label: string; icon: LucideIcon }[] = [
   { num: 1, label: 'Pemilihan Obat', icon: ListChecks },
@@ -22,7 +23,7 @@ const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
 
   return (
     <>
-      <div className="bg-card rounded-2xl p-6 shadow-soft">
+      <Card className="p-6">
         <div className="flex items-center gap-2">
           {STEPS.map((step, index) => {
             const Icon = currentStep > step.num ? CircleCheck : step.icon;
@@ -52,7 +53,7 @@ const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
             );
           })}
         </div>
-      </div>
+      </Card>
 
       {currentStep === 1 && (
         <StepSelectProducts

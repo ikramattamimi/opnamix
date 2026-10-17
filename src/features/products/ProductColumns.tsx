@@ -3,6 +3,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Product } from './types';
 import { Pencil, Trash2, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface ProductColumnsProps {
   onEdit: (product: Product) => void;
@@ -68,16 +69,10 @@ export const createProductColumns = ({
 
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              isLowStock
-                ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
-                : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
-            }`}
-          >
+          <Badge variant={isLowStock ? 'danger' : 'success'}>
             {isLowStock && <TriangleAlert className="size-3" aria-hidden />}
             {stock}
-          </span>
+          </Badge>
         </div>
       );
     },

@@ -4,6 +4,7 @@ import { CircleCheck, Eye } from 'lucide-react';
 import { StockOutRequest } from './types';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 
 // Source type options for filter
 const sourceTypeOptions = [
@@ -12,9 +13,9 @@ const sourceTypeOptions = [
 ];
 
 // Static class maps to avoid dynamic Tailwind class purging
-const sourceTypeClasses: Record<string, string> = {
-  PENGAJUAN_NAKES: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
-  KASIR_LANGSUNG: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
+const sourceTypeVariants: Record<string, BadgeProps['variant']> = {
+  PENGAJUAN_NAKES: 'info',
+  KASIR_LANGSUNG: 'success',
 };
 
 // Status options for filter
@@ -78,9 +79,9 @@ export const createStockOutColumns = ({
       const tipeSumber = row.getValue('tipeSumber') as string;
       const sourceType = sourceTypeOptions.find((option) => option.value === tipeSumber);
       return (
-        <div className={`inline px-2.5 py-1 rounded-full ${sourceTypeClasses[tipeSumber] ?? ''}`}>
+        <Badge variant={sourceTypeVariants[tipeSumber] ?? 'neutral'}>
           {sourceType?.label ?? tipeSumber}
-        </div>
+        </Badge>
       );
     },
     filterFn: (row, id, value) => {
@@ -124,18 +125,12 @@ export const createStockOutColumns = ({
 
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              isCompleted
-                ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
-                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300'
-            }`}
-          >
+          <Badge variant={isCompleted ? 'success' : 'warning'}>
             <span
               className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-green-500' : 'bg-yellow-500'}`}
             ></span>
             {status}
-          </span>
+          </Badge>
         </div>
       );
     },

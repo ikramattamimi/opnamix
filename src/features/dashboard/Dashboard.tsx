@@ -6,6 +6,7 @@ import type { DashboardStats } from './api';
 import { useDashboardStats, useRecentTransactions } from './useDashboard';
 import DashboardMetrics from './components/DashboardMetrics';
 import RecentTransactionsCard from './components/RecentTransactionsCard';
+import { Card } from '@/components/ui/card';
 
 const Dashboard: React.FC = () => {
   const {
@@ -52,9 +53,9 @@ const Dashboard: React.FC = () => {
 
       {/* Metrics Row */}
       {statsError && !stats ? (
-        <div className="bg-card rounded-2xl shadow-soft">
+        <Card>
           <ErrorState title="Gagal memuat ringkasan stok" onRetry={() => void refetchStats()} />
-        </div>
+        </Card>
       ) : (
         <DashboardMetrics stats={safeStats} />
       )}

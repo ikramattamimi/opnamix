@@ -2,6 +2,7 @@ import React from 'react';
 import { Users, type LucideIcon } from 'lucide-react';
 import { ROLE_OPTIONS } from '../roles';
 import type { UserRow } from '../types';
+import { Card } from '@/components/ui/card';
 
 const StatItem: React.FC<{
   icon: LucideIcon;
@@ -10,7 +11,7 @@ const StatItem: React.FC<{
   value: number;
   label: string;
 }> = ({ icon: Icon, iconBg, iconColor, value, label }) => (
-  <div className="bg-card rounded-2xl p-5 shadow-soft">
+  <Card className="p-5">
     <div className="flex items-center gap-3">
       <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
         <Icon className={`size-6 ${iconColor}`} aria-hidden />
@@ -20,7 +21,7 @@ const StatItem: React.FC<{
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
     </div>
-  </div>
+  </Card>
 );
 
 // Kartu jumlah pengguna total dan per role

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { UserProfile } from '@/features/auth/api';
 import { FIELD_INPUT_CLASS, FIELD_LABEL_CLASS, type RoleInfo } from './profileUi';
+import { Card } from '@/components/ui/card';
 
 interface ProfileInfoSectionProps {
   profile: UserProfile;
@@ -32,7 +33,7 @@ const ProfileInfoSection: React.FC<ProfileInfoSectionProps> = ({
   const RoleIcon = roleInfo.icon;
 
   return (
-    <div className="bg-card rounded-2xl shadow-soft p-6 md:p-8">
+    <Card className="p-6 md:p-8">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <CircleUserRound className="text-primary size-6" aria-hidden />
@@ -120,7 +121,7 @@ const ProfileInfoSection: React.FC<ProfileInfoSectionProps> = ({
           </p>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -4,6 +4,7 @@ import { Service } from './types';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
+import { Badge } from '@/components/ui/badge';
 
 interface ServiceColumnsProps {
   onEdit: (service: Service) => void;
@@ -69,18 +70,12 @@ export const createServiceColumns = ({
 
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              isActive
-                ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
-                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-            }`}
-          >
+          <Badge variant={isActive ? 'success' : 'neutral'}>
             <span
               className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-500' : 'bg-gray-500'}`}
             ></span>
             {isActive ? 'Aktif' : 'Non-Aktif'}
-          </span>
+          </Badge>
         </div>
       );
     },

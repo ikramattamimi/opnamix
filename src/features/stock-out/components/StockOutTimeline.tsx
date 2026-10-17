@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import { getErrorMessage } from '@/lib/utils';
 import { useRecentStockOuts } from '../useStockOut';
+import { Card } from '@/components/ui/card';
 
 const TIMELINE_LIMIT = 10;
 
@@ -34,7 +35,7 @@ const StockOutTimeline: React.FC = () => {
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-soft p-6 mt-6">
+    <Card className="p-6 mt-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h3 className="font-bold text-xl text-foreground">Riwayat Pengeluaran</h3>
         <div className="flex items-center gap-2">
@@ -61,7 +62,7 @@ const StockOutTimeline: React.FC = () => {
       </div>
 
       {showTimeline && renderContent()}
-    </div>
+    </Card>
   );
 };
 

@@ -32,6 +32,7 @@ import {
 } from '../serviceSchema';
 import { ServiceCategoryDialog } from './ServiceCategoryDialog';
 import { serviceInputClassName, serviceLabelClassName } from './serviceFormStyles';
+import { Card } from '@/components/ui/card';
 
 interface ServiceFormDialogProps {
   editingService?: Service;
@@ -89,7 +90,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
   return (
     <>
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm m-0">
-        <div className="bg-card w-full max-w-2xl rounded-2xl shadow-soft p-8 overflow-y-auto max-h-[90vh] relative">
+        <Card className="w-full max-w-2xl p-8 overflow-y-auto max-h-[90vh] relative">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold text-foreground">
               {editingService ? 'Edit Jasa' : 'Tambah Jasa Baru'}
@@ -224,7 +225,7 @@ export const ServiceFormDialog: React.FC<ServiceFormDialogProps> = ({
               </div>
             </form>
           </Form>
-        </div>
+        </Card>
       </div>
 
       {isCategoryDialogOpen && (

@@ -3,6 +3,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { SlidersHorizontal } from 'lucide-react';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
 import type { StockMutationRow } from './types';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 
 // Type options for filter
 const typeOptions = [
@@ -70,16 +71,16 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
     },
     cell: ({ row }) => {
       const type = row.getValue('type') as string;
-      const getTypeStyle = () => {
+      const getTypeVariant = (): BadgeProps['variant'] => {
         switch (type) {
           case 'masuk':
-            return 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300';
+            return 'success';
           case 'keluar':
-            return 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300';
+            return 'danger';
           case 'penyesuaian':
-            return 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300';
+            return 'violet';
           default:
-            return 'bg-gray-100 text-gray-600';
+            return 'neutral';
         }
       };
       const getTypeLabel = () => {
@@ -96,12 +97,10 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
       };
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${getTypeStyle()}`}
-          >
+          <Badge variant={getTypeVariant()}>
             {type === 'penyesuaian' && <SlidersHorizontal className="size-3" aria-hidden />}
             {getTypeLabel()}
-          </span>
+          </Badge>
         </div>
       );
     },
@@ -189,15 +188,9 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
       const status = row.getValue('status') as string;
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              status === 'selesai'
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300'
-            }`}
-          >
+          <Badge variant={status === 'selesai' ? 'info' : 'warning'}>
             {status === 'selesai' ? 'Selesai' : 'Menunggu'}
-          </span>
+          </Badge>
         </div>
       );
     },

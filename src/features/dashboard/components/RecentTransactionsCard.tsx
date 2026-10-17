@@ -5,6 +5,15 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryS
 import { exportRecentTransactionsToExcel } from '@/features/reports/exportUtils';
 import type { RecentTransaction } from '../api';
 import type { useRecentTransactions } from '../useDashboard';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 const EMPTY_TRANSACTIONS: RecentTransaction[] = [];
 
@@ -27,7 +36,7 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
   const loading = isPending || isPlaceholderData;
 
   return (
-    <div className="bg-card p-6 rounded-2xl shadow-soft">
+    <Card className="p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <h3 className="text-xl font-bold text-foreground">Transaksi Terbaru</h3>
         <div className="flex gap-2">
@@ -77,43 +86,33 @@ const RecentTransactionsCard: React.FC<RecentTransactionsCardProps> = ({
         />
       ) : recentTrx.length > 0 ? (
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-left border-b border-gray-100 dark:border-gray-800">
-                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium pl-2">
-                  Nama Obat
-                </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                  Status
-                </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                  Kategori
-                </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                  Jumlah
-                </th>
-                <th className="pb-4 text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                  Tanggal
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-sm font-medium text-foreground">
+          <Table>
+            <TableHeader>
+              <TableRow className="text-left">
+                <TableHead>Nama Obat</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Kategori</TableHead>
+                <TableHead>Jumlah</TableHead>
+                <TableHead>Tanggal</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="text-sm font-medium text-foreground">
               {recentTrx.map((trx) => (
                 <TransactionRow key={trx.id} trx={trx} />
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       ) : (
         <EmptyState title="Belum ada transaksi terbaru." className="py-10" />
       )}
-    </div>
+    </Card>
   );
 };
 
 const TransactionRow: React.FC<{ trx: RecentTransaction }> = ({ trx }) => (
-  <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-    <td className="py-4 pl-2 flex items-center gap-3">
+  <TableRow>
+    <TableCell className="flex items-center gap-3">
       <div
         className={`w-10 h-10 rounded-full ${trx.iconBg} dark:bg-opacity-20 flex items-center justify-center ${trx.iconColor}`}
       >
@@ -124,14 +123,14 @@ const TransactionRow: React.FC<{ trx: RecentTransaction }> = ({ trx }) => (
         )}
       </div>
       <span className="font-bold">{trx.name}</span>
-    </td>
-    <td className="py-4">
+    </TableCell>
+    <TableCell>
       <span>{trx.status}</span>
-    </td>
-    <td className="py-4">{trx.category}</td>
-    <td className="py-4 font-bold">{trx.amount}</td>
-    <td className="py-4 text-muted-foreground">{trx.date}</td>
-  </tr>
+    </TableCell>
+    <TableCell>{trx.category}</TableCell>
+    <TableCell className="font-bold">{trx.amount}</TableCell>
+    <TableCell className="text-muted-foreground">{trx.date}</TableCell>
+  </TableRow>
 );
 
 export default RecentTransactionsCard;

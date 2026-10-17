@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Service } from '@/features/services/types';
 import type { StockOutRequestValues } from '../schemas';
+import { Card } from '@/components/ui/card';
 
 interface ServicePickerProps {
   services: Service[];
@@ -44,7 +45,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
   };
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-soft">
+    <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-700">
@@ -134,7 +135,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft, ArrowRight, BadgeCheck, Info, LogOut, Save, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 interface OpnameActionsProps {
   currentStep: number;
@@ -31,7 +32,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
   onBackward,
   onExit,
 }) => (
-  <div className="bg-card rounded-2xl p-6 shadow-soft">
+  <Card className="p-6">
     <h3 className="text-base font-bold mb-2 flex items-center gap-2">
       <Zap className="size-5 text-primary" aria-hidden />
       Tindakan
@@ -108,7 +109,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
         Keluar
       </Button>
     </div>
-  </div>
+  </Card>
 );
 
 // Bar tindakan yang menempel di bawah layar (mobile)

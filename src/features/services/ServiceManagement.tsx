@@ -15,6 +15,7 @@ import { ServiceFormDialog } from './components/ServiceFormDialog';
 import { ServiceCategoryDialog } from './components/ServiceCategoryDialog';
 import PageLayout from '@/components/layout/PageLayout';
 import PageHeader from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 // Form jasa: tertutup, tambah baru, atau edit jasa tertentu
 type ServiceFormState = { isOpen: false } | { isOpen: true; service?: Service };
@@ -126,7 +127,7 @@ const ServiceManagement: React.FC = () => {
 
         {/* Table */}
         <div className="w-full">
-          <div className="bg-card rounded-2xl p-6 shadow-soft h-full">
+          <Card className="p-6 h-full">
             {isPending ? (
               <LoadingState label="Memuat jasa..." />
             ) : isError ? (
@@ -149,7 +150,7 @@ const ServiceManagement: React.FC = () => {
               onPageChange={setPage}
               isPlaceholderData={isPlaceholderData}
             />
-          </div>
+          </Card>
         </div>
       </PageLayout>
 
