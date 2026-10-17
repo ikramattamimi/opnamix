@@ -9,22 +9,22 @@ export interface RoleInfo {
 const ROLE_LABELS: Record<string, RoleInfo> = {
   admin: {
     label: 'Admin',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300',
     icon: ShieldCheck,
   },
   apoteker: {
     label: 'Farmasi',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
     icon: Pill,
   },
   farmasi: {
     label: 'Farmasi',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
     icon: Pill,
   },
   nakes: {
     label: 'Nakes',
-    color: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    color: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
     icon: ShieldPlus,
   },
 };

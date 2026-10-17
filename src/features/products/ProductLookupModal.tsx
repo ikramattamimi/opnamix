@@ -115,7 +115,7 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
                     >
                       <div className="flex items-center gap-4">
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${product.stock > 0 ? 'bg-blue-50 text-primary dark:bg-blue-500/20 dark:text-blue-300' : 'bg-red-50 text-red-500 dark:bg-red-500/20'}`}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${product.stock > 0 ? 'bg-blue-50 text-primary dark:bg-blue-500/20 dark:text-blue-300' : 'bg-red-50 text-red-700 dark:bg-red-500/20'}`}
                         >
                           {product.stock > 0 ? (
                             <Pill className="size-6" aria-hidden />

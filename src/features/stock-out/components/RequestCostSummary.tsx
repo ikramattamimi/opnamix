@@ -51,7 +51,7 @@ const RequestCostSummary: React.FC<RequestCostSummaryProps> = ({
               <FormItem className="rounded-xl bg-white/10 p-3">
                 <FormLabel className="block text-sm font-medium text-white/90">{label}</FormLabel>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-white/80">Rp</span>
+                  <span className="text-sm text-white/90">Rp</span>
                   <FormControl>
                     <Input
                       type="number"
@@ -62,7 +62,7 @@ const RequestCostSummary: React.FC<RequestCostSummaryProps> = ({
                       onBlur={field.onBlur}
                       value={field.value === 0 ? '' : field.value}
                       onChange={(e) => field.onChange(toAmount(e.target.value))}
-                      className="h-auto rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm md:text-sm font-bold text-white placeholder:text-white/50 focus:border-white/40 focus-visible:ring-white/40"
+                      className="h-auto rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm md:text-sm font-bold text-white placeholder:text-white/90 focus:border-white/40 focus-visible:ring-white/40"
                     />
                   </FormControl>
                 </div>
@@ -79,7 +79,7 @@ const RequestCostSummary: React.FC<RequestCostSummaryProps> = ({
       <Button
         type="submit"
         size="lg"
-        className="w-full bg-white text-primary hover:bg-blue-50 font-bold py-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-lg h-auto [&_svg]:size-6"
+        className="w-full bg-white text-blue-700 hover:bg-blue-50 font-bold py-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-lg h-auto [&_svg]:size-6"
         disabled={isLoading}
       >
         {isLoading ? (

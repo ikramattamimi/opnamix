@@ -71,8 +71,8 @@ export const createProductColumns = ({
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
               isLowStock
-                ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400'
-                : 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
+                ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
+                : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
             }`}
           >
             {isLowStock && <TriangleAlert className="size-3" aria-hidden />}

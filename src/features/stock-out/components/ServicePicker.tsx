@@ -47,7 +47,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
     <div className="bg-card rounded-[20px] p-6 shadow-soft h-auto">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-600">
+          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-700">
             <BriefcaseMedical className="size-5" aria-hidden />
           </span>
           Jasa

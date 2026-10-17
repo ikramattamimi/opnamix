@@ -142,13 +142,13 @@ const ProfilePage: React.FC = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Messages */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
           <CircleAlert className="size-5" aria-hidden />
           {error}
         </div>
       )}
       {success && (
-        <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
+        <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
           <CircleCheck className="size-5" aria-hidden />
           {success}
         </div>

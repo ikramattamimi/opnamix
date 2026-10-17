@@ -338,7 +338,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               >
                 <Bell className="size-[22px]" aria-hidden />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-purple-50 dark:border-gray-900">
+                  <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-600 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-purple-50 dark:border-gray-900">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
@@ -385,7 +385,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     variant="ghost"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
+                    className="w-full px-4 py-3 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
                   >
                     {isLoggingOut ? (
                       <>
@@ -430,7 +430,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             >
               <Bell className="size-6" aria-hidden />
               {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-white dark:border-border">
+                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 bg-red-600 rounded-full text-[9px] font-bold text-white flex items-center justify-center px-0.5 border-2 border-white dark:border-border">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -476,7 +476,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                   variant="ghost"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
+                  className="w-full px-4 py-3 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-start gap-2 h-auto disabled:opacity-50"
                 >
                   {isLoggingOut ? (
                     <>

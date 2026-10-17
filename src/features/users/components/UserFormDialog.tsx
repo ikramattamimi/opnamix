@@ -196,7 +196,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({ user, onClose, onSucces
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className={`${footerButtonClass} bg-primary text-white shadow-lg hover:bg-blue-700`}
+                className={`${footerButtonClass} bg-primary text-white shadow-lg hover:bg-primary/90`}
               >
                 {isSubmitting ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Simpan'}
               </Button>

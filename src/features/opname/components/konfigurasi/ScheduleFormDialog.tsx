@@ -40,7 +40,7 @@ const stepClass = (active: boolean, done: boolean) =>
   cn(
     'flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-initial justify-center',
     active && 'bg-primary text-white',
-    done && 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400',
+    done && 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
     !active && !done && 'bg-background text-muted-foreground',
   );
 

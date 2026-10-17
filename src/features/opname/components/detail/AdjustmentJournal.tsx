@@ -84,9 +84,9 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
                         className={cn(
                           'font-bold px-2 py-1 rounded-full text-xs',
                           (row.selisih ?? 0) > 0
-                            ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
                             : (row.selisih ?? 0) < 0
-                              ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400'
+                              ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
                               : 'bg-gray-100 text-muted-foreground dark:bg-gray-500/20',
                         )}
                       >

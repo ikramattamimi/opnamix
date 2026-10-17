@@ -65,7 +65,7 @@ const ProfileInfoSection: React.FC<ProfileInfoSectionProps> = ({
             <Button
               onClick={onSave}
               disabled={isSubmitting}
-              className="rounded-xl text-sm h-auto py-2 px-4 font-bold bg-primary text-white hover:bg-blue-700"
+              className="rounded-xl text-sm h-auto py-2 px-4 font-bold bg-primary text-white hover:bg-primary/90"
             >
               {isSubmitting ? 'Menyimpan...' : 'Simpan'}
             </Button>

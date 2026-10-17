@@ -22,7 +22,7 @@ const formatDiff = (diff: number) => (diff > 0 ? `+${diff}` : diff);
 const RequiredMark: React.FC<{ className: string }> = ({ className }) => (
   <span
     className={cn(
-      'absolute right-2 text-[10px] font-bold text-red-400 bg-red-50 px-1.5 py-0.5 rounded uppercase',
+      'absolute right-2 text-[10px] font-bold text-red-700 bg-red-50 px-1.5 py-0.5 rounded uppercase',
       className,
     )}
   >
@@ -99,9 +99,9 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                     className={cn(
                       'font-bold px-2 py-1 rounded-full text-xs',
                       diff > 0
-                        ? 'bg-green-100 text-green-600'
+                        ? 'bg-green-100 text-green-700'
                         : diff < 0
-                          ? 'bg-red-100 text-red-600'
+                          ? 'bg-red-100 text-red-700'
                           : 'bg-gray-100 text-muted-foreground',
                     )}
                   >

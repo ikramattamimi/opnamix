@@ -36,7 +36,7 @@ const StockReport: React.FC = () => {
             <TabsTrigger value="analysis" asChild>
               <Button
                 variant={activeTab === 'analysis' ? 'default' : 'ghost'}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-none ${activeTab === 'analysis' ? 'bg-white shadow text-primary hover:bg-white hover:text-primary' : 'text-muted-foreground hover:text-primary bg-transparent'}`}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-none ${activeTab === 'analysis' ? 'bg-card shadow text-primary hover:bg-card hover:text-primary' : 'text-muted-foreground hover:text-primary bg-transparent'}`}
               >
                 Analisis
               </Button>

@@ -18,7 +18,7 @@ export const ActiveSchedulesStrip: React.FC<{ schedules: ScheduleInfo[] }> = ({ 
     return (
       <div className="bg-gradient-to-r from-primary to-indigo-700 rounded-2xl shadow-lg px-4 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2 text-white">
-          <CalendarX className="size-5 text-white/60" aria-hidden />
+          <CalendarX className="size-5 text-white/90" aria-hidden />
           <span className="text-sm font-bold">Belum ada jadwal aktif</span>
         </div>
         <Button
@@ -41,11 +41,11 @@ export const ActiveSchedulesStrip: React.FC<{ schedules: ScheduleInfo[] }> = ({ 
         className="w-full h-auto flex items-center justify-between px-4 py-3 text-white hover:text-white hover:bg-transparent dark:hover:bg-transparent rounded-none active:scale-100 [&_svg]:size-6"
       >
         <div className="flex items-center gap-2">
-          <CalendarDays className="!size-5 text-white/80" aria-hidden />
+          <CalendarDays className="!size-5 text-white/90" aria-hidden />
           <span className="text-sm font-bold">{schedules.length} Jadwal Aktif</span>
         </div>
         <ChevronDown
-          className={cn('text-white/60 transition-transform', isExpanded && 'rotate-180')}
+          className={cn('text-white/90 transition-transform', isExpanded && 'rotate-180')}
           aria-hidden
         />
       </Button>
@@ -54,7 +54,7 @@ export const ActiveSchedulesStrip: React.FC<{ schedules: ScheduleInfo[] }> = ({ 
           {schedules.map((s) => (
             <div key={s.scheduleId} className="bg-white/15 rounded-xl px-4 py-2.5">
               <p className="text-sm font-bold text-white">{s.nama}</p>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-white/90">
                 {repeatLabel(s)} · Berikutnya: {formatDate(s.nextDate)}
               </p>
             </div>
@@ -82,8 +82,8 @@ export const ActiveSchedulesSidebar: React.FC<{
   return (
     <div className="bg-gradient-to-b from-primary to-indigo-700 rounded-2xl shadow-lg p-5 space-y-3">
       <div className="flex items-center gap-2">
-        <CalendarDays className="size-5 text-white/80" aria-hidden />
-        <span className="text-sm font-bold text-white/80">Jadwal Aktif</span>
+        <CalendarDays className="size-5 text-white/90" aria-hidden />
+        <span className="text-sm font-bold text-white/90">Jadwal Aktif</span>
       </div>
 
       {schedules.length > 0 ? (
@@ -91,15 +91,15 @@ export const ActiveSchedulesSidebar: React.FC<{
           {schedules.map((s) => (
             <div key={s.scheduleId} className="bg-white/15 rounded-xl px-4 py-3">
               <p className="text-sm font-bold text-white">{s.nama}</p>
-              <p className="text-[11px] text-white/60 mt-0.5">{repeatLabel(s)}</p>
-              <p className="text-[11px] text-white/60">Berikutnya: {formatDate(s.nextDate)}</p>
+              <p className="text-[11px] text-white/90 mt-0.5">{repeatLabel(s)}</p>
+              <p className="text-[11px] text-white/90">Berikutnya: {formatDate(s.nextDate)}</p>
             </div>
           ))}
         </div>
       ) : (
         <div className="bg-white/10 rounded-xl px-4 py-5 text-center">
           <CalendarX className="size-6 text-white/40 mx-auto mb-1" aria-hidden />
-          <p className="text-xs text-white/60">Belum ada jadwal aktif</p>
+          <p className="text-xs text-white/90">Belum ada jadwal aktif</p>
         </div>
       )}
 
@@ -113,7 +113,7 @@ export const ActiveSchedulesSidebar: React.FC<{
 
       <Button
         onClick={onAddOpname}
-        className="w-full bg-white hover:bg-primary/90 text-blue-600 font-bold rounded-xl px-4 h-auto py-3 text-sm shadow-lg shadow-primary/20"
+        className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-xl px-4 h-auto py-3 text-sm shadow-lg shadow-primary/20"
       >
         <CirclePlus className="mr-1.5" aria-hidden />
         Tambah Opname

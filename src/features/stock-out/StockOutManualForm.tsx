@@ -224,7 +224,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                 <Button
                   type="submit"
                   className={cn(
-                    'w-full bg-white text-primary hover:bg-blue-50 font-bold py-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-base',
+                    'w-full bg-white text-blue-700 hover:bg-blue-50 font-bold py-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-base',
                     '[&_svg]:size-6',
                   )}
                   disabled={isLoading}

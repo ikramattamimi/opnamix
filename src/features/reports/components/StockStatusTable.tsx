@@ -5,9 +5,9 @@ import type { Product } from '@/features/products/types';
 import { getStockStatus, getStockValue, type StockStatus } from '../stockAnalytics';
 
 const STATUS_BADGE: Record<StockStatus, { className: string; icon: LucideIcon }> = {
-  Kritikal: { className: 'bg-red-100 text-red-600', icon: OctagonAlert },
-  Menipis: { className: 'bg-amber-100 text-amber-600', icon: TriangleAlert },
-  Aman: { className: 'bg-green-100 text-green-600', icon: CircleCheck },
+  Kritikal: { className: 'bg-red-100 text-red-700', icon: OctagonAlert },
+  Menipis: { className: 'bg-amber-100 text-amber-800', icon: TriangleAlert },
+  Aman: { className: 'bg-green-100 text-green-700', icon: CircleCheck },
 };
 
 const StockStatusBadge: React.FC<{ status: StockStatus }> = ({ status }) => {

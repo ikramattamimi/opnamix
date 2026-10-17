@@ -100,7 +100,7 @@ export const OpnameActionsSidebar: React.FC<OpnameActionsProps> = ({
       <Button
         variant="ghost"
         onClick={onExit}
-        className="w-full font-bold rounded-xl h-auto py-3 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+        className="w-full font-bold rounded-xl h-auto py-3 text-red-700 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
       >
         <LogOut className="mr-2" aria-hidden />
         Keluar

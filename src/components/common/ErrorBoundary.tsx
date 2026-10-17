@@ -54,7 +54,7 @@ class ErrorBoundary extends Component<Props, State> {
           <Button
             variant="outline"
             onClick={() => this.setState({ hasError: false, error: null })}
-            className="mt-4 h-auto px-4 py-2 bg-white dark:bg-red-500/20 border-red-200 dark:border-red-500/20 rounded-xl text-xs font-bold text-red-600 dark:text-white shadow-none hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            className="mt-4 h-auto px-4 py-2 bg-white dark:bg-red-500/20 border-red-200 dark:border-red-500/20 rounded-xl text-xs font-bold text-red-700 dark:text-white shadow-none hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
           >
             Coba Muat Ulang
           </Button>

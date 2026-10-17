@@ -216,7 +216,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
               <div className={CARD}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className={CARD_TITLE}>
-                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-600">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-700">
                       <IdCard className="size-5" aria-hidden />
                     </span>
                     Nama Nakes
@@ -252,7 +252,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
               <div className={CARD}>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className={CARD_TITLE}>
-                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-600">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-700">
                       <Pill className="size-5" aria-hidden />
                     </span>
                     Permintaan Obat & Alkes

@@ -147,7 +147,7 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                           variant="ghost"
                           size="icon"
                           aria-label="Hapus obat"
-                          className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 h-8 w-8 rounded-lg [&_svg]:size-5"
+                          className="text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 h-8 w-8 rounded-lg [&_svg]:size-5"
                         >
                           <Trash2 aria-hidden />
                         </Button>

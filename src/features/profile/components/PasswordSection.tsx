@@ -84,7 +84,7 @@ const PasswordSection: React.FC<PasswordSectionProps> = ({ isSubmitting, onChang
             <Button
               onClick={() => void handleSubmit()}
               disabled={isSubmitting}
-              className="bg-primary text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 h-auto py-2.5 px-6"
+              className="bg-primary text-white rounded-xl font-bold shadow-lg hover:bg-primary/90 h-auto py-2.5 px-6"
             >
               {isSubmitting ? 'Menyimpan...' : 'Ubah Password'}
             </Button>

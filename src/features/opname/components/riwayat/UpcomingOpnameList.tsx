@@ -51,7 +51,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 rounded-lg">
+                    <span className="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 rounded-lg">
                       Sedang Dilaksanakan
                     </span>
                     <span className="text-xs text-muted-foreground">
@@ -66,7 +66,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => openPelaksanaan(opname.id)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl px-6 h-auto py-2.5 shadow-lg shadow-blue-600/20"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-6 h-auto py-2.5 shadow-lg shadow-primary/20"
                   >
                     <Play className="mr-1.5" aria-hidden />
                     Lanjutkan
@@ -74,7 +74,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                   <Button
                     variant="ghost"
                     onClick={() => onDelete(opname.id)}
-                    className="px-4 p-2.5 font-bold h-auto text-sm rounded-xl text-red-600 hover:text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="px-4 p-2.5 font-bold h-auto text-sm rounded-xl text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                   >
                     <Trash2 className="mr-1.5" aria-hidden />
@@ -96,7 +96,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <span className="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 rounded-lg">
+                  <span className="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300 rounded-lg">
                     Belum Dilaksanakan
                   </span>
                   <p className="font-bold text-foreground">{opname.scheduleName}</p>
@@ -116,7 +116,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(opname.id)}
-                    className="h-auto w-auto p-2.5 rounded-xl text-red-600 hover:text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="h-auto w-auto p-2.5 rounded-xl text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                     aria-label="Hapus Opname"
                   >

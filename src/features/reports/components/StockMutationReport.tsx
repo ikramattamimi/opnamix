@@ -56,7 +56,7 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
       <DateRangeFilter value={range} onChange={setRange}>
         <Button
           onClick={() => void mutationQuery.refetch()}
-          className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2 [&_svg]:size-5"
+          className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-primary/90 transition-colors h-auto flex items-center gap-2 [&_svg]:size-5"
         >
           <Search className="size-5" aria-hidden />
           Tampilkan Laporan

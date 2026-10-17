@@ -112,7 +112,7 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                       size="icon"
                       onClick={() => edit.onRemove(drug.id)}
                       aria-label="Hapus item"
-                      className="h-auto w-auto p-2 text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg"
+                      className="h-auto w-auto p-2 text-red-700 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg"
                     >
                       <Trash2 aria-hidden />
                     </Button>

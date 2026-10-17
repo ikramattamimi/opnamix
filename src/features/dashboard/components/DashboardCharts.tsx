@@ -78,7 +78,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
               <h3 className="text-xl font-bold text-foreground">Peringatan Stok Rendah</h3>
               <p className="text-sm text-muted-foreground">Item di bawah ambang batas</p>
             </div>
-            <div className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-lg">
+            <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-2 rounded-lg">
               <TriangleAlert className="size-6" aria-hidden />
             </div>
           </div>
@@ -136,7 +136,7 @@ const LowStockItem: React.FC<{ name: string; count: number; color: string }> = (
       <span className="text-sm font-medium text-foreground">{name}</span>
     </div>
     <span
-      className={`text-xs font-bold ${color === 'bg-red-500' ? 'text-red-500 bg-red-50' : 'text-orange-500 bg-orange-50'} dark:bg-opacity-10 px-2 py-1 rounded`}
+      className={`text-xs font-bold ${color === 'bg-red-500' ? 'text-red-700 bg-red-50' : 'text-orange-700 bg-orange-50'} dark:bg-opacity-10 px-2 py-1 rounded`}
     >
       Sisa {count}
     </span>

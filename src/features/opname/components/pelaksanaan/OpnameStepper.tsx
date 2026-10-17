@@ -39,7 +39,7 @@ const OpnameStepper: React.FC<OpnameStepperProps> = ({ execution }) => {
                     'flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all',
                     currentStep === step.num && 'bg-primary text-white shadow-lg shadow-primary/20',
                     currentStep > step.num &&
-                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
+                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
                     currentStep < step.num && 'bg-background text-muted-foreground',
                   )}
                 >

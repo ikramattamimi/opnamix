@@ -41,7 +41,7 @@ const DashboardMetrics: React.FC<{ stats: DashboardStats }> = ({ stats }) => (
         </h3>
       </div>
       {/* Pertumbuhan dihitung dari data real (placeholder untuk implementasi lengkap) */}
-      <div className="ml-auto flex items-center text-green-500 text-sm font-bold bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg">
+      <div className="ml-auto flex items-center text-green-700 dark:text-green-300 text-sm font-bold bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg">
         <TrendingUp className="size-5 mr-1" aria-hidden />
         Real-time
       </div>

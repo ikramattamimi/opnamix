@@ -41,7 +41,7 @@ const DetailOpnamePage: React.FC = () => {
           <h2 className="text-xl font-bold">Detail Opname</h2>
           <p className="text-sm text-muted-foreground">{opnameInfo?.opnameNumber || ''}</p>
         </div>
-        <span className="ml-auto text-xs font-bold px-3 py-1.5 bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-xl flex items-center gap-1">
+        <span className="ml-auto text-xs font-bold px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 rounded-xl flex items-center gap-1">
           <CircleCheck className="size-3" aria-hidden />
           Selesai
         </span>

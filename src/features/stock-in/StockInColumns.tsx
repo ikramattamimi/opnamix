@@ -94,8 +94,8 @@ export const createStockInColumns = ({
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
               isCompleted
-                ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
-                : 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400'
+                ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
+                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300'
             }`}
           >
             <span

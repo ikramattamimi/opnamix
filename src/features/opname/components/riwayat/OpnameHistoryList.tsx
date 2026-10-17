@@ -43,12 +43,12 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-lg flex items-center gap-1">
+                    <span className="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 rounded-lg flex items-center gap-1">
                       <CircleCheck className="size-3" aria-hidden />
                       Selesai
                     </span>
                     {(opname.discrepancyCount || 0) > 0 && (
-                      <span className="text-xs font-bold px-2 py-1 bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 rounded-lg">
+                      <span className="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300 rounded-lg">
                         {opname.discrepancyCount} Selisih
                       </span>
                     )}
@@ -74,7 +74,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   <Button
                     onClick={() => onDelete(opname.id)}
                     variant="ghost"
-                    className="rounded-xl font-bold px-4 text-sm h-auto py-2.5 text-red-600 hover:text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="rounded-xl font-bold px-4 text-sm h-auto py-2.5 text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                   >
                     <Trash2 className="mr-1.5" aria-hidden />

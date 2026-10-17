@@ -146,7 +146,7 @@ const InfoRow: React.FC<{ label: string; value: string; isStatus?: boolean }> = 
   <div>
     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
     {isStatus ? (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 mt-1 rounded-full text-xs font-bold bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 mt-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300">
         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
         {value}
       </span>

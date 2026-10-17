@@ -63,7 +63,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           iconBg: 'bg-blue-100 dark:bg-blue-500/20',
           iconColor: 'text-blue-600 dark:text-blue-400',
           icon: Info,
-          confirmBg: 'bg-primary hover:bg-blue-700 shadow-primary/30',
+          confirmBg: 'bg-primary hover:bg-primary/90 shadow-primary/30',
         };
     }
   };
