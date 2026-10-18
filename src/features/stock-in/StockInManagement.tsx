@@ -1,164 +1,206 @@
-import React, { useState } from 'react';
-import { StockInReceipt } from './types';
-import { Product } from '@/features/products/types';
-import { transactionsApi } from '@/features/transactions/api';
-import { stockInApi } from './api';
-import { exportStockInToExcel } from '@/features/reports/exportUtils';
-import { useStockInReceipts, useCreateStockIn } from './useStockIn';
-import StatCard from '@/components/common/StatCard';
-import { Archive, CircleArrowDown, Download, Plus, TrendingUp } from 'lucide-react';
-import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
-import StockInForm from './StockInForm';
-import StockInDetail from './StockInDetail';
-import PaginationControls from '@/components/common/PaginationControls';
-import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/ui/data-table';
-import { createStockInColumns } from './StockInColumns';
-import { useToast } from '@/components/ui/toast';
-import { withErrorDetail, getErrorMessage } from '@/lib/utils';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Archive, Download, Plus, SearchX } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { ListWithPanel } from '@/components/layout/ListWithPanel';
+import { Toolbar, ToolbarSpacer } from '@/components/data/Toolbar';
+import { SearchInput } from '@/components/data/SearchInput';
+import { FilterChips } from '@/components/data/FilterChips';
+import { GroupedList, ListRow } from '@/components/data/ListRow';
+import { groupByDay } from '@/components/data/listGroups';
+import { Pagination } from '@/components/data/Pagination';
+import { StatusChip } from '@/components/data/StatusChip';
+import { Avatar } from '@/components/data/Avatar';
+import { OptionSelect } from '@/components/form/OptionSelect';
+import { SidePanel } from '@/components/panel/SidePanel';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useListSelection } from '@/hooks/useListSelection';
+import { dayLabel, monthName, rp, rpShort } from '@/lib/format';
+import { ROUTES } from '@/types/routes';
+import { useAllProducts } from '@/features/products/useProducts';
+import { exportStockInToExcel } from '@/features/reports/exportUtils';
+import { useStockInReceipts } from './useStockIn';
+import {
+  ALL_SUPPLIERS,
+  expiringItems,
+  filterReceipts,
+  receiptDate,
+  receiptTime,
+  stockInStats,
+  supplierNames,
+  totalUnits,
+} from './stockInView';
+import { StockInPanel } from './components/StockInPanel';
 
-interface StockInManagementProps {
-  products?: Product[]; // Optional now, or removed
-}
+const PAGE_SIZE = 10;
 
-const StockInManagement: React.FC<StockInManagementProps> = () => {
-  const { showToast } = useToast();
+const hm = (date: Date) => date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+const StockInManagement: React.FC = () => {
+  const navigate = useNavigate();
+  // Semua penerimaan dimuat sekaligus supaya filter, ringkasan, dan grup per hari
+  // dihitung di klien (jumlahnya kecil untuk satu klinik)
+  const { data, isPending, isError, refetch } = useStockInReceipts({ page: 1, perPage: 1000 });
+  const receipts = useMemo(() => data?.data ?? [], [data]);
+  const { data: products = [] } = useAllProducts();
+  const productMap = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
+
+  const [query, setQuery] = useState('');
+  const [supplier, setSupplier] = useState(ALL_SUPPLIERS);
+  const [expiring, setExpiring] = useState(false);
   const [page, setPage] = useState(1);
-  const perPage = 10;
 
-  const {
-    data: paginatedData,
-    isPlaceholderData,
-    isPending,
-    isError,
-    refetch,
-  } = useStockInReceipts({ page, perPage });
-  const receipts = paginatedData?.data || [];
-  const totalPages = paginatedData?.totalPages || 1;
-  const totalReceipts = paginatedData?.total || 0;
+  const stats = useMemo(() => stockInStats(receipts), [receipts]);
+  const suppliers = useMemo(() => supplierNames(receipts), [receipts]);
+  const filtered = useMemo(
+    () => filterReceipts(receipts, { query, supplier, expiring }),
+    [receipts, query, supplier, expiring],
+  );
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, pages);
+  const visible = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const groups = groupByDay(visible, receiptDate, (d) => dayLabel(d));
 
-  const createStockIn = useCreateStockIn();
+  const { selectedId, select, panelOpen, closePanel } = useListSelection<string>();
+  const selected = receipts.find((r) => r.id === selectedId) ?? visible[0];
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState<StockInReceipt | null>(null);
+  const resetPage =
+    <T,>(setter: (v: T) => void) =>
+    (v: T) => {
+      setter(v);
+      setPage(1);
+    };
 
-  const handleSaveReceipt = async (receipt: StockInReceipt, file?: Blob) => {
-    setIsSubmitting(true);
-    try {
-      // Keep generated number only for receipt image filename
-      const transactionNumber = await transactionsApi.generateTransactionNumber('masuk');
+  const isFiltered = !!query.trim() || supplier !== ALL_SUPPLIERS || expiring;
 
-      // Upload image if provided
-      let imageUrl: string | undefined;
-      if (file) {
-        try {
-          imageUrl = await stockInApi.uploadReceiptImage(file, transactionNumber);
-        } catch (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          showToast(
-            `Gagal mengupload gambar: ${getErrorMessage(uploadError) || JSON.stringify(uploadError)}`,
-            'warning',
-          );
-          // Continue even if upload fails
-        }
-      }
+  const list = (
+    <Card className="flex flex-col gap-3 p-3">
+      <Toolbar>
+        <SearchInput
+          value={query}
+          onChange={resetPage(setQuery)}
+          placeholder="Cari supplier atau nomor nota"
+          label="Cari penerimaan"
+        />
+        <ToolbarSpacer />
+        <OptionSelect
+          aria-label="Supplier"
+          className="w-auto max-w-full"
+          value={supplier}
+          onValueChange={resetPage(setSupplier)}
+          options={[
+            { value: ALL_SUPPLIERS, label: 'Semua supplier' },
+            ...suppliers.map((s) => ({ value: s, label: s })),
+          ]}
+        />
+      </Toolbar>
+      <FilterChips
+        filters={expiring ? [{ key: 'exp', label: 'Ada batch kedaluwarsa < 6 bulan' }] : []}
+        onRemove={() => resetPage(setExpiring)(false)}
+      />
 
-      // Convert StockInReceipt to Transaction Payload
-      await createStockIn.mutateAsync({
-        nomor: receipt.invoiceNumber,
-        tanggal: receipt.date,
-        tipe: 'masuk',
-        tipe_sumber: 'PEMBELIAN',
-        status: 'selesai',
-        nama_pasien: receipt.supplierName,
-        keterangan: `Invoice: ${receipt.invoiceNumber}`,
-        bukti: imageUrl,
-        total: 0,
-        items: receipt.items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          price: 0,
-          batch: `EXP: ${item.expiryDate}`,
-          expiryDate: item.expiryDate,
-        })),
-        services: [],
-      });
-
-      setIsFormOpen(false);
-      showToast(
-        'Stok berhasil disimpan!' + (imageUrl ? ' Bukti nota berhasil diupload.' : ''),
-        'success',
-      );
-    } catch (error) {
-      console.error('Error saving stock in:', error);
-      showToast(withErrorDetail('Gagal menyimpan penerimaan stok', error), 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (selectedReceipt) {
-    return <StockInDetail receipt={selectedReceipt} onBack={() => setSelectedReceipt(null)} />;
-  }
+      {isPending ? (
+        <LoadingState label="Memuat penerimaan..." />
+      ) : isError ? (
+        <ErrorState onRetry={() => void refetch()} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon={isFiltered ? SearchX : Archive}
+          title={isFiltered ? 'Tidak ada penerimaan yang cocok' : 'Belum ada penerimaan'}
+          description={isFiltered ? 'Ubah kata kunci atau hapus filter.' : undefined}
+        />
+      ) : (
+        <>
+          <GroupedList
+            groups={groups}
+            getKey={(r) => r.id}
+            renderItem={(r) => {
+              const soon = expiringItems(r).length;
+              return (
+                <ListRow
+                  lead={<Avatar name={r.supplierName} tone="neutral" />}
+                  title={r.supplierName}
+                  subtitle={<span className="font-mono">{r.invoiceNumber}</span>}
+                  middle={`${r.items.length} produk · ${totalUnits(r).toLocaleString('id-ID')} unit`}
+                  middleSub={`Diterima ${r.receivedBy} · ${hm(receiptTime(r))}`}
+                  value={rp(r.total)}
+                  status={
+                    soon ? (
+                      <StatusChip tone="warn">{soon} exp dekat</StatusChip>
+                    ) : (
+                      <StatusChip tone="ok">Diterima</StatusChip>
+                    )
+                  }
+                  selected={r.id === selected?.id}
+                  onClick={() => select(r.id)}
+                />
+              );
+            }}
+          />
+          <Pagination
+            page={current}
+            pageSize={PAGE_SIZE}
+            total={filtered.length}
+            onPageChange={setPage}
+            note={`${PAGE_SIZE} per halaman`}
+          />
+        </>
+      )}
+    </Card>
+  );
 
   return (
     <>
       <PageHeader
+        stats={[
+          {
+            id: 'month',
+            label: monthName(new Date().getMonth()),
+            value: `${stats.monthCount} penerimaan`,
+          },
+          { id: 'value', label: 'Nilai pembelian', value: rpShort(stats.monthValue) },
+          {
+            id: 'exp',
+            label: 'Kedaluwarsa < 6 bln',
+            value: `${stats.expiringBatches} batch`,
+            tone: 'warn',
+            onClick: () => resetPage(setExpiring)(!expiring),
+            pressed: expiring,
+          },
+        ]}
         actions={
           <>
-            <Button variant="glass" onClick={() => void exportStockInToExcel(receipts)}>
+            <Button
+              variant="glass"
+              onClick={() => void exportStockInToExcel(filtered)}
+              disabled={filtered.length === 0}
+            >
               <Download aria-hidden />
               Ekspor
             </Button>
-            <Button variant="light" onClick={() => setIsFormOpen(true)}>
+            <Button variant="light" onClick={() => navigate(ROUTES.STOK_MASUK_BARU)}>
               <Plus aria-hidden />
-              Terima Stok Baru
+              Terima barang
             </Button>
           </>
         }
       />
-      <div className="space-y-6">
-        {/* Top Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <StatCard label="Total Stok Masuk" value={totalReceipts} icon={Archive} color="primary" />
-          <StatCard label="Masuk Hari Ini" value="-" icon={CircleArrowDown} color="blue-500" />
-          <StatCard label="Growth Stok" value="-" icon={TrendingUp} color="green-500" />
-        </div>
-
-        <Card className="p-6">
-          <div className="overflow-x-auto">
-            {isPending ? (
-              <LoadingState label="Memuat penerimaan stok..." />
-            ) : isError ? (
-              <ErrorState onRetry={() => void refetch()} />
-            ) : receipts.length === 0 ? (
-              <EmptyState icon={Archive} title="Belum ada penerimaan stok." />
-            ) : (
-              <DataTable
-                columns={createStockInColumns({ onView: setSelectedReceipt })}
-                data={receipts}
-                searchable={false}
-              />
-            )}
-            <PaginationControls
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-              isPlaceholderData={isPlaceholderData}
-            />
-          </div>
-        </Card>
-      </div>
-      {isFormOpen && (
-        <StockInForm
-          onSave={handleSaveReceipt}
-          onClose={() => setIsFormOpen(false)}
-          isLoading={isSubmitting}
-        />
-      )}
+      <ListWithPanel
+        list={list}
+        panelOpen={panelOpen}
+        onPanelClose={closePanel}
+        panel={
+          selected ? (
+            <StockInPanel key={selected.id} receipt={selected} products={productMap} />
+          ) : (
+            <SidePanel icon={Archive} title="Detail penerimaan">
+              <EmptyState title="Belum ada penerimaan dipilih" />
+            </SidePanel>
+          )
+        }
+      />
     </>
   );
 };

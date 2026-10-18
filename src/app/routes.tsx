@@ -59,7 +59,9 @@ const Dashboard = React.lazy(() => import('@/features/dashboard/Dashboard'));
 const ProductManagement = React.lazy(() => import('@/features/products/ProductManagement'));
 const ServiceManagement = React.lazy(() => import('@/features/services/ServiceManagement'));
 const StockInManagement = React.lazy(() => import('@/features/stock-in/StockInManagement'));
+const StockInPos = React.lazy(() => import('@/features/stock-in/StockInPos'));
 const StockOutManagement = React.lazy(() => import('@/features/stock-out/StockOutManagement'));
+const StockOutPos = React.lazy(() => import('@/features/stock-out/StockOutPos'));
 const RiwayatOpnamePage = React.lazy(() => import('@/features/opname/RiwayatOpnamePage'));
 const KonfigurasiOpnamePage = React.lazy(() => import('@/features/opname/KonfigurasiOpnamePage'));
 const PelaksanaanOpnamePage = React.lazy(() => import('@/features/opname/PelaksanaanOpnamePage'));
@@ -117,12 +119,28 @@ export const APP_ROUTES: readonly AppRoute[] = [
     sidebar: { label: 'Stok Masuk', icon: CircleArrowDown, group: 'Transaksi' },
   },
   {
+    path: ROUTES.STOK_MASUK_BARU,
+    title: 'Terima barang',
+    roles: STAFF_ROLES,
+    element: StockInPos,
+    errorName: 'Terima barang',
+    showInSidebar: false,
+  },
+  {
     path: ROUTES.STOK_KELUAR,
     title: 'Pengeluaran Stok (Keluar)',
     element: StockOutManagement,
     errorName: 'Pengeluaran Stok',
     showInSidebar: true,
     sidebar: { label: 'Stok Keluar', icon: CircleArrowUp, group: 'Transaksi' },
+  },
+  {
+    // Judul diganti halaman sesuai mode (permintaan/manual/edit)
+    path: ROUTES.STOK_KELUAR_BARU,
+    title: 'Permintaan baru',
+    element: StockOutPos,
+    errorName: 'Stok Keluar baru',
+    showInSidebar: false,
   },
   {
     path: ROUTES.STOK_OPNAME,

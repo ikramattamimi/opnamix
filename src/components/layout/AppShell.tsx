@@ -19,7 +19,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   const openDrawer = useCallback(() => setDrawerOpen(true), []);
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
-  const shell = useMemo(() => ({ openDrawer }), [openDrawer]);
+  const shell = useMemo(() => ({ openDrawer, sidebarPinned: pinned }), [openDrawer, pinned]);
 
   // Pindah halaman: tutup laci dan mulai dari atas
   useEffect(() => {

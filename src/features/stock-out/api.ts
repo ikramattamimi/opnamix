@@ -1,9 +1,8 @@
 import { supabase } from '@/lib/supabaseClient';
 import { StockOutRequest } from './types';
 import { PaginationParams, PaginatedResponse } from '@/types/pagination';
-import type { ApiResult } from '@/types/api';
-import { toDate } from '@/lib/utils';
 import { getDisplayNameFromMasterObat } from '@/features/products/productDisplay';
+import { getProfileNames } from '@/lib/profiles';
 import { extractTransactionNoteAndMeta } from './mappers';
 
 export const stockOutApi = {
@@ -47,22 +46,10 @@ export const stockOutApi = {
 
     if (error) throw error;
 
-    // Fetch profile names for created_by users
-    const createdByIds = [
-      ...new Set((data || []).map((t) => t.created_by).filter((id): id is string => Boolean(id))),
-    ];
-    const profileMap: Record<string, string> = {};
-    if (createdByIds.length > 0) {
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .in('id', createdByIds);
-      if (profiles) {
-        profiles.forEach((p) => {
-          profileMap[p.id] = p.full_name || '';
-        });
-      }
-    }
+    // Nama pembuat dan pemroses dari profiles
+    const profileMap = await getProfileNames(
+      (data || []).flatMap((t) => [t.created_by, t.processed_by]),
+    ).catch(() => ({}) as Record<string, string>);
 
     const mappedData = data.map((t) => {
       const transactionMeta = extractTransactionNoteAndMeta(t.keterangan);
@@ -96,6 +83,10 @@ export const stockOutApi = {
             }))
           : [],
         createdBy: t.created_by,
+        createdAt: t.created_at || t.tanggal,
+        processedAt: t.processed_at,
+        processedBy: (t.processed_by && profileMap[t.processed_by]) || null,
+        note: transactionMeta.note,
         totalAmount: t.total,
         discount: t.diskon ?? 0,
         serviceFee: normalizedServiceFee,
@@ -193,77 +184,6 @@ export const stockOutApi = {
     return { success: true };
   },
 
-  getRecentStockOuts: async (limit: number = 10) => {
-    const { data, error } = await supabase
-      .from('transaksi')
-      .select(
-        `
-        *,
-        transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (
-          qty,
-          master_obat (nama, jenis, merek, kandungan)
-        )
-      `,
-      )
-      .eq('tipe', 'keluar')
-      .eq('status', 'selesai')
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (error) throw error;
-
-    return data.map((t) => {
-      const itemCount = t.transaksi_detail?.length || 0;
-      const firstItemName =
-        getDisplayNameFromMasterObat(t.transaksi_detail?.[0]?.master_obat) || 'Item';
-      const totalQty = t.transaksi_detail?.reduce((acc: number, d) => acc + (d.qty || 0), 0) || 0;
-
-      let title = 'Pengeluaran Stok';
-      if (t.tipe_sumber === 'KASIR_LANGSUNG') {
-        title = 'Stok Manual';
-      } else if (t.tipe_sumber === 'PENGAJUAN_NAKES') {
-        title = 'Permintaan Nakes';
-      }
-
-      // Use created_at for accurate timestamps
-      const createdAt = toDate(t.created_at);
-      const now = new Date();
-      const diffMs = now.getTime() - createdAt.getTime();
-      const diffMins = Math.floor(diffMs / 60000);
-      const diffHours = Math.floor(diffMins / 60);
-      const diffDays = Math.floor(diffHours / 24);
-
-      let timeStr: string;
-      if (diffMins < 1) {
-        timeStr = 'Baru saja';
-      } else if (diffMins < 60) {
-        timeStr = `${diffMins} menit lalu`;
-      } else if (diffHours < 24) {
-        timeStr = `${diffHours} jam lalu`;
-      } else if (diffDays === 1) {
-        timeStr = `Kemarin ${createdAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
-      } else if (diffDays < 7) {
-        timeStr = `${diffDays} hari lalu`;
-      } else {
-        timeStr = createdAt.toLocaleDateString('id-ID', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        });
-      }
-
-      const itemDesc = itemCount > 1 ? `${firstItemName} +${itemCount - 1} lainnya` : firstItemName;
-
-      return {
-        id: t.id,
-        title,
-        desc: `${itemDesc} (${totalQty} pcs) — ${t.nama_pasien || 'Umum'}`,
-        time: timeStr,
-        dotColor: t.tipe_sumber === 'KASIR_LANGSUNG' ? 'bg-primary' : 'bg-emerald-500',
-      };
-    });
-  },
-
   // Fetch all staff profiles for dropdowns
   getNakesProfiles: async () => {
     const { data, error } = await supabase
@@ -275,5 +195,3 @@ export const stockOutApi = {
     return (data || []).map((p) => ({ id: p.id, full_name: p.full_name }));
   },
 };
-
-export type RecentStockOut = ApiResult<typeof stockOutApi.getRecentStockOuts>[number];

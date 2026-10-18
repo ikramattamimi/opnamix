@@ -10,6 +10,7 @@ import { TokenDocs } from './sections/TokenDocs';
 import { PageHeaderDocs, SegmentedDocs, ToneIconDocs } from './sections/ShellDocs';
 import { DataPrimitiveDocs, FormPrimitiveDocs, ListPanelDocs } from './sections/PrimitiveDocs';
 import { ProductDomainDocs, TagInputDocs } from './sections/ProductDocs';
+import { PosDocs } from './sections/PosDocs';
 import { DocsTocInline, DocsTocSidebar } from './components/DocsToc';
 import { PageHeader } from '@/components/layout/PageHeader';
 
@@ -26,6 +27,7 @@ const SECTIONS: { id: string; label: string; Component: React.FC }[] = [
   { id: 'form-primitives', label: 'Primitif form', Component: FormPrimitiveDocs },
   { id: 'tag-input', label: 'TagInput & OptionSelect', Component: TagInputDocs },
   { id: 'product-domain', label: 'Komponen produk', Component: ProductDomainDocs },
+  { id: 'pos', label: 'PosLayout & POS', Component: PosDocs },
   { id: 'dialog', label: 'Dialog', Component: DialogDocs },
   { id: 'dropdown', label: 'Dropdown', Component: DropdownDocs },
   { id: 'segmented', label: 'SegmentedControl', Component: SegmentedDocs },

@@ -25,6 +25,8 @@ export const stockInItemSchema = z.object({
     })
     .transform((value) => value as number),
   unit: z.string(),
+  batch: z.string(), // opsional
+  price: z.number().min(0, 'Harga beli tidak boleh negatif'), // harga beli per satuan
 });
 
 export const stockInFormSchema = z.object({
@@ -44,6 +46,8 @@ export const emptyStockInItem = (): StockInItemInput => ({
   expiryDate: '',
   quantity: 0,
   unit: 'Box',
+  batch: '',
+  price: 0,
 });
 
 export const todayIsoDate = () => new Date().toISOString().split('T')[0];

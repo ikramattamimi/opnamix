@@ -1,235 +1,260 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { StockOutRequest, StockOutManual } from './types';
-import { useProducts } from '@/features/products/useProducts';
-import { useStockOutRequests, useStockOutRealtime, useCreateStockOutRequest } from './useStockOut';
-import StockOutManualForm from './StockOutManualForm';
-import StockOutRequestForm from './StockOutRequestForm';
-import { NotebookPen, Pill } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/toast';
-import { withErrorDetail } from '@/lib/utils';
-import { useAuth } from '@/features/auth/useAuth';
-import StockOutTable from './components/StockOutTable';
-import StockOutTimeline from './components/StockOutTimeline';
-import StockOutDetailDialog, { type DetailMode } from './components/StockOutDetailDialog';
-import StockOutProcessDialog, { type ProcessDraft } from './components/StockOutProcessDialog';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Download, Inbox, NotebookPen, Plus, SearchX } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { ListWithPanel } from '@/components/layout/ListWithPanel';
+import { Toolbar, ToolbarSpacer } from '@/components/data/Toolbar';
+import { SearchInput } from '@/components/data/SearchInput';
+import { SegmentedControl } from '@/components/data/SegmentedControl';
+import { GroupedList, ListRow } from '@/components/data/ListRow';
+import { groupByDay } from '@/components/data/listGroups';
+import { Pagination } from '@/components/data/Pagination';
+import { StatusChip } from '@/components/data/StatusChip';
+import { Avatar } from '@/components/data/Avatar';
+import { OptionSelect } from '@/components/form/OptionSelect';
+import { SidePanel } from '@/components/panel/SidePanel';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { useListSelection } from '@/hooks/useListSelection';
+import { dayLabel, rp, rpShort } from '@/lib/format';
+import { useAuth } from '@/features/auth/useAuth';
+import { getUserRoles } from '@/app/routeUtils';
+import { useAllProducts } from '@/features/products/useProducts';
+import { exportStockOutToExcel } from '@/features/reports/exportUtils';
+import { useStockOutRequests, useStockOutRealtime } from './useStockOut';
+import {
+  filterRequests,
+  itemSummary,
+  requestTime,
+  stockOutStats,
+  typeLabel,
+  type StatusFilter,
+  type TypeFilter,
+} from './stockOutView';
+import { posOutPath, type PosOutState } from './navigation';
+import { StockOutPanel } from './components/StockOutPanel';
+import type { StockOutRequest } from './types';
+
+const PAGE_SIZE = 10;
+
+const TYPE_OPTIONS: { value: TypeFilter; label: string }[] = [
+  { value: 'Semua', label: 'Semua jenis' },
+  { value: 'Permintaan', label: 'Permintaan' },
+  { value: 'Manual', label: 'Manual' },
+];
+
+const hm = (date: Date) => date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
 const StockOutManagement: React.FC = () => {
-  const { showToast } = useToast();
-  const { data: productData } = useProducts({ page: 1, perPage: 1000 });
-  const products = productData?.data || [];
-
-  const [filterStatus, setFilterStatus] = useState<string>('Semua');
-  const hasInitializedQueueFilter = useRef(false);
-
-  // Hak akses, dipakai juga untuk parameter query
+  const navigate = useNavigate();
   const { userProfile } = useAuth();
   const userId = userProfile?.id;
-  const userRoles = userProfile?.roles ?? (userProfile?.role ? [userProfile.role] : []);
-  const isAdmin = userRoles.includes('admin');
-  const isFarmasi = userRoles.includes('apoteker') || userRoles.includes('farmasi');
-  const isNakes = userRoles.includes('nakes');
+  const roles = getUserRoles(userProfile);
+  const isAdmin = roles.includes('admin');
+  const isFarmasi = roles.includes('apoteker') || roles.includes('farmasi');
+  const isNakes = roles.includes('nakes');
+  const canCreateRequest = isAdmin || isNakes;
+  const canManual = isAdmin || isFarmasi;
+  const canProcess = isAdmin || isFarmasi;
 
-  const {
-    data: paginatedRequests,
-    isLoading: isRequestsLoading,
-    error: requestsError,
-    refetch: refetchRequests,
-  } = useStockOutRequests({
+  // Nakes hanya melihat permintaannya sendiri
+  const { data, isPending, isError, refetch } = useStockOutRequests({
     page: 1,
     perPage: 1000,
-    status: filterStatus === 'Semua' ? undefined : filterStatus,
     createdBy: isNakes && userId ? userId : undefined,
     nakesName: isNakes && userProfile?.full_name ? userProfile.full_name : undefined,
   });
-  const requests = paginatedRequests?.data || [];
-
-  // Realtime subscription — refresh tabel otomatis saat ada transaksi baru
+  const requests = useMemo(() => data?.data ?? [], [data]);
   useStockOutRealtime();
 
-  const createTransaction = useCreateStockOutRequest();
+  const { data: products = [] } = useAllProducts();
+  const productMap = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
 
-  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
-  const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
-  const [selected, setSelected] = useState<{ request: StockOutRequest; mode: DetailMode } | null>(
-    null,
-  );
-  const [processDraft, setProcessDraft] = useState<ProcessDraft | null>(null);
+  const [status, setStatus] = useState<StatusFilter>('Semua');
+  const [type, setType] = useState<TypeFilter>('Semua');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
 
-  const canCreateRequest = isAdmin || isNakes;
-  const canManualStock = isAdmin || isFarmasi;
-  const canProcessRequest = isAdmin || isFarmasi;
-  const canEditRequest = (request: StockOutRequest) =>
-    request.status === 'Menunggu' &&
-    (isAdmin || isFarmasi || (isNakes && request.createdBy === userId));
-
+  // Farmasi dan admin membuka antrean "Menunggu" lebih dulu (sekali saja)
+  const queueInitialized = useRef(false);
   useEffect(() => {
-    if (hasInitializedQueueFilter.current || !userProfile) return;
+    if (queueInitialized.current || !userProfile) return;
+    queueInitialized.current = true;
+    if (isAdmin || isFarmasi) setStatus('Menunggu');
+  }, [userProfile, isAdmin, isFarmasi]);
 
-    setFilterStatus(isAdmin || isFarmasi ? 'Menunggu' : 'Semua');
-    hasInitializedQueueFilter.current = true;
-  }, [isAdmin, isFarmasi, userProfile]);
+  const stats = useMemo(() => stockOutStats(requests), [requests]);
+  const statusCounts = useMemo(() => {
+    const byType = filterRequests(requests, { status: 'Semua', type, query });
+    return {
+      Semua: byType.length,
+      Menunggu: byType.filter((r) => r.status === 'Menunggu').length,
+      Selesai: byType.filter((r) => r.status === 'Selesai').length,
+    };
+  }, [requests, type, query]);
 
-  const handleSaveManualRecord = async (record: StockOutManual) => {
-    try {
-      const totalAmount = record.items.reduce((sum, item) => {
-        const product = products.find((p) => p.id === item.productId);
-        return sum + (product ? product.sellingPrice : 0) * item.quantity;
-      }, 0);
+  const filtered = useMemo(
+    () => filterRequests(requests, { status, type, query }),
+    [requests, status, type, query],
+  );
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, pages);
+  const visible = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const groups = groupByDay(visible, requestTime, (d) => dayLabel(d));
 
-      await createTransaction.mutateAsync({
-        tanggal: record.date,
-        tipe: 'keluar',
-        tipe_sumber: 'KASIR_LANGSUNG',
-        status: 'selesai',
-        nama_pasien: record.patient.fullName,
-        tanggal_lahir_pasien: record.patient.birthDate,
-        keterangan: record.reason,
-        total: totalAmount,
-        items: record.items.map((item) => {
-          const product = products.find((p) => p.id === item.productId);
-          return {
-            productId: item.productId,
-            quantity: item.quantity,
-            price: product ? product.sellingPrice : 0,
-          };
-        }),
-        services: [],
-        requestedBy: isAdmin ? 'Admin' : 'Farmasi',
-      });
+  const { selectedId, select, panelOpen, closePanel } = useListSelection<string>();
+  const selected = requests.find((r) => r.id === selectedId) ?? visible[0];
 
-      setIsManualModalOpen(false);
+  const resetPage =
+    <T,>(setter: (v: T) => void) =>
+    (v: T) => {
+      setter(v);
+      setPage(1);
+    };
 
-      const itemCount = record.items.length;
-      const itemSummary =
-        itemCount === 1
-          ? record.items[0].productName
-          : `${record.items[0].productName} dan ${itemCount - 1} item lainnya`;
-
-      showToast(
-        `Stok keluar untuk ${record.patient.fullName} berhasil dicatat: ${itemSummary}`,
-        'success',
-      );
-    } catch (error) {
-      console.error('Error saving manual record:', error);
-      showToast(withErrorDetail('Gagal menyimpan transaksi manual', error), 'error');
-    }
+  const openPos = (request: StockOutRequest, intent: PosOutState['intent']) => {
+    const mode = intent === 'edit' && typeLabel(request) === 'Manual' ? 'manual' : 'permintaan';
+    navigate(posOutPath(mode), { state: { request, intent } satisfies PosOutState });
   };
 
-  const handleSaveRequest = async (request: StockOutRequest) => {
-    try {
-      await createTransaction.mutateAsync({
-        tanggal: request.date,
-        tipe: 'keluar',
-        tipe_sumber: request.tipeSumber,
-        status: 'diajukan',
-        nama_pasien: request.patient.fullName,
-        tanggal_lahir_pasien: request.patient.birthDate,
-        keterangan: `Request from Nakes - Original ID: ${request.requestId}`,
-        total: request.totalAmount,
-        diskon: request.discount ?? 0,
-        serviceFee: request.serviceFee ?? 0,
-        items: request.drugs.map((drug) => {
-          const product = products.find((p) => p.id === drug.productId);
-          return {
-            productId: drug.productId,
-            quantity: drug.quantity,
-            price: product ? product.sellingPrice : 0,
-          };
-        }),
-        services: request.services.map((svc) => ({
-          serviceId: svc.id,
-          price: svc.price,
-        })),
-        requestedBy: request.requestedBy,
-      });
+  const isFiltered = !!query.trim() || status !== 'Semua' || type !== 'Semua';
 
-      setIsRequestFormOpen(false);
-      showToast(
-        `Pengajuan stok keluar untuk ${request.patient.fullName} berhasil disimpan.`,
-        'success',
-      );
-    } catch (error) {
-      console.error('Error saving request:', error);
-      showToast(withErrorDetail('Gagal menyimpan pengajuan', error), 'error');
-    }
-  };
+  const list = (
+    <Card className="flex flex-col gap-3 p-3">
+      <Toolbar>
+        <SearchInput
+          value={query}
+          onChange={resetPage(setQuery)}
+          placeholder="Cari pasien atau nomor"
+          label="Cari transaksi"
+        />
+        <SegmentedControl
+          label="Status"
+          options={(['Semua', 'Menunggu', 'Selesai'] as const).map((value) => ({
+            value,
+            label: value,
+            count: statusCounts[value],
+          }))}
+          value={status}
+          onChange={resetPage(setStatus)}
+        />
+        <ToolbarSpacer />
+        <OptionSelect
+          aria-label="Jenis"
+          className="w-auto"
+          value={type}
+          onValueChange={resetPage(setType)}
+          options={TYPE_OPTIONS}
+        />
+        <Button
+          variant="outline"
+          onClick={() => void exportStockOutToExcel(filtered)}
+          disabled={filtered.length === 0}
+        >
+          <Download aria-hidden />
+          Ekspor
+        </Button>
+      </Toolbar>
+
+      {isPending ? (
+        <LoadingState label="Memuat transaksi..." />
+      ) : isError ? (
+        <ErrorState onRetry={() => void refetch()} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon={isFiltered ? SearchX : Inbox}
+          title={isFiltered ? 'Tidak ada transaksi yang cocok' : 'Belum ada transaksi'}
+          description={isFiltered ? 'Ubah kata kunci atau filter.' : undefined}
+        />
+      ) : (
+        <>
+          <GroupedList
+            groups={groups}
+            getKey={(r) => r.id}
+            renderItem={(r) => (
+              <ListRow
+                lead={<Avatar name={r.patient.fullName} />}
+                title={r.patient.fullName || 'Tanpa nama'}
+                subtitle={`${r.requestId} · ${typeLabel(r)}`}
+                middle={itemSummary(r)}
+                middleSub={`${r.requestedBy} · ${hm(requestTime(r))}`}
+                value={rp(r.totalAmount || 0)}
+                status={
+                  <StatusChip tone={r.status === 'Menunggu' ? 'warn' : 'ok'}>{r.status}</StatusChip>
+                }
+                selected={r.id === selected?.id}
+                onClick={() => select(r.id)}
+              />
+            )}
+          />
+          <Pagination
+            page={current}
+            pageSize={PAGE_SIZE}
+            total={filtered.length}
+            onPageChange={setPage}
+            note={`${PAGE_SIZE} per halaman`}
+          />
+        </>
+      )}
+    </Card>
+  );
+
+  const panel = selected ? (
+    <StockOutPanel
+      key={selected.id}
+      request={selected}
+      products={productMap}
+      canEdit={
+        selected.status === 'Menunggu' &&
+        (isAdmin || isFarmasi || (isNakes && selected.createdBy === userId))
+      }
+      canProcess={canProcess}
+      canCopy={canCreateRequest}
+      onEdit={() => openPos(selected, 'edit')}
+      onCopy={() => openPos(selected, 'copy')}
+    />
+  ) : (
+    <SidePanel icon={Inbox} title="Detail transaksi">
+      <EmptyState title="Belum ada transaksi dipilih" />
+    </SidePanel>
+  );
 
   return (
     <>
       <PageHeader
+        stats={[
+          {
+            id: 'wait',
+            label: 'Menunggu proses',
+            value: stats.waiting,
+            tone: 'warn',
+            onClick: () => resetPage(setStatus)(status === 'Menunggu' ? 'Semua' : 'Menunggu'),
+            pressed: status === 'Menunggu',
+          },
+          { id: 'today', label: 'Hari ini', value: `${stats.today} transaksi` },
+          { id: 'week', label: 'Keluar 7 hari', value: rpShort(stats.weekTotal) },
+        ]}
         actions={
-          (canCreateRequest || canManualStock) && (
+          (canManual || canCreateRequest) && (
             <>
-              {canManualStock && (
-                <Button variant="glass" onClick={() => setIsManualModalOpen(true)}>
+              {canManual && (
+                <Button variant="glass" onClick={() => navigate(posOutPath('manual'))}>
                   <NotebookPen aria-hidden />
-                  Stok Manual
+                  Keluar manual
                 </Button>
               )}
               {canCreateRequest && (
-                <Button variant="light" onClick={() => setIsRequestFormOpen(true)}>
-                  <Pill aria-hidden />
-                  Buat Permintaan
+                <Button variant="light" onClick={() => navigate(posOutPath())}>
+                  <Plus aria-hidden />
+                  Buat permintaan
                 </Button>
               )}
             </>
           )
         }
       />
-      <div className="space-y-6">
-        <StockOutTable
-          requests={requests}
-          isLoading={isRequestsLoading}
-          error={requestsError}
-          onRetry={() => void refetchRequests()}
-          isNakes={isNakes}
-          canProcess={canProcessRequest}
-          filterStatus={filterStatus}
-          onFilterChange={setFilterStatus}
-          onView={(request) => setSelected({ request, mode: 'view' })}
-          onProcess={(request) => setSelected({ request, mode: 'process' })}
-        />
-
-        <StockOutTimeline />
-      </div>
-
-      {isManualModalOpen && (
-        <StockOutManualForm
-          onSave={handleSaveManualRecord}
-          onClose={() => setIsManualModalOpen(false)}
-          isLoading={createTransaction.isPending}
-        />
-      )}
-
-      {isRequestFormOpen && (
-        <StockOutRequestForm
-          onSave={handleSaveRequest}
-          onClose={() => setIsRequestFormOpen(false)}
-          isLoading={createTransaction.isPending}
-        />
-      )}
-
-      {selected && (
-        <StockOutDetailDialog
-          key={`${selected.request.id}-${selected.mode}`}
-          request={selected.request}
-          mode={selected.mode}
-          canEdit={canEditRequest(selected.request)}
-          canProcess={canProcessRequest}
-          onClose={() => setSelected(null)}
-          onRequestUpdated={(request) => setSelected({ ...selected, request })}
-          onConfirmProcess={(draft) => {
-            setProcessDraft(draft);
-            setSelected(null);
-          }}
-        />
-      )}
-
-      {processDraft && (
-        <StockOutProcessDialog draft={processDraft} onClose={() => setProcessDraft(null)} />
-      )}
+      <ListWithPanel list={list} panel={panel} panelOpen={panelOpen} onPanelClose={closePanel} />
     </>
   );
 };

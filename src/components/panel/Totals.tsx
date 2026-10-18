@@ -6,7 +6,12 @@ export interface TotalRow {
   value: React.ReactNode;
 }
 
-export const Totals: React.FC<{ rows?: TotalRow[]; grand: TotalRow }> = ({ rows = [], grand }) => (
+export interface TotalsProps {
+  rows?: TotalRow[];
+  grand: TotalRow;
+}
+
+export const Totals: React.FC<TotalsProps> = ({ rows = [], grand }) => (
   <div className="flex flex-col gap-1.5 text-meta">
     {rows.map((row, index) => (
       <div key={index} className="flex justify-between gap-3 text-muted-foreground">

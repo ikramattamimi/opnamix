@@ -335,7 +335,7 @@ export const DataPrimitiveDocs: React.FC = () => {
     >
       <DocExample
         title="Toolbar, SearchInput, FilterChips"
-        note="Tekan / untuk memfokuskan kotak cari."
+        note="Tekan / untuk memfokuskan kotak cari. Prop onEnter menjalankan aksi saat Enter (mis. menambah hasil teratas di POS); icon mengganti kaca pembesar (POS memakai ScanBarcode)."
         code={`
 <Toolbar>
   <SearchInput value={q} onChange={setQ} placeholder="Cari produk…" />

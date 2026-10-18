@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Kbd } from './Kbd';
 
 // Kotak cari di daftar. Tombol "/" memfokuskan kotak ini (kecuali sedang mengetik
-// di isian lain).
+// di isian lain). Dengan onEnter, Enter menjalankan aksi, mis. menambah hasil
+// teratas (atau hasil scan barcode) ke keranjang POS.
 
 interface SearchInputProps {
   value: string;
@@ -12,6 +14,9 @@ interface SearchInputProps {
   label?: string;
   /** Aktifkan pintasan "/" */
   shortcut?: boolean;
+  onEnter?: () => void;
+  /** Bawaan: kaca pembesar; POS memakai ikon scan */
+  icon?: LucideIcon;
   className?: string;
 }
 
@@ -25,6 +30,8 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   placeholder = 'Cari…',
   label,
   shortcut = true,
+  onEnter,
+  icon: Icon = Search,
   className,
 }) => {
   const ref = useRef<HTMLInputElement>(null);
@@ -48,12 +55,18 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         className,
       )}
     >
-      <Search className="size-4 shrink-0" aria-hidden />
+      <Icon className="size-4 shrink-0" aria-hidden />
       <input
         ref={ref}
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && onEnter) {
+            event.preventDefault();
+            onEnter();
+          }
+        }}
         placeholder={placeholder}
         aria-label={label ?? placeholder}
         className="min-w-0 flex-1 bg-transparent text-meta text-foreground outline-none placeholder:text-faint [&::-webkit-search-cancel-button]:hidden"
@@ -71,11 +84,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           <X className="size-3.5" aria-hidden />
         </button>
       ) : (
-        shortcut && (
-          <kbd className="rounded-md border bg-surface-2 px-1.5 font-mono text-2xs text-muted-foreground">
-            /
-          </kbd>
-        )
+        shortcut && <Kbd>/</Kbd>
       )}
     </label>
   );

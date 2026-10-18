@@ -7,7 +7,14 @@ import {
   type StockInFormInput,
 } from './stockInSchema';
 
-const validItem = { productId: 'p1', expiryDate: '2027-01-01', quantity: 10, unit: 'Box' };
+const validItem = {
+  productId: 'p1',
+  expiryDate: '2027-01-01',
+  quantity: 10,
+  unit: 'Box',
+  batch: '',
+  price: 1500,
+};
 const valid: StockInFormInput = {
   invoiceNumber: 'INV-001',
   supplierName: '',
@@ -44,6 +51,12 @@ describe('stockInFormSchema', () => {
   it('jumlah yang dikosongkan wajib diisi', () => {
     expect(issuesOf({ ...valid, items: [{ ...validItem, quantity: undefined }] })).toEqual({
       'items.0.quantity': 'Jumlah wajib diisi',
+    });
+  });
+
+  it('harga beli tidak boleh negatif', () => {
+    expect(issuesOf({ ...valid, items: [{ ...validItem, price: -1 }] })).toEqual({
+      'items.0.price': 'Harga beli tidak boleh negatif',
     });
   });
 
