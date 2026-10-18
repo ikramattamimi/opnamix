@@ -99,10 +99,8 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({ user, onClose, onSucces
           <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 flex items-center gap-3">
             <UserAvatar user={user} />
             <div>
-              <p className="font-bold text-sm text-text-primary-light dark:text-white">
-                {user.email}
-              </p>
-              <p className="text-xs text-text-secondary-light">ID: {user.id.slice(0, 8)}...</p>
+              <p className="font-bold text-sm text-foreground">{user.email}</p>
+              <p className="text-xs text-muted-foreground">ID: {user.id.slice(0, 8)}...</p>
             </div>
           </div>
         )}
@@ -198,7 +196,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({ user, onClose, onSucces
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className={`${footerButtonClass} bg-primary text-white shadow-lg hover:bg-blue-700`}
+                className={`${footerButtonClass} bg-primary text-white shadow-lg hover:bg-primary/90`}
               >
                 {isSubmitting ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Simpan'}
               </Button>

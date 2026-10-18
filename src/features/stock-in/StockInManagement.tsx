@@ -17,6 +17,7 @@ import { createStockInColumns } from './StockInColumns';
 import { useToast } from '@/components/ui/toast';
 import { withErrorDetail, getErrorMessage } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 interface StockInManagementProps {
   products?: Product[]; // Optional now, or removed
@@ -127,13 +128,7 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
           <StatCard label="Growth Stok" value="-" icon={TrendingUp} color="green-500" />
         </div>
 
-        <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h2 className="text-xl font-bold text-text-primary-light dark:text-white">
-              Daftar Penerimaan Stok
-            </h2>
-          </div>
-
+        <Card className="p-6">
           <div className="overflow-x-auto">
             {isPending ? (
               <LoadingState label="Memuat penerimaan stok..." />
@@ -155,7 +150,7 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
               isPlaceholderData={isPlaceholderData}
             />
           </div>
-        </div>
+        </Card>
       </div>
       {isFormOpen && (
         <StockInForm

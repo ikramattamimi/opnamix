@@ -40,8 +40,9 @@ const UiDocsPage: React.FC = () => (
         <div className="rounded-card border bg-card p-5 shadow">
           <p className="text-sm text-muted-foreground">
             Komponen bersama di <code className="font-mono text-xs">src/components/ui</code>{' '}
-            (shadcn/ui) dan <code className="font-mono text-xs">src/components/common</code>. Pakai
-            komponen ini sebelum membuat versi sendiri. Konvensi lengkap ada di{' '}
+            (shadcn/ui) dan <code className="font-mono text-xs">src/components/common</code>, dan{' '}
+            <code className="font-mono text-xs">src/components/layout</code>. Pakai komponen ini
+            sebelum membuat versi sendiri. Konvensi lengkap ada di{' '}
             <code className="font-mono text-xs">.ai/conventions/</code>.
           </p>
         </div>

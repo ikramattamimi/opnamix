@@ -44,9 +44,7 @@ const RequestServices: React.FC<RequestServicesProps> = ({ selected, edit }) => 
                     onChange={() => edit.onToggle(service.id)}
                     className="rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span className="font-medium text-text-primary-light dark:text-white">
-                    {service.name}
-                  </span>
+                  <span className="font-medium text-foreground">{service.name}</span>
                 </div>
                 <span className="text-sm font-bold text-primary dark:text-blue-300">
                   Rp {service.price.toLocaleString('id-ID')}
@@ -70,9 +68,7 @@ const RequestServices: React.FC<RequestServicesProps> = ({ selected, edit }) => 
             key={i}
             className="flex justify-between items-center p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-white/5"
           >
-            <span className="font-bold text-sm text-text-primary-light dark:text-white">
-              {svc.name}
-            </span>
+            <span className="font-bold text-sm text-foreground">{svc.name}</span>
             <span className="font-bold text-sm text-primary dark:text-blue-300">
               Rp {(svc.price || 0).toLocaleString('id-ID')}
             </span>

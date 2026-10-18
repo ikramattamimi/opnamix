@@ -9,6 +9,7 @@ import { createInitialDateRange, type ReportDateRange } from '../reportPeriod';
 import type { StockMutationRow } from '../types';
 import { useStockMutationReport } from '../useReports';
 import DateRangeFilter from './DateRangeFilter';
+import { Card } from '@/components/ui/card';
 
 const EMPTY_MUTATION_ROWS: StockMutationRow[] = [];
 
@@ -39,16 +40,14 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-[20px] shadow-soft p-6">
+    <Card className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-lg text-text-primary-light dark:text-white">
-          Laporan Mutasi Stok
-        </h3>
+        <h3 className="font-bold text-lg text-foreground">Laporan Mutasi Stok</h3>
         <Button
           onClick={handleExportMutations}
           variant="outline"
           disabled={allMutationData.length === 0}
-          className="px-6 py-2.5 rounded-xl font-bold h-auto flex items-center gap-2 [&_svg]:size-5"
+          className="px-6 font-bold flex items-center gap-2 [&_svg]:size-5"
         >
           <Download className="size-5" aria-hidden />
           Export Excel
@@ -58,7 +57,7 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
       <DateRangeFilter value={range} onChange={setRange}>
         <Button
           onClick={() => void mutationQuery.refetch()}
-          className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-colors h-auto flex items-center gap-2 [&_svg]:size-5"
+          className="bg-primary text-white px-6 font-bold shadow-lg hover:bg-primary/90 transition-colors flex items-center gap-2 [&_svg]:size-5"
         >
           <Search className="size-5" aria-hidden />
           Tampilkan Laporan
@@ -77,7 +76,7 @@ const StockMutationReport: React.FC<StockMutationReportProps> = ({ active }) => 
           pageSize={10}
         />
       )}
-    </div>
+    </Card>
   );
 };
 

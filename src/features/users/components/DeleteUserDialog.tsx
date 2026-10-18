@@ -42,15 +42,15 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
 
   return (
     <AlertDialog open onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent className="max-w-sm gap-5 rounded-2xl sm:rounded-2xl border-none bg-card-light dark:bg-card-dark p-6 shadow-xl">
+      <AlertDialogContent className="max-w-sm gap-5 rounded-2xl sm:rounded-2xl border-none bg-card p-6 shadow-xl">
         <div className="text-center">
           <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center mx-auto mb-4">
             <TriangleAlert className="size-8 text-red-500" aria-hidden />
           </div>
-          <AlertDialogTitle className="text-lg font-bold text-text-primary-light dark:text-white">
+          <AlertDialogTitle className="text-lg font-bold text-foreground">
             Hapus Pengguna?
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2">
+          <AlertDialogDescription className="text-sm text-muted-foreground mt-2">
             Anda akan menghapus profil <strong>{user.full_name || user.email}</strong>. Tindakan ini
             tidak dapat dibatalkan.
           </AlertDialogDescription>

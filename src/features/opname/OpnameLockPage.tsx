@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { OpnameLockInfo, useActiveOpnameLock } from './useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
 import { toDate } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 interface OpnameLockPageProps {
   opname: OpnameLockInfo;
@@ -64,9 +65,9 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
-        <div className="bg-card-light dark:bg-card-dark rounded-3xl p-8 md:p-12 shadow-soft text-center space-y-6">
+        <Card className="p-8 md:p-12 text-center space-y-6">
           {/* Icon */}
           <div className="flex justify-center">
             {isNakes ? (
@@ -85,7 +86,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
               {isNakes ? 'Opname Sedang Berlangsung' : 'Opname Sedang Berlangsung'}
             </h1>
-            <p className="text-text-secondary-light text-sm md:text-base">
+            <p className="text-muted-foreground text-sm md:text-base">
               {isNakes
                 ? 'Mohon menunggu. Opname sedang dilakukan oleh tim farmasi.'
                 : `Opname ${opname.opnameNumber} sedang dilaksanakan.`}
@@ -93,19 +94,19 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
           </div>
 
           {/* Progress Info */}
-          <div className="bg-background-light dark:bg-background-dark rounded-2xl p-6 space-y-3">
+          <div className="bg-background rounded-2xl p-6 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary-light">Kode Opname</span>
+              <span className="text-sm text-muted-foreground">Kode Opname</span>
               <span className="font-bold">{opname.opnameNumber}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary-light">Tahap Saat Ini</span>
+              <span className="text-sm text-muted-foreground">Tahap Saat Ini</span>
               <span className="font-bold text-primary">
                 {opname.currentStep}/3 - {getStepLabel(opname.currentStep)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary-light">Dimulai</span>
+              <span className="text-sm text-muted-foreground">Dimulai</span>
               <span className="font-bold">
                 {toDate(opname.startedAt).toLocaleString('id-ID', {
                   dateStyle: 'medium',
@@ -119,8 +120,9 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
           <div className="space-y-3">
             {(isAdmin || isFarmasi) && (
               <Button
+                size="lg"
                 onClick={handleContinueOpname}
-                className="w-full font-bold rounded-xl h-auto py-4 text-base [&_svg]:size-6"
+                className="w-full font-bold text-base [&_svg]:size-6"
               >
                 <Play className="mr-2" aria-hidden />
                 Lanjutkan Opname
@@ -130,10 +132,11 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
             {isNakes && (
               <>
                 <Button
+                  size="lg"
                   onClick={handleCheckStatus}
                   disabled={isChecking}
                   variant="outline"
-                  className="w-full font-bold rounded-xl h-auto py-4 text-base [&_svg]:size-6"
+                  className="w-full font-bold text-base [&_svg]:size-6"
                 >
                   {isChecking ? (
                     <>
@@ -159,7 +162,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
                     </p>
                     <Button
                       onClick={handleReload}
-                      className="w-full font-bold rounded-xl h-auto py-3 bg-emerald-500 hover:bg-emerald-600"
+                      className="w-full font-bold bg-emerald-500 hover:bg-emerald-600"
                     >
                       Muat Ulang Aplikasi
                     </Button>
@@ -203,7 +206,7 @@ const OpnameLockPage: React.FC<OpnameLockPageProps> = ({ opname }) => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

@@ -60,16 +60,16 @@ const StockOutDetailDialog: React.FC<StockOutDetailDialogProps> = ({
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       {/* Tombol tutup bawaan DialogContent disembunyikan; header punya tombol tutup sendiri */}
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-3xl p-0 gap-0 border-none bg-white dark:bg-card-dark shadow-2xl flex flex-col [&>button:last-child]:hidden">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl sm:rounded-2xl p-0 gap-0 border-none bg-card shadow-2xl flex flex-col [&>button:last-child]:hidden">
         <div className="p-6 border-b border-gray-100 dark:border-white/10 flex justify-between items-center bg-gray-50/50 dark:bg-white/5 sticky top-0 backdrop-blur-md z-10">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <ReceiptText className="size-6 text-primary" aria-hidden />
-              <DialogTitle className="text-xl font-bold leading-normal text-text-primary-light dark:text-white">
+              <DialogTitle className="text-xl font-bold leading-normal text-foreground">
                 {title}
               </DialogTitle>
             </div>
-            <DialogDescription className="text-sm text-text-secondary-light">
+            <DialogDescription className="text-sm text-muted-foreground">
               {request.requestId} • {formatDateTimeForDisplay(request.date)}
             </DialogDescription>
           </div>
@@ -78,7 +78,7 @@ const StockOutDetailDialog: React.FC<StockOutDetailDialogProps> = ({
               variant="ghost"
               size="icon"
               aria-label="Tutup"
-              className="h-auto w-auto p-2 rounded-full text-current hover:text-current hover:bg-gray-200 dark:hover:bg-white/10 [&_svg]:size-6"
+              className="w-auto p-2 rounded-full text-current hover:text-current hover:bg-gray-200 dark:hover:bg-white/10 [&_svg]:size-6"
             >
               <X aria-hidden />
             </Button>
@@ -115,7 +115,7 @@ const StockOutDetailDialog: React.FC<StockOutDetailDialogProps> = ({
                 <Button
                   variant="outline"
                   onClick={() => setIsEditMode(true)}
-                  className="h-auto px-6 py-2.5 rounded-xl font-bold text-sm bg-transparent shadow-none border border-primary/20 text-primary hover:text-primary hover:bg-primary/10 hover:border-primary/20"
+                  className="px-6 font-bold text-sm bg-transparent shadow-none border border-primary/20 text-primary hover:text-primary hover:bg-primary/10 hover:border-primary/20"
                 >
                   <Pencil aria-hidden />
                   Edit Detail

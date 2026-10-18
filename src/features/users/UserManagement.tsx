@@ -58,13 +58,13 @@ const UserManagement: React.FC = () => {
       <div className="space-y-6">
         {/* Toast Messages - Fixed Position */}
         {error && (
-          <div className="fixed top-4 right-4 z-[60] bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
+          <div className="fixed top-4 right-4 z-[60] bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
             <CircleAlert className="size-5 shrink-0" aria-hidden />
             {error}
           </div>
         )}
         {success && (
-          <div className="fixed top-4 right-4 z-[60] bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
+          <div className="fixed top-4 right-4 z-[60] bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
             <CircleCheck className="size-5 shrink-0" aria-hidden />
             {success}
           </div>

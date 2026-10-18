@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, type LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 export const SectionHeader: React.FC<{
   icon: LucideIcon;
@@ -23,7 +24,7 @@ export const OpnameSearchInput: React.FC<{
 }> = ({ value, onChange, placeholder }) => (
   <div className="relative mb-4">
     <Search
-      className="size-4 text-text-secondary-light absolute left-3 top-1/2 -translate-y-1/2"
+      className="size-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
       aria-hidden
     />
     <Input
@@ -32,12 +33,12 @@ export const OpnameSearchInput: React.FC<{
       aria-label={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-auto w-full bg-card-light dark:bg-card-dark border-none rounded-xl pl-9 pr-4 py-2.5 text-sm md:text-sm font-medium placeholder:text-text-secondary-light/50 focus-visible:ring-2 focus-visible:ring-primary/20 shadow-soft"
+      className="w-full bg-card border-none pl-9 pr-4 text-sm md:text-sm font-medium placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-primary/20 shadow-soft"
     />
   </div>
 );
 
 // Wadah kartu untuk status kosong/gagal di daftar opname
 export const ListStateCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft">{children}</div>
+  <Card>{children}</Card>
 );
