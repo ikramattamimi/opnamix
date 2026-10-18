@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { gridLayout } from '@/components/data/pagination';
+import { gridLayout } from '@/components/data/pageMath';
 
 // Jumlah kolom grid dari lebar wadah dan ukuran halaman (kolom × baris).
 // Pasang `ref` ke ResponsiveGrid dan teruskan `cols` ke sana.
