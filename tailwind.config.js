@@ -50,7 +50,19 @@ export default {
           imun: solid('cat-imun'),
           alkes: solid('cat-alkes'),
         },
-        glass: { DEFAULT: fixed('glass'), 2: fixed('glass-2'), line: fixed('glass-line') },
+        glass: {
+          DEFAULT: fixed('glass'),
+          2: fixed('glass-2'),
+          line: fixed('glass-line'),
+          shade: fixed('glass-shade'),
+        },
+        'grad-ink': solid('grad-ink'),
+        dot: {
+          ok: solid('dot-ok'),
+          warn: solid('dot-warn'),
+          bad: solid('dot-bad'),
+          'warn-ink': solid('on-dot-warn'),
+        },
         'on-grad': { DEFAULT: solid('on-grad'), 2: fixed('on-grad-2'), 3: fixed('on-grad-3') },
         chart: {
           ser1: solid('ser1'),
@@ -101,6 +113,15 @@ export default {
       spacing: {
         // Tinggi tombol lg (38px)
         9.5: '2.375rem',
+        // Lebar sidebar: rel ikon dan terbuka
+        4.5: '1.125rem',
+        6.5: '1.625rem',
+        7.5: '1.875rem',
+        8.5: '2.125rem',
+        rail: '4rem',
+        sbw: '14.5rem',
+        // Posisi elemen menempel tepat di bawah header halaman
+        'below-header': 'calc(var(--page-header-h, 0px) + 1rem)',
       },
       borderRadius: {
         // Kartu 14px, kontrol 8–9px

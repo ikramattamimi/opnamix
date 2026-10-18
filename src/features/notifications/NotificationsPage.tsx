@@ -11,6 +11,7 @@ import {
 } from './useNotifications';
 import { getNotificationLucideIcon, getNotificationColor, formatNotificationTime } from './format';
 import { AppNotification } from './types';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const TYPE_LABELS: Record<string, string> = {
   STOCK_OUT_REQUEST: 'Permintaan Stok Keluar',
@@ -62,27 +63,19 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary-light dark:text-white">Notifikasi</h1>
-          <p className="text-sm text-text-secondary-light mt-1">
-            {unreadCount > 0
-              ? `${unreadCount} notifikasi belum dibaca`
-              : 'Semua notifikasi sudah dibaca'}
-          </p>
-        </div>
-        {unreadCount > 0 && (
-          <Button
-            variant="ghost"
-            onClick={markAllAsRead}
-            className="text-sm font-bold text-primary hover:text-primary/80 border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 h-auto"
-          >
-            <CheckCheck className="size-4 mr-1.5" aria-hidden />
-            Tandai semua dibaca
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        stats={[
+          { label: 'Belum dibaca', value: unreadCount, tone: unreadCount > 0 ? 'warn' : 'ok' },
+        ]}
+        actions={
+          unreadCount > 0 && (
+            <Button variant="glass" onClick={markAllAsRead}>
+              <CheckCheck aria-hidden />
+              Tandai semua dibaca
+            </Button>
+          )
+        }
+      />
 
       {/* Filters */}
       <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 shadow-soft space-y-3">

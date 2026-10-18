@@ -16,6 +16,10 @@ const buttonVariants = cva(
         soft: 'bg-primary-soft text-primary-ink hover:border-primary/30',
         ghost: 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
         link: 'text-primary-ink underline-offset-4 hover:underline',
+        // Di atas gradien header/sidebar
+        light: 'bg-on-grad text-grad-ink hover:bg-primary-soft',
+        glass:
+          'border-glass-line bg-glass text-on-grad hover:bg-glass-2 aria-pressed:border-on-grad aria-pressed:bg-on-grad aria-pressed:text-grad-ink',
       },
       // sm 28px, default 32px, lg 38px
       size: {

@@ -5,6 +5,9 @@ import { extendTailwindMerge } from 'tailwind-merge';
 // `text-meta` dianggap warna teks dan membuang `text-primary` di kelas yang sama.
 const twMerge = extendTailwindMerge({
   extend: {
+    theme: {
+      spacing: ['rail', 'sbw', 'below-header'],
+    },
     classGroups: {
       'font-size': [{ text: ['2xs', 'meta'] }],
       shadow: [{ shadow: ['float'] }],

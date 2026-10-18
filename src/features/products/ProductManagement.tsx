@@ -30,6 +30,7 @@ import { createProductColumns } from './ProductColumns';
 import { useToast } from '@/components/ui/toast';
 import { exportProductsToExcel } from '@/features/reports/exportUtils';
 import { useDashboardStats } from '@/features/dashboard/useDashboard';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const ProductManagement: React.FC = () => {
   const { showToast } = useToast();
@@ -129,6 +130,24 @@ const ProductManagement: React.FC = () => {
 
   return (
     <>
+      <PageHeader
+        actions={
+          <>
+            <Button
+              variant="glass"
+              onClick={() => void exportProductsToExcel(products)}
+              disabled={products.length === 0}
+            >
+              <Download aria-hidden />
+              Ekspor Excel
+            </Button>
+            <Button variant="light" onClick={() => setIsModalOpen(true)}>
+              <Plus aria-hidden />
+              Tambah Produk Baru
+            </Button>
+          </>
+        }
+      />
       <div className="space-y-6">
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -150,30 +169,6 @@ const ProductManagement: React.FC = () => {
             icon={TriangleAlert}
             color="red-500"
           />
-        </div>
-
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-text-primary-light dark:text-white">
-            Daftar Produk
-          </h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-              onClick={() => void exportProductsToExcel(products)}
-              disabled={products.length === 0}
-            >
-              <Download aria-hidden />
-              Ekspor Excel
-            </Button>
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-            >
-              <Plus aria-hidden />
-              Tambah Produk Baru
-            </Button>
-          </div>
         </div>
 
         {/* Filter Bar */}

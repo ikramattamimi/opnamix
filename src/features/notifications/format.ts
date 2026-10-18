@@ -17,6 +17,7 @@ import {
   TriangleAlert,
   type LucideIcon,
 } from 'lucide-react';
+import { ROUTES } from '@/types/routes';
 
 const NOTIFICATION_ICONS: Record<string, LucideIcon> = {
   STOCK_OUT_REQUEST: ClipboardList,
@@ -42,42 +43,45 @@ export function getNotificationLucideIcon(type: string): LucideIcon {
   return NOTIFICATION_ICONS[type] ?? Bell;
 }
 
+export type NotificationTone = 'ok' | 'warn' | 'bad' | 'info' | 'neutral';
+
+const NOTIFICATION_TONES: Record<string, NotificationTone> = {
+  STOCK_OUT_REQUEST: 'info',
+  STOCK_OUT_PROCESSED: 'ok',
+  STOCK_LOW: 'warn',
+  STOCK_EMPTY: 'bad',
+  OPNAME_STARTED: 'info',
+  OPNAME_COMPLETED: 'ok',
+  OPNAME_CREATED: 'info',
+  OPNAME_STEP_CHANGED: 'info',
+  STOCK_IN: 'ok',
+  STOCK_OUT_DIRECT: 'info',
+  OPNAME_DISCREPANCY: 'warn',
+  PRODUCT_ADDED: 'ok',
+  PRODUCT_DELETED: 'bad',
+  SERVICE_ADDED: 'ok',
+};
+
 /**
- * Get the notification color based on type (for icon/badge).
+ * Nada warna (token status) untuk tipe notifikasi.
+ */
+export function getNotificationTone(type: string): NotificationTone {
+  return NOTIFICATION_TONES[type] ?? 'neutral';
+}
+
+const TONE_TEXT: Record<NotificationTone, string> = {
+  ok: 'text-ok',
+  warn: 'text-warn',
+  bad: 'text-bad',
+  info: 'text-info',
+  neutral: 'text-muted-foreground',
+};
+
+/**
+ * Kelas warna teks ikon notifikasi.
  */
 export function getNotificationColor(type: string): string {
-  switch (type) {
-    case 'STOCK_OUT_REQUEST':
-      return 'text-blue-500';
-    case 'STOCK_OUT_PROCESSED':
-      return 'text-emerald-500';
-    case 'STOCK_LOW':
-      return 'text-amber-500';
-    case 'STOCK_EMPTY':
-      return 'text-red-500';
-    case 'OPNAME_STARTED':
-      return 'text-purple-500';
-    case 'OPNAME_COMPLETED':
-      return 'text-emerald-500';
-    case 'OPNAME_CREATED':
-      return 'text-indigo-500';
-    case 'OPNAME_STEP_CHANGED':
-      return 'text-blue-500';
-    case 'STOCK_IN':
-      return 'text-teal-500';
-    case 'STOCK_OUT_DIRECT':
-      return 'text-orange-500';
-    case 'OPNAME_DISCREPANCY':
-      return 'text-red-400';
-    case 'PRODUCT_ADDED':
-      return 'text-green-500';
-    case 'PRODUCT_DELETED':
-      return 'text-red-400';
-    case 'SERVICE_ADDED':
-      return 'text-cyan-500';
-    default:
-      return 'text-gray-500';
-  }
+  return TONE_TEXT[getNotificationTone(type)];
 }
 
 /**
@@ -98,4 +102,28 @@ export function formatNotificationTime(dateString: string): string {
   if (diffDay < 7) return `${diffDay} hari lalu`;
 
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+const NOTIFICATION_TARGETS: Partial<Record<string, string>> = {
+  STOCK_OUT_REQUEST: ROUTES.STOK_KELUAR,
+  STOCK_OUT_PROCESSED: ROUTES.STOK_KELUAR,
+  STOCK_OUT_DIRECT: ROUTES.STOK_KELUAR,
+  STOCK_LOW: ROUTES.MASTER_DATA_PRODUK,
+  STOCK_EMPTY: ROUTES.MASTER_DATA_PRODUK,
+  PRODUCT_ADDED: ROUTES.MASTER_DATA_PRODUK,
+  PRODUCT_DELETED: ROUTES.MASTER_DATA_PRODUK,
+  STOCK_IN: ROUTES.STOK_MASUK,
+  SERVICE_ADDED: ROUTES.MASTER_DATA_JASA,
+  OPNAME_STARTED: ROUTES.STOK_OPNAME,
+  OPNAME_COMPLETED: ROUTES.STOK_OPNAME,
+  OPNAME_CREATED: ROUTES.STOK_OPNAME,
+  OPNAME_STEP_CHANGED: ROUTES.STOK_OPNAME,
+  OPNAME_DISCREPANCY: ROUTES.STOK_OPNAME,
+};
+
+/**
+ * Halaman yang dibuka saat notifikasi diklik. Tipe tak dikenal ke halaman Notifikasi.
+ */
+export function getNotificationTarget(type: string): string {
+  return NOTIFICATION_TARGETS[type] ?? ROUTES.NOTIFICATIONS;
 }

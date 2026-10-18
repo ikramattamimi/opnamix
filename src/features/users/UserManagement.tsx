@@ -8,6 +8,7 @@ import UserTable from './components/UserTable';
 import UserFormDialog from './components/UserFormDialog';
 import ResetPasswordDialog from './components/ResetPasswordDialog';
 import DeleteUserDialog from './components/DeleteUserDialog';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 type ActiveDialog =
   { type: 'create' } | { type: 'edit' | 'resetPassword' | 'delete'; user: UserRow } | null;
@@ -46,26 +47,15 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
-              Manajemen Pengguna
-            </h2>
-            <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-              Kelola akun pengguna dan hak akses sistem.
-            </p>
-          </div>
-          <Button
-            onClick={() => openDialog({ type: 'create' })}
-            className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all h-auto flex items-center gap-2"
-          >
-            <UserPlus className="size-5" aria-hidden />
+      <PageHeader
+        actions={
+          <Button variant="light" onClick={() => openDialog({ type: 'create' })}>
+            <UserPlus aria-hidden />
             Tambah Pengguna
           </Button>
-        </div>
-
+        }
+      />
+      <div className="space-y-6">
         {/* Toast Messages - Fixed Position */}
         {error && (
           <div className="fixed top-4 right-4 z-[60] bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">

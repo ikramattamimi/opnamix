@@ -1,8 +1,8 @@
 import React from 'react';
-import { ArrowLeft, Eye, ReceiptText } from 'lucide-react';
+import { Eye, ReceiptText } from 'lucide-react';
 import { StockInReceipt } from './types';
-import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/common/QueryState';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 interface StockInDetailProps {
   receipt: StockInReceipt;
@@ -12,21 +12,7 @@ interface StockInDetailProps {
 const StockInDetail: React.FC<StockInDetailProps> = ({ receipt, onBack }) => {
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4 mb-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onBack}
-          aria-label="Kembali"
-          className="h-auto w-auto p-2 text-current bg-white dark:bg-card-dark hover:bg-white dark:hover:bg-card-dark rounded-full shadow-soft hover:text-primary transition-colors [&_svg]:size-6"
-        >
-          <ArrowLeft aria-hidden />
-        </Button>
-        <h2 className="text-2xl font-bold text-text-primary-light dark:text-white">
-          Detail Penerimaan Stok
-        </h2>
-      </div>
+      <PageHeader title="Detail Penerimaan Stok" back={onBack} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">

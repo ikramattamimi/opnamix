@@ -1,13 +1,14 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/types/routes';
-import Sidebar from '@/components/layout/Sidebar';
-import Header from '@/components/layout/Header';
+import { AppShell } from '@/components/layout/AppShell';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { EmptyState } from '@/components/common/QueryState';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { UserProfile } from '@/features/auth/api';
 import { useActiveOpnameLock, useOpnameLockRealtime } from '@/features/opname/useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
-import { SearchX } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/common/QueryState';
 import { APP_ROUTES, type AppRoute } from './routes';
@@ -31,20 +32,21 @@ const ProtectedRoute: React.FC<{
   return <>{children}</>;
 };
 
-const NotFoundPage = () => (
-  <div className="flex flex-col items-center justify-center h-64 text-center">
-    <SearchX className="size-12 text-gray-300 dark:text-gray-600 mb-4" aria-hidden />
-    <h2 className="text-2xl font-bold text-text-primary-light dark:text-white mb-2">
-      Halaman Tidak Ditemukan
-    </h2>
-    <p className="text-text-secondary-light mb-6">Halaman yang Anda cari tidak tersedia.</p>
-    <Button onClick={() => (window.location.href = '/')}>Kembali ke Dashboard</Button>
-  </div>
-);
+const NotFoundPage = () => {
+  const navigate = useNavigate();
+  return (
+    <>
+      <PageHeader title="Halaman Tidak Ditemukan" />
+      <EmptyState
+        title="Halaman yang Anda cari tidak tersedia."
+        action={<Button onClick={() => navigate(ROUTES.DASHBOARD)}>Kembali ke Dashboard</Button>}
+      />
+    </>
+  );
+};
 
 const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data: lock, isLoading } = useActiveOpnameLock();
   useOpnameLockRealtime();
   const isLocked = lock?.isLocked ?? false;
@@ -65,43 +67,29 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-300 font-body">
-      <Sidebar isMobileOpen={isSidebarOpen} onCloseMobile={() => setIsSidebarOpen(false)} />
+    <AppShell>
+      <Suspense fallback={<LoadingState label="Memuat modul..." className="min-h-[400px]" />}>
+        <Routes>
+          {APP_ROUTES.map((route) => {
+            const Page = route.element;
+            const page = (
+              <ErrorBoundary name={route.errorName}>
+                <Page />
+              </ErrorBoundary>
+            );
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.roles ? <ProtectedRoute route={route}>{page}</ProtectedRoute> : page}
+              />
+            );
+          })}
 
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-        <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-
-        <div className="p-6 md:p-8">
-          <Suspense fallback={<LoadingState label="Memuat modul..." className="min-h-[400px]" />}>
-            <Routes>
-              {APP_ROUTES.map((route) => {
-                const Page = route.element;
-                const page = (
-                  <ErrorBoundary name={route.errorName}>
-                    <Page />
-                  </ErrorBoundary>
-                );
-                return (
-                  <Route
-                    key={route.path}
-                    path={route.path}
-                    element={
-                      route.roles ? <ProtectedRoute route={route}>{page}</ProtectedRoute> : page
-                    }
-                  />
-                );
-              })}
-
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </div>
-
-        <footer className="mt-auto py-6 px-8 text-sm text-text-secondary-light flex flex-col md:flex-row justify-between items-center bg-transparent">
-          <p>© {new Date().getFullYear()} Opnamix. Hak Cipta Dilindungi.</p>
-        </footer>
-      </main>
-    </div>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
+    </AppShell>
   );
 };
 

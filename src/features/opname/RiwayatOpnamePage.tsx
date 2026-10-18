@@ -15,6 +15,7 @@ import {
   ActiveSchedulesSidebar,
   ActiveSchedulesStrip,
 } from './components/riwayat/ActiveSchedulesPanel';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const NO_CARDS: OpnameCard[] = [];
 const NO_SCHEDULE_INFO: ScheduleInfo[] = [];
@@ -62,11 +63,24 @@ const RiwayatOpnamePage: React.FC = () => {
   };
 
   if (isLoading) {
-    return <LoadingState label="Memuat data..." className="min-h-[400px]" />;
+    return (
+      <>
+        <PageHeader />
+        <LoadingState label="Memuat data..." className="min-h-[400px]" />
+      </>
+    );
   }
 
   return (
     <div className="mx-auto">
+      <PageHeader
+        actions={
+          <Button variant="light" onClick={openManualModal}>
+            <Plus aria-hidden />
+            Tambah Opname
+          </Button>
+        }
+      />
       <div className="md:hidden mb-4">
         <ActiveSchedulesStrip schedules={activeSchedules} />
       </div>
@@ -93,7 +107,7 @@ const RiwayatOpnamePage: React.FC = () => {
 
         {/* Kolom kanan, desktop saja */}
         <div className="hidden md:block md:w-[30%] flex-shrink-0">
-          <div className="sticky top-32 space-y-4">
+          <div className="sticky top-below-header space-y-4">
             <ActiveSchedulesSidebar schedules={activeSchedules} onAddOpname={openManualModal} />
           </div>
         </div>

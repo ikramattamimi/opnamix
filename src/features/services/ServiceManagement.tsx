@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toast';
 import { exportServicesToExcel } from '@/features/reports/exportUtils';
 import { ServiceFormDialog } from './components/ServiceFormDialog';
 import { ServiceCategoryDialog } from './components/ServiceCategoryDialog';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 // Form jasa: tertutup, tambah baru, atau edit jasa tertentu
 type ServiceFormState = { isOpen: false } | { isOpen: true; service?: Service };
@@ -68,6 +69,28 @@ const ServiceManagement: React.FC = () => {
 
   return (
     <>
+      <PageHeader
+        actions={
+          <>
+            <Button variant="glass" onClick={() => setIsCategoryModalOpen(true)}>
+              <ListPlus aria-hidden />
+              Tambah Kategori
+            </Button>
+            <Button
+              variant="glass"
+              onClick={() => void exportServicesToExcel(services)}
+              disabled={services.length === 0}
+            >
+              <Download aria-hidden />
+              Ekspor Excel
+            </Button>
+            <Button variant="light" onClick={() => handleOpenModal()}>
+              <Plus aria-hidden />
+              Tambah Jasa Baru
+            </Button>
+          </>
+        }
+      />
       <div className="space-y-6">
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -87,36 +110,6 @@ const ServiceManagement: React.FC = () => {
             icon={DollarSign}
             color="orange-500"
           />
-        </div>
-
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-text-primary-light dark:text-white">Daftar Jasa</h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-              onClick={() => setIsCategoryModalOpen(true)}
-            >
-              <ListPlus aria-hidden />
-              Tambah Kategori
-            </Button>
-            <Button
-              variant="outline"
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-              onClick={() => void exportServicesToExcel(services)}
-              disabled={services.length === 0}
-            >
-              <Download aria-hidden />
-              Ekspor Excel
-            </Button>
-            <Button
-              onClick={() => handleOpenModal()}
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-            >
-              <Plus aria-hidden />
-              Tambah Jasa Baru
-            </Button>
-          </div>
         </div>
 
         {/* Table */}

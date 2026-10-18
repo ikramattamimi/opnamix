@@ -33,6 +33,24 @@ export const ButtonDocs: React.FC = () => (
     </DocExample>
 
     <DocExample
+      title="Di atas gradien"
+      note="light untuk aksi utama di header, glass untuk aksi lain. glass dengan aria-pressed menjadi putih (dipakai tombol pin)."
+      code={`
+<Button variant="light"><Plus /> Tambah</Button>
+<Button variant="glass">Ekspor</Button>`}
+    >
+      <div className="flex gap-2 rounded-xl bg-grad-hero p-4">
+        <Button variant="light">
+          <Plus aria-hidden /> Tambah
+        </Button>
+        <Button variant="glass">Ekspor</Button>
+        <Button variant="glass" aria-pressed>
+          Dipilih
+        </Button>
+      </div>
+    </DocExample>
+
+    <DocExample
       title="Ukuran"
       note="sm 28px (aksi di baris/panel), default 32px, lg 38px (aksi utama layar penuh, mis. POS). Semua dalam rem, jadi ikut membesar di mode Besar."
       code={`

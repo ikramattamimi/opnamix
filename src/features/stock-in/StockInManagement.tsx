@@ -16,6 +16,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { createStockInColumns } from './StockInColumns';
 import { useToast } from '@/components/ui/toast';
 import { withErrorDetail, getErrorMessage } from '@/lib/utils';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 interface StockInManagementProps {
   products?: Product[]; // Optional now, or removed
@@ -104,6 +105,20 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
 
   return (
     <>
+      <PageHeader
+        actions={
+          <>
+            <Button variant="glass" onClick={() => void exportStockInToExcel(receipts)}>
+              <Download aria-hidden />
+              Ekspor
+            </Button>
+            <Button variant="light" onClick={() => setIsFormOpen(true)}>
+              <Plus aria-hidden />
+              Terima Stok Baru
+            </Button>
+          </>
+        }
+      />
       <div className="space-y-6">
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -117,22 +132,6 @@ const StockInManagement: React.FC<StockInManagementProps> = () => {
             <h2 className="text-xl font-bold text-text-primary-light dark:text-white">
               Daftar Penerimaan Stok
             </h2>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => setIsFormOpen(true)}
-                className="shadow-lg shadow-primary/30 flex items-center gap-2 [&_svg]:size-5"
-              >
-                <Plus aria-hidden />
-                Terima Stok Baru
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center gap-2"
-                onClick={() => void exportStockInToExcel(receipts)}
-              >
-                <Download aria-hidden /> Ekspor
-              </Button>
-            </div>
           </div>
 
           <div className="overflow-x-auto">

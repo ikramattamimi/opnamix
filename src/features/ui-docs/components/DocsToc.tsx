@@ -23,7 +23,7 @@ const useActiveSection = (ids: string[]) => {
         if (first) setActiveId(first);
       },
       // Abaikan area di bawah header (atas) dan separuh bawah layar
-      { rootMargin: '-140px 0px -55% 0px' },
+      { rootMargin: '-120px 0px -55% 0px' },
     );
 
     ids.forEach((id) => {
@@ -64,7 +64,7 @@ export const DocsTocSidebar: React.FC<{ items: TocItem[] }> = ({ items }) => {
   return (
     <nav
       aria-label="Daftar komponen"
-      className="sticky top-32 max-h-[calc(100vh-10rem)] overflow-y-auto"
+      className="sticky top-below-header max-h-[calc(100vh-10rem)] overflow-y-auto"
     >
       <p className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         Komponen

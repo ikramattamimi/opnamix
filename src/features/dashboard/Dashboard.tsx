@@ -4,6 +4,7 @@ import type { DashboardStats } from './api';
 import { useDashboardStats, useRecentTransactions } from './useDashboard';
 import DashboardMetrics from './components/DashboardMetrics';
 import RecentTransactionsCard from './components/RecentTransactionsCard';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const Dashboard: React.FC = () => {
   const {
@@ -27,7 +28,12 @@ const Dashboard: React.FC = () => {
   }, [trxError]);
 
   if (loading) {
-    return <LoadingState label="Memuat dashboard..." className="h-64" />;
+    return (
+      <>
+        <PageHeader />
+        <LoadingState label="Memuat dashboard..." className="h-64" />
+      </>
+    );
   }
 
   // Fallback if stats fail
@@ -46,6 +52,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <PageHeader />
       {/* Metrics Row */}
       {statsError && !stats ? (
         <div className="bg-card-light dark:bg-card-dark rounded-DEFAULT shadow-soft">

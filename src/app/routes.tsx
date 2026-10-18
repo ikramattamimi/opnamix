@@ -12,7 +12,6 @@ import {
   History,
   LayoutDashboard,
   Settings,
-  User,
   UserCog,
   type LucideIcon,
 } from 'lucide-react';
@@ -31,7 +30,11 @@ export interface SidebarConfig {
   group?: string;
   // Item yang punya parent dikelompokkan dalam menu yang bisa dibuka-tutup.
   parent?: SidebarParent;
+  // Angka di samping menu, diisi oleh useSidebarBadges
+  badge?: SidebarBadge;
 }
+
+export type SidebarBadge = 'notifications';
 
 export interface SidebarParent {
   label: string;
@@ -174,14 +177,6 @@ export const APP_ROUTES: readonly AppRoute[] = [
     showInSidebar: false,
   },
   {
-    path: ROUTES.NOTIFICATIONS,
-    title: 'Notifikasi',
-    element: NotificationsPage,
-    errorName: 'Notifikasi',
-    showInSidebar: true,
-    sidebar: { label: 'Notifikasi', icon: Bell },
-  },
-  {
     path: ROUTES.LAPORAN_STOK,
     title: 'Analisis & Laporan Stok',
     roles: STAFF_ROLES,
@@ -191,13 +186,21 @@ export const APP_ROUTES: readonly AppRoute[] = [
     sidebar: { label: 'Laporan Stok', icon: ChartColumn, group: 'Laporan' },
   },
   {
+    path: ROUTES.NOTIFICATIONS,
+    title: 'Notifikasi',
+    element: NotificationsPage,
+    errorName: 'Notifikasi',
+    showInSidebar: true,
+    sidebar: { label: 'Notifikasi', icon: Bell, group: 'Lainnya', badge: 'notifications' },
+  },
+  {
     path: ROUTES.USER_MANAGEMENT,
     title: 'Manajemen Pengguna',
     roles: ['admin'],
     element: UserManagement,
     errorName: 'Manajemen Pengguna',
     showInSidebar: true,
-    sidebar: { label: 'Kelola Pengguna', icon: UserCog },
+    sidebar: { label: 'Kelola Pengguna', icon: UserCog, group: 'Lainnya' },
   },
   {
     // Dokumentasi pengembang, jadi hanya untuk admin
@@ -207,14 +210,14 @@ export const APP_ROUTES: readonly AppRoute[] = [
     element: UiDocsPage,
     errorName: 'Dokumentasi Komponen UI',
     showInSidebar: true,
-    sidebar: { label: 'Komponen UI', icon: Component },
+    sidebar: { label: 'Komponen UI', icon: Component, group: 'Lainnya' },
   },
   {
     path: ROUTES.PROFIL,
     title: 'Profil Saya',
     element: ProfilePage,
     errorName: 'Profil',
-    showInSidebar: true,
-    sidebar: { label: 'Profil', icon: User },
+    // Dibuka dari kartu pengguna di bawah sidebar
+    showInSidebar: false,
   },
 ];
