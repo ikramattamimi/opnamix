@@ -189,7 +189,6 @@ const ProfilePage: React.FC = () => {
       />
 
       <PasswordSection isSubmitting={isSubmitting} onChangePassword={handleChangePassword} />
-
     </div>
   );
 };
