@@ -42,12 +42,12 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="success">
+                    <Badge variant="ok">
                       <CircleCheck className="size-3" aria-hidden />
                       Selesai
                     </Badge>
                     {(opname.discrepancyCount || 0) > 0 && (
-                      <Badge variant="danger">{opname.discrepancyCount} Selisih</Badge>
+                      <Badge variant="bad">{opname.discrepancyCount} Selisih</Badge>
                     )}
                   </div>
                   <p className="font-bold text-foreground">{opname.scheduleName}</p>

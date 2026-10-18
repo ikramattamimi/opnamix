@@ -8,8 +8,7 @@ import { getRoleIconColor, getRoleInfo } from './components/profileUi';
 import ProfileHeaderCard from './components/ProfileHeaderCard';
 import ProfileInfoSection from './components/ProfileInfoSection';
 import PasswordSection from './components/PasswordSection';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const ProfilePage: React.FC = () => {
   const { userProfile } = useAuth();
@@ -121,32 +120,41 @@ const ProfilePage: React.FC = () => {
   };
 
   if (isProfileLoading) {
-    return <LoadingState label="Memuat profil..." className="min-h-[400px]" />;
+    return (
+      <>
+        <PageHeader />
+        <LoadingState label="Memuat profil..." className="min-h-[400px]" />
+      </>
+    );
   }
 
   if (!profile) {
     if (isProfileError) {
       return (
-        <ErrorState
-          title="Gagal memuat profil"
-          onRetry={() => void refetchProfile()}
-          className="min-h-[400px]"
-        />
+        <>
+          <PageHeader />
+          <ErrorState
+            title="Gagal memuat profil"
+            onRetry={() => void refetchProfile()}
+            className="min-h-[400px]"
+          />
+        </>
       );
     }
-    return <EmptyState title="Profil tidak ditemukan." className="min-h-[400px]" />;
+    return (
+      <>
+        <PageHeader />
+        <EmptyState title="Profil tidak ditemukan." className="min-h-[400px]" />
+      </>
+    );
   }
 
   const userRoles = profile?.roles ?? (profile?.role ? [profile.role] : []);
   const roleInfo = getRoleInfo(userRoles);
 
   return (
-    <PageLayout maxWidth="narrow">
-      <PageHeader
-        title="Akun Saya"
-        description="Lihat dan perbarui data profil serta kata sandi Anda."
-      />
-
+    <div className="max-w-3xl mx-auto space-y-6">
+      <PageHeader />
       {/* Messages */}
       {error && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
@@ -181,7 +189,7 @@ const ProfilePage: React.FC = () => {
       />
 
       <PasswordSection isSubmitting={isSubmitting} onChangePassword={handleChangePassword} />
-    </PageLayout>
+    </div>
   );
 };
 

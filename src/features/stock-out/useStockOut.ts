@@ -17,13 +17,6 @@ export function useStockOutRequests(params?: PaginationParams) {
   });
 }
 
-export function useRecentStockOuts(limit: number) {
-  return useQuery({
-    queryKey: stockOutKeys.recent(limit),
-    queryFn: () => stockOutApi.getRecentStockOuts(limit),
-  });
-}
-
 export function useNakesProfiles() {
   return useQuery({
     queryKey: stockOutKeys.nakesProfiles(),

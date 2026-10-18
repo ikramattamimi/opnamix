@@ -22,7 +22,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code }) => {
 
   return (
     <div className="relative">
-      <pre className="overflow-x-auto rounded-xl bg-slate-900 p-4 pr-12 text-xs leading-relaxed text-slate-100">
+      <pre className="overflow-x-auto rounded-xl border bg-surface-2 p-3.5 pr-12 font-mono text-xs leading-relaxed text-foreground">
         <code>{code.trim()}</code>
       </pre>
       <Button
@@ -30,7 +30,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code }) => {
         size="icon-sm"
         onClick={handleCopy}
         aria-label={copied ? 'Kode tersalin' : 'Salin kode'}
-        className="absolute right-2 top-2 text-slate-300 hover:bg-white/10 hover:text-white"
+        className="absolute right-2 top-2"
       >
         {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
       </Button>

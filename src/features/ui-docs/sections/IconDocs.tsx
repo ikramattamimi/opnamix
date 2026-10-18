@@ -48,10 +48,7 @@ export const IconDocs: React.FC = () => (
     >
       <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {COMMON_ICONS.map(({ name, icon: Icon, usage }) => (
-          <div
-            key={name}
-            className="flex items-center gap-3 rounded-xl border border-gray-100 p-3 dark:border-white/10"
-          >
+          <div key={name} className="flex items-center gap-3 rounded-xl border p-3">
             <Icon className="size-5 shrink-0 text-primary" aria-hidden />
             <div className="min-w-0">
               <p className="truncate font-mono text-xs text-foreground">{name}</p>
@@ -59,7 +56,7 @@ export const IconDocs: React.FC = () => (
             </div>
           </div>
         ))}
-        <div className="flex items-center gap-3 rounded-xl border border-gray-100 p-3 dark:border-white/10">
+        <div className="flex items-center gap-3 rounded-xl border p-3">
           <Loader2 className="size-5 shrink-0 animate-spin text-primary" aria-hidden />
           <div>
             <p className="font-mono text-xs text-foreground">Loader2</p>

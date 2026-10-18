@@ -17,10 +17,10 @@ export const DocSection: React.FC<DocSectionProps> = ({
   importPath,
   children,
 }) => (
-  <section id={id} className="scroll-mt-36 rounded-2xl bg-card p-6 shadow-soft">
-    <h2 className="text-lg font-bold text-foreground">{title}</h2>
+  <section id={id} className="scroll-mt-36 rounded-card border bg-card p-5 shadow">
+    <h2 className="text-base font-bold text-foreground">{title}</h2>
     <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-    <p className="mt-3 inline-block rounded-lg bg-gray-100 px-2 py-1 font-mono text-xs text-muted-foreground dark:bg-white/5">
+    <p className="mt-3 inline-block rounded-md bg-surface-2 px-2 py-1 font-mono text-xs text-muted-foreground">
       {importPath}
     </p>
     <div className="mt-6 space-y-8">{children}</div>
@@ -41,7 +41,7 @@ export const DocExample: React.FC<DocExampleProps> = ({ title, code, note, child
       <h3 className="text-sm font-bold text-foreground">{title}</h3>
       {note && <p className="mt-0.5 text-xs text-muted-foreground">{note}</p>}
     </div>
-    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-gray-200 p-5 dark:border-white/10">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-border-strong p-4">
       {children}
     </div>
     <CodeBlock code={code} />

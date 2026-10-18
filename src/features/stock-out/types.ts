@@ -34,8 +34,12 @@ export interface StockOutRequest {
   requestedByAvatar: string;
   status: 'Menunggu' | 'Selesai';
   date: string;
-  tipeSumber: 'PENGAJUAN_NAKES'; // New field
+  tipeSumber: 'PENGAJUAN_NAKES' | 'KASIR_LANGSUNG';
   createdBy: string; // Add createdBy for Nakes filtering
+  createdAt: string; // waktu dicatat (untuk jam di daftar)
+  processedAt: string | null;
+  processedBy: string | null; // nama yang memproses
+  note: string; // keterangan tanpa meta
 }
 
 export interface StockOutManualItem {

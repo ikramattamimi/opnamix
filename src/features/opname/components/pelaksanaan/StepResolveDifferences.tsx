@@ -105,7 +105,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                 </TableCell>
                 <TableCell className="text-center font-bold text-primary">{physical}</TableCell>
                 <TableCell className="text-center">
-                  <Badge variant={diff > 0 ? 'success' : diff < 0 ? 'danger' : 'neutral'}>
+                  <Badge variant={diff > 0 ? 'ok' : diff < 0 ? 'bad' : 'neutral'}>
                     {formatDiff(diff)}
                   </Badge>
                 </TableCell>

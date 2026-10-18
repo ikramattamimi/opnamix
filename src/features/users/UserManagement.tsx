@@ -8,8 +8,7 @@ import UserTable from './components/UserTable';
 import UserFormDialog from './components/UserFormDialog';
 import ResetPasswordDialog from './components/ResetPasswordDialog';
 import DeleteUserDialog from './components/DeleteUserDialog';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 type ActiveDialog =
   { type: 'create' } | { type: 'edit' | 'resetPassword' | 'delete'; user: UserRow } | null;
@@ -48,21 +47,15 @@ const UserManagement: React.FC = () => {
 
   return (
     <>
-      <PageLayout>
-        <PageHeader
-          title="Daftar Pengguna"
-          description="Kelola akun pengguna dan hak akses sistem."
-          actions={
-            <Button
-              onClick={() => openDialog({ type: 'create' })}
-              className="bg-primary text-white px-6 font-bold shadow-lg hover:bg-primary/90 transition-all flex items-center gap-2"
-            >
-              <UserPlus className="size-5" aria-hidden />
-              Tambah Pengguna
-            </Button>
-          }
-        />
-
+      <PageHeader
+        actions={
+          <Button variant="light" onClick={() => openDialog({ type: 'create' })}>
+            <UserPlus aria-hidden />
+            Tambah Pengguna
+          </Button>
+        }
+      />
+      <div className="space-y-6">
         {/* Toast Messages - Fixed Position */}
         {error && (
           <div className="fixed top-4 right-4 z-[60] bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s] shadow-lg max-w-md">
@@ -88,7 +81,7 @@ const UserManagement: React.FC = () => {
           onResetPassword={(user) => openDialog({ type: 'resetPassword', user })}
           onDelete={(user) => setDialog({ type: 'delete', user })}
         />
-      </PageLayout>
+      </div>
 
       {dialog?.type === 'create' && <UserFormDialog {...dialogProps} />}
       {dialog?.type === 'edit' && <UserFormDialog user={dialog.user} {...dialogProps} />}

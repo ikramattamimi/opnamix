@@ -4,8 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StockAnalytics from './components/StockAnalytics';
 import StockMutationReport from './components/StockMutationReport';
 import TransactionReport from './components/TransactionReport';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 type ReportTab = 'analysis' | 'transactions' | 'mutation';
 
@@ -26,17 +25,17 @@ const StockReport: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ReportTab>('analysis');
 
   return (
-    <PageLayout>
+    <>
+      <PageHeader />
       <Tabs
         value={activeTab}
         onValueChange={(value) => isReportTab(value) && setActiveTab(value)}
         className="space-y-6"
       >
-        <PageHeader
-          title="Laporan Stok"
-          description="Analisis stok, laporan transaksi, dan mutasi stok."
-          actions={
-            <TabsList className="flex h-auto items-stretch justify-start bg-gray-100 dark:bg-card rounded-xl p-1 text-inherit">
+        {/* Top Action Bar */}
+        <div className="flex flex-col md:flex-row justify-end items-start md:items-center gap-4">
+          <div className="flex min-w-0 max-w-full gap-3">
+            <TabsList className="flex h-auto max-w-full items-stretch justify-start overflow-x-auto bg-gray-100 dark:bg-card-dark rounded-xl p-1 text-inherit">
               <TabsTrigger value="analysis" asChild>
                 <Button
                   variant={activeTab === 'analysis' ? 'default' : 'ghost'}
@@ -62,8 +61,8 @@ const StockReport: React.FC = () => {
                 </Button>
               </TabsTrigger>
             </TabsList>
-          }
-        />
+          </div>
+        </div>
 
         <TabsContent value="analysis" forceMount className="mt-0 space-y-6">
           <StockAnalytics />
@@ -75,7 +74,7 @@ const StockReport: React.FC = () => {
           <StockMutationReport active={activeTab === 'mutation'} />
         </TabsContent>
       </Tabs>
-    </PageLayout>
+    </>
   );
 };
 

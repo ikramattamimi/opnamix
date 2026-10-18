@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { Archive, CircleDollarSign, Download, Plus, TriangleAlert } from 'lucide-react';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { Archive, CircleDollarSign, TriangleAlert } from 'lucide-react';
 import StatCard from '@/components/common/StatCard';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,65 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DocExample, DocSection } from '../components/DocSection';
-
-export const PageLayoutDocs: React.FC = () => (
-  <DocSection
-    id="page-layout"
-    title="PageLayout dan PageHeader"
-    description="Pembungkus setiap halaman di routes.tsx. PageLayout mengatur lebar dan jarak antar-bagian (space-y-6); PageHeader adalah judul h2 di dalam halaman (h1 sudah ada di Header) dengan deskripsi dan slot aksi di kanan."
-    importPath="import PageLayout from '@/components/layout/PageLayout'; import PageHeader from '@/components/layout/PageHeader';"
-  >
-    <DocExample
-      title="Judul dengan aksi"
-      note="Aksi utama memakai Button default; aksi pendamping outline. Di layar kecil aksi turun ke bawah judul."
-      code={`
-<PageLayout>
-  <PageHeader
-    title="Daftar Produk"
-    description="Kelola data obat dan alkes."
-    actions={
-      <>
-        <Button variant="outline"><Download /> Ekspor</Button>
-        <Button><Plus /> Tambah Produk</Button>
-      </>
-    }
-  />
-  {/* isi halaman */}
-</PageLayout>`}
-    >
-      <PageLayout>
-        <PageHeader
-          title="Daftar Produk"
-          description="Kelola data obat dan alkes."
-          actions={
-            <>
-              <Button variant="outline">
-                <Download aria-hidden /> Ekspor
-              </Button>
-              <Button>
-                <Plus aria-hidden /> Tambah Produk
-              </Button>
-            </>
-          }
-        />
-      </PageLayout>
-    </DocExample>
-
-    <DocExample
-      title="Lebar sempit"
-      note='maxWidth="narrow" membatasi isi ke max-w-3xl di tengah, untuk halaman baca atau form satu kolom (Profil, Notifikasi). Default "full".'
-      code={`
-<PageLayout maxWidth="narrow">
-  <PageHeader title="Akun Saya" description="Data profil dan kata sandi." />
-  ...
-</PageLayout>`}
-    >
-      <PageLayout maxWidth="narrow" className="rounded-xl bg-background p-4">
-        <PageHeader title="Akun Saya" description="Data profil dan kata sandi." />
-      </PageLayout>
-    </DocExample>
-  </DocSection>
-);
 
 export const CardDocs: React.FC = () => (
   <DocSection

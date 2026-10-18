@@ -74,12 +74,12 @@ describe('buildSidebarNodes', () => {
       'Stok Keluar',
       '# Audit & Kontrol',
       'Stok Opname > Riwayat Opname, Konfigurasi Opname',
-      'Notifikasi',
       '# Laporan',
       'Laporan Stok',
+      '# Lainnya',
+      'Notifikasi',
       'Kelola Pengguna',
       'Komponen UI',
-      'Profil',
     ]);
   });
 
@@ -96,8 +96,8 @@ describe('buildSidebarNodes', () => {
       'Dashboard',
       '# Transaksi',
       'Stok Keluar',
+      '# Lainnya',
       'Notifikasi',
-      'Profil',
     ]);
   });
 

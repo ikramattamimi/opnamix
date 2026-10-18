@@ -50,7 +50,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
     <Card className="p-6 flex flex-col md:flex-row items-center gap-8">
       <div className="flex-1">
         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-          <ChartPie className="size-6 text-secondary" aria-hidden />
+          <ChartPie className="size-6 text-primary" aria-hidden />
           Distribusi Kategori
         </h3>
         <div className="space-y-4">
@@ -62,7 +62,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
               </div>
               <div className="h-2 w-full bg-background rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-1000 ${i % 2 === 0 ? 'bg-primary' : 'bg-secondary'}`}
+                  className={`h-full rounded-full transition-all duration-1000 ${i % 2 === 0 ? 'bg-chart-ser1' : 'bg-chart-ser2'}`}
                   style={{ width: `${stat.percent}%` }}
                 ></div>
               </div>
@@ -86,7 +86,8 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
             cy="18"
             r="15.915"
             fill="transparent"
-            stroke="#4318FF"
+            stroke="currentColor"
+            className="text-chart-ser1"
             strokeWidth="3"
             strokeDasharray="65 35"
             strokeDashoffset="25"
@@ -96,7 +97,8 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
             cy="18"
             r="15.915"
             fill="transparent"
-            stroke="#6AD2FF"
+            stroke="currentColor"
+            className="text-chart-ser2"
             strokeWidth="3"
             strokeDasharray="35 65"
             strokeDashoffset="60"

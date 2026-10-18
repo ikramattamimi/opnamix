@@ -75,7 +75,7 @@ export const createTransactionReportColumns = ({
       const type = row.getValue('type') as string;
       return (
         <div className="text-center">
-          <Badge variant={type === 'masuk' ? 'success' : 'danger'}>
+          <Badge variant={type === 'masuk' ? 'ok' : 'bad'}>
             {type === 'masuk' ? 'Masuk' : 'Keluar'}
           </Badge>
         </div>
@@ -118,7 +118,7 @@ export const createTransactionReportColumns = ({
       const isPending = status === 'Menunggu';
 
       return (
-        <Badge variant={isPending ? 'warning' : 'success'}>
+        <Badge variant={isPending ? 'warn' : 'ok'}>
           <span
             className={`h-1.5 w-1.5 rounded-full ${isPending ? 'bg-yellow-500' : 'bg-green-500'}`}
           ></span>

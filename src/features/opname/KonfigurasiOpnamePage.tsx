@@ -14,8 +14,7 @@ import { ErrorState, LoadingState } from '@/components/common/QueryState';
 import { useToast } from '@/components/ui/toast';
 import ScheduleFormDialog from './components/konfigurasi/ScheduleFormDialog';
 import { ScheduleCards, ScheduleTable } from './components/konfigurasi/ScheduleList';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/card';
 
 const NO_SCHEDULES: OpnameSchedule[] = [];
@@ -63,7 +62,12 @@ const KonfigurasiOpnamePage: React.FC = () => {
   };
 
   if (schedulesQuery.isLoading) {
-    return <LoadingState label="Memuat data..." className="min-h-[400px]" />;
+    return (
+      <>
+        <PageHeader />
+        <LoadingState label="Memuat data..." className="min-h-[400px]" />
+      </>
+    );
   }
 
   const listProps = {
@@ -74,16 +78,11 @@ const KonfigurasiOpnamePage: React.FC = () => {
   };
 
   return (
-    <PageLayout>
+    <div className="space-y-6">
       <PageHeader
-        title="Konfigurasi Jadwal Opname"
-        description="Kelola jadwal audit stok berkala."
         actions={
-          <Button
-            onClick={() => openModal(null)}
-            className="bg-primary hover:bg-primary/90 text-white font-bold px-5 shadow-lg shadow-primary/20 w-full sm:w-auto"
-          >
-            <Plus className="mr-1.5" aria-hidden />
+          <Button variant="light" onClick={() => openModal(null)}>
+            <Plus aria-hidden />
             Tambah Jadwal
           </Button>
         }
@@ -120,7 +119,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
         onConfirm={doDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </PageLayout>
+    </div>
   );
 };
 

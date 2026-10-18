@@ -23,7 +23,7 @@ const useActiveSection = (ids: string[]) => {
         if (first) setActiveId(first);
       },
       // Abaikan area di bawah header (atas) dan separuh bawah layar
-      { rootMargin: '-140px 0px -55% 0px' },
+      { rootMargin: '-120px 0px -55% 0px' },
     );
 
     ids.forEach((id) => {
@@ -48,7 +48,7 @@ export const DocsTocInline: React.FC<{ items: TocItem[] }> = ({ items }) => (
         key={id}
         type="button"
         onClick={() => scrollToSection(id)}
-        className="rounded-lg bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-soft transition-colors hover:text-primary"
+        className="rounded-lg border bg-card px-3 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:text-primary"
       >
         {label}
       </button>
@@ -64,12 +64,12 @@ export const DocsTocSidebar: React.FC<{ items: TocItem[] }> = ({ items }) => {
   return (
     <nav
       aria-label="Daftar komponen"
-      className="sticky top-32 max-h-[calc(100vh-10rem)] overflow-y-auto"
+      className="sticky top-below-header max-h-[calc(100vh-10rem)] overflow-y-auto"
     >
       <p className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         Komponen
       </p>
-      <ul className="space-y-0.5 border-l border-gray-200 dark:border-white/10">
+      <ul className="space-y-0.5 border-l border-border">
         {items.map(({ id, label }) => {
           const isActive = id === activeId;
           return (
@@ -82,7 +82,7 @@ export const DocsTocSidebar: React.FC<{ items: TocItem[] }> = ({ items }) => {
                   '-ml-px w-full border-l-2 px-3 py-1.5 text-left text-sm transition-colors',
                   isActive
                     ? 'border-primary font-bold text-primary'
-                    : 'border-transparent text-muted-foreground hover:border-gray-300 hover:text-foreground dark:hover:text-white',
+                    : 'border-transparent text-muted-foreground hover:border-border-strong hover:text-foreground',
                 )}
               >
                 {label}

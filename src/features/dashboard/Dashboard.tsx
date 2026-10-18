@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ErrorState, LoadingState } from '@/components/common/QueryState';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
 import type { DashboardStats } from './api';
 import { useDashboardStats, useRecentTransactions } from './useDashboard';
 import DashboardMetrics from './components/DashboardMetrics';
 import RecentTransactionsCard from './components/RecentTransactionsCard';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/card';
 
 const Dashboard: React.FC = () => {
@@ -30,7 +29,12 @@ const Dashboard: React.FC = () => {
   }, [trxError]);
 
   if (loading) {
-    return <LoadingState label="Memuat dashboard..." className="h-64" />;
+    return (
+      <>
+        <PageHeader />
+        <LoadingState label="Memuat dashboard..." className="h-64" />
+      </>
+    );
   }
 
   // Fallback if stats fail
@@ -48,9 +52,8 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <PageLayout>
-      <PageHeader title="Ringkasan Stok" description="Ikhtisar stok dan transaksi terbaru." />
-
+    <div className="space-y-6">
+      <PageHeader />
       {/* Metrics Row */}
       {statsError && !stats ? (
         <Card>
@@ -64,7 +67,7 @@ const Dashboard: React.FC = () => {
       {/* <DashboardCharts stats={safeStats} /> */}
 
       <RecentTransactionsCard page={trxPage} onPageChange={setTrxPage} query={trxQuery} />
-    </PageLayout>
+    </div>
   );
 };
 

@@ -94,11 +94,7 @@ const AdjustmentJournal: React.FC<AdjustmentJournalProps> = ({ rows, isError, on
                     <TableCell className="text-center">
                       <Badge
                         variant={
-                          (row.selisih ?? 0) > 0
-                            ? 'success'
-                            : (row.selisih ?? 0) < 0
-                              ? 'danger'
-                              : 'neutral'
+                          (row.selisih ?? 0) > 0 ? 'ok' : (row.selisih ?? 0) < 0 ? 'bad' : 'neutral'
                         }
                       >
                         {formatDiff(row.selisih)}

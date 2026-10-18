@@ -90,7 +90,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
             <Card key={opname.id} className="p-5 border-l-4 border-amber-400">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <Badge variant="warning">Belum Dilaksanakan</Badge>
+                  <Badge variant="warn">Belum Dilaksanakan</Badge>
                   <p className="font-bold text-foreground">{opname.scheduleName}</p>
                   <p className="text-xs text-muted-foreground">
                     Target: {formatDate(opname.scheduleDate)}

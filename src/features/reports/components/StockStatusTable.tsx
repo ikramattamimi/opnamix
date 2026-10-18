@@ -15,9 +15,9 @@ import {
 } from '@/components/ui/table';
 
 const STATUS_BADGE: Record<StockStatus, { variant: BadgeProps['variant']; icon: LucideIcon }> = {
-  Kritikal: { variant: 'danger', icon: OctagonAlert },
-  Menipis: { variant: 'warning', icon: TriangleAlert },
-  Aman: { variant: 'success', icon: CircleCheck },
+  Kritikal: { variant: 'bad', icon: OctagonAlert },
+  Menipis: { variant: 'warn', icon: TriangleAlert },
+  Aman: { variant: 'ok', icon: CircleCheck },
 };
 
 const StockStatusBadge: React.FC<{ status: StockStatus }> = ({ status }) => {

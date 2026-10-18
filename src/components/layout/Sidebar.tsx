@@ -1,266 +1,292 @@
-import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LogOut, Monitor, Moon, Pin, PinOff, Sun } from 'lucide-react';
+import { SegmentedControl } from '@/components/data/SegmentedControl';
+import { useTheme } from '@/app/providers/ThemeProvider';
+import type { SizePreference, ThemePreference } from '@/app/providers/displayPreferences';
 import { useAuth } from '@/features/auth/useAuth';
-import { APP_ROUTES, type AppRoute, type SidebarParent } from '@/app/routes';
+import { useNotifications } from '@/features/notifications/useNotifications';
+import { APP_ROUTES, type AppRoute, type SidebarBadge } from '@/app/routes';
 import { buildSidebarNodes, getUserRoles } from '@/app/routeUtils';
+import { ROUTES } from '@/types/routes';
+import { cn } from '@/lib/utils';
+
+// Sidebar: rel ikon 64px yang terbuka saat pointer di atasnya (melayang di atas
+// isi), bisa di-pin supaya tetap terbuka (isi bergeser), dan menjadi laci di HP.
+// Menu dibangun dari APP_ROUTES dan difilter per role.
 
 interface SidebarProps {
-  isMobileOpen?: boolean;
-  onCloseMobile?: () => void;
+  pinned: boolean;
+  onTogglePin: () => void;
+  isMobile: boolean;
+  drawerOpen: boolean;
+  onCloseDrawer: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen = false, onCloseMobile }) => {
-  const { userProfile } = useAuth();
-  // Menu dibangun dari APP_ROUTES dan difilter per role
-  const nodes = buildSidebarNodes(APP_ROUTES, getUserRoles(userProfile));
+const HOVER_IN_MS = 90;
+const HOVER_OUT_MS = 160;
 
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    // Collapsed by default on medium screens (md to lg), expanded on lg+
-    return typeof window !== 'undefined' && window.innerWidth < 1024;
-  });
+const THEME_OPTIONS = [
+  { value: 'light', label: 'Terang', icon: Sun },
+  { value: 'system', label: 'Sistem', icon: Monitor },
+  { value: 'dark', label: 'Gelap', icon: Moon },
+] as const;
 
-  // On mobile overlay, always show full menu (not collapsed)
-  const effectiveCollapsed = isMobileOpen ? false : isCollapsed;
+const SIZE_OPTIONS = [
+  {
+    value: 'standar',
+    label: (
+      <>
+        <span className="text-2xs font-bold">Aa</span>Standar
+      </>
+    ),
+  },
+  {
+    value: 'besar',
+    label: (
+      <>
+        <span className="text-sm font-bold">Aa</span>Besar
+      </>
+    ),
+  },
+] as const;
 
-  return (
-    <>
-      {/* Mobile Overlay */}
-      <div
-        className={cn(
-          'fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300',
-          isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none',
-        )}
-        onClick={onCloseMobile}
-      />
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          'bg-card flex flex-col border-r border-gray-100 dark:border-none relative',
-          // Desktop
-          'transition-all duration-300',
-          isCollapsed ? 'md:w-24' : 'md:w-72',
-          // Mobile - Animated slide in/out
-          'fixed md:relative inset-y-0 left-0 w-72',
-          'transform transition-transform duration-300 ease-in-out',
-          // Z-index
-          isMobileOpen ? 'z-50' : 'z-20',
-          // Translation
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
-        )}
-      >
-        {/* Toggle Button — hidden on mobile */}
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          aria-label={isCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-          className="absolute -right-3 top-9 bg-card border border-gray-100 dark:border-gray-700 rounded-full p-1.5 shadow-sm hover:text-primary hover:scale-110 active:scale-95 transition-all duration-200 z-30 hidden md:flex"
-        >
-          {isCollapsed ? (
-            <ChevronRight className="size-4" aria-hidden />
-          ) : (
-            <ChevronLeft className="size-4" aria-hidden />
-          )}
-        </Button>
-
-        {/* Header / Logo */}
-        <div
-          className={cn(
-            'flex items-center justify-center h-24 border-b border-gray-100 dark:border-gray-800 mb-4 transition-all duration-300',
-            effectiveCollapsed ? 'mx-2' : 'mx-6',
-          )}
-        >
-          <div
-            className={cn(
-              'flex items-center transition-all duration-300',
-              effectiveCollapsed ? 'justify-center' : 'gap-3',
-            )}
-          >
-            <img
-              src="/logo.svg"
-              alt="Logo Opnamix"
-              className={cn(
-                'object-contain rounded-xl transition-all duration-300',
-                effectiveCollapsed ? 'h-10 w-10' : 'h-12 w-12',
-              )}
-            />
-            {!effectiveCollapsed && (
-              <div className="text-xl font-bold uppercase tracking-wide text-foreground whitespace-nowrap">
-                Opna<span className="text-primary font-bold">mix</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto pb-8 scrollbar-hide">
-          {nodes.map((node) => {
-            if (node.kind === 'group') {
-              return effectiveCollapsed ? (
-                <div key={`group-${node.label}`} className="h-4"></div>
-              ) : (
-                <div key={`group-${node.label}`} className="px-4 pt-4 pb-2">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                    {node.label}
-                  </p>
-                </div>
-              );
-            }
-
-            if (node.kind === 'parent') {
-              return (
-                <NavParent
-                  key={`parent-${node.parent.label}`}
-                  parent={node.parent}
-                  items={node.children}
-                  collapsed={effectiveCollapsed}
-                  onCloseMobile={onCloseMobile}
-                />
-              );
-            }
-
-            return (
-              <NavItem
-                key={node.route.path}
-                route={node.route}
-                collapsed={effectiveCollapsed}
-                onCloseMobile={onCloseMobile}
-              />
-            );
-          })}
-        </nav>
-      </aside>
-    </>
-  );
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Admin',
+  apoteker: 'Apoteker',
+  farmasi: 'Farmasi',
+  nakes: 'Nakes',
 };
 
-interface NavParentProps {
-  parent: SidebarParent;
-  items: AppRoute[];
-  collapsed: boolean;
-  onCloseMobile?: () => void;
+// Label muncul saat sidebar terbuka; di HP selalu tampil karena laci selalu lebar
+const LABEL =
+  'min-w-0 truncate opacity-0 transition-opacity duration-100 pointer-events-none group-data-[expanded]/sb:pointer-events-auto group-data-[expanded]/sb:opacity-100 group-data-[expanded]/sb:delay-75 max-md:pointer-events-auto max-md:opacity-100';
+
+function useSidebarBadges(): Record<SidebarBadge, number> {
+  const { user } = useAuth();
+  const { data } = useNotifications(user?.id ?? '');
+  return { notifications: data?.unreadCount ?? 0 };
 }
 
-// Menu induk yang bisa dibuka-tutup, misalnya Stok Opname
-const NavParent: React.FC<NavParentProps> = ({ parent, items, collapsed, onCloseMobile }) => {
-  const location = useLocation();
-  const isActivePath = location.pathname.startsWith(parent.pathPrefix);
-  const [expanded, setExpanded] = useState(isActivePath);
-  const Icon = parent.icon;
-
-  return (
-    <>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        title={collapsed ? parent.label : ''}
-        className={cn(
-          'w-full flex items-center h-11 transition-all duration-200 group rounded-lg relative hover:scale-[1.02] active:scale-[0.98]',
-          collapsed ? 'justify-center px-2' : 'justify-start px-4',
-          isActivePath
-            ? 'text-primary font-bold'
-            : 'text-muted-foreground hover:text-foreground dark:hover:text-white font-medium',
-        )}
-      >
-        <Icon
-          className={cn(
-            'size-5 shrink-0 transition-transform duration-200',
-            !collapsed && 'mr-3',
-            isActivePath ? 'text-primary' : 'group-hover:text-primary',
-          )}
-          aria-hidden
-        />
-        {!collapsed && (
-          <>
-            <span>{parent.label}</span>
-            <ChevronDown
-              className={cn(
-                'size-4 ml-auto transition-transform duration-300 ease-in-out',
-                expanded && 'rotate-180',
-              )}
-              aria-hidden
-            />
-          </>
-        )}
-      </button>
-
-      {/* Sub-menu items */}
-      <div
-        className={cn(
-          'ml-6 pl-3 border-l-2 border-primary/10 space-y-0.5 overflow-hidden transition-all duration-300 ease-in-out',
-          expanded && !collapsed ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0',
-        )}
-      >
-        {items.map((item) => (
-          <NavItem
-            key={item.path}
-            route={item}
-            collapsed={collapsed}
-            onCloseMobile={onCloseMobile}
-          />
-        ))}
-      </div>
-    </>
-  );
-};
-
-interface NavItemProps {
-  route: AppRoute;
-  collapsed?: boolean;
-  onCloseMobile?: () => void;
+function initials(name: string | null | undefined, email: string | null | undefined): string {
+  const source = name?.trim() || email || 'U';
+  const parts = source.split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || 'U';
 }
 
-const NavItem: React.FC<NavItemProps> = ({ route, collapsed, onCloseMobile }) => {
-  const label = route.sidebar?.label ?? route.title;
-  const Icon: LucideIcon | undefined = route.sidebar?.icon;
+export const Sidebar: React.FC<SidebarProps> = ({
+  pinned,
+  onTogglePin,
+  isMobile,
+  drawerOpen,
+  onCloseDrawer,
+}) => {
+  const { userProfile, logout } = useAuth();
+  const { theme, setTheme, size, setSize } = useTheme();
+  const navigate = useNavigate();
+  const badges = useSidebarBadges();
+  const [hover, setHover] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const timer = useRef(0);
+  const asideRef = useRef<HTMLElement>(null);
 
-  const handleClick = () => {
-    if (onCloseMobile) {
-      // Close mobile menu when clicking on mobile
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        onCloseMobile();
-      }
+  const roles = getUserRoles(userProfile);
+  const nodes = buildSidebarNodes(APP_ROUTES, roles);
+  const expanded = isMobile ? drawerOpen : pinned || hover;
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const hoverTo = (value: boolean, delay: number) => {
+    if (isMobile) return;
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setHover(value), delay);
+  };
+
+  const handleLogout = async () => {
+    if (loggingOut || !window.confirm('Apakah Anda yakin ingin keluar dari aplikasi?')) return;
+    setLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLoggingOut(false);
     }
   };
 
-  return (
-    <NavLink
-      to={route.path}
-      title={collapsed ? label : ''}
-      onClick={handleClick}
-      className={({ isActive }) =>
-        cn(
-          'w-full flex items-center h-11 transition-all duration-200 group rounded-lg relative hover:scale-[1.02] active:scale-[0.98]',
-          collapsed ? 'justify-center px-2' : 'justify-start px-4',
-          isActive
-            ? 'bg-primary/10 text-primary font-bold hover:bg-primary/15 hover:text-primary'
-            : 'text-muted-foreground hover:text-foreground dark:hover:text-white font-medium hover:bg-transparent',
-        )
-      }
-    >
-      {({ isActive }) => (
-        <>
-          {Icon && (
-            <Icon
-              className={cn(
-                'size-5 shrink-0 transition-all duration-200',
-                !collapsed && 'mr-3',
-                isActive ? 'text-primary' : 'group-hover:text-primary',
-              )}
+  const renderItem = (route: AppRoute) => {
+    const config = route.sidebar;
+    if (!config) return null;
+    const Icon = config.icon;
+    const count = config.badge ? badges[config.badge] : 0;
+    return (
+      <NavLink
+        key={route.path}
+        to={route.path}
+        end={route.path === ROUTES.DASHBOARD}
+        title={config.label}
+        onClick={() => isMobile && onCloseDrawer()}
+        className={({ isActive }) =>
+          cn(
+            'grid h-8.5 w-full shrink-0 grid-cols-[2.75rem_1fr_auto] items-center rounded-lg text-meta font-medium text-on-grad-2 transition-colors hover:bg-glass hover:text-on-grad focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-on-grad',
+            isActive && 'bg-glass-2 font-semibold text-on-grad ring-1 ring-inset ring-glass-line',
+          )
+        }
+      >
+        <span className="relative grid place-items-center">
+          <Icon className="size-4.5" aria-hidden />
+          {count > 0 && (
+            <span
+              className="absolute -top-0.5 right-2.5 size-1.5 rounded-full bg-dot-warn ring-2 ring-grad-ink transition-opacity group-data-[expanded]/sb:opacity-0 max-md:opacity-0"
               aria-hidden
             />
           )}
-          {!collapsed && <span>{label}</span>}
-          {isActive && !collapsed && (
-            <div className="ml-auto w-1 h-8 bg-primary rounded-full absolute right-0"></div>
-          )}
-        </>
+        </span>
+        <span className={LABEL}>{config.label}</span>
+        {count > 0 ? (
+          <span
+            className={cn(
+              LABEL,
+              'mr-2 rounded-full bg-dot-warn px-1.5 text-2xs font-semibold leading-4 text-dot-warn-ink',
+            )}
+          >
+            {count > 99 ? '99+' : count}
+            <span className="sr-only"> belum dibaca</span>
+          </span>
+        ) : (
+          <span />
+        )}
+      </NavLink>
+    );
+  };
+
+  return (
+    <aside
+      ref={asideRef}
+      aria-label="Navigasi utama"
+      data-expanded={expanded ? '' : undefined}
+      onMouseEnter={() => hoverTo(true, HOVER_IN_MS)}
+      onMouseLeave={() => hoverTo(false, HOVER_OUT_MS)}
+      onFocus={() => !isMobile && setHover(true)}
+      onBlur={(event) => {
+        if (!asideRef.current?.contains(event.relatedTarget as Node | null)) setHover(false);
+      }}
+      className={cn(
+        'group/sb fixed inset-y-0 left-0 z-40 flex flex-col gap-2.5 overflow-hidden bg-grad-side px-2.5 py-3 text-on-grad transition-[width,transform,box-shadow] duration-200 ease-out',
+        'pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]',
+        // HP: laci selebar sidebar terbuka, tersembunyi di kiri
+        'max-md:w-sbw',
+        isMobile && !drawerOpen && '-translate-x-[102%]',
+        isMobile && drawerOpen && 'shadow-float',
+        // Layar lebar: rel ikon, melebar saat hover (melayang) atau pin
+        !isMobile && (expanded ? 'w-sbw' : 'w-rail'),
+        !isMobile && expanded && !pinned && 'shadow-float',
       )}
-    </NavLink>
+    >
+      <div className="grid h-11 shrink-0 grid-cols-[2.75rem_1fr_auto] items-center">
+        <img
+          src="/logo.svg"
+          alt=""
+          className="size-8.5 justify-self-center rounded-xl shadow"
+          aria-hidden
+        />
+        <span className={cn(LABEL, 'flex flex-col leading-tight')}>
+          <b className="text-[0.9375rem] tracking-wide">Opnamix</b>
+          <small className="text-xs text-on-grad-2">Stok farmasi klinik</small>
+        </span>
+        <button
+          type="button"
+          onClick={onTogglePin}
+          aria-pressed={pinned}
+          aria-label={pinned ? 'Lepas kunci sidebar' : 'Kunci sidebar tetap terbuka'}
+          title={pinned ? 'Lepas kunci (sidebar menutup sendiri)' : 'Kunci sidebar tetap terbuka'}
+          className={cn(
+            LABEL,
+            'grid size-7 place-items-center rounded-lg text-on-grad-2 hover:bg-glass hover:text-on-grad aria-pressed:bg-glass-2 aria-pressed:text-on-grad max-md:hidden [&_svg]:size-4',
+          )}
+        >
+          {pinned ? <PinOff aria-hidden /> : <Pin aria-hidden />}
+        </button>
+      </div>
+
+      <nav className="scrollbar-hide flex flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden">
+        {nodes.map((node) => {
+          if (node.kind === 'group') {
+            return (
+              <div
+                key={`group-${node.label}`}
+                className="relative flex h-6.5 shrink-0 items-end pb-1 pl-3 text-2xs font-semibold uppercase tracking-widest text-on-grad-3"
+              >
+                <span
+                  className="absolute bottom-2.5 left-3 h-px w-5 bg-glass-line transition-opacity group-data-[expanded]/sb:opacity-0 max-md:opacity-0"
+                  aria-hidden
+                />
+                <span className={LABEL}>{node.label}</span>
+              </div>
+            );
+          }
+          // Menu bertingkat lama (Riwayat/Konfigurasi Opname) ditampilkan rata;
+          // keduanya digabung jadi satu menu Stok Opname di Fase 6.
+          if (node.kind === 'parent') return node.children.map(renderItem);
+          return renderItem(node.route);
+        })}
+      </nav>
+
+      <div className="flex shrink-0 flex-col gap-2">
+        <SegmentedControl<ThemePreference>
+          label="Tema"
+          variant="glass"
+          full
+          value={theme}
+          onChange={setTheme}
+          options={THEME_OPTIONS}
+          className={cn(LABEL, 'mx-0.5')}
+        />
+        <SegmentedControl<SizePreference>
+          label="Ukuran tampilan"
+          variant="glass"
+          full
+          value={size}
+          onChange={setSize}
+          options={SIZE_OPTIONS}
+          className={cn(LABEL, 'mx-0.5')}
+        />
+        <div className="grid h-11 grid-cols-[2.75rem_1fr_auto] items-center rounded-xl border border-glass-line bg-glass">
+          <button
+            type="button"
+            onClick={() => {
+              navigate(ROUTES.PROFIL);
+              if (isMobile) onCloseDrawer();
+            }}
+            title="Profil"
+            aria-label="Buka profil"
+            className="col-span-2 grid h-full grid-cols-subgrid items-center rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-on-grad"
+          >
+            <span className="grid size-7.5 place-items-center justify-self-center rounded-full bg-on-grad text-xs font-bold text-grad-ink">
+              {initials(userProfile?.full_name, userProfile?.email)}
+            </span>
+            <span className={cn(LABEL, 'flex flex-col leading-tight')}>
+              <b className="truncate text-meta">{userProfile?.full_name || userProfile?.email}</b>
+              <small className="truncate text-xs text-on-grad-2">
+                {roles.map((r) => ROLE_LABELS[r] ?? r).join(' · ') || 'Pengguna'}
+              </small>
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleLogout()}
+            disabled={loggingOut}
+            aria-label="Keluar"
+            title="Keluar"
+            className={cn(
+              LABEL,
+              'mr-1.5 grid size-7 place-items-center rounded-lg text-on-grad-2 hover:bg-glass-2 hover:text-on-grad disabled:opacity-50 [&_svg]:size-4',
+            )}
+          >
+            <LogOut aria-hidden />
+          </button>
+        </div>
+      </div>
+    </aside>
   );
 };
-
-export default Sidebar;

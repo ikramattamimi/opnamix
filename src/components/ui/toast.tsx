@@ -41,31 +41,31 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const colorMap: Record<ToastType, string> = {
-    success: 'bg-emerald-600',
-    error: 'bg-red-600',
-    warning: 'bg-amber-600',
-    info: 'bg-primary',
+  const iconColorMap: Record<ToastType, string> = {
+    success: 'text-ok',
+    error: 'text-bad',
+    warning: 'text-warn',
+    info: 'text-info',
   };
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
       {/* Toast container */}
-      <div className="fixed top-20 right-4 md:top-28 md:right-6 z-[100] flex flex-col gap-3 pointer-events-none">
+      <div className="fixed top-20 right-4 md:top-28 md:right-6 z-[100] flex flex-col gap-2 pointer-events-none">
         {toasts.map((toast) => {
           const Icon = iconMap[toast.type];
           return (
             <div
               key={toast.id}
-              className={`pointer-events-auto ${colorMap[toast.type]} text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] max-w-[420px] animate-slideUp`}
+              className="pointer-events-auto flex w-[min(26rem,calc(100vw-2rem))] items-center gap-2.5 rounded-card border bg-popover px-3.5 py-3 text-popover-foreground shadow-float animate-slideUp"
             >
-              <Icon className="size-5 flex-shrink-0" aria-hidden />
-              <span className="text-sm font-bold flex-1">{toast.message}</span>
+              <Icon className={`size-5 flex-shrink-0 ${iconColorMap[toast.type]}`} aria-hidden />
+              <span className="text-sm font-semibold flex-1">{toast.message}</span>
               <button
                 onClick={() => removeToast(toast.id)}
                 aria-label="Tutup"
-                className="opacity-60 hover:opacity-100 transition-opacity flex-shrink-0"
+                className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
               >
                 <X className="size-4" aria-hidden />
               </button>

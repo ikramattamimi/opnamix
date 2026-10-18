@@ -1,49 +1,104 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-// Tema terang/gelap untuk seluruh aplikasi. Pilihan disimpan di localStorage
-// dengan kunci yang sama seperti sebelumnya supaya pilihan lama tetap terbaca.
+import {
+  SIZE_STORAGE_KEY,
+  THEME_STORAGE_KEY,
+  readSizePreference,
+  readThemePreference,
+  resolveTheme,
+  type ResolvedTheme,
+  type SizePreference,
+  type ThemePreference,
+} from './displayPreferences';
 
-const STORAGE_KEY = 'darkMode';
+// Preferensi tampilan untuk seluruh aplikasi: tema Terang / Sistem / Gelap dan
+// ukuran Standar / Besar. Keduanya disimpan di localStorage dan diterapkan ke
+// <html>: kelas `dark` untuk tema, `data-size="besar"` untuk ukuran (menaikkan
+// font-size root, jadi semua ukuran berbasis rem ikut naik).
+
+const DARK_QUERY = '(prefers-color-scheme: dark)';
 
 interface ThemeContextValue {
+  theme: ThemePreference;
+  setTheme: (value: ThemePreference) => void;
+  /** Tema yang benar-benar tampil setelah pilihan Sistem diterjemahkan */
+  resolvedTheme: ResolvedTheme;
   isDarkMode: boolean;
-  setIsDarkMode: (value: boolean) => void;
+  /** Beralih ke kebalikan tema yang sedang tampil (pilihan Sistem jadi eksplisit) */
   toggleDarkMode: () => void;
+  size: SizePreference;
+  setSize: (value: SizePreference) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-// localStorage bisa melempar error (mode privat, storage diblokir)
-function readStoredDarkMode(): boolean {
+function getStorage(): Pick<Storage, 'getItem'> {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) === true : false;
+    return window.localStorage;
   } catch {
-    return false;
+    return { getItem: () => null };
   }
 }
 
-function storeDarkMode(value: boolean) {
+function store(key: string, value: string) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+    localStorage.setItem(key, value);
   } catch {
-    // Abaikan: tema tetap berlaku untuk sesi ini walau tidak tersimpan
+    // Abaikan: pilihan tetap berlaku untuk sesi ini walau tidak tersimpan
   }
+}
+
+function systemPrefersDark(): boolean {
+  return typeof window !== 'undefined' && !!window.matchMedia?.(DARK_QUERY).matches;
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(readStoredDarkMode);
+  const [theme, setTheme] = useState<ThemePreference>(() => readThemePreference(getStorage()));
+  const [size, setSize] = useState<SizePreference>(() => readSizePreference(getStorage()));
+  const [systemDark, setSystemDark] = useState(systemPrefersDark);
 
   useEffect(() => {
-    storeDarkMode(isDarkMode);
-    document.documentElement.classList.toggle('dark', isDarkMode);
-  }, [isDarkMode]);
+    const media = window.matchMedia?.(DARK_QUERY);
+    if (!media) return;
+    const onChange = (event: MediaQueryListEvent) => setSystemDark(event.matches);
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
 
-  const toggleDarkMode = useCallback(() => setIsDarkMode((prev) => !prev), []);
+  const resolvedTheme = resolveTheme(theme, systemDark);
+
+  useEffect(() => {
+    store(THEME_STORAGE_KEY, theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('dark', resolvedTheme === 'dark');
+    root.style.colorScheme = resolvedTheme;
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    store(SIZE_STORAGE_KEY, size);
+    if (size === 'besar') document.documentElement.dataset.size = 'besar';
+    else delete document.documentElement.dataset.size;
+  }, [size]);
+
+  const toggleDarkMode = useCallback(
+    () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark'),
+    [resolvedTheme],
+  );
 
   const value = useMemo(
-    () => ({ isDarkMode, setIsDarkMode, toggleDarkMode }),
-    [isDarkMode, toggleDarkMode],
+    () => ({
+      theme,
+      setTheme,
+      resolvedTheme,
+      isDarkMode: resolvedTheme === 'dark',
+      toggleDarkMode,
+      size,
+      setSize,
+    }),
+    [theme, resolvedTheme, toggleDarkMode, size],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

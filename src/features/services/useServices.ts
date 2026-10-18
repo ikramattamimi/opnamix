@@ -15,6 +15,15 @@ export function useServices(params?: PaginationParams) {
   });
 }
 
+// Semua jasa aktif (grid Data Jasa)
+export function useAllServices() {
+  return useQuery({
+    queryKey: serviceKeys.allList(),
+    queryFn: servicesApi.getAllServices,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 export function useCreateService() {
   const queryClient = useQueryClient();
   return useMutation({

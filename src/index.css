@@ -2,9 +2,277 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  -webkit-font-smoothing: antialiased;
+/*
+ * Token tampilan Opnamix. Satu-satunya tempat nilai warna literal boleh ditulis.
+ *
+ * Format:
+ * - Warna solid ditulis sebagai kanal RGB ("37 99 235") supaya Tailwind bisa
+ *   menambah opasitas (`bg-primary/10`).
+ * - Token *soft*, kaca, dan on-grad di mode gelap sudah membawa alfa sendiri
+ *   ("110 155 255 / 0.14"). Jangan pakai pengubah opasitas pada token ini.
+ * - Gradien dan bayangan disimpan utuh dan dipakai lewat `bg-grad-*` / `shadow-*`.
+ *
+ * Tema gelap aktif lewat kelas `.dark` di <html> (diatur ThemeProvider, termasuk
+ * pilihan "Sistem"). Ukuran Besar aktif lewat `data-size="besar"` di <html>.
+ */
+@layer base {
+  :root {
+    /* Permukaan */
+    --background: 242 244 249; /* #F2F4F9 */
+    --foreground: 19 26 43; /* #131A2B */
+    --card: 255 255 255;
+    --card-foreground: 19 26 43;
+    --popover: 255 255 255;
+    --popover-foreground: 19 26 43;
+    --surface-2: 246 247 251; /* #F6F7FB */
+    --muted: 246 247 251;
+    --muted-foreground: 87 96 117; /* #576075 */
+    --faint: 135 144 163; /* #8790A3, hanya untuk meta sekunder */
+    --border: 227 231 240; /* #E3E7F0 */
+    --border-strong: 207 214 228; /* #CFD6E4 */
+    --input: 207 214 228;
+
+    /* Primer: isi tombol, aksen (teks/ikon/fokus), tinta tautan, latar lembut */
+    --primary: 37 99 235; /* #2563EB */
+    --primary-foreground: 255 255 255;
+    --primary-accent: 37 99 235;
+    --primary-ink: 29 78 216; /* #1D4ED8 */
+    --primary-soft: 234 240 254; /* #EAF0FE */
+    --ring: 37 99 235;
+
+    /* Netral shadcn */
+    --secondary: 246 247 251;
+    --secondary-foreground: 19 26 43;
+    --accent: 246 247 251;
+    --accent-foreground: 19 26 43;
+
+    /* Status */
+    --ok: 21 128 61; /* #15803D */
+    --ok-soft: 231 245 236; /* #E7F5EC */
+    --warn: 180 83 9; /* #B45309 */
+    --warn-soft: 253 242 225; /* #FDF2E1 */
+    --bad: 200 30 30; /* #C81E1E */
+    --bad-soft: 253 236 236; /* #FDECEC */
+    --info: 29 78 216;
+    --info-soft: 234 240 254;
+    --destructive: 200 30 30; /* isi tombol hapus, teks putih */
+    --destructive-foreground: 255 255 255;
+
+    /* Kategori produk */
+    --cat-obat: 37 99 235; /* #2563EB */
+    --cat-bhp: 15 138 128; /* #0F8A80 */
+    --cat-imun: 124 58 237; /* #7C3AED */
+    --cat-alkes: 194 65 12; /* #C2410C */
+
+    /* Gradien header & sidebar, kaca di atas gradien */
+    --grad-hero:
+      radial-gradient(90% 170% at 100% 0%, rgba(130, 170, 255, 0.5), transparent 60%),
+      linear-gradient(118deg, #0a2466 0%, #1543c2 58%, #3b6cf2 100%);
+    --grad-side: linear-gradient(185deg, #0a2160 0%, #123a9e 58%, #2556d6 100%);
+    --glass: 255 255 255 / 0.11;
+    --glass-2: 255 255 255 / 0.2;
+    --glass-line: 255 255 255 / 0.16;
+    --on-grad: 255 255 255;
+    --on-grad-2: 255 255 255 / 0.76;
+    --on-grad-3: 255 255 255 / 0.5;
+    --glass-shade: 0 0 0 / 0.18; /* alur gelap di atas gradien (pilihan tema sidebar) */
+    --grad-ink: 18 58 158; /* #123A9E, teks di atas tombol putih pada gradien */
+    /* Titik status di atas gradien (sama di kedua mode) */
+    --dot-ok: 74 222 128; /* #4ADE80 */
+    --dot-warn: 251 191 36; /* #FBBF24 */
+    --dot-bad: 251 113 133; /* #FB7185 */
+    --on-dot-warn: 58 38 0; /* #3A2600 */
+
+    /* Grafik (lolos validator buta warna) */
+    --ser1: 37 99 235; /* #2563EB */
+    --ser2: 56 189 248; /* #38BDF8 */
+    --viz-minus: 227 73 72; /* #E34948 */
+    --viz-plus: 37 99 235;
+    --r1: 42 120 214; /* #2A78D6 */
+    --r2: 235 104 52; /* #EB6834 */
+    --r3: 27 175 122; /* #1BAF7A */
+    --r4: 237 161 0; /* #EDA100 */
+    --r5: 232 123 164; /* #E87BA4 */
+    --r6: 0 131 0; /* #008300 */
+    --grid: 233 236 243; /* #E9ECF3 */
+
+    /* Bayangan & scrim */
+    --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+    --shadow-float: 0 18px 40px rgba(10, 20, 50, 0.2);
+    --scrim: 8 14 30 / 0.45;
+    --shadow-header: 0 10px 28px rgba(10, 20, 50, 0.28);
+    --shadow-header-peek: 0 18px 40px rgba(10, 20, 50, 0.35);
+    --grad-stripe: rgba(255, 255, 255, 0.035);
+
+    /* Radius: kartu 14px, kontrol 8px */
+    --radius: 0.875rem;
+    --radius-control: 0.5rem;
+  }
+
+  .dark {
+    /* Palet arang netral; biru hanya di sidebar, header, dan aksen */
+    --background: 12 15 20; /* #0C0F14 */
+    --foreground: 230 233 239; /* #E6E9EF */
+    --card: 20 24 32; /* #141820 */
+    --card-foreground: 230 233 239;
+    --popover: 26 31 41;
+    --popover-foreground: 230 233 239;
+    --surface-2: 26 31 41; /* #1A1F29 */
+    --muted: 26 31 41;
+    --muted-foreground: 158 166 181; /* #9EA6B5 */
+    --faint: 111 119 136; /* #6F7788 */
+    --border: 37 43 54; /* #252B36 */
+    --border-strong: 53 61 76; /* #353D4C */
+    --input: 53 61 76;
+
+    --primary: 47 102 238; /* #2F66EE, isi tombol dengan teks putih */
+    --primary-foreground: 255 255 255;
+    --primary-accent: 110 155 255; /* #6E9BFF, teks/ikon/aksen */
+    --primary-ink: 163 190 255; /* #A3BEFF */
+    --primary-soft: 110 155 255 / 0.14;
+    --ring: 110 155 255;
+
+    --secondary: 26 31 41;
+    --secondary-foreground: 230 233 239;
+    --accent: 26 31 41;
+    --accent-foreground: 230 233 239;
+
+    --ok: 74 222 128; /* #4ADE80 */
+    --ok-soft: 74 222 128 / 0.12;
+    --warn: 251 191 36; /* #FBBF24 */
+    --warn-soft: 251 191 36 / 0.12;
+    --bad: 248 113 113; /* #F87171 */
+    --bad-soft: 248 113 113 / 0.13;
+    --info: 163 190 255;
+    --info-soft: 110 155 255 / 0.14;
+    --destructive: 200 30 30; /* tetap gelap supaya teks putih terbaca */
+    --destructive-foreground: 255 255 255;
+
+    --cat-obat: 110 155 255; /* #6E9BFF */
+    --cat-bhp: 45 212 191; /* #2DD4BF */
+    --cat-imun: 167 139 250; /* #A78BFA */
+    --cat-alkes: 251 146 60; /* #FB923C */
+
+    --grad-hero:
+      radial-gradient(90% 170% at 100% 0%, rgba(90, 130, 255, 0.3), transparent 60%),
+      linear-gradient(118deg, #0b1430 0%, #142a66 60%, #2445a8 100%);
+    --grad-side: linear-gradient(185deg, #0a0f1f 0%, #0f1c42 60%, #172e6c 100%);
+
+    --ser1: 61 111 242; /* #3D6FF2 */
+    --ser2: 20 163 199; /* #14A3C7 */
+    --viz-minus: 230 103 103; /* #E66767 */
+    --viz-plus: 61 111 242;
+    --r1: 57 135 229; /* #3987E5 */
+    --r2: 217 89 38; /* #D95926 */
+    --r3: 25 158 112; /* #199E70 */
+    --r4: 201 133 0; /* #C98500 */
+    --r5: 213 81 129; /* #D55181 */
+    --r6: 0 131 0; /* #008300 */
+    --grid: 34 40 52; /* #222834 */
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-float: 0 18px 44px rgba(0, 0, 0, 0.55);
+    --scrim: 0 0 0 / 0.55;
+  }
+
+  /* Ukuran Besar: semua ukuran berbasis rem ikut naik 15% */
+  html[data-size='besar'] {
+    font-size: 115%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background font-sans text-sm text-foreground antialiased;
+  }
+  code,
+  kbd,
+  samp {
+    @apply font-mono;
+  }
+}
+
+/*
+ * Header halaman (PageHeader). Status ditulis oleh useStickyHeader sebagai
+ * atribut data-*: stuck (menempel), compact (ringkas), peek (intip), anim, grow.
+ */
+@layer components {
+  .page-header {
+    transition:
+      border-radius 0.15s,
+      box-shadow 0.15s;
+  }
+  .page-header > * {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0 2.9375rem,
+      var(--grad-stripe) 2.9375rem 3rem
+    );
+    pointer-events: none;
+  }
+  .page-header[data-stuck] {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: var(--shadow-header);
+  }
+  .page-header[data-compact] {
+    padding-block: 0.5rem;
+    gap: 0;
+  }
+  .page-header[data-compact]:not([data-peek]) > :not([data-header-top]) {
+    display: none;
+  }
+  .page-header[data-compact] h1 {
+    font-size: 1.0625rem;
+  }
+  .page-header[data-compact][data-peek] {
+    gap: 0.625rem;
+    box-shadow: var(--shadow-header-peek);
+  }
+  .page-header[data-peek] > :not([data-header-top]),
+  .page-header[data-grow] > :not([data-header-top]) {
+    animation: pageHeaderIn 0.24s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .page-header[data-anim] {
+    transition:
+      height 0.24s cubic-bezier(0.2, 0.7, 0.2, 1),
+      margin-bottom 0.24s cubic-bezier(0.2, 0.7, 0.2, 1),
+      border-radius 0.15s,
+      box-shadow 0.2s;
+  }
+  /* Tombol pin hanya muncul saat header menempel, atau saat sedang di-pin */
+  .page-header:not([data-stuck]) [data-header-pin]:not([aria-pressed='true']) {
+    display: none;
+  }
+}
+
+@keyframes pageHeaderIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -16,88 +284,8 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #a3aed0;
+  background: rgb(var(--border-strong));
   border-radius: 3px;
-}
-
-@layer base {
-  /* Semua pasangan teks/latar di sini lolos WCAG AA (4.5:1). */
-  :root {
-    --background: 222 83% 98%; /* #F4F7FE */
-    --foreground: 217 33% 17%; /* #1E293B */
-    --card: 0 0% 100%;
-    --card-foreground: 217 33% 17%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 217 33% 17%;
-    --primary: 221 83% 53%; /* #2563EB - teks putih 5.2:1 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 91% 95%;
-    --secondary-foreground: 217 91% 20%;
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 19% 35%; /* #475569 */
-    --accent: 217 91% 95%;
-    --accent-foreground: 217 91% 20%;
-    --destructive: 0 72% 51%; /* #DC2626 - teks putih 4.8:1 */
-    --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%; /* #E2E8F0 */
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  /* Palet dark navy */
-  .dark {
-    --background: 228 67% 13%; /* #0B1437 */
-    --foreground: 210 40% 98%; /* #F8FAFC */
-    --card: 227 60% 17%; /* #111C44 */
-    --card-foreground: 210 40% 98%;
-    --popover: 227 60% 17%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 230 53% 23%; /* #1B2559 */
-    --secondary-foreground: 210 40% 98%;
-    --muted: 230 53% 23%;
-    --muted-foreground: 215 20% 65%; /* #94A3B8 - 6.4:1 di card */
-    --accent: 230 53% 23%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 228 50% 24%; /* #1E2A5A */
-    --input: 228 50% 24%;
-    --ring: 217 91% 60%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Primary/destructive #2563EB/#DC2626 cukup untuk latar tombol, tapi sebagai
-   teks di atas navy hanya ~3.4:1. Di dark mode teksnya pakai tingkat lebih terang. */
-@layer utilities {
-  .dark .text-primary,
-  .dark .hover\:text-primary:hover {
-    color: #60a5fa;
-  }
-  .dark .text-destructive,
-  .dark .hover\:text-destructive:hover {
-    color: #f87171;
-  }
 }
 
 /* Animations */

@@ -1,5 +1,20 @@
 import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
+
+// tailwind-merge perlu tahu token tambahan di tailwind.config.js. Tanpa ini,
+// `text-meta` dianggap warna teks dan membuang `text-primary` di kelas yang sama.
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      spacing: ['rail', 'sbw', 'below-header'],
+    },
+    classGroups: {
+      'font-size': [{ text: ['2xs', 'meta', 'note', 'label', 'panel'] }],
+      shadow: [{ shadow: ['float'] }],
+      rounded: [{ rounded: ['card', 'control'] }],
+    },
+  },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

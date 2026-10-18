@@ -74,11 +74,11 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
       const getTypeVariant = (): BadgeProps['variant'] => {
         switch (type) {
           case 'masuk':
-            return 'success';
+            return 'ok';
           case 'keluar':
-            return 'danger';
+            return 'bad';
           case 'penyesuaian':
-            return 'violet';
+            return 'info';
           default:
             return 'neutral';
         }
@@ -188,7 +188,7 @@ export const stockMutationColumns: ColumnDef<StockMutationRow>[] = [
       const status = row.getValue('status') as string;
       return (
         <div className="text-center">
-          <Badge variant={status === 'selesai' ? 'info' : 'warning'}>
+          <Badge variant={status === 'selesai' ? 'info' : 'warn'}>
             {status === 'selesai' ? 'Selesai' : 'Menunggu'}
           </Badge>
         </div>

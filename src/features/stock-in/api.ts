@@ -3,6 +3,7 @@ import { StockInReceipt } from './types';
 import { PaginationParams, PaginatedResponse } from '@/types/pagination';
 import { getProfileNames } from '@/lib/profiles';
 import { getDisplayNameFromMasterObat } from '@/features/products/productDisplay';
+import { cleanBatch } from './expiry';
 
 export const stockInApi = {
   // HELPER: Upload receipt image to Supabase Storage with the user's session
@@ -71,6 +72,9 @@ export const stockInApi = {
         status: t.status === 'selesai' ? 'Selesai' : 'Menunggu',
         receivedBy: (t.created_by && profileMap[t.created_by]) || 'Admin',
         evidenceUrl: t.bukti, // Map evidenceUrl
+        total:
+          t.total || (t.transaksi_detail || []).reduce((sum, d) => sum + (d.harga || 0) * d.qty, 0),
+        createdAt: t.created_at || (t.tanggal as string),
         items: t.transaksi_detail
           ? t.transaksi_detail.map((d) => ({
               id: d.id.toString(),
@@ -80,6 +84,8 @@ export const stockInApi = {
               quantity: d.qty,
               unit: d.master_obat?.satuan || 'Pcs',
               expiryDate: d.expire_date || '-',
+              batch: cleanBatch(d.batch),
+              price: d.harga || 0,
             }))
           : [],
       };

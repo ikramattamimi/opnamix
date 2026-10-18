@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { ROUTES } from '@/types/routes';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { LoadingState } from '@/components/common/QueryState';
 import OpnameStepper from './components/pelaksanaan/OpnameStepper';
 import { OpnameActionsBar, OpnameActionsSidebar } from './components/pelaksanaan/OpnameActions';
 import { useOpnameExecution } from './components/pelaksanaan/useOpnameExecution';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const PelaksanaanOpnamePage: React.FC = () => {
   const { opnameId } = useParams<{ opnameId: string }>();
@@ -17,7 +17,12 @@ const PelaksanaanOpnamePage: React.FC = () => {
   const [showBackwardWarning, setShowBackwardWarning] = useState(false);
 
   if (execution.isLoading) {
-    return <LoadingState label="Memuat data opname..." className="min-h-[400px]" />;
+    return (
+      <>
+        <PageHeader back={ROUTES.RIWAYAT_OPNAME} />
+        <LoadingState label="Memuat data opname..." className="min-h-[400px]" />
+      </>
+    );
   }
 
   const handleFinish = () => {
@@ -41,25 +46,19 @@ const PelaksanaanOpnamePage: React.FC = () => {
 
   return (
     <>
-      <PageLayout>
-        <PageHeader
-          title={`Opname — ${execution.opnameData?.scheduleName || 'Opname'}`}
-          description={execution.opnameData?.opnameNumber}
-        />
+      <PageHeader back={ROUTES.RIWAYAT_OPNAME} />
+      <div className="md:flex md:gap-6 md:items-start min-h-screen">
+        <div className="md:w-full space-y-6 md:flex-1">
+          <OpnameStepper execution={execution} />
+        </div>
 
-        <div className="md:flex md:gap-6 md:items-start">
-          <div className="md:w-full space-y-6 md:flex-1">
-            <OpnameStepper execution={execution} />
-          </div>
-
-          {/* Kolom tindakan, desktop saja */}
-          <div className="hidden md:block md:w-[25%] sticky top-32 ">
-            <div className="space-y-4">
-              <OpnameActionsSidebar {...actionProps} />
-            </div>
+        {/* Kolom tindakan, desktop saja */}
+        <div className="hidden md:block md:w-[25%] sticky top-below-header ">
+          <div className="space-y-4">
+            <OpnameActionsSidebar {...actionProps} />
           </div>
         </div>
-      </PageLayout>
+      </div>
 
       <OpnameActionsBar {...actionProps} />
 

@@ -12,7 +12,6 @@ import {
   History,
   LayoutDashboard,
   Settings,
-  User,
   UserCog,
   type LucideIcon,
 } from 'lucide-react';
@@ -31,7 +30,11 @@ export interface SidebarConfig {
   group?: string;
   // Item yang punya parent dikelompokkan dalam menu yang bisa dibuka-tutup.
   parent?: SidebarParent;
+  // Angka di samping menu, diisi oleh useSidebarBadges
+  badge?: SidebarBadge;
 }
+
+export type SidebarBadge = 'notifications';
 
 export interface SidebarParent {
   label: string;
@@ -56,7 +59,9 @@ const Dashboard = React.lazy(() => import('@/features/dashboard/Dashboard'));
 const ProductManagement = React.lazy(() => import('@/features/products/ProductManagement'));
 const ServiceManagement = React.lazy(() => import('@/features/services/ServiceManagement'));
 const StockInManagement = React.lazy(() => import('@/features/stock-in/StockInManagement'));
+const StockInPos = React.lazy(() => import('@/features/stock-in/StockInPos'));
 const StockOutManagement = React.lazy(() => import('@/features/stock-out/StockOutManagement'));
+const StockOutPos = React.lazy(() => import('@/features/stock-out/StockOutPos'));
 const RiwayatOpnamePage = React.lazy(() => import('@/features/opname/RiwayatOpnamePage'));
 const KonfigurasiOpnamePage = React.lazy(() => import('@/features/opname/KonfigurasiOpnamePage'));
 const PelaksanaanOpnamePage = React.lazy(() => import('@/features/opname/PelaksanaanOpnamePage'));
@@ -114,12 +119,28 @@ export const APP_ROUTES: readonly AppRoute[] = [
     sidebar: { label: 'Stok Masuk', icon: CircleArrowDown, group: 'Transaksi' },
   },
   {
+    path: ROUTES.STOK_MASUK_BARU,
+    title: 'Terima barang',
+    roles: STAFF_ROLES,
+    element: StockInPos,
+    errorName: 'Terima barang',
+    showInSidebar: false,
+  },
+  {
     path: ROUTES.STOK_KELUAR,
     title: 'Pengeluaran Stok (Keluar)',
     element: StockOutManagement,
     errorName: 'Pengeluaran Stok',
     showInSidebar: true,
     sidebar: { label: 'Stok Keluar', icon: CircleArrowUp, group: 'Transaksi' },
+  },
+  {
+    // Judul diganti halaman sesuai mode (permintaan/manual/edit)
+    path: ROUTES.STOK_KELUAR_BARU,
+    title: 'Permintaan baru',
+    element: StockOutPos,
+    errorName: 'Stok Keluar baru',
+    showInSidebar: false,
   },
   {
     path: ROUTES.STOK_OPNAME,
@@ -174,14 +195,6 @@ export const APP_ROUTES: readonly AppRoute[] = [
     showInSidebar: false,
   },
   {
-    path: ROUTES.NOTIFICATIONS,
-    title: 'Notifikasi',
-    element: NotificationsPage,
-    errorName: 'Notifikasi',
-    showInSidebar: true,
-    sidebar: { label: 'Notifikasi', icon: Bell },
-  },
-  {
     path: ROUTES.LAPORAN_STOK,
     title: 'Analisis & Laporan Stok',
     roles: STAFF_ROLES,
@@ -191,13 +204,21 @@ export const APP_ROUTES: readonly AppRoute[] = [
     sidebar: { label: 'Laporan Stok', icon: ChartColumn, group: 'Laporan' },
   },
   {
+    path: ROUTES.NOTIFICATIONS,
+    title: 'Notifikasi',
+    element: NotificationsPage,
+    errorName: 'Notifikasi',
+    showInSidebar: true,
+    sidebar: { label: 'Notifikasi', icon: Bell, group: 'Lainnya', badge: 'notifications' },
+  },
+  {
     path: ROUTES.USER_MANAGEMENT,
     title: 'Manajemen Pengguna',
     roles: ['admin'],
     element: UserManagement,
     errorName: 'Manajemen Pengguna',
     showInSidebar: true,
-    sidebar: { label: 'Kelola Pengguna', icon: UserCog },
+    sidebar: { label: 'Kelola Pengguna', icon: UserCog, group: 'Lainnya' },
   },
   {
     // Dokumentasi pengembang, jadi hanya untuk admin
@@ -207,14 +228,14 @@ export const APP_ROUTES: readonly AppRoute[] = [
     element: UiDocsPage,
     errorName: 'Dokumentasi Komponen UI',
     showInSidebar: true,
-    sidebar: { label: 'Komponen UI', icon: Component },
+    sidebar: { label: 'Komponen UI', icon: Component, group: 'Lainnya' },
   },
   {
     path: ROUTES.PROFIL,
     title: 'Profil Saya',
     element: ProfilePage,
     errorName: 'Profil',
-    showInSidebar: true,
-    sidebar: { label: 'Profil', icon: User },
+    // Dibuka dari kartu pengguna di bawah sidebar
+    showInSidebar: false,
   },
 ];

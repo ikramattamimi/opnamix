@@ -11,8 +11,7 @@ import {
 } from './useNotifications';
 import { getNotificationLucideIcon, getNotificationColor, formatNotificationTime } from './format';
 import { AppNotification } from './types';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/card';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -64,22 +63,15 @@ const NotificationsPage: React.FC = () => {
   };
 
   return (
-    <PageLayout maxWidth="narrow">
+    <div className="max-w-3xl mx-auto space-y-6">
       <PageHeader
-        title="Kotak Masuk"
-        description={
-          unreadCount > 0
-            ? `${unreadCount} notifikasi belum dibaca`
-            : 'Semua notifikasi sudah dibaca'
-        }
+        stats={[
+          { label: 'Belum dibaca', value: unreadCount, tone: unreadCount > 0 ? 'warn' : 'ok' },
+        ]}
         actions={
           unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              onClick={markAllAsRead}
-              className="text-sm font-bold text-primary hover:text-primary/80 border border-primary/20 hover:border-primary/40 px-4"
-            >
-              <CheckCheck className="size-4 mr-1.5" aria-hidden />
+            <Button variant="glass" onClick={markAllAsRead}>
+              <CheckCheck aria-hidden />
               Tandai semua dibaca
             </Button>
           )
@@ -205,7 +197,7 @@ const NotificationsPage: React.FC = () => {
           Menampilkan {filtered.length} dari {notifications.length} notifikasi
         </p>
       )}
-    </PageLayout>
+    </div>
   );
 };
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CircleAlert, Inbox, Loader2, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ToneIcon } from '@/components/data/ToneIcon';
 import { cn } from '@/lib/utils';
 
 // Tampilan bersama untuk status data: memuat, kosong, dan gagal.
@@ -50,11 +51,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className,
 }) => (
   <div
-    className={cn('flex flex-col items-center justify-center gap-2 py-12 text-center', className)}
+    className={cn(
+      'flex flex-col items-center justify-center gap-1.5 px-3 py-7 text-center text-meta text-muted-foreground',
+      className,
+    )}
   >
-    <Icon className="size-10 text-gray-300 dark:text-gray-600" aria-hidden />
-    <p className="font-medium text-foreground">{title}</p>
-    {description && <p className="max-w-sm text-sm text-muted-foreground">{description}</p>}
+    <ToneIcon icon={Icon} tone="primary" size="xl" className="mb-0.5" />
+    <p className="font-semibold text-foreground">{title}</p>
+    {description && <p className="max-w-sm">{description}</p>}
     {action && <div className="mt-2">{action}</div>}
   </div>
 );
@@ -75,11 +79,14 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 }) => (
   <div
     role="alert"
-    className={cn('flex flex-col items-center justify-center gap-2 py-12 text-center', className)}
+    className={cn(
+      'flex flex-col items-center justify-center gap-1.5 px-3 py-7 text-center text-meta text-muted-foreground',
+      className,
+    )}
   >
-    <CircleAlert className="size-10 text-red-500" aria-hidden />
-    <p className="font-medium text-foreground">{title}</p>
-    <p className="max-w-sm text-sm text-muted-foreground">{message}</p>
+    <ToneIcon icon={CircleAlert} tone="bad" size="xl" className="mb-0.5" />
+    <p className="font-semibold text-foreground">{title}</p>
+    <p className="max-w-sm">{message}</p>
     {onRetry && (
       <Button variant="outline" size="sm" className="mt-2" onClick={onRetry}>
         Coba lagi

@@ -15,8 +15,7 @@ import {
   ActiveSchedulesSidebar,
   ActiveSchedulesStrip,
 } from './components/riwayat/ActiveSchedulesPanel';
-import PageLayout from '@/components/layout/PageLayout';
-import PageHeader from '@/components/layout/PageHeader';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const NO_CARDS: OpnameCard[] = [];
 const NO_SCHEDULE_INFO: ScheduleInfo[] = [];
@@ -64,17 +63,25 @@ const RiwayatOpnamePage: React.FC = () => {
   };
 
   if (isLoading) {
-    return <LoadingState label="Memuat data..." className="min-h-[400px]" />;
+    return (
+      <>
+        <PageHeader />
+        <LoadingState label="Memuat data..." className="min-h-[400px]" />
+      </>
+    );
   }
 
   return (
-    <PageLayout>
+    <div className="mx-auto">
       <PageHeader
-        title="Riwayat Opname"
-        description="Opname yang dijadwalkan, masih berupa draf, dan sudah selesai."
+        actions={
+          <Button variant="light" onClick={openManualModal}>
+            <Plus aria-hidden />
+            Tambah Opname
+          </Button>
+        }
       />
-
-      <div className="md:hidden">
+      <div className="md:hidden mb-4">
         <ActiveSchedulesStrip schedules={activeSchedules} />
       </div>
 
@@ -100,7 +107,7 @@ const RiwayatOpnamePage: React.FC = () => {
 
         {/* Kolom kanan, desktop saja */}
         <div className="hidden md:block md:w-[30%] flex-shrink-0">
-          <div className="sticky top-32 space-y-4">
+          <div className="sticky top-below-header space-y-4">
             <ActiveSchedulesSidebar schedules={activeSchedules} onAddOpname={openManualModal} />
           </div>
         </div>
@@ -108,7 +115,7 @@ const RiwayatOpnamePage: React.FC = () => {
 
       {/* Tombol tambah opname melayang (mobile) */}
       <Button
-        size="icon-lg"
+        size="icon"
         onClick={openManualModal}
         className="md:hidden fixed bottom-6 right-6 bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center z-50 active:scale-95 transition-transform [&_svg]:size-6"
         title="Tambah Opname"
@@ -132,7 +139,7 @@ const RiwayatOpnamePage: React.FC = () => {
         onConfirm={doDeleteOpname}
         onCancel={() => setDeleteId(null)}
       />
-    </PageLayout>
+    </div>
   );
 };
 
