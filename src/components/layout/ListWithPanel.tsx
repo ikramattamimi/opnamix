@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { PanelContext } from '@/components/panel/panelContext';
 import { cn } from '@/lib/utils';
@@ -27,6 +27,27 @@ export const ListWithPanel: React.FC<ListWithPanelProps> = ({
   const isDrawer = useMediaQuery(PANEL_DRAWER_QUERY);
   const context = useMemo(() => ({ isDrawer, close: onPanelClose }), [isDrawer, onPanelClose]);
   const drawerOpen = isDrawer && panelOpen;
+  const stickyRef = useRef<HTMLDivElement>(null);
+
+  // Tinggi panel = sisa layar dari posisi panel sekarang. Di puncak halaman
+  // panel masih di bawah header yang belum menempel, jadi tinggi dari
+  // --page-header-h saja membuat kaki panel (tombol Simpan) terdorong keluar layar.
+  useLayoutEffect(() => {
+    const el = stickyRef.current;
+    if (isDrawer || !el) return;
+    const fit = () => {
+      const gap = parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.5;
+      const top = Math.max(el.getBoundingClientRect().top, 0);
+      el.style.maxHeight = `${window.innerHeight - top - gap}px`;
+    };
+    fit();
+    window.addEventListener('scroll', fit, { passive: true });
+    window.addEventListener('resize', fit);
+    return () => {
+      window.removeEventListener('scroll', fit);
+      window.removeEventListener('resize', fit);
+    };
+  }, [isDrawer]);
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -70,7 +91,7 @@ export const ListWithPanel: React.FC<ListWithPanelProps> = ({
             </div>
           </>
         ) : (
-          <div className="sticky top-below-header flex max-h-[calc(100dvh-var(--page-header-h,0px)-1.5rem)] min-h-0 flex-col">
+          <div ref={stickyRef} className="sticky top-below-header flex min-h-0 flex-col">
             {panel}
           </div>
         )}

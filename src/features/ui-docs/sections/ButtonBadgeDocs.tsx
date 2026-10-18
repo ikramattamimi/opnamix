@@ -21,6 +21,7 @@ export const ButtonDocs: React.FC = () => (
 <Button variant="outline">Batal</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="destructive">Hapus</Button>
+<Button variant="ghost-danger">Hapus (kaki panel)</Button>
 <Button variant="link">Lihat detail</Button>`}
     >
       <Button>Simpan</Button>
@@ -29,6 +30,7 @@ export const ButtonDocs: React.FC = () => (
       <Button variant="outline">Batal</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="destructive">Hapus</Button>
+      <Button variant="ghost-danger">Hapus (kaki panel)</Button>
       <Button variant="link">Lihat detail</Button>
     </DocExample>
 

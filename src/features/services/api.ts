@@ -40,6 +40,19 @@ const generateUniqueServiceCategoryCode = async (name: string) => {
 };
 
 export const servicesApi = {
+  // Semua jasa aktif (grid Data Jasa menyaring di browser)
+  getAllServices: async (): Promise<Service[]> => {
+    const { data, error } = await supabase
+      .from('master_jasa')
+      .select('*, service_categories(name)')
+      .eq('is_active', true)
+      .is('deleted_at', null)
+      .order('nama');
+
+    if (error) throw error;
+    return data.map(mapServiceFromDB);
+  },
+
   // SERVICES
   getServices: async (params?: PaginationParams): Promise<PaginatedResponse<Service>> => {
     const { page = 1, perPage = 10, search = '' } = params || {};

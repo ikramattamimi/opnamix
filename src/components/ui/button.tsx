@@ -15,6 +15,8 @@ const buttonVariants = cva(
         secondary: 'bg-surface-2 text-foreground border-border hover:bg-muted hover:border-input',
         soft: 'bg-primary-soft text-primary-ink hover:border-primary/30',
         ghost: 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
+        // Aksi hapus di kaki panel, di samping tombol utama
+        'ghost-danger': 'text-bad hover:bg-bad-soft',
         link: 'text-primary-ink underline-offset-4 hover:underline',
         // Di atas gradien header/sidebar
         light: 'bg-on-grad text-grad-ink hover:bg-primary-soft',

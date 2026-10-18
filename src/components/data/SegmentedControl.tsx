@@ -32,7 +32,8 @@ const groupVariants = cva('gap-0.5 rounded-xl p-0.5', {
     },
     full: {
       true: 'grid auto-cols-fr grid-flow-col',
-      false: 'inline-flex max-w-full overflow-x-auto',
+      false:
+        'inline-flex max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
     },
   },
 });

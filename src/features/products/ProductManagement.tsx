@@ -1,300 +1,333 @@
-import React, { useState, useEffect } from 'react';
-import { Product, Category } from './types';
-import StatCard from '@/components/common/StatCard';
-import {
-  Archive,
-  CircleDollarSign,
-  Download,
-  FunnelX,
-  Plus,
-  Search,
-  SearchX,
-  TriangleAlert,
-} from 'lucide-react';
-import ProductForm from './ProductForm';
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from './useProducts';
-import PaginationControls from '@/components/common/PaginationControls';
+import React, { useMemo, useState } from 'react';
+import { Archive, Download, Plus, SearchX } from 'lucide-react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { ListWithPanel } from '@/components/layout/ListWithPanel';
+import { Toolbar, ToolbarSpacer } from '@/components/data/Toolbar';
+import { SearchInput } from '@/components/data/SearchInput';
+import { SegmentedControl } from '@/components/data/SegmentedControl';
+import { FilterChips } from '@/components/data/FilterChips';
+import { ResponsiveGrid } from '@/components/data/ResponsiveGrid';
+import { ItemCard } from '@/components/data/ItemCard';
+import { Pagination } from '@/components/data/Pagination';
+import { StatusChip } from '@/components/data/StatusChip';
+import { Meter } from '@/components/data/Meter';
+import { OptionSelect } from '@/components/form/OptionSelect';
+import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
-import { DataTable } from '@/components/ui/data-table';
-import { createProductColumns } from './ProductColumns';
-import { useToast } from '@/components/ui/toast';
-import { exportProductsToExcel } from '@/features/reports/exportUtils';
-import { useDashboardStats } from '@/features/dashboard/useDashboard';
-import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/card';
+import { useToast } from '@/components/ui/toast';
+import { useGridPageSize } from '@/hooks/useGridPageSize';
+import { useListSelection } from '@/hooks/useListSelection';
+import { rp, rpShort } from '@/lib/format';
+import { exportProductsToExcel } from '@/features/reports/exportUtils';
+import {
+  useAllProducts,
+  useCreateProduct,
+  useDeleteProduct,
+  useUpdateProduct,
+} from './useProducts';
+import {
+  CATEGORIES,
+  CATEGORY_META,
+  PRODUCT_SORTS,
+  STOCK_STATUS_META,
+  collectIngredientNames,
+  productMatches,
+  sortProducts,
+  stockStatus,
+  type ProductSort,
+} from './catalog';
+import { ProductBrandTag, ProductMeta, ProductTitle } from './components/ProductTitle';
+import { ProductFormPanel } from './components/ProductFormPanel';
+import { Category, type Product } from './types';
+
+type CategoryFilter = 'Semua' | Category;
+type StatusFilter = 'menipis' | 'habis' | null;
+
+const GRID_ROWS = 4;
 
 const ProductManagement: React.FC = () => {
   const { showToast } = useToast();
+  const { data: products = [], isPending, isError, refetch } = useAllProducts();
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+  const deleteProduct = useDeleteProduct();
+
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState<CategoryFilter>('Semua');
+  const [status, setStatus] = useState<StatusFilter>(null);
+  const [sort, setSort] = useState<ProductSort>('nama');
   const [page, setPage] = useState(1);
-  const perPage = 10;
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; productId: string | null }>(
-    {
-      isOpen: false,
-      productId: null,
-    },
+  const [toDelete, setToDelete] = useState<Product | null>(null);
+  // Naik setiap Batal, supaya form produk baru kembali kosong
+  const [formKey, setFormKey] = useState(0);
+
+  // selectedId kosong = panel "Tambah produk"
+  const { selectedId, select, panelOpen, openPanel, closePanel, setSelectedId } =
+    useListSelection<string>();
+  const selected = products.find((p) => p.id === selectedId);
+
+  const grid = useGridPageSize(208, GRID_ROWS);
+
+  const counts = useMemo(() => {
+    const byCategory = new Map<Category, number>();
+    let low = 0;
+    let out = 0;
+    let value = 0;
+    for (const p of products) {
+      byCategory.set(p.category, (byCategory.get(p.category) ?? 0) + 1);
+      const s = stockStatus(p);
+      if (s === 'menipis') low += 1;
+      if (s === 'habis') out += 1;
+      value += p.stock * p.sellingPrice;
+    }
+    return { byCategory, low, out, value };
+  }, [products]);
+
+  const ingredientNames = useMemo(() => collectIngredientNames(products), [products]);
+
+  const existingCodes = useMemo(() => products.map((p) => p.code), [products]);
+
+  const filtered = useMemo(
+    () =>
+      sortProducts(
+        products.filter(
+          (p) =>
+            (category === 'Semua' || p.category === category) &&
+            (!status || stockStatus(p) === status) &&
+            productMatches(p, query),
+        ),
+        sort,
+      ),
+    [products, category, status, query, sort],
   );
 
-  // Filter state
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState<string>('Semua');
+  const pages = Math.max(1, Math.ceil(filtered.length / grid.pageSize));
+  const current = Math.min(page, pages);
+  const visible = filtered.slice((current - 1) * grid.pageSize, current * grid.pageSize);
 
-  // Use hooks with filters
-  const {
-    data: paginatedData,
-    isPlaceholderData,
-    isPending,
-    isError,
-    refetch,
-  } = useProducts({
-    page,
-    perPage,
-    search: searchTerm,
-  });
-  let products = paginatedData?.data || [];
+  const resetPage =
+    <T,>(setter: (v: T) => void) =>
+    (v: T) => {
+      setter(v);
+      setPage(1);
+    };
+  const toggleStatus = (next: Exclude<StatusFilter, null>) =>
+    resetPage(setStatus)(status === next ? null : next);
 
-  // Client-side category filtering
-  if (filterCategory !== 'Semua') {
-    products = products.filter((p) => p.category === filterCategory);
-  }
-
-  const totalPages = paginatedData?.totalPages || 1;
-  const totalProducts = paginatedData?.total || 0;
-
-  const createMutation = useCreateProduct();
-  const updateMutation = useUpdateProduct();
-  const deleteMutation = useDeleteProduct();
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingProduct(undefined);
+  const startNew = () => {
+    setSelectedId(null);
+    openPanel();
   };
 
-  const handleSave = async (product: Product) => {
+  const handleSave = async (data: Partial<Product>) => {
     try {
-      if (editingProduct) {
-        await updateMutation.mutateAsync({ id: editingProduct.id, updates: product });
+      if (selected) {
+        await updateProduct.mutateAsync({ id: selected.id, updates: data });
+        showToast('Perubahan produk disimpan.', 'success');
       } else {
-        await createMutation.mutateAsync(product);
+        await createProduct.mutateAsync(data);
+        showToast(`${data.name} ditambahkan.`, 'success');
       }
-      handleCloseModal();
+      return true;
     } catch (error) {
       console.error('Error saving product:', error);
       showToast('Gagal menyimpan produk', 'error');
+      return false;
     }
-  };
-
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (id: string) => {
-    setDeleteConfirm({ isOpen: true, productId: id });
   };
 
   const confirmDelete = async () => {
-    if (deleteConfirm.productId) {
-      try {
-        await deleteMutation.mutateAsync(deleteConfirm.productId);
-        setDeleteConfirm({ isOpen: false, productId: null });
-      } catch (error) {
-        console.error('Error deleting product:', error);
-        showToast('Gagal menghapus produk', 'error');
-      }
+    if (!toDelete) return;
+    try {
+      await deleteProduct.mutateAsync(toDelete.id);
+      showToast(`${toDelete.name} dihapus.`, 'success');
+      setToDelete(null);
+      select(null);
+      closePanel();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      showToast('Gagal menghapus produk', 'error');
     }
   };
 
-  // Stat nyata, berbagi cache dengan Dashboard
-  const { data: dashboardStats, error: statsError } = useDashboardStats();
+  const categoryOptions = [
+    { value: 'Semua' as const, label: 'Semua', count: products.length },
+    ...CATEGORIES.map((c) => ({
+      value: c,
+      label: CATEGORY_META[c].short,
+      count: counts.byCategory.get(c) ?? 0,
+    })),
+  ];
 
-  useEffect(() => {
-    if (statsError) console.error(statsError);
-  }, [statsError]);
+  const isFiltered = !!query.trim() || category !== 'Semua' || !!status;
 
-  const stats = {
-    total: totalProducts,
-    lowStock: dashboardStats?.lowStockCount ?? 0,
-    totalValue: dashboardStats?.totalValue ?? 0,
-  };
+  const list = (
+    <Card className="flex flex-col gap-3 p-3">
+      <Toolbar>
+        <SearchInput
+          value={query}
+          onChange={resetPage(setQuery)}
+          placeholder="Cari nama, merek, kode, atau zat"
+          label="Cari produk"
+        />
+        <SegmentedControl
+          label="Kategori"
+          options={categoryOptions}
+          value={category}
+          onChange={resetPage(setCategory)}
+        />
+        <ToolbarSpacer />
+        <OptionSelect
+          aria-label="Urutkan"
+          className="w-auto"
+          value={sort}
+          onValueChange={setSort}
+          options={PRODUCT_SORTS}
+        />
+      </Toolbar>
+      <FilterChips
+        filters={
+          status ? [{ key: 'status', label: `Status: ${STOCK_STATUS_META[status].label}` }] : []
+        }
+        onRemove={() => resetPage(setStatus)(null)}
+      />
+
+      {isPending ? (
+        <LoadingState label="Memuat produk..." />
+      ) : isError ? (
+        <ErrorState onRetry={() => void refetch()} />
+      ) : (
+        <>
+          <ResponsiveGrid ref={grid.ref} cols={grid.cols}>
+            {visible.map((p) => {
+              const s = stockStatus(p);
+              const tone = STOCK_STATUS_META[s].tone;
+              return (
+                <ItemCard
+                  key={p.id}
+                  topStart={<ProductBrandTag product={p} />}
+                  topEnd={
+                    s !== 'aman' && (
+                      <StatusChip tone={tone}>{STOCK_STATUS_META[s].label}</StatusChip>
+                    )
+                  }
+                  title={<ProductTitle product={p} showBrand={false} />}
+                  subtitle={<ProductMeta product={p} />}
+                  meter={
+                    <Meter
+                      value={p.stock / Math.max(p.minStock * 3, 1)}
+                      tone={tone === 'warn' || tone === 'bad' ? tone : 'ok'}
+                      label="Sisa stok"
+                    />
+                  }
+                  footer={
+                    <>
+                      <span>
+                        <b>{p.stock.toLocaleString('id-ID')}</b> {p.unit.toLowerCase()} · min{' '}
+                        {p.minStock}
+                      </span>
+                      <b>{rp(p.sellingPrice)}</b>
+                    </>
+                  }
+                  selected={p.id === selectedId}
+                  onClick={() => select(p.id)}
+                />
+              );
+            })}
+          </ResponsiveGrid>
+          {filtered.length === 0 && (
+            <EmptyState
+              icon={isFiltered ? SearchX : Archive}
+              title={isFiltered ? 'Tidak ada produk yang cocok' : 'Belum ada produk'}
+              description={isFiltered ? 'Ubah kata kunci atau hapus filter.' : undefined}
+            />
+          )}
+          <Pagination
+            page={current}
+            pageSize={grid.pageSize}
+            total={filtered.length}
+            onPageChange={setPage}
+            note={`${grid.pageSize} per halaman (${grid.cols} × ${GRID_ROWS}, mengikuti lebar layar)`}
+          />
+        </>
+      )}
+    </Card>
+  );
 
   return (
     <>
       <PageHeader
+        stats={[
+          { id: 'total', label: 'Produk', value: products.length.toLocaleString('id-ID') },
+          { id: 'value', label: 'Nilai stok', value: rpShort(counts.value) },
+          {
+            id: 'low',
+            label: 'Menipis',
+            value: counts.low,
+            tone: 'warn',
+            onClick: () => toggleStatus('menipis'),
+            pressed: status === 'menipis',
+          },
+          {
+            id: 'out',
+            label: 'Habis',
+            value: counts.out,
+            tone: 'bad',
+            onClick: () => toggleStatus('habis'),
+            pressed: status === 'habis',
+          },
+        ]}
         actions={
           <>
             <Button
               variant="glass"
-              onClick={() => void exportProductsToExcel(products)}
-              disabled={products.length === 0}
+              onClick={() => void exportProductsToExcel(filtered)}
+              disabled={filtered.length === 0}
             >
               <Download aria-hidden />
               Ekspor Excel
             </Button>
-            <Button variant="light" onClick={() => setIsModalOpen(true)}>
+            <Button variant="light" onClick={startNew}>
               <Plus aria-hidden />
-              Tambah Produk Baru
+              Tambah produk
             </Button>
           </>
         }
       />
-      <div className="space-y-6">
-        {/* Top Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          <StatCard
-            label="Total Produk"
-            value={stats.total.toLocaleString()}
-            icon={Archive}
-            color="primary"
-          />
-          <StatCard
-            label="Total Nilai"
-            value={`Rp ${stats.totalValue.toLocaleString('id-ID')}`}
-            icon={CircleDollarSign}
-            color="green-500"
-          />
-          <StatCard
-            label="Stok Menipis (Top 3)"
-            value={stats.lowStock}
-            icon={TriangleAlert}
-            color="red-500"
-          />
-        </div>
 
-        {/* Filter Bar */}
-        <Card className="p-4 flex flex-wrap items-center gap-4">
-          <div className="flex-1 min-w-[200px] relative">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground pointer-events-none"
-              aria-hidden
-            />
-            <Input
-              type="text"
-              placeholder="Cari produk atau SKU..."
-              aria-label="Cari produk"
-              className="w-full pl-12 pr-4 bg-background border-none text-sm font-medium focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-muted-foreground uppercase ml-2">
-              Kategori:
-            </span>
-            <Select
-              value={filterCategory}
-              onValueChange={(value) => {
-                setFilterCategory(value);
-                setPage(1);
-              }}
-            >
-              <SelectTrigger
-                aria-label="Filter kategori"
-                className="w-auto gap-2 bg-background border-none px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Semua">Semua</SelectItem>
-                {Object.values(Category).map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              setSearchTerm('');
-              setFilterCategory('Semua');
-              setPage(1);
+      <ListWithPanel
+        list={list}
+        panelOpen={panelOpen}
+        onPanelClose={closePanel}
+        panel={
+          <ProductFormPanel
+            key={`${selected?.id ?? 'new'}-${formKey}`}
+            product={selected}
+            existingCodes={existingCodes}
+            ingredientNames={ingredientNames}
+            saving={createProduct.isPending || updateProduct.isPending}
+            onSave={handleSave}
+            onDelete={setToDelete}
+            onCancel={() => {
+              setFormKey((k) => k + 1);
+              select(null);
+              closePanel();
             }}
-            className="text-muted-foreground hover:text-red-500 transition-colors [&_svg]:size-6"
-            title="Reset Filter"
-            aria-label="Reset Filter"
-          >
-            <FunnelX aria-hidden />
-          </Button>
-        </Card>
-
-        {/* Table */}
-        <div className="w-full">
-          <Card className="p-6">
-            {isPending ? (
-              <LoadingState label="Memuat produk..." />
-            ) : isError ? (
-              <ErrorState onRetry={() => void refetch()} />
-            ) : products.length === 0 ? (
-              <EmptyState
-                icon={searchTerm || filterCategory !== 'Semua' ? SearchX : Archive}
-                title={
-                  searchTerm || filterCategory !== 'Semua'
-                    ? 'Tidak ada produk ditemukan.'
-                    : 'Belum ada produk.'
-                }
-              />
-            ) : (
-              <DataTable
-                columns={createProductColumns({ onEdit: handleEdit, onDelete: handleDelete })}
-                data={products}
-                searchable={false}
-              />
-            )}
-          </Card>
-          <PaginationControls
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            isPlaceholderData={isPlaceholderData}
           />
-        </div>
-      </div>
+        }
+      />
 
-      {/* Product Form Modal */}
-      {isModalOpen && (
-        <Dialog open onOpenChange={(open) => !open && handleCloseModal()}>
-          <DialogContent className="max-w-2xl p-8" aria-describedby={undefined}>
-            <ProductForm
-              inDialog
-              onSave={handleSave}
-              editingProduct={editingProduct}
-              onCancel={handleCloseModal}
-              isLoading={createMutation.isPending || updateMutation.isPending}
-            />
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {/* Delete Confirmation Modal */}
       <ConfirmationModal
-        isOpen={deleteConfirm.isOpen}
-        title="Hapus Produk?"
-        message="Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan."
-        confirmText="Ya, Hapus"
+        isOpen={!!toDelete}
+        title="Hapus produk?"
+        message={`${toDelete?.name ?? 'Produk ini'} akan dihapus dari daftar. Riwayat transaksi tetap tersimpan.`}
+        confirmText="Ya, hapus"
         cancelText="Batal"
         type="danger"
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteConfirm({ isOpen: false, productId: null })}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setToDelete(null)}
       />
     </>
   );

@@ -23,7 +23,7 @@ export const mapProductFromDB = (item: ProductRow): Product => ({
   name: item.nama?.trim() || getProductDisplayNameFromDb(item),
   category: (item.jenis as Category) || Category.Obat,
   unit: (item.satuan as Unit) || Unit.Strip,
-  purchasePrice: 0,
+  purchasePrice: item.harga_beli || 0,
   sellingPrice: item.harga || 0,
   stock: item.qty || 0,
   minStock: item.buffer_stok || 0,

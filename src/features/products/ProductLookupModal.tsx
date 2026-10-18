@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Ban, Pill, Plus, Search, SearchX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +11,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { EmptyState, LoadingState } from '@/components/common/QueryState';
 import { Product } from './types';
-import ProductForm from './ProductForm';
+import { ProductFormPanel } from './components/ProductFormPanel';
+import { collectIngredientNames } from './catalog';
 import { useCreateProduct } from './useProducts';
 import { useToast } from '@/components/ui/toast';
 
@@ -36,13 +37,18 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
   const createProductMutation = useCreateProduct();
   const { showToast } = useToast();
 
-  const handleCreateProduct = async (product: Product) => {
+  const ingredientNames = useMemo(() => collectIngredientNames(products), [products]);
+  const existingCodes = useMemo(() => products.map((p) => p.code), [products]);
+
+  const handleCreateProduct = async (product: Partial<Product>) => {
     try {
-      await createProductMutation.mutateAsync(product);
-      onSelect(product); // Auto-select the new product
+      const created = await createProductMutation.mutateAsync(product);
+      onSelect(created); // Produk baru langsung dipilih
+      return true;
     } catch (error) {
       console.error('Failed to create product', error);
       showToast('Gagal membuat produk baru.', 'error');
+      return false;
     }
   };
 
@@ -61,8 +67,15 @@ const ProductLookupModal: React.FC<ProductLookupModalProps> = ({
         </DialogHeader>
 
         {isAddingNew ? (
-          <div className="flex-1 overflow-y-auto p-6">
-            <ProductForm onSave={handleCreateProduct} onCancel={() => setIsAddingNew(false)} />
+          <div className="flex min-h-0 flex-1 flex-col p-4">
+            <ProductFormPanel
+              existingCodes={existingCodes}
+              ingredientNames={ingredientNames}
+              saving={createProductMutation.isPending}
+              onSave={handleCreateProduct}
+              onDelete={() => undefined}
+              onCancel={() => setIsAddingNew(false)}
+            />
           </div>
         ) : (
           <>

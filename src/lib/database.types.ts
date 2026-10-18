@@ -107,6 +107,7 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           harga: number | null
+          harga_beli: number | null
           id: number
           is_active: boolean | null
           isi_kemasan: string | null
@@ -129,6 +130,7 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           harga?: number | null
+          harga_beli?: number | null
           id?: never
           is_active?: boolean | null
           isi_kemasan?: string | null
@@ -151,6 +153,7 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           harga?: number | null
+          harga_beli?: number | null
           id?: never
           is_active?: boolean | null
           isi_kemasan?: string | null

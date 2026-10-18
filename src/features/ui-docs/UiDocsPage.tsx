@@ -9,6 +9,7 @@ import { IconDocs } from './sections/IconDocs';
 import { TokenDocs } from './sections/TokenDocs';
 import { PageHeaderDocs, SegmentedDocs, ToneIconDocs } from './sections/ShellDocs';
 import { DataPrimitiveDocs, FormPrimitiveDocs, ListPanelDocs } from './sections/PrimitiveDocs';
+import { ProductDomainDocs, TagInputDocs } from './sections/ProductDocs';
 import { DocsTocInline, DocsTocSidebar } from './components/DocsToc';
 import { PageHeader } from '@/components/layout/PageHeader';
 
@@ -23,6 +24,8 @@ const SECTIONS: { id: string; label: string; Component: React.FC }[] = [
   { id: 'input', label: 'Input & Select', Component: InputDocs },
   { id: 'form', label: 'Form', Component: FormDocs },
   { id: 'form-primitives', label: 'Primitif form', Component: FormPrimitiveDocs },
+  { id: 'tag-input', label: 'TagInput & OptionSelect', Component: TagInputDocs },
+  { id: 'product-domain', label: 'Komponen produk', Component: ProductDomainDocs },
   { id: 'dialog', label: 'Dialog', Component: DialogDocs },
   { id: 'dropdown', label: 'Dropdown', Component: DropdownDocs },
   { id: 'segmented', label: 'SegmentedControl', Component: SegmentedDocs },
@@ -44,7 +47,7 @@ const UiDocsPage: React.FC = () => (
         <div className="rounded-card border bg-card p-5 shadow">
           <p className="text-sm text-muted-foreground">
             Komponen bersama di <code className="font-mono text-xs">src/components/ui</code>{' '}
-            (shadcn/ui) dan <code className="font-mono text-xs">src/components/common</code>, dan{' '}
+            (shadcn/ui), <code className="font-mono text-xs">src/components/common</code>, dan{' '}
             <code className="font-mono text-xs">src/components/layout</code>. Pakai komponen ini
             sebelum membuat versi sendiri. Konvensi lengkap ada di{' '}
             <code className="font-mono text-xs">.ai/conventions/</code>.

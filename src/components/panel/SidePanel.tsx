@@ -64,7 +64,9 @@ export const SidePanel: React.FC<SidePanelProps> = ({
           </button>
         )}
       </header>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3.5">{children}</div>
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3.5 [&>*]:shrink-0">
+        {children}
+      </div>
       {footer && (
         <footer className="flex items-center gap-2 border-t bg-card px-3.5 py-2.5 [&>*]:flex-1 sm:[&>*]:flex-none">
           {footer}

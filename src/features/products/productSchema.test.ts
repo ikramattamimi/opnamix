@@ -1,68 +1,87 @@
 import { describe, expect, it } from 'vitest';
-import { emptyProductFormValues, productFormSchema, type ProductFormValues } from './productSchema';
-import { Category } from './types';
+import {
+  emptyProductFormValues,
+  formValuesToProduct,
+  validateProductForm,
+  type ProductFormValues,
+} from './productSchema';
+import { Category, Unit, type Product } from './types';
 
-const valid: ProductFormValues = {
+const pct = { name: 'Paracetamol', strength: '500 mg' };
+const medicine: ProductFormValues = {
   ...emptyProductFormValues,
-  category: Category.Alkes,
-  name: 'Kasa Steril',
-  sellingPrice: 5000,
-  stock: 10,
-  minStock: 2,
+  ingredients: [pct],
+  sellingPrice: 3500,
+  stock: 100,
+  minStock: 10,
 };
 
-const errorsOf = (values: ProductFormValues) => {
-  const result = productFormSchema.safeParse(values);
-  if (result.success) return {};
-  return Object.fromEntries(result.error.issues.map((issue) => [issue.path[0], issue.message]));
-};
-
-describe('productFormSchema', () => {
-  it('menerima produk yang lengkap', () => {
-    expect(productFormSchema.safeParse(valid).success).toBe(true);
+describe('validateProductForm', () => {
+  it('menerima obat satu zat yang lengkap', () => {
+    expect(validateProductForm(medicine, { isNew: true })).toEqual({});
   });
 
-  it('form kosong menampilkan pesan per field', () => {
-    expect(errorsOf({ ...emptyProductFormValues, category: Category.Alkes })).toEqual({
-      name: 'Nama produk wajib diisi',
-      sellingPrice: 'Harga jual harus lebih dari 0',
-      stock: 'Stok tidak boleh negatif',
-      minStock: 'Stok minimum tidak boleh negatif',
+  it('obat wajib punya kandungan', () => {
+    expect(validateProductForm({ ...medicine, ingredients: [] }, { isNew: true })).toEqual({
+      ingredients: 'Isi minimal satu kandungan',
     });
   });
 
-  it('nama non-obat minimal 3 karakter', () => {
-    expect(errorsOf({ ...valid, name: 'Ka' }).name).toBe('Nama produk minimal 3 karakter');
-    expect(errorsOf({ ...valid, name: '   ' }).name).toBe('Nama produk wajib diisi');
-  });
-
-  it('obat memakai merek atau kandungan sebagai nama', () => {
-    const medicine = { ...valid, category: Category.Obat, name: '' };
-    expect(errorsOf({ ...medicine, brand: 'Ab' }).name).toBe(
-      'Isi merek atau kandungan obat minimal 3 karakter',
+  it('kategori lain wajib punya nama minimal 3 karakter', () => {
+    const bhp = { ...medicine, category: Category.BHP, ingredients: [] };
+    expect(validateProductForm({ ...bhp, name: '' }, { isNew: true }).name).toBe(
+      'Nama produk wajib diisi',
     );
-    expect(errorsOf({ ...medicine, composition: 'Paracetamol' }).name).toBeUndefined();
+    expect(validateProductForm({ ...bhp, name: 'ab' }, { isNew: true }).name).toBe(
+      'Nama produk minimal 3 karakter',
+    );
+    expect(validateProductForm({ ...bhp, name: 'Spuit 3 ml' }, { isNew: true })).toEqual({});
   });
 
   it('harga jual harus lebih dari 0', () => {
-    expect(errorsOf({ ...valid, sellingPrice: 0 }).sellingPrice).toBe(
-      'Harga jual harus lebih dari 0',
-    );
+    expect(validateProductForm({ ...medicine, sellingPrice: null }, { isNew: true })).toEqual({
+      sellingPrice: 'Harga jual harus lebih dari 0',
+    });
   });
 
-  it('stok dan stok minimum tidak boleh negatif', () => {
-    expect(errorsOf({ ...valid, stock: -1 }).stock).toBe('Stok tidak boleh negatif');
-    expect(errorsOf({ ...valid, minStock: -1 }).minStock).toBe('Stok minimum tidak boleh negatif');
+  it('stok awal hanya wajib untuk produk baru', () => {
+    const noStock = { ...medicine, stock: null };
+    expect(validateProductForm(noStock, { isNew: true }).stock).toBe('Stok awal wajib diisi');
+    expect(validateProductForm(noStock, { isNew: false })).toEqual({});
   });
 
-  it('stok minimum tidak boleh lebih dari stok awal', () => {
-    expect(errorsOf({ ...valid, stock: 5, minStock: 6 }).minStock).toBe(
+  it('stok minimum tidak melebihi stok awal, kecuali saat edit', () => {
+    const high = { ...medicine, minStock: 200 };
+    expect(validateProductForm(high, { isNew: true }).minStock).toBe(
       'Stok minimum tidak boleh lebih dari stok awal',
     );
-    expect(errorsOf({ ...valid, stock: 5, minStock: 5 }).minStock).toBeUndefined();
+    expect(validateProductForm(high, { isNew: false })).toEqual({});
+  });
+});
+
+describe('formValuesToProduct', () => {
+  it('membentuk nama obat dari kandungan dan menyertakan stok awal', () => {
+    expect(formValuesToProduct({ ...medicine, brand: ' Sanmol ' })).toMatchObject({
+      name: 'Paracetamol 500 mg',
+      brand: 'Sanmol',
+      stock: 100,
+      ingredients: [pct],
+    });
   });
 
-  it('stok 0 tidak dibandingkan dengan stok minimum (aturan lama)', () => {
-    expect(errorsOf({ ...valid, stock: 0, minStock: 5 }).minStock).toBeUndefined();
+  it('tidak mengirim stok saat edit dan mengosongkan data khusus obat untuk BHP', () => {
+    const existing = { id: '1', category: Category.BHP, ingredients: [] } as unknown as Product;
+    const result = formValuesToProduct(
+      {
+        ...medicine,
+        category: Category.BHP,
+        name: 'Spuit 3 ml',
+        unit: Unit.Pcs,
+        packageSize: '3 ml',
+      },
+      existing,
+    );
+    expect(result).not.toHaveProperty('stock');
+    expect(result).toMatchObject({ name: 'Spuit 3 ml', ingredients: [], packageSize: '' });
   });
 });

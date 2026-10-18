@@ -3,6 +3,9 @@
 --
 -- * master_obat.sediaan     : bentuk sediaan obat (Tablet, Kapsul, Sirup, …)
 -- * master_obat.isi_kemasan : isi per kemasan, opsional (mis. "60 ml")
+-- * master_obat.harga_beli  : harga beli per satuan stok, opsional. Form lama
+--                             sudah punya isian ini tetapi nilainya tidak
+--                             pernah disimpan.
 -- * product_ingredients     : satu baris per zat aktif, kekuatan opsional,
 --                             urutan sesuai input. Dipilih tabel terpisah
 --                             (bukan jsonb) supaya saran nama zat dan
@@ -18,7 +21,8 @@
 
 alter table public.master_obat
   add column if not exists sediaan text,
-  add column if not exists isi_kemasan text;
+  add column if not exists isi_kemasan text,
+  add column if not exists harga_beli numeric;
 
 create table if not exists public.product_ingredients (
   id bigint generated always as identity primary key,

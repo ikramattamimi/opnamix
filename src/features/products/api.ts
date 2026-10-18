@@ -16,6 +16,7 @@ const toRow = (product: Partial<Product>) => ({
   jenis: product.category,
   satuan: product.unit,
   harga: product.sellingPrice,
+  harga_beli: product.purchasePrice || null,
   buffer_stok: product.minStock,
   merek: product.brand?.trim() || null,
   sediaan: product.category === Category.Obat ? product.dosageForm?.trim() || null : null,
@@ -54,18 +55,6 @@ export const productsApi = {
       if (data.length < CHUNK) break;
     }
     return rows.map(mapProductFromDB);
-  },
-
-  // Nama zat yang pernah dipakai, untuk saran di isian kandungan
-  getIngredientNames: async (): Promise<string[]> => {
-    const { data, error } = await supabase.from('product_ingredients').select('nama_zat');
-    if (error) throw error;
-    const unique = new Map<string, string>();
-    for (const row of data) {
-      const key = row.nama_zat.trim().toLocaleLowerCase('id-ID');
-      if (key && !unique.has(key)) unique.set(key, row.nama_zat.trim());
-    }
-    return [...unique.values()].sort((a, b) => a.localeCompare(b, 'id'));
   },
 
   // PRODUCTS

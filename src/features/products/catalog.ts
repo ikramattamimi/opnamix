@@ -75,3 +75,62 @@ export function nextProductCode(prefix: string, existingCodes: readonly string[]
   }, 0);
   return `${prefix}-${String(max + 1).padStart(4, '0')}`;
 }
+
+// Baris bawah card: "Obat · Sirup 60 ml", kategori lain "BHP · Pcs"
+export function productMetaText(
+  p: Pick<Product, 'category' | 'dosageForm' | 'packageSize' | 'unit'>,
+): string {
+  const meta = CATEGORY_META[p.category] ?? CATEGORY_META[Category.Obat];
+  const form =
+    p.category === Category.Obat
+      ? [p.dosageForm, p.packageSize].filter((v) => v?.trim()).join(' ')
+      : '';
+  return `${meta.short} · ${form || p.unit}`;
+}
+
+// Pencarian produk: nama, merek, kode, dan semua nama zat
+export function productMatches(
+  p: Pick<Product, 'name' | 'brand' | 'code' | 'ingredients'>,
+  query: string,
+): boolean {
+  const q = query.trim().toLocaleLowerCase('id-ID');
+  if (!q) return true;
+  const haystack = [p.name, p.brand, p.code, ...(p.ingredients ?? []).map((i) => i.name)]
+    .filter(Boolean)
+    .join(' ')
+    .toLocaleLowerCase('id-ID');
+  return q.split(/\s+/).every((word) => haystack.includes(word));
+}
+
+export type ProductSort = 'nama' | 'stok' | 'harga';
+
+export const PRODUCT_SORTS: { value: ProductSort; label: string }[] = [
+  { value: 'nama', label: 'Urut: Nama A–Z' },
+  { value: 'stok', label: 'Urut: Stok paling kritis' },
+  { value: 'harga', label: 'Urut: Harga jual tertinggi' },
+];
+
+// Stok kritis = rasio stok terhadap minimum paling kecil
+export function sortProducts<
+  T extends Pick<Product, 'name' | 'stock' | 'minStock' | 'sellingPrice'>,
+>(list: readonly T[], sort: ProductSort): T[] {
+  const compare: Record<ProductSort, (a: T, b: T) => number> = {
+    nama: (a, b) => a.name.localeCompare(b.name, 'id'),
+    stok: (a, b) => a.stock / Math.max(a.minStock, 1) - b.stock / Math.max(b.minStock, 1),
+    harga: (a, b) => b.sellingPrice - a.sellingPrice,
+  };
+  return [...list].sort((a, b) => compare[sort](a, b) || a.name.localeCompare(b.name, 'id'));
+}
+
+// Nama zat unik dari semua produk, untuk saran TagInput
+export function collectIngredientNames(
+  products: readonly Pick<Product, 'ingredients'>[],
+): string[] {
+  const names = new Map<string, string>();
+  for (const p of products)
+    for (const i of p.ingredients ?? []) {
+      const key = i.name.trim().toLocaleLowerCase('id-ID');
+      if (key && !names.has(key)) names.set(key, i.name.trim());
+    }
+  return [...names.values()].sort((a, b) => a.localeCompare(b, 'id'));
+}

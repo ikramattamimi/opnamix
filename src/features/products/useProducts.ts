@@ -24,14 +24,6 @@ export function useAllProducts() {
   });
 }
 
-export function useIngredientNames() {
-  return useQuery({
-    queryKey: productKeys.ingredients(),
-    queryFn: productsApi.getIngredientNames,
-    staleTime: 1000 * 60 * 60,
-  });
-}
-
 export function useCreateProduct() {
   const queryClient = useQueryClient();
   return useMutation({
