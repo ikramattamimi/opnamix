@@ -109,15 +109,22 @@ export default {
         // Meta 11–13px; `text-xs` (12px) dan `text-sm` (14px) tetap bawaan
         '2xs': ['0.6875rem', { lineHeight: '1rem' }],
         meta: ['0.8125rem', { lineHeight: '1.125rem' }],
+        // 12,5px untuk catatan kecil, 13,5px untuk judul baris/kartu, 15,5px judul panel
+        note: ['0.78125rem', { lineHeight: '1.125rem' }],
+        label: ['0.84375rem', { lineHeight: '1.25rem' }],
+        panel: ['0.96875rem', { lineHeight: '1.3' }],
       },
       spacing: {
         // Tinggi tombol lg (38px)
         9.5: '2.375rem',
         // Lebar sidebar: rel ikon dan terbuka
         4.5: '1.125rem',
+        5.5: '1.375rem',
         6.5: '1.625rem',
         7.5: '1.875rem',
         8.5: '2.125rem',
+        22: '5.5rem',
+        30: '7.5rem',
         rail: '4rem',
         sbw: '14.5rem',
         // Posisi elemen menempel tepat di bawah header halaman

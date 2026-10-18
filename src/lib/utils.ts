@@ -9,7 +9,7 @@ const twMerge = extendTailwindMerge({
       spacing: ['rail', 'sbw', 'below-header'],
     },
     classGroups: {
-      'font-size': [{ text: ['2xs', 'meta'] }],
+      'font-size': [{ text: ['2xs', 'meta', 'note', 'label', 'panel'] }],
       shadow: [{ shadow: ['float'] }],
       rounded: [{ rounded: ['card', 'control'] }],
     },

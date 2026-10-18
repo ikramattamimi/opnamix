@@ -8,6 +8,7 @@ import { FeedbackDocs, TableDocs } from './sections/DataDocs';
 import { IconDocs } from './sections/IconDocs';
 import { TokenDocs } from './sections/TokenDocs';
 import { PageHeaderDocs, SegmentedDocs, ToneIconDocs } from './sections/ShellDocs';
+import { DataPrimitiveDocs, FormPrimitiveDocs, ListPanelDocs } from './sections/PrimitiveDocs';
 import { DocsTocInline, DocsTocSidebar } from './components/DocsToc';
 import { PageHeader } from '@/components/layout/PageHeader';
 
@@ -15,10 +16,13 @@ import { PageHeader } from '@/components/layout/PageHeader';
 const SECTIONS: { id: string; label: string; Component: React.FC }[] = [
   { id: 'token', label: 'Token & Tema', Component: TokenDocs },
   { id: 'page-header', label: 'PageHeader', Component: PageHeaderDocs },
+  { id: 'list-panel', label: 'ListWithPanel', Component: ListPanelDocs },
+  { id: 'data', label: 'Primitif daftar', Component: DataPrimitiveDocs },
   { id: 'button', label: 'Button', Component: ButtonDocs },
   { id: 'badge', label: 'Badge', Component: BadgeDocs },
   { id: 'input', label: 'Input & Select', Component: InputDocs },
   { id: 'form', label: 'Form', Component: FormDocs },
+  { id: 'form-primitives', label: 'Primitif form', Component: FormPrimitiveDocs },
   { id: 'dialog', label: 'Dialog', Component: DialogDocs },
   { id: 'dropdown', label: 'Dropdown', Component: DropdownDocs },
   { id: 'segmented', label: 'SegmentedControl', Component: SegmentedDocs },
