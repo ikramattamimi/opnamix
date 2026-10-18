@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IdCard, Pill, User, X } from 'lucide-react';
+import { IdCard, Pill, User } from 'lucide-react';
 import { StockOutRequest } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import { useServices } from '@/features/services/useServices';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   Form,
@@ -40,12 +40,12 @@ const DEFAULT_AVATAR =
 
 const LABEL = 'block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 ml-1 leading-normal';
 const INPUT =
-  'h-auto rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm md:text-sm focus:border-primary focus-visible:ring-primary dark:text-white aria-[invalid=true]:border-red-500';
+  'border-gray-100 dark:border-gray-700 bg-background px-4 text-sm md:text-sm focus:border-primary focus-visible:ring-primary dark:text-white aria-[invalid=true]:border-red-500';
 const MESSAGE = 'text-xs font-normal text-red-500 mt-1 ml-1';
-const CARD = 'bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft';
-const CARD_TITLE = 'font-bold text-lg text-brand-dark dark:text-white flex items-center gap-2';
+const CARD = 'bg-card rounded-2xl p-6 shadow-soft';
+const CARD_TITLE = 'font-bold text-lg text-foreground flex items-center gap-2';
 
-const RequiredMark = () => <span className="text-red-500">*</span>;
+const RequiredMark = () => <span className="text-red-600 dark:text-red-400">*</span>;
 
 // Nilai select nakes; profil tanpa nama memakai id karena item select tidak boleh kosong
 const nakesValue = (n: { id: string; full_name: string | null }) => n.full_name || n.id;
@@ -129,21 +129,13 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-background-light dark:bg-background-dark w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-[40px] shadow-soft p-4 md:p-8 lg:p-10 font-display">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-brand-dark dark:text-white tracking-tight">
-            Formulir Permintaan Obat
-          </h2>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            aria-label="Tutup"
-            className="rounded-full hover:bg-gray-200 dark:hover:bg-white/5 shadow-sm [&_svg]:size-6"
-          >
-            <X aria-hidden />
-          </Button>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="block max-h-[95vh] max-w-6xl bg-background p-4 md:p-8 lg:p-10 font-display"
+        aria-describedby={undefined}
+      >
+        <div className="mb-8 pr-10">
+          <DialogTitle className="text-3xl tracking-tight">Formulir Permintaan Obat</DialogTitle>
         </div>
 
         <Form {...form}>
@@ -216,7 +208,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
               <div className={CARD}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className={CARD_TITLE}>
-                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-600">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-700">
                       <IdCard className="size-5" aria-hidden />
                     </span>
                     Nama Nakes
@@ -231,7 +223,7 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
                         <FormControl>
                           <SelectTrigger
                             aria-label="Nama Nakes"
-                            className="h-auto rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm focus:border-primary focus:ring-primary dark:text-white"
+                            className="border-gray-100 dark:border-gray-700 bg-background px-4 text-sm focus:border-primary focus:ring-primary dark:text-white"
                           >
                             <SelectValue placeholder="Memuat data nakes..." />
                           </SelectTrigger>
@@ -252,11 +244,11 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
               <div className={CARD}>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className={CARD_TITLE}>
-                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-600">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-700">
                       <Pill className="size-5" aria-hidden />
                     </span>
                     Permintaan Obat & Alkes
-                    <span className="text-xs font-normal text-text-secondary-light ml-1">
+                    <span className="text-xs font-normal text-muted-foreground ml-1">
                       (Opsional)
                     </span>
                   </h3>
@@ -276,8 +268,8 @@ const StockOutRequestForm: React.FC<StockOutRequestFormProps> = ({
             </div>
           </form>
         </Form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

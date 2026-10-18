@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, X } from 'lucide-react';
 import { Product, Category, Unit } from './types';
 import { Button } from '@/components/ui/button';
+import { DialogTitle } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import {
   Select,
@@ -24,6 +26,8 @@ interface ProductFormProps {
   editingProduct?: Product;
   onCancel: () => void;
   isLoading?: boolean;
+  // Dirender di dalam <DialogContent>: judul jadi DialogTitle, tombol tutup dari Dialog
+  inDialog?: boolean;
 }
 
 const toFormValues = (product: Product): ProductFormValues => ({
@@ -44,7 +48,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   editingProduct,
   onCancel,
   isLoading = false,
+  inDialog = false,
 }) => {
+  const Title = inDialog ? DialogTitle : 'h2';
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: emptyProductFormValues,
@@ -87,29 +93,31 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   return (
     <div className="h-full">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-bold text-text-primary-light dark:text-white">
+      <div className={cn('flex justify-between items-center mb-6', inDialog && 'pr-10')}>
+        <Title className="text-lg font-bold text-foreground">
           {editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}
-        </h2>
+        </Title>
         <div className="flex items-center gap-2">
           <Button
             type="button"
             variant="ghost"
             onClick={handleReset}
-            className="h-auto text-primary hover:text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
+            className="text-primary hover:text-primary bg-primary/10 hover:bg-primary/20 px-3 transition-colors text-sm font-medium"
           >
             Reset
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onCancel}
-            aria-label="Tutup"
-            className="h-auto w-auto p-2 text-current hover:text-current bg-background-light dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
-          >
-            <X aria-hidden />
-          </Button>
+          {!inDialog && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onCancel}
+              aria-label="Tutup"
+              className="w-auto p-2 text-current hover:text-current bg-background dark:bg-white/5 rounded-full hover:bg-gray-200 transition-colors [&_svg]:size-6"
+            >
+              <X aria-hidden />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -177,11 +185,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
               className="col-span-2"
               label={
                 <>
-                  Harga Jual <span className="text-red-500">*</span>
+                  Harga Jual <span className="text-red-600 dark:text-red-400">*</span>
                 </>
               }
               labelClassName={productLabelClassName}
-              inputClassName={`${productInputClassName} pl-10 pr-4 py-3`}
+              inputClassName={`${productInputClassName} pl-10 pr-4`}
               prefix="Rp"
               onBlur={revalidate}
             />
@@ -215,7 +223,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 <FormLabel className={productLabelClassName}>Deskripsi / Dosis</FormLabel>
                 <FormControl>
                   <Textarea
-                    className={`${productInputClassName} resize-none shadow-none`}
+                    className={`${productInputClassName} py-3 resize-none shadow-none`}
                     placeholder="Tambahkan keterangan..."
                     rows={3}
                     {...field}

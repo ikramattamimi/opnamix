@@ -32,7 +32,7 @@ export function DataTableColumnFilter<TData, TValue>({
           column.setFilterValue(value === 'all' ? undefined : value);
         }}
       >
-        <SelectTrigger className="h-8 w-full">
+        <SelectTrigger className="w-full">
           <SelectValue placeholder={title} />
         </SelectTrigger>
         <SelectContent>
@@ -53,7 +53,7 @@ export function DataTableColumnFilter<TData, TValue>({
       placeholder={title ? `Filter ${title}...` : 'Filter...'}
       value={(filterValue as string) ?? ''}
       onChange={(event) => column.setFilterValue(event.target.value)}
-      className="h-8 w-full"
+      className="w-full"
     />
   );
 }

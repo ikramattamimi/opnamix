@@ -2,6 +2,7 @@ import React from 'react';
 import { ChartColumn, ChartPie } from 'lucide-react';
 import type { Product } from '@/features/products/types';
 import type { CategoryStat } from '../stockAnalytics';
+import { Card } from '@/components/ui/card';
 
 interface StockChartsProps {
   topProducts: Product[];
@@ -13,7 +14,7 @@ interface StockChartsProps {
 const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, totalSku }) => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
     {/* Bar Chart: Stock Levels */}
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+    <Card className="p-6">
       <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
         <ChartColumn className="size-6 text-primary" aria-hidden />
         Level Stok Produk Teratas
@@ -24,7 +25,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
             <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-primary text-white text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap z-10">
               Stok: {p.stock}
             </div>
-            <div className="w-full bg-background-light dark:bg-background-dark rounded-t-xl h-48 relative overflow-hidden">
+            <div className="w-full bg-background rounded-t-xl h-48 relative overflow-hidden">
               <div
                 className="absolute bottom-0 w-full bg-primary/80 group-hover:bg-primary transition-all duration-500"
                 style={{ height: `${Math.min(100, (p.stock / 250) * 100)}%` }}
@@ -34,19 +35,19 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
                 style={{ bottom: `${(p.minStock / 250) * 100}%` }}
               ></div>
             </div>
-            <span className="text-[10px] font-bold text-text-secondary-light mt-2 text-center line-clamp-1">
+            <span className="text-[10px] font-bold text-muted-foreground mt-2 text-center line-clamp-1">
               {p.name}
             </span>
           </div>
         ))}
       </div>
-      <p className="text-[10px] text-text-secondary-light mt-4 text-center italic">
+      <p className="text-[10px] text-muted-foreground mt-4 text-center italic">
         *Garis merah menunjukkan batas minimum stok
       </p>
-    </div>
+    </Card>
 
     {/* Donut Chart: Category Distribution */}
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft flex flex-col md:flex-row items-center gap-8">
+    <Card className="p-6 flex flex-col md:flex-row items-center gap-8">
       <div className="flex-1">
         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
           <ChartPie className="size-6 text-primary" aria-hidden />
@@ -56,10 +57,10 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
           {categoryStats.map((stat, i) => (
             <div key={stat.name} className="space-y-1">
               <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                <span className="text-text-secondary-light">{stat.name}</span>
-                <span className="text-text-primary-light dark:text-white">{stat.percent}%</span>
+                <span className="text-muted-foreground">{stat.name}</span>
+                <span className="text-foreground">{stat.percent}%</span>
               </div>
-              <div className="h-2 w-full bg-background-light dark:bg-background-dark rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-background rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-1000 ${i % 2 === 0 ? 'bg-chart-ser1' : 'bg-chart-ser2'}`}
                   style={{ width: `${stat.percent}%` }}
@@ -78,7 +79,7 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
             fill="transparent"
             stroke="currentColor"
             strokeWidth="3"
-            className="text-background-light dark:text-background-dark"
+            className="text-background"
           ></circle>
           <circle
             cx="18"
@@ -105,12 +106,12 @@ const StockCharts: React.FC<StockChartsProps> = ({ topProducts, categoryStats, t
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="text-xl font-bold">{totalSku}</span>
-          <span className="text-[8px] uppercase font-bold text-text-secondary-light tracking-widest">
+          <span className="text-[8px] uppercase font-bold text-muted-foreground tracking-widest">
             Total SKU
           </span>
         </div>
       </div>
-    </div>
+    </Card>
   </div>
 );
 

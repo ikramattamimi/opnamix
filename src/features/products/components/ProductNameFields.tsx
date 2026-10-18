@@ -33,7 +33,7 @@ export const ProductNameFields: React.FC<ProductNameFieldsProps> = ({
         render={({ field, fieldState, formState }) => (
           <FormItem className="space-y-0">
             <FormLabel className={productLabelClassName}>
-              Nama Produk <span className="text-red-500">*</span>
+              Nama Produk <span className="text-red-600 dark:text-red-400">*</span>
             </FormLabel>
             <FormControl>
               <Input
@@ -98,9 +98,9 @@ export const ProductNameFields: React.FC<ProductNameFieldsProps> = ({
         />
       ))}
       <div className="col-span-2">
-        <p className="text-xs text-text-secondary-light">
+        <p className="text-xs text-muted-foreground">
           Nama produk otomatis:{' '}
-          <span className="font-bold text-text-primary-light dark:text-white">
+          <span className="font-bold text-foreground">
             {previewProductName || values.name || '-'}
           </span>
         </p>

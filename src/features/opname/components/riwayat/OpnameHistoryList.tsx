@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState } from '@/components/common/QueryState';
 import { filterOpnames, formatDate, OpnameCard } from './format';
 import { ListStateCard, OpnameSearchInput, SectionHeader } from './shared';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface OpnameHistoryListProps {
   history: OpnameCard[];
@@ -36,27 +38,20 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
       {filteredHistory.length > 0 ? (
         <div className="space-y-3">
           {filteredHistory.map((opname) => (
-            <div
-              key={opname.id}
-              className="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-soft hover:shadow-md transition-shadow"
-            >
+            <Card key={opname.id} className="p-5 hover:shadow-md transition-shadow">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-lg flex items-center gap-1">
+                    <Badge variant="ok">
                       <CircleCheck className="size-3" aria-hidden />
                       Selesai
-                    </span>
+                    </Badge>
                     {(opname.discrepancyCount || 0) > 0 && (
-                      <span className="text-xs font-bold px-2 py-1 bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 rounded-lg">
-                        {opname.discrepancyCount} Selisih
-                      </span>
+                      <Badge variant="bad">{opname.discrepancyCount} Selisih</Badge>
                     )}
                   </div>
-                  <p className="font-bold text-text-primary-light dark:text-white">
-                    {opname.scheduleName}
-                  </p>
-                  <div className="flex items-center gap-4 text-xs text-text-secondary-light flex-wrap">
+                  <p className="font-bold text-foreground">{opname.scheduleName}</p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                     <span>Dilaksanakan: {formatDate(opname.date || opname.scheduleDate)}</span>
                     <span className="hidden sm:inline">
                       Jadwal: {formatDate(opname.scheduleDate)}
@@ -68,7 +63,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   <Button
                     variant="ghost"
                     onClick={() => navigate(`/audit/stok-opname/detail/${opname.id}`)}
-                    className="text-primary font-bold rounded-xl px-4 h-auto py-2.5 hover:bg-primary/10"
+                    className="text-primary font-bold px-4 hover:bg-primary/10"
                   >
                     <Eye className="mr-1.5" aria-hidden />
                     Lihat Detail
@@ -76,7 +71,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   <Button
                     onClick={() => onDelete(opname.id)}
                     variant="ghost"
-                    className="rounded-xl font-bold px-4 text-sm h-auto py-2.5 text-red-400 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="font-bold px-4 text-sm text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                   >
                     <Trash2 className="mr-1.5" aria-hidden />
@@ -84,7 +79,7 @@ const OpnameHistoryList: React.FC<OpnameHistoryListProps> = ({
                   </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       ) : isError ? (

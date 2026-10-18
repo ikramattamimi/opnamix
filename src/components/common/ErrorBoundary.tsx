@@ -40,7 +40,7 @@ class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
       return (
-        <div className="p-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-[20px] text-center">
+        <div className="p-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl text-center">
           <div className="mb-3 bg-red-100 dark:bg-red-500/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
             <CircleAlert className="text-red-500 size-6" aria-hidden />
           </div>
@@ -54,7 +54,7 @@ class ErrorBoundary extends Component<Props, State> {
           <Button
             variant="outline"
             onClick={() => this.setState({ hasError: false, error: null })}
-            className="mt-4 h-auto px-4 py-2 bg-white dark:bg-red-500/20 border-red-200 dark:border-red-500/20 rounded-xl text-xs font-bold text-red-600 dark:text-white shadow-none hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            className="mt-4 px-4 bg-white dark:bg-red-500/20 border-red-200 dark:border-red-500/20 text-xs font-bold text-red-700 dark:text-white shadow-none hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
           >
             Coba Muat Ulang
           </Button>

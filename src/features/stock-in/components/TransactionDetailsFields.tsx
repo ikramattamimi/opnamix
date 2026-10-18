@@ -7,11 +7,11 @@ import { FieldErrorMessage } from '@/features/products/components/FieldErrorMess
 import { useSupplierSuggestions } from '../useStockIn';
 import type { StockInFormInput } from '../stockInSchema';
 
-const labelClassName = 'text-sm font-bold text-text-primary-light dark:text-white ml-1';
+const labelClassName = 'text-sm font-bold text-foreground ml-1';
 const inputClassName =
-  'h-auto w-full bg-transparent border border-gray-200 dark:border-white/10 rounded-2xl pl-4 pr-10 py-3.5 text-sm font-medium text-text-primary-light dark:text-white focus:ring-0 focus-visible:ring-0 focus:border-primary transition-all';
+  'w-full bg-transparent border border-gray-200 dark:border-white/10 pl-4 pr-10 text-sm font-medium text-foreground focus:ring-0 focus-visible:ring-0 focus:border-primary transition-all';
 const inputIconClassName =
-  'absolute right-4 top-3.5 size-5 text-text-secondary-light pointer-events-none';
+  'absolute right-4 top-3.5 size-5 text-muted-foreground pointer-events-none';
 
 // Nomor nota, supplier, dan tanggal penerimaan
 export const TransactionDetailsFields: React.FC = () => {
@@ -20,7 +20,7 @@ export const TransactionDetailsFields: React.FC = () => {
 
   return (
     <div>
-      <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider mb-6">
+      <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-6">
         Detail Transaksi
       </h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -33,7 +33,7 @@ export const TransactionDetailsFields: React.FC = () => {
               <div className="relative">
                 <FormControl>
                   <Input
-                    className={`${inputClassName} placeholder:text-text-secondary-light`}
+                    className={`${inputClassName} placeholder:text-muted-foreground`}
                     placeholder="Contoh: INV-2023-001"
                     type="text"
                     {...field}
@@ -52,7 +52,7 @@ export const TransactionDetailsFields: React.FC = () => {
             <FormItem className="space-y-2">
               <FormLabel className={labelClassName}>
                 Nama Supplier{' '}
-                <span className="text-xs font-normal text-text-secondary-light">(Opsional)</span>
+                <span className="text-xs font-normal text-muted-foreground">(Opsional)</span>
               </FormLabel>
               <div className="relative">
                 <FormControl>

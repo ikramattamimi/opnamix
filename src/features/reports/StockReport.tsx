@@ -12,10 +12,10 @@ const isReportTab = (value: string): value is ReportTab =>
   value === 'analysis' || value === 'transactions' || value === 'mutation';
 
 const reportTabClass = (active: boolean) =>
-  `px-6 py-3 text-sm font-bold rounded-xl transition-all shadow-none h-auto ${
+  `px-6 text-sm font-bold transition-all shadow-none ${
     active
       ? 'bg-primary text-white shadow-md hover:bg-primary/90'
-      : 'text-text-secondary-light hover:bg-white dark:hover:bg-white/5 bg-transparent'
+      : 'text-muted-foreground hover:bg-white dark:hover:bg-white/5 bg-transparent'
   }`;
 
 // Halaman laporan dengan tiga tab. Isi tab tetap ter-mount (forceMount) supaya
@@ -39,7 +39,7 @@ const StockReport: React.FC = () => {
               <TabsTrigger value="analysis" asChild>
                 <Button
                   variant={activeTab === 'analysis' ? 'default' : 'ghost'}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-none ${activeTab === 'analysis' ? 'bg-white shadow text-primary hover:bg-white hover:text-primary' : 'text-text-secondary-light hover:text-primary bg-transparent'}`}
+                  className={reportTabClass(activeTab === 'analysis')}
                 >
                   Analisis
                 </Button>

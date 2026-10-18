@@ -117,7 +117,7 @@ const RiwayatOpnamePage: React.FC = () => {
       <Button
         size="icon"
         onClick={openManualModal}
-        className="md:hidden fixed bottom-6 right-6 bg-primary hover:bg-primary/90 text-white rounded-full w-14 h-14 shadow-lg shadow-primary/30 flex items-center justify-center z-50 active:scale-95 transition-transform [&_svg]:size-6"
+        className="md:hidden fixed bottom-6 right-6 bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center z-50 active:scale-95 transition-transform [&_svg]:size-6"
         title="Tambah Opname"
         aria-label="Tambah Opname"
       >

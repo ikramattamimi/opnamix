@@ -4,6 +4,7 @@ import { CircleCheck, Eye } from 'lucide-react';
 import { StockOutRequest } from './types';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 
 // Source type options for filter
 const sourceTypeOptions = [
@@ -12,9 +13,9 @@ const sourceTypeOptions = [
 ];
 
 // Static class maps to avoid dynamic Tailwind class purging
-const sourceTypeClasses: Record<string, string> = {
-  PENGAJUAN_NAKES: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
-  KASIR_LANGSUNG: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400',
+const sourceTypeVariants: Record<string, BadgeProps['variant']> = {
+  PENGAJUAN_NAKES: 'info',
+  KASIR_LANGSUNG: 'ok',
 };
 
 // Status options for filter
@@ -49,7 +50,7 @@ export const createStockOutColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Permintaan</div>
+          <div className="font-bold text-foreground">Permintaan</div>
           <DataTableColumnFilter column={column} title="ID / Nama" />
         </div>
       );
@@ -58,12 +59,8 @@ export const createStockOutColumns = ({
       <div className="flex items-center gap-3">
         <div className="w-1 h-10 bg-primary rounded-full"></div>
         <div>
-          <div className="font-medium text-text-primary-light dark:text-white">
-            {row.getValue('requestId')}
-          </div>
-          <div className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-            {row.original.patient.fullName}
-          </div>
+          <div className="font-medium text-foreground">{row.getValue('requestId')}</div>
+          <div className="text-xs text-muted-foreground">{row.original.patient.fullName}</div>
         </div>
       </div>
     ),
@@ -73,7 +70,7 @@ export const createStockOutColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Tipe Sumber</div>
+          <div className="font-bold text-foreground">Tipe Sumber</div>
           <DataTableColumnFilter column={column} title="Tipe" options={sourceTypeOptions} />
         </div>
       );
@@ -82,9 +79,9 @@ export const createStockOutColumns = ({
       const tipeSumber = row.getValue('tipeSumber') as string;
       const sourceType = sourceTypeOptions.find((option) => option.value === tipeSumber);
       return (
-        <div className={`inline px-2.5 py-1 rounded-full ${sourceTypeClasses[tipeSumber] ?? ''}`}>
+        <Badge variant={sourceTypeVariants[tipeSumber] ?? 'neutral'}>
           {sourceType?.label ?? tipeSumber}
-        </div>
+        </Badge>
       );
     },
     filterFn: (row, id, value) => {
@@ -95,7 +92,7 @@ export const createStockOutColumns = ({
     accessorKey: 'requestedBy',
     header: ({ column }) => (
       <div className="space-y-2">
-        <div className="font-bold text-text-primary-light dark:text-white">Diminta Oleh</div>
+        <div className="font-bold text-foreground">Diminta Oleh</div>
         <DataTableColumnFilter column={column} title="Nama" />
       </div>
     ),
@@ -108,9 +105,7 @@ export const createStockOutColumns = ({
         <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center font-bold text-primary text-[10px] uppercase">
           {(row.getValue('requestedBy') as string)?.[0] || '?'}
         </div>
-        <span className="text-sm font-medium text-text-primary-light dark:text-white">
-          {row.getValue('requestedBy')}
-        </span>
+        <span className="text-sm font-medium text-foreground">{row.getValue('requestedBy')}</span>
       </div>
     ),
   },
@@ -119,9 +114,7 @@ export const createStockOutColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white text-center">
-            Status
-          </div>
+          <div className="font-bold text-foreground text-center">Status</div>
           <DataTableColumnFilter column={column} title="Status" options={statusOptions} />
         </div>
       );
@@ -132,18 +125,12 @@ export const createStockOutColumns = ({
 
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              isCompleted
-                ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
-                : 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400'
-            }`}
-          >
+          <Badge variant={isCompleted ? 'ok' : 'warn'}>
             <span
               className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-green-500' : 'bg-yellow-500'}`}
             ></span>
             {status}
-          </span>
+          </Badge>
         </div>
       );
     },
@@ -153,21 +140,17 @@ export const createStockOutColumns = ({
   },
   {
     accessorKey: 'serviceFee',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-right">
-        Biaya Layanan
-      </div>
-    ),
+    header: () => <div className="font-bold text-foreground text-right">Biaya Layanan</div>,
     cell: ({ row }) => {
       const serviceFee = (row.original.serviceFee ?? 0) as number;
       return (
         <div className="text-right text-sm">
           {serviceFee > 0 ? (
-            <span className="font-semibold text-text-primary-light dark:text-white">
+            <span className="font-semibold text-foreground">
               Rp {serviceFee.toLocaleString('id-ID')}
             </span>
           ) : (
-            <span className="text-text-secondary-light dark:text-text-secondary-dark">-</span>
+            <span className="text-muted-foreground">-</span>
           )}
         </div>
       );
@@ -175,9 +158,7 @@ export const createStockOutColumns = ({
   },
   {
     accessorKey: 'discount',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-right">Diskon</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-right">Diskon</div>,
     cell: ({ row }) => {
       const discount = (row.original.discount ?? 0) as number;
       return (
@@ -187,7 +168,7 @@ export const createStockOutColumns = ({
               - Rp {discount.toLocaleString('id-ID')}
             </span>
           ) : (
-            <span className="text-text-secondary-light dark:text-text-secondary-dark">-</span>
+            <span className="text-muted-foreground">-</span>
           )}
         </div>
       );
@@ -195,22 +176,20 @@ export const createStockOutColumns = ({
   },
   {
     accessorKey: 'totalAmount',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-right">Total</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-right">Total</div>,
     cell: ({ row }) => (
-      <div className="text-right font-bold text-text-primary-light dark:text-white text-sm">
+      <div className="text-right font-bold text-foreground text-sm">
         Rp {(row.original.totalAmount ?? 0).toLocaleString('id-ID')}
       </div>
     ),
   },
   {
     accessorKey: 'date',
-    header: () => <div className="font-bold text-text-primary-light dark:text-white">Tanggal</div>,
+    header: () => <div className="font-bold text-foreground">Tanggal</div>,
     cell: ({ row }) => {
       const date = new Date(row.getValue('date'));
       return (
-        <div className="text-text-primary-light dark:text-white">
+        <div className="text-foreground">
           {date.toLocaleDateString('id-ID', {
             day: '2-digit',
             month: 'short',
@@ -222,9 +201,7 @@ export const createStockOutColumns = ({
   },
   {
     id: 'actions',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">Aksi</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Aksi</div>,
     cell: ({ row }) => {
       const request = row.original;
       const isPending = request.status === 'Menunggu';

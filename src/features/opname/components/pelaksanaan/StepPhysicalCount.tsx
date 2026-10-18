@@ -4,6 +4,15 @@ import { OpnameItem } from '../../types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { StockInputs } from './useOpnameExecution';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface StepPhysicalCountProps {
   items: OpnameItem[];
@@ -31,10 +40,10 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
   };
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+    <Card className="p-6">
       <div className="mb-6">
         <h3 className="text-lg font-bold">Tahap 2: Input Stok Fisik</h3>
-        <p className="text-sm text-text-secondary-light">
+        <p className="text-sm text-muted-foreground">
           Masukkan jumlah stok fisik hasil penghitungan di gudang.
         </p>
       </div>
@@ -48,28 +57,23 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
 
       {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto mb-6">
-        <table className="w-full text-left">
-          <thead className="border-b border-gray-100 dark:border-gray-800">
-            <tr className="text-xs uppercase font-bold text-text-secondary-light tracking-wider">
-              <th className="px-4 py-3">Nama Produk</th>
-              <th className="px-4 py-3 w-48 text-center bg-primary/5 rounded-t-xl">
-                Jumlah Stok Fisik
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+        <Table>
+          <TableHeader>
+            <TableRow className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+              <TableHead>Nama Produk</TableHead>
+              <TableHead className="w-48 text-center rounded-t-xl">Jumlah Stok Fisik</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {items.map((item) => (
-              <tr
-                key={item.id}
-                className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-              >
-                <td className="px-4 py-4">
+              <TableRow key={item.id}>
+                <TableCell>
                   <p className="font-bold text-sm">{item.productName}</p>
-                  <p className="text-xs text-text-secondary-light">
+                  <p className="text-xs text-muted-foreground">
                     {item.category} · {item.unit}
                   </p>
-                </td>
-                <td className="px-4 py-4 bg-primary/5">
+                </TableCell>
+                <TableCell className="bg-primary/5">
                   <Input
                     type="number"
                     min="0"
@@ -77,13 +81,13 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
                     onChange={(e) => setCount(item.id, e.target.value)}
                     placeholder="0"
                     aria-label={`Stok fisik ${item.productName}`}
-                    className="h-auto w-full bg-white dark:bg-card-dark border-2 border-primary/20 focus:border-primary focus-visible:ring-0 rounded-xl text-center font-bold text-lg md:text-lg py-3 shadow-sm placeholder:text-gray-300"
+                    className="w-full bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-0 text-center font-bold text-lg md:text-lg shadow-sm placeholder:text-gray-300"
                   />
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Mobile cards */}
@@ -91,18 +95,18 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
         {items.map((item) => (
           <div
             key={item.id}
-            className="bg-background-light dark:bg-background-dark rounded-xl pt-1 pb-3 px-3 space-y-2 flex gap-2 items-center justify-between"
+            className="bg-background rounded-xl pt-1 pb-3 px-3 space-y-2 flex gap-2 items-center justify-between"
           >
             <div>
               <p className="font-bold text-sm">{item.productName}</p>
-              <p className="text-xs text-text-secondary-light">
+              <p className="text-xs text-muted-foreground">
                 {item.category} · {item.unit}
               </p>
             </div>
             <div>
               <Label
                 htmlFor={`fisik-${item.id}`}
-                className="text-xs font-bold text-text-secondary-light tracking-wider mb-1.5 block"
+                className="text-xs font-bold text-muted-foreground tracking-wider mb-1.5 block"
               >
                 Stok Fisik
               </Label>
@@ -113,13 +117,13 @@ const StepPhysicalCount: React.FC<StepPhysicalCountProps> = ({
                 value={physicalCounts[item.id] ?? ''}
                 onChange={(e) => setCount(item.id, e.target.value)}
                 placeholder="0"
-                className="h-auto w-20 text-sm bg-white dark:bg-card-dark border-2 border-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 rounded-md text-center font-bold px-0 py-1 shadow-sm placeholder:text-gray-300"
+                className="w-20 text-sm bg-card border-2 border-primary/20 focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 text-center font-bold px-0 shadow-sm placeholder:text-gray-300"
               />
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 

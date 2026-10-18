@@ -12,6 +12,14 @@ import {
 import type { Product } from '@/features/products/types';
 import type { DrugField } from '../requestItems';
 import { RequestedDrug } from '../types';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface RequestDrugTableProps {
   drugs: RequestedDrug[];
@@ -25,7 +33,7 @@ interface RequestDrugTableProps {
 }
 
 const EDIT_FIELD =
-  'h-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark px-3 py-2 text-sm md:text-sm text-text-primary-light dark:text-white';
+  'border border-gray-200 dark:border-gray-700 bg-card px-3 text-sm md:text-sm text-foreground';
 
 // Daftar item obat & alkes di detail permintaan
 const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
@@ -49,21 +57,21 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
       )}
     </div>
     <div className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-gray-50 dark:bg-white/5 text-text-secondary-light font-bold border-b border-gray-100 dark:border-gray-800 uppercase text-xs">
-          <tr>
-            <th className="px-4 py-3">Nama Produk</th>
-            <th className="px-4 py-3 text-center">Jumlah</th>
-            <th className="px-4 py-3 text-right">Harga Satuan</th>
-            <th className="px-4 py-3 text-right">Total</th>
-            {edit && <th className="px-4 py-3 text-center">Aksi</th>}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Nama Produk</TableHead>
+            <TableHead className="text-center">Jumlah</TableHead>
+            <TableHead className="text-right">Harga Satuan</TableHead>
+            <TableHead className="text-right">Total</TableHead>
+            {edit && <TableHead className="text-center">Aksi</TableHead>}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {drugs.length > 0 ? (
             drugs.map((drug, i) => (
-              <tr key={i}>
-                <td className="px-4 py-3 font-medium text-text-primary-light dark:text-white">
+              <TableRow key={i}>
+                <TableCell className="font-medium text-foreground">
                   {edit ? (
                     <Select
                       value={drug.productId}
@@ -83,8 +91,8 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                   ) : (
                     drug.productName
                   )}
-                </td>
-                <td className="px-4 py-3 text-center font-bold">
+                </TableCell>
+                <TableCell className="text-center font-bold">
                   {edit ? (
                     <Input
                       type="number"
@@ -97,41 +105,38 @@ const RequestDrugTable: React.FC<RequestDrugTableProps> = ({ drugs, edit }) => (
                   ) : (
                     drug.quantity
                   )}
-                </td>
-                <td className="px-4 py-3 text-right text-text-secondary-light">
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground">
                   Rp {(drug.price || 0).toLocaleString('id-ID')}
-                </td>
-                <td className="px-4 py-3 text-right font-bold text-text-primary-light dark:text-white">
+                </TableCell>
+                <TableCell className="text-right font-bold text-foreground">
                   Rp {((drug.price || 0) * drug.quantity).toLocaleString('id-ID')}
-                </td>
+                </TableCell>
                 {edit && (
-                  <td className="px-4 py-3 text-center">
+                  <TableCell className="text-center">
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       onClick={() => edit.onRemove(drug.id)}
                       aria-label="Hapus item"
-                      className="h-auto w-auto p-2 text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg"
+                      className="w-auto p-2 text-red-700 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
                     >
                       <Trash2 aria-hidden />
                     </Button>
-                  </td>
+                  </TableCell>
                 )}
-              </tr>
+              </TableRow>
             ))
           ) : (
-            <tr>
-              <td
-                colSpan={edit ? 5 : 4}
-                className="px-4 py-6 text-center text-text-secondary-light dark:text-text-secondary-dark"
-              >
+            <TableRow>
+              <TableCell colSpan={edit ? 5 : 4} className="text-center text-muted-foreground">
                 Tidak ada item obat. Permintaan ini hanya berisi jasa.
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   </div>
 );
