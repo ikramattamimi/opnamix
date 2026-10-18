@@ -15,6 +15,12 @@ export enum Unit {
   Pcs = 'Pcs',
 }
 
+// Zat aktif obat; kekuatan opsional ("500 mg", "120 mg/5 ml")
+export interface Ingredient {
+  name: string;
+  strength: string;
+}
+
 export interface Product {
   id: string;
   code: string;
@@ -27,6 +33,9 @@ export interface Product {
   minStock: number;
   description: string;
   color: string;
-  brand?: string; // merek obat
-  composition?: string; // kandungan obat
+  brand?: string; // merek, semua kategori; kosong berarti generik
+  composition?: string; // ringkasan teks kandungan (kolom kandungan)
+  dosageForm?: string; // sediaan obat
+  packageSize?: string; // isi kemasan
+  ingredients?: Ingredient[];
 }

@@ -109,6 +109,7 @@ export type Database = {
           harga: number | null
           id: number
           is_active: boolean | null
+          isi_kemasan: string | null
           jenis: string | null
           jenis_obat_id: number | null
           kandungan: string | null
@@ -118,6 +119,7 @@ export type Database = {
           qty: number | null
           satuan: string | null
           satuan_id: number | null
+          sediaan: string | null
           updated_at: string | null
           updated_by: string | null
         }
@@ -129,6 +131,7 @@ export type Database = {
           harga?: number | null
           id?: never
           is_active?: boolean | null
+          isi_kemasan?: string | null
           jenis?: string | null
           jenis_obat_id?: number | null
           kandungan?: string | null
@@ -138,6 +141,7 @@ export type Database = {
           qty?: number | null
           satuan?: string | null
           satuan_id?: number | null
+          sediaan?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -149,6 +153,7 @@ export type Database = {
           harga?: number | null
           id?: never
           is_active?: boolean | null
+          isi_kemasan?: string | null
           jenis?: string | null
           jenis_obat_id?: number | null
           kandungan?: string | null
@@ -158,6 +163,7 @@ export type Database = {
           qty?: number | null
           satuan?: string | null
           satuan_id?: number | null
+          sediaan?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -425,6 +431,41 @@ export type Database = {
           waktu_menit?: number | null
         }
         Relationships: []
+      }
+      product_ingredients: {
+        Row: {
+          created_at: string
+          id: number
+          kekuatan: string | null
+          nama_zat: string
+          product_id: number
+          urutan: number
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          kekuatan?: string | null
+          nama_zat: string
+          product_id: number
+          urutan?: number
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          kekuatan?: string | null
+          nama_zat?: string
+          product_id?: number
+          urutan?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_ingredients_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "master_obat"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -781,6 +822,10 @@ export type Database = {
       }
       save_opname_details: {
         Args: { p_opname_id: number; p_step: number; p_updates: Json }
+        Returns: undefined
+      }
+      save_product_ingredients: {
+        Args: { p_items: Json; p_product_id: number }
         Returns: undefined
       }
       update_opname_selection: {

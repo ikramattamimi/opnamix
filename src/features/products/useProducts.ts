@@ -15,6 +15,23 @@ export function useProducts(params?: PaginationParams) {
   });
 }
 
+// Semua produk aktif (grid Data Produk, katalog POS)
+export function useAllProducts() {
+  return useQuery({
+    queryKey: productKeys.allList(),
+    queryFn: productsApi.getAllProducts,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useIngredientNames() {
+  return useQuery({
+    queryKey: productKeys.ingredients(),
+    queryFn: productsApi.getIngredientNames,
+    staleTime: 1000 * 60 * 60,
+  });
+}
+
 export function useCreateProduct() {
   const queryClient = useQueryClient();
   return useMutation({
