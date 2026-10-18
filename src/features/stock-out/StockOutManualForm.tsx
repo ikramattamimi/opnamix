@@ -1,10 +1,11 @@
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { BriefcaseMedical, Loader2, Send, X } from 'lucide-react';
+import { BriefcaseMedical, Loader2, Send } from 'lucide-react';
 import { StockOutManual } from './types';
 import { useProducts } from '@/features/products/useProducts';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -18,6 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import { emptyManualItem, stockOutManualSchema, type StockOutManualValues } from './schemas';
 import ManualItemsTable from './components/ManualItemsTable';
+import { Card } from '@/components/ui/card';
 
 interface StockOutManualFormProps {
   onSave: (record: StockOutManual) => void;
@@ -29,10 +31,10 @@ const randomId = () => Math.random().toString(36).slice(2, 11);
 
 const LABEL = 'text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 leading-normal';
 const INPUT =
-  'h-auto rounded-xl border-gray-100 dark:border-gray-700 bg-background-light dark:bg-background-dark px-4 py-3 text-sm md:text-sm focus:border-primary focus-visible:ring-primary text-text-primary-light dark:text-white aria-[invalid=true]:border-red-500';
+  'border-gray-100 dark:border-gray-700 bg-background px-4 text-sm md:text-sm focus:border-primary focus-visible:ring-primary text-foreground aria-[invalid=true]:border-red-500';
 const MESSAGE = 'text-xs font-normal text-red-500 ml-1';
 
-const RequiredMark = () => <span className="text-red-500">*</span>;
+const RequiredMark = () => <span className="text-red-600 dark:text-red-400">*</span>;
 
 const toRecord = (values: StockOutManualValues): StockOutManual => ({
   id: randomId(),
@@ -78,21 +80,13 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
   }, 0);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-background-light dark:bg-background-dark w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-[40px] shadow-soft p-4 md:p-8 lg:p-10 font-display">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-2xl font-bold text-text-primary-light dark:text-white">
-            Catat Stok Keluar Manual
-          </h3>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="icon"
-            aria-label="Tutup"
-            className="rounded-full hover:bg-gray-200 dark:hover:bg-white/5 [&_svg]:size-6"
-          >
-            <X aria-hidden />
-          </Button>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className="block max-h-[95vh] max-w-6xl bg-background p-4 md:p-8 lg:p-10 font-display"
+        aria-describedby={undefined}
+      >
+        <div className="mb-8 pr-10">
+          <DialogTitle className="text-2xl">Catat Stok Keluar Manual</DialogTitle>
         </div>
 
         <Form {...form}>
@@ -102,7 +96,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
             className="grid grid-cols-1 lg:grid-cols-3 gap-6"
           >
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft space-y-4">
+              <Card className="p-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -171,45 +165,43 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                     )}
                   />
                 </div>
-              </div>
+              </Card>
 
-              <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
+              <Card className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-soft text-primary">
                     <BriefcaseMedical className="size-5" aria-hidden />
                   </span>
-                  <h4 className="text-base font-bold text-text-primary-light dark:text-white">
-                    Permintaan Obat & Alkes
-                  </h4>
+                  <h4 className="text-base font-bold text-foreground">Permintaan Obat & Alkes</h4>
                 </div>
                 <ManualItemsTable />
-              </div>
+              </Card>
             </div>
 
             <div className="lg:col-span-1 space-y-6">
-              <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft space-y-4">
+              <Card className="p-6 space-y-4">
                 <FormField
                   control={form.control}
                   name="reason"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-bold text-text-primary-light dark:text-white leading-normal">
+                      <FormLabel className="text-sm font-bold text-foreground leading-normal">
                         Keterangan
                       </FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Ketik keterangan di sini..."
                           rows={3}
-                          className="bg-background-light dark:bg-background-dark border-none shadow-none rounded-2xl px-4 py-3.5 text-sm md:text-sm font-medium focus-visible:ring-2 focus-visible:ring-primary/20 text-text-primary-light dark:text-white resize-none"
+                          className="bg-background border-none shadow-none px-4 text-sm md:text-sm font-medium focus-visible:ring-2 focus-visible:ring-primary/20 text-foreground resize-none"
                           {...field}
                         />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-              </div>
+              </Card>
 
-              <div className="bg-gradient-to-br from-primary to-blue-600 rounded-[20px] p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden">
+              <div className="bg-gradient-to-br from-primary to-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                 <h3 className="font-bold text-lg mb-4 relative z-10">Ringkasan Biaya</h3>
 
@@ -226,9 +218,10 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
                 </div>
 
                 <Button
+                  size="lg"
                   type="submit"
                   className={cn(
-                    'w-full bg-white text-primary hover:bg-blue-50 font-bold py-6 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-base',
+                    'w-full bg-white text-blue-700 hover:bg-blue-50 font-bold shadow-lg transition-all flex items-center justify-center gap-2 relative z-10 text-base',
                     '[&_svg]:size-6',
                   )}
                   disabled={isLoading}
@@ -249,8 +242,8 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
             </div>
           </form>
         </Form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

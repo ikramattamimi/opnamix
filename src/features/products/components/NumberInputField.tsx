@@ -66,7 +66,7 @@ export function NumberInputField<T extends FieldValues>({
             <FormLabel className={labelClassName}>{label}</FormLabel>
             {prefix ? (
               <div className="relative">
-                <span className="absolute left-4 top-3.5 text-text-secondary-light text-sm">
+                <span className="absolute left-4 top-3.5 text-muted-foreground text-sm">
                   {prefix}
                 </span>
                 {input}

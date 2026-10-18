@@ -16,6 +16,7 @@ import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } fro
 import PaginationControls from '@/components/common/PaginationControls';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -30,6 +31,9 @@ import { createProductColumns } from './ProductColumns';
 import { useToast } from '@/components/ui/toast';
 import { exportProductsToExcel } from '@/features/reports/exportUtils';
 import { useDashboardStats } from '@/features/dashboard/useDashboard';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 const ProductManagement: React.FC = () => {
   const { showToast } = useToast();
@@ -129,7 +133,32 @@ const ProductManagement: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
+      <PageLayout>
+        <PageHeader
+          title="Daftar Produk"
+          description="Kelola data obat dan alkes beserta stok dan harganya."
+          actions={
+            <>
+              <Button
+                variant="outline"
+                className="shadow-md flex items-center gap-2 [&_svg]:size-6"
+                onClick={() => void exportProductsToExcel(products)}
+                disabled={products.length === 0}
+              >
+                <Download aria-hidden />
+                Ekspor Excel
+              </Button>
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="shadow-md flex items-center gap-2 [&_svg]:size-6"
+              >
+                <Plus aria-hidden />
+                Tambah Produk Baru
+              </Button>
+            </>
+          }
+        />
+
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           <StatCard
@@ -152,42 +181,18 @@ const ProductManagement: React.FC = () => {
           />
         </div>
 
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-text-primary-light dark:text-white">
-            Daftar Produk
-          </h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-              onClick={() => void exportProductsToExcel(products)}
-              disabled={products.length === 0}
-            >
-              <Download aria-hidden />
-              Ekspor Excel
-            </Button>
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="shadow-md flex items-center gap-2 [&_svg]:size-6"
-            >
-              <Plus aria-hidden />
-              Tambah Produk Baru
-            </Button>
-          </div>
-        </div>
-
         {/* Filter Bar */}
-        <div className="bg-card-light dark:bg-card-dark rounded-3xl p-4 shadow-soft flex flex-wrap items-center gap-4">
+        <Card className="p-4 flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px] relative">
             <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-text-secondary-light pointer-events-none"
+              className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground pointer-events-none"
               aria-hidden
             />
             <Input
               type="text"
               placeholder="Cari produk atau SKU..."
               aria-label="Cari produk"
-              className="h-auto w-full pl-12 pr-4 py-3 bg-background-light dark:bg-background-dark border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
+              className="w-full pl-12 pr-4 bg-background border-none text-sm font-medium focus:ring-2 focus:ring-primary/20 focus-visible:ring-2 focus-visible:ring-primary/20"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -197,7 +202,7 @@ const ProductManagement: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-text-secondary-light uppercase ml-2">
+            <span className="text-xs font-bold text-muted-foreground uppercase ml-2">
               Kategori:
             </span>
             <Select
@@ -209,7 +214,7 @@ const ProductManagement: React.FC = () => {
             >
               <SelectTrigger
                 aria-label="Filter kategori"
-                className="h-auto w-auto gap-2 bg-background-light dark:bg-background-dark border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
+                className="w-auto gap-2 bg-background border-none px-4 text-sm font-bold focus:ring-2 focus:ring-primary/20"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -232,17 +237,17 @@ const ProductManagement: React.FC = () => {
               setFilterCategory('Semua');
               setPage(1);
             }}
-            className="p-3 text-text-secondary-light hover:text-red-500 transition-colors h-auto w-auto [&_svg]:size-6"
+            className="text-muted-foreground hover:text-red-500 transition-colors [&_svg]:size-6"
             title="Reset Filter"
             aria-label="Reset Filter"
           >
             <FunnelX aria-hidden />
           </Button>
-        </div>
+        </Card>
 
         {/* Table */}
         <div className="w-full">
-          <div className="bg-card-light dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
+          <Card className="p-6">
             {isPending ? (
               <LoadingState label="Memuat produk..." />
             ) : isError ? (
@@ -263,7 +268,7 @@ const ProductManagement: React.FC = () => {
                 searchable={false}
               />
             )}
-          </div>
+          </Card>
           <PaginationControls
             currentPage={page}
             totalPages={totalPages}
@@ -271,20 +276,21 @@ const ProductManagement: React.FC = () => {
             isPlaceholderData={isPlaceholderData}
           />
         </div>
-      </div>
+      </PageLayout>
 
       {/* Product Form Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white dark:bg-card-dark w-full max-w-2xl rounded-[32px] shadow-soft p-8 overflow-y-auto max-h-[90vh] relative">
+        <Dialog open onOpenChange={(open) => !open && handleCloseModal()}>
+          <DialogContent className="max-w-2xl p-8" aria-describedby={undefined}>
             <ProductForm
+              inDialog
               onSave={handleSave}
               editingProduct={editingProduct}
               onCancel={handleCloseModal}
               isLoading={createMutation.isPending || updateMutation.isPending}
             />
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Delete Confirmation Modal */}

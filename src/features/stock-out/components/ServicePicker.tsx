@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Service } from '@/features/services/types';
 import type { StockOutRequestValues } from '../schemas';
+import { Card } from '@/components/ui/card';
 
 interface ServicePickerProps {
   services: Service[];
@@ -44,10 +45,10 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
   };
 
   return (
-    <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft h-auto">
+    <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-lg text-brand-dark dark:text-white flex items-center gap-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-600">
+        <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 text-purple-700">
             <BriefcaseMedical className="size-5" aria-hidden />
           </span>
           Jasa
@@ -69,13 +70,11 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
                 variant="ghost"
                 onClick={() => toggleCategory(categoryName)}
                 aria-expanded={isExpanded}
-                className="w-full h-auto justify-between rounded-none px-4 py-3 font-normal bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 active:scale-100 [&_svg]:size-5"
+                className="w-full justify-between rounded-none px-4 font-normal bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 active:scale-100 [&_svg]:size-5"
               >
                 <div className="flex items-center gap-2">
                   <Folder className="text-purple-500" aria-hidden />
-                  <span className="font-bold text-sm text-brand-dark dark:text-white">
-                    {categoryName}
-                  </span>
+                  <span className="font-bold text-sm text-foreground">{categoryName}</span>
                   {selectedCount > 0 && (
                     <span className="text-[10px] font-bold bg-primary text-white rounded-full px-1.5 py-0.5">
                       {selectedCount}
@@ -111,7 +110,7 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
                           type="checkbox"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-brand-dark dark:text-white truncate">
+                          <p className="font-semibold text-sm text-foreground truncate">
                             {service.name}
                           </p>
                         </div>
@@ -129,14 +128,14 @@ const ServicePicker: React.FC<ServicePickerProps> = ({ services, totalServices }
 
         <div className="mt-2 pt-4 border-t border-dashed border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-slate-600 font-medium">Subtotal Jasa</span>
+            <span className="text-sm text-muted-foreground font-medium">Subtotal Jasa</span>
             <span className="font-bold text-slate-800 dark:text-white">
               Rp {totalServices.toLocaleString('id-ID')}
             </span>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

@@ -18,10 +18,7 @@ interface FilterFieldProps {
 // Label kecil huruf kapital di atas field filter laporan.
 export const FilterField: React.FC<FilterFieldProps> = ({ label, htmlFor, children }) => (
   <div className="space-y-2">
-    <Label
-      htmlFor={htmlFor}
-      className="block text-xs font-bold uppercase text-text-secondary-light"
-    >
+    <Label htmlFor={htmlFor} className="block text-xs font-bold uppercase text-muted-foreground">
       {label}
     </Label>
     {children}
@@ -48,7 +45,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
     <SelectTrigger
       id={id}
       className={cn(
-        'h-auto min-w-[160px] gap-2 rounded-xl border-0 bg-white px-4 py-2 text-base text-text-primary-light shadow-none dark:bg-card-dark dark:text-white',
+        'min-w-[160px] gap-2 border-0 bg-white px-4 text-base text-foreground shadow-none dark:bg-card',
         className,
       )}
     >

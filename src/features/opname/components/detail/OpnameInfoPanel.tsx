@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { OpnameDetail } from '../../api';
+import { Card } from '@/components/ui/card';
 
 const formatDate = (dateStr: string) =>
   new Date(dateStr).toLocaleDateString('id-ID', { dateStyle: 'long' });
@@ -22,7 +23,7 @@ const InfoRow: React.FC<{
   value: string;
 }> = ({ icon: Icon, iconClassName, label, value }) => (
   <div>
-    <p className="text-xs font-bold text-text-secondary-light uppercase tracking-wider mb-1 flex items-center gap-1.5">
+    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5">
       <Icon className={`size-4 ${iconClassName}`} aria-hidden />
       {label}
     </p>
@@ -37,7 +38,7 @@ const StatRow: React.FC<{
   value: number;
 }> = ({ icon: Icon, colorClassName, label, value }) => (
   <div className="flex items-center justify-between">
-    <span className="text-sm text-text-secondary-light flex items-center gap-2">
+    <span className="text-sm text-muted-foreground flex items-center gap-2">
       <Icon className={`size-4 ${colorClassName}`} aria-hidden />
       {label}
     </span>
@@ -59,7 +60,7 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
   matched,
   discrepancies,
 }) => (
-  <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft sticky top-6">
+  <Card className="p-6 sticky top-6">
     <h3 className="text-base font-bold mb-5 flex items-center gap-2">
       <Info className="size-5 text-primary" aria-hidden />
       Informasi Opname
@@ -80,13 +81,13 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
       />
       <InfoRow
         icon={CalendarDays}
-        iconClassName="text-amber-500"
+        iconClassName="text-amber-600 dark:text-amber-400"
         label="Tanggal Jadwal"
         value={opname?.scheduleDate ? formatDate(opname.scheduleDate) : '-'}
       />
       <InfoRow
         icon={CircleCheck}
-        iconClassName="text-emerald-500"
+        iconClassName="text-emerald-600 dark:text-emerald-400"
         label="Tanggal Dilaksanakan"
         value={opname?.completedAt ? formatDate(opname.completedAt) : '-'}
       />
@@ -94,15 +95,20 @@ const OpnameInfoPanel: React.FC<OpnameInfoPanelProps> = ({
 
     <div className="border-t border-gray-100 dark:border-gray-800 mt-5 pt-5 space-y-3">
       <StatRow icon={Archive} colorClassName="text-primary" label="Total Item" value={totalItems} />
-      <StatRow icon={BadgeCheck} colorClassName="text-emerald-500" label="Sesuai" value={matched} />
+      <StatRow
+        icon={BadgeCheck}
+        colorClassName="text-emerald-700 dark:text-emerald-400"
+        label="Sesuai"
+        value={matched}
+      />
       <StatRow
         icon={TriangleAlert}
-        colorClassName="text-amber-500"
+        colorClassName="text-amber-700 dark:text-amber-400"
         label="Selisih"
         value={discrepancies}
       />
     </div>
-  </div>
+  </Card>
 );
 
 export default OpnameInfoPanel;

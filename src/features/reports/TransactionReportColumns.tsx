@@ -3,6 +3,7 @@ import type { ColumnDef, FilterFn } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import type { TransactionReportRow } from './api';
 import ColumnFilterHeader from './components/ColumnFilterHeader';
+import { Badge } from '@/components/ui/badge';
 
 // Type options for filter
 const typeOptions = [
@@ -47,7 +48,7 @@ export const createTransactionReportColumns = ({
     cell: ({ row }) => {
       const date = new Date(row.getValue('date'));
       return (
-        <div className="text-text-primary-light dark:text-white">
+        <div className="text-foreground">
           {date.toLocaleString('id-ID', {
             year: 'numeric',
             month: '2-digit',
@@ -63,11 +64,7 @@ export const createTransactionReportColumns = ({
   {
     accessorKey: 'id',
     header: ({ column }) => <ColumnFilterHeader column={column} label="Nomor Ref" title="Nomor" />,
-    cell: ({ row }) => (
-      <div className="font-medium text-text-primary-light dark:text-white">
-        {row.getValue('id')}
-      </div>
-    ),
+    cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue('id')}</div>,
   },
   {
     accessorKey: 'type',
@@ -78,15 +75,9 @@ export const createTransactionReportColumns = ({
       const type = row.getValue('type') as string;
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              type === 'masuk'
-                ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
-                : 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400'
-            }`}
-          >
+          <Badge variant={type === 'masuk' ? 'ok' : 'bad'}>
             {type === 'masuk' ? 'Masuk' : 'Keluar'}
-          </span>
+          </Badge>
         </div>
       );
     },
@@ -101,7 +92,7 @@ export const createTransactionReportColumns = ({
       const rowType = row.getValue('type') as string;
       const label = rowType === 'masuk' ? 'Supplier' : 'Pasien';
       return (
-        <div className="text-text-primary-light dark:text-white">
+        <div className="text-foreground">
           {label}: {row.getValue('patient') || '-'}
         </div>
       );
@@ -113,9 +104,7 @@ export const createTransactionReportColumns = ({
       <ColumnFilterHeader column={column} label="Sumber" title="Sumber" options={sourceOptions} />
     ),
     cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">
-        {formatSource(row.getValue('source'))}
-      </div>
+      <div className="text-foreground">{formatSource(row.getValue('source'))}</div>
     ),
     filterFn: exactMatchFilter,
   },
@@ -129,18 +118,12 @@ export const createTransactionReportColumns = ({
       const isPending = status === 'Menunggu';
 
       return (
-        <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
-            isPending
-              ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300'
-              : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300'
-          }`}
-        >
+        <Badge variant={isPending ? 'warn' : 'ok'}>
           <span
             className={`h-1.5 w-1.5 rounded-full ${isPending ? 'bg-yellow-500' : 'bg-green-500'}`}
           ></span>
           {status}
-        </span>
+        </Badge>
       );
     },
     filterFn: exactMatchFilter,
@@ -153,7 +136,7 @@ export const createTransactionReportColumns = ({
     cell: ({ row }) => {
       const date = row.getValue('birthDate') ? new Date(row.getValue('birthDate')) : null;
       return (
-        <div className="text-text-primary-light dark:text-white">
+        <div className="text-foreground">
           {date
             ? date.toLocaleString('id-ID', {
                 year: 'numeric',
@@ -168,39 +151,33 @@ export const createTransactionReportColumns = ({
   {
     accessorKey: 'nakes',
     header: ({ column }) => <ColumnFilterHeader column={column} label="Nakes" title="Nakes" />,
-    cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">{row.getValue('nakes') || '-'}</div>
-    ),
+    cell: ({ row }) => <div className="text-foreground">{row.getValue('nakes') || '-'}</div>,
   },
   {
     accessorKey: 'items',
-    header: () => <div className="font-bold text-text-primary-light dark:text-white">Obat</div>,
+    header: () => <div className="font-bold text-foreground">Obat</div>,
     cell: ({ row }) => (
-      <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark max-w-md truncate">
+      <div className="text-sm text-muted-foreground max-w-md truncate">
         {row.getValue('items') || '-'}
       </div>
     ),
   },
   {
     accessorKey: 'services',
-    header: () => <div className="font-bold text-text-primary-light dark:text-white">Jasa</div>,
+    header: () => <div className="font-bold text-foreground">Jasa</div>,
     cell: ({ row }) => (
-      <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark max-w-md truncate">
+      <div className="text-sm text-muted-foreground max-w-md truncate">
         {row.getValue('services') || '-'}
       </div>
     ),
   },
   {
     accessorKey: 'serviceFee',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-right">
-        Biaya Layanan
-      </div>
-    ),
+    header: () => <div className="font-bold text-foreground text-right">Biaya Layanan</div>,
     cell: ({ row }) => {
       const serviceFee = parseFloat(row.getValue('serviceFee') || '0');
       return (
-        <div className="text-right text-text-primary-light dark:text-white">
+        <div className="text-right text-foreground">
           {serviceFee > 0 ? `Rp ${serviceFee.toLocaleString('id-ID')}` : '-'}
         </div>
       );
@@ -208,9 +185,7 @@ export const createTransactionReportColumns = ({
   },
   {
     accessorKey: 'discount',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-right">Diskon</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-right">Diskon</div>,
     cell: ({ row }) => {
       const discount = parseFloat(row.getValue('discount') || '0');
       return (
@@ -220,7 +195,7 @@ export const createTransactionReportColumns = ({
               - Rp {discount.toLocaleString('id-ID')}
             </span>
           ) : (
-            <span className="text-text-secondary-light dark:text-text-secondary-dark">-</span>
+            <span className="text-muted-foreground">-</span>
           )}
         </div>
       );
@@ -228,9 +203,7 @@ export const createTransactionReportColumns = ({
   },
   {
     accessorKey: 'total',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-right">Total</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-right">Total</div>,
     cell: ({ row }) => {
       const total = parseFloat(row.getValue('total') || '0');
       const formatted = new Intl.NumberFormat('id-ID', {
@@ -238,24 +211,18 @@ export const createTransactionReportColumns = ({
         currency: 'IDR',
         minimumFractionDigits: 0,
       }).format(total);
-      return (
-        <div className="font-bold text-text-primary-light dark:text-white text-right">
-          {formatted}
-        </div>
-      );
+      return <div className="font-bold text-foreground text-right">{formatted}</div>;
     },
   },
   {
     id: 'actions',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">Aksi</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Aksi</div>,
     cell: ({ row }) => (
       <div className="flex justify-center">
         <Button
           type="button"
           variant="ghost"
-          className="h-9 px-3 text-xs font-bold"
+          className="px-3 text-xs font-bold"
           onClick={() => onViewDetail(row.original)}
         >
           Detail

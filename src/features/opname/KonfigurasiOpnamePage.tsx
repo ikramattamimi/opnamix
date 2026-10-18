@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Settings } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import {
   useDeleteOpnameSchedule,
   useOpnameSchedules,
@@ -14,6 +14,9 @@ import { ErrorState, LoadingState } from '@/components/common/QueryState';
 import { useToast } from '@/components/ui/toast';
 import ScheduleFormDialog from './components/konfigurasi/ScheduleFormDialog';
 import { ScheduleCards, ScheduleTable } from './components/konfigurasi/ScheduleList';
+import PageLayout from '@/components/layout/PageLayout';
+import PageHeader from '@/components/layout/PageHeader';
+import { Card } from '@/components/ui/card';
 
 const NO_SCHEDULES: OpnameSchedule[] = [];
 const NO_PRODUCTS: Product[] = [];
@@ -71,27 +74,20 @@ const KonfigurasiOpnamePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-xl">
-            <Settings className="size-5 sm:size-6 text-primary" aria-hidden />
-          </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold">Konfigurasi Jadwal Opname</h2>
-            <p className="text-xs sm:text-sm text-text-secondary-light">
-              Kelola jadwal audit stok berkala.
-            </p>
-          </div>
-        </div>
-        <Button
-          onClick={() => openModal(null)}
-          className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-5 h-auto py-3 sm:py-2.5 shadow-lg shadow-primary/20 w-full sm:w-auto"
-        >
-          <Plus className="mr-1.5" aria-hidden />
-          Tambah Jadwal
-        </Button>
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Konfigurasi Jadwal Opname"
+        description="Kelola jadwal audit stok berkala."
+        actions={
+          <Button
+            onClick={() => openModal(null)}
+            className="bg-primary hover:bg-primary/90 text-white font-bold px-5 shadow-lg shadow-primary/20 w-full sm:w-auto"
+          >
+            <Plus className="mr-1.5" aria-hidden />
+            Tambah Jadwal
+          </Button>
+        }
+      />
 
       <ScheduleFormDialog
         key={dialogKey}
@@ -102,12 +98,12 @@ const KonfigurasiOpnamePage: React.FC = () => {
       />
 
       {schedulesQuery.isError ? (
-        <div className="bg-card-light dark:bg-card-dark rounded-3xl shadow-soft">
+        <Card>
           <ErrorState
             title="Gagal memuat jadwal opname"
             onRetry={() => void schedulesQuery.refetch()}
           />
-        </div>
+        </Card>
       ) : (
         <>
           <ScheduleTable {...listProps} />
@@ -124,7 +120,7 @@ const KonfigurasiOpnamePage: React.FC = () => {
         onConfirm={doDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </PageLayout>
   );
 };
 

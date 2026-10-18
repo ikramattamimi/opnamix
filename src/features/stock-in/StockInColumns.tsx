@@ -4,6 +4,7 @@ import { StockInReceipt } from './types';
 import { Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnFilter } from '@/components/ui/data-table-column-filter';
+import { Badge } from '@/components/ui/badge';
 
 // Status options for filter
 const statusOptions = [
@@ -23,7 +24,7 @@ export const createStockInColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Nomor Invoice</div>
+          <div className="font-bold text-foreground">Nomor Invoice</div>
           <DataTableColumnFilter column={column} title="Invoice" />
         </div>
       );
@@ -31,9 +32,7 @@ export const createStockInColumns = ({
     cell: ({ row }) => (
       <div className="flex items-center gap-3">
         <div className="w-1 h-10 bg-primary rounded-full"></div>
-        <div className="font-medium text-text-primary-light dark:text-white">
-          {row.getValue('invoiceNumber') || '-'}
-        </div>
+        <div className="font-medium text-foreground">{row.getValue('invoiceNumber') || '-'}</div>
       </div>
     ),
   },
@@ -42,40 +41,32 @@ export const createStockInColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Supplier</div>
+          <div className="font-bold text-foreground">Supplier</div>
           <DataTableColumnFilter column={column} title="Supplier" />
         </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">
-        {row.getValue('supplierName') || '-'}
-      </div>
-    ),
+    cell: ({ row }) => <div className="text-foreground">{row.getValue('supplierName') || '-'}</div>,
   },
   {
     accessorKey: 'receivedBy',
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white">Penerima</div>
+          <div className="font-bold text-foreground">Penerima</div>
           <DataTableColumnFilter column={column} title="Penerima" />
         </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="text-text-primary-light dark:text-white">
-        {row.getValue('receivedBy') || '-'}
-      </div>
-    ),
+    cell: ({ row }) => <div className="text-foreground">{row.getValue('receivedBy') || '-'}</div>,
   },
   {
     accessorKey: 'date',
-    header: () => <div className="font-bold text-text-primary-light dark:text-white">Tanggal</div>,
+    header: () => <div className="font-bold text-foreground">Tanggal</div>,
     cell: ({ row }) => {
       const date = new Date(row.getValue('date'));
       return (
-        <div className="text-text-primary-light dark:text-white">
+        <div className="text-foreground">
           {date.toLocaleDateString('id-ID', {
             day: '2-digit',
             month: 'short',
@@ -90,9 +81,7 @@ export const createStockInColumns = ({
     header: ({ column }) => {
       return (
         <div className="space-y-2">
-          <div className="font-bold text-text-primary-light dark:text-white text-center">
-            Status
-          </div>
+          <div className="font-bold text-foreground text-center">Status</div>
           <DataTableColumnFilter column={column} title="Status" options={statusOptions} />
         </div>
       );
@@ -103,18 +92,12 @@ export const createStockInColumns = ({
 
       return (
         <div className="text-center">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-              isCompleted
-                ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400'
-                : 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400'
-            }`}
-          >
+          <Badge variant={isCompleted ? 'ok' : 'warn'}>
             <span
               className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-green-500' : 'bg-yellow-500'}`}
             ></span>
             {status}
-          </span>
+          </Badge>
         </div>
       );
     },
@@ -124,9 +107,7 @@ export const createStockInColumns = ({
   },
   {
     id: 'actions',
-    header: () => (
-      <div className="font-bold text-text-primary-light dark:text-white text-center">Aksi</div>
-    ),
+    header: () => <div className="font-bold text-foreground text-center">Aksi</div>,
     cell: ({ row }) => {
       const receipt = row.original;
 

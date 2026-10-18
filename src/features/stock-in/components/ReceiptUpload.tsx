@@ -13,7 +13,7 @@ export const ReceiptUpload: React.FC<ReceiptUploadProps> = ({ file, onFileSelect
 
   return (
     <div>
-      <h4 className="text-sm font-bold text-text-secondary-light uppercase tracking-wider mb-6">
+      <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-6">
         Bukti Fisik (Opsional)
       </h4>
       <div
@@ -26,20 +26,20 @@ export const ReceiptUpload: React.FC<ReceiptUploadProps> = ({ file, onFileSelect
             inputRef.current?.click();
           }
         }}
-        className="border-2 border-dashed border-gray-200 dark:border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-background-light dark:hover:bg-white/5 transition-colors group bg-background-light/30"
+        className="border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-background dark:hover:bg-white/5 transition-colors group bg-background/30"
       >
         <div className="bg-primary/10 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform duration-200">
           <CloudUpload className="size-8 text-primary" aria-hidden />
         </div>
-        <p className="text-text-primary-light dark:text-white font-bold text-lg mb-1">
+        <p className="text-foreground font-bold text-lg mb-1">
           {file ? file.name : 'Upload Bukti Nota'}
         </p>
         {file && (
-          <p className="text-xs text-text-secondary-light font-medium mb-2">
+          <p className="text-xs text-muted-foreground font-medium mb-2">
             Ukuran asli: {formatFileSize(file.size)}
           </p>
         )}
-        <p className="text-xs text-text-secondary-light font-medium">
+        <p className="text-xs text-muted-foreground font-medium">
           File PNG, JPG, dan GIF diizinkan
         </p>
         <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mt-2">
