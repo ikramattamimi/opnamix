@@ -175,7 +175,7 @@ const StockOutManualForm: React.FC<StockOutManualFormProps> = ({
 
               <div className="bg-white dark:bg-card-dark rounded-[20px] p-6 shadow-soft">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/20 text-secondary">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-soft text-primary">
                     <BriefcaseMedical className="size-5" aria-hidden />
                   </span>
                   <h4 className="text-base font-bold text-text-primary-light dark:text-white">

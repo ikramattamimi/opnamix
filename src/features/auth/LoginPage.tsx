@@ -60,7 +60,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] bg-primary/15 rounded-full blur-[70px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-secondary/15 rounded-full blur-[70px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-chart-ser2/15 rounded-full blur-[70px]"></div>
       </div>
 
       <div className="w-full max-w-lg relative z-10 perspective-1000">

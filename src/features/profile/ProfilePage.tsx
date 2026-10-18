@@ -8,6 +8,7 @@ import { getRoleIconColor, getRoleInfo } from './components/profileUi';
 import ProfileHeaderCard from './components/ProfileHeaderCard';
 import ProfileInfoSection from './components/ProfileInfoSection';
 import PasswordSection from './components/PasswordSection';
+import DisplayPreferencesSection from './components/DisplayPreferencesSection';
 
 const ProfilePage: React.FC = () => {
   const { userProfile } = useAuth();
@@ -174,6 +175,8 @@ const ProfilePage: React.FC = () => {
       />
 
       <PasswordSection isSubmitting={isSubmitting} onChangePassword={handleChangePassword} />
+
+      <DisplayPreferencesSection />
     </div>
   );
 };

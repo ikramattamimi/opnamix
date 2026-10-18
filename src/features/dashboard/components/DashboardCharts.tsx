@@ -8,14 +8,14 @@ import type { DashboardStats } from '../api';
 // TODO: Ambil data konsumsi mingguan dari API (jumlah transaksi keluar per hari
 // dalam 7 hari terakhir).
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Obat: 'bg-primary',
-  'BHP (Habis Pakai)': 'bg-secondary',
-  'Alat Kesehatan': 'bg-orange-400',
-  Imunisasi: 'bg-green-400',
+// Kelas legenda dan variabel CSS irisan memakai token kategori yang sama
+const CATEGORY_COLORS: Record<string, { dot: string; slice: string }> = {
+  Obat: { dot: 'bg-cat-obat', slice: 'rgb(var(--cat-obat))' },
+  'BHP (Habis Pakai)': { dot: 'bg-cat-bhp', slice: 'rgb(var(--cat-bhp))' },
+  'Alat Kesehatan': { dot: 'bg-cat-alkes', slice: 'rgb(var(--cat-alkes))' },
+  Imunisasi: { dot: 'bg-cat-imun', slice: 'rgb(var(--cat-imun))' },
 };
-
-const PIE_COLORS = ['#4318FF', '#6AD2FF', '#F59E0B', '#10B981'];
+const FALLBACK_COLOR = { dot: 'bg-faint', slice: 'rgb(var(--faint))' };
 
 const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
   const totalItems = Object.values(stats.categoryDistribution).reduce((a, b) => a + b, 0);
@@ -26,11 +26,12 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
   const maxVal = Math.max(...weekly.map((w) => w.count), 1);
 
   let currentDeg = 0;
-  const gradients = categories.slice(0, 4).map((cat, idx) => {
+  const gradients = categories.slice(0, 4).map((cat) => {
     const percentage = stats.categoryDistribution[cat] / safeTotalItems;
     const startDeg = currentDeg;
     currentDeg += percentage * 360;
-    return `${PIE_COLORS[idx % PIE_COLORS.length]} ${startDeg}deg ${currentDeg}deg`;
+    const color = (CATEGORY_COLORS[cat] ?? FALLBACK_COLOR).slice;
+    return `${color} ${startDeg}deg ${currentDeg}deg`;
   });
 
   return (
@@ -109,7 +110,7 @@ const DashboardCharts: React.FC<{ stats: DashboardStats }> = ({ stats }) => {
               {categories.slice(0, 3).map((cat, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <div
-                    className={`w-3 h-3 rounded-full ${CATEGORY_COLORS[cat] || 'bg-gray-400'}`}
+                    className={`w-3 h-3 rounded-full ${(CATEGORY_COLORS[cat] ?? FALLBACK_COLOR).dot}`}
                   ></div>
                   <span className="text-xs text-text-secondary-light">
                     {cat} ({Math.round((stats.categoryDistribution[cat] / safeTotalItems) * 100)}%)

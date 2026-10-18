@@ -111,17 +111,17 @@ if (data.length === 0)
   return <EmptyState icon={PackageSearch} title="Belum ada produk" description="..." />;`}
       >
         <div className="grid w-full gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-gray-100 dark:border-white/10">
+          <div className="rounded-xl border">
             <LoadingState label="Memuat produk..." />
           </div>
-          <div className="rounded-xl border border-gray-100 dark:border-white/10">
+          <div className="rounded-xl border">
             <EmptyState
               icon={PackageSearch}
               title="Belum ada produk"
               description="Tambahkan produk pertama lewat tombol Tambah Produk."
             />
           </div>
-          <div className="rounded-xl border border-gray-100 dark:border-white/10">
+          <div className="rounded-xl border">
             <ErrorState onRetry={() => showToast('Mencoba lagi...', 'info')} />
           </div>
         </div>

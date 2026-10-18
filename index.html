@@ -9,7 +9,7 @@
     <meta name="description" content="Opnamix - Sistem Manajemen Inventaris" />
     <meta name="keywords" content="inventory, Opnamix, klinik, apotek, obat, stok, manajemen" />
     <meta name="author" content="Opnamix" />
-    <meta name="theme-color" content="#4A90E2" />
+    <meta name="theme-color" content="#2563EB" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
@@ -18,14 +18,33 @@
     <meta property="og:site_name" content="Opnamix" />
     <title>Opnamix - Sistem Manajemen Inventaris</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // Terapkan tema dan ukuran sebelum React jalan supaya layar tidak berkedip.
+      // Aturannya sama dengan src/app/providers/displayPreferences.ts.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var theme = localStorage.getItem('opnamix.theme');
+          if (theme !== 'light' && theme !== 'dark' && theme !== 'system') {
+            var legacy = localStorage.getItem('darkMode');
+            theme = legacy === 'true' ? 'dark' : legacy === 'false' ? 'light' : 'system';
+          }
+          var dark =
+            theme === 'dark' ||
+            (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) root.classList.add('dark');
+          if (localStorage.getItem('opnamix.size') === 'besar') root.dataset.size = 'besar';
+        } catch (e) {
+          // Storage diblokir: biarkan ThemeProvider yang menerapkan bawaan
+        }
+      })();
+    </script>
   </head>
 
-  <body
-    class="bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-300"
-  >
+  <body class="transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

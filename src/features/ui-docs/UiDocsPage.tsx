@@ -6,10 +6,12 @@ import { DialogDocs, DropdownDocs } from './sections/OverlayDocs';
 import { CardDocs, TabsDocs } from './sections/LayoutDocs';
 import { FeedbackDocs, TableDocs } from './sections/DataDocs';
 import { IconDocs } from './sections/IconDocs';
+import { TokenDocs } from './sections/TokenDocs';
 import { DocsTocInline, DocsTocSidebar } from './components/DocsToc';
 
 // Urutan = urutan di halaman dan di daftar komponen
 const SECTIONS: { id: string; label: string; Component: React.FC }[] = [
+  { id: 'token', label: 'Token & Tema', Component: TokenDocs },
   { id: 'button', label: 'Button', Component: ButtonDocs },
   { id: 'badge', label: 'Badge', Component: BadgeDocs },
   { id: 'input', label: 'Input & Select', Component: InputDocs },
@@ -28,8 +30,8 @@ const TOC_ITEMS = SECTIONS.map(({ id, label }) => ({ id, label }));
 const UiDocsPage: React.FC = () => (
   <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-8">
     <div className="min-w-0 space-y-6">
-      <div className="rounded-[20px] bg-card-light p-6 shadow-soft dark:bg-card-dark">
-        <p className="text-sm text-text-secondary-light">
+      <div className="rounded-card border bg-card p-5 shadow">
+        <p className="text-sm text-muted-foreground">
           Komponen bersama di <code className="font-mono text-xs">src/components/ui</code>{' '}
           (shadcn/ui) dan <code className="font-mono text-xs">src/components/common</code>. Pakai
           komponen ini sebelum membuat versi sendiri. Konvensi lengkap ada di{' '}

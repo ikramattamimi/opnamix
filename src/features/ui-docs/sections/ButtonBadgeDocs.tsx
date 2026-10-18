@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { CircleCheck, Loader2, Plus, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DocExample, DocSection } from '../components/DocSection';
@@ -13,9 +13,10 @@ export const ButtonDocs: React.FC = () => (
   >
     <DocExample
       title="Variant"
-      note="default untuk aksi utama (satu per area), outline/secondary untuk aksi pendamping, destructive untuk hapus."
+      note="default untuk aksi utama (satu per area), soft/outline/secondary untuk aksi pendamping, destructive untuk hapus."
       code={`
 <Button>Simpan</Button>
+<Button variant="soft">Soft</Button>
 <Button variant="secondary">Secondary</Button>
 <Button variant="outline">Batal</Button>
 <Button variant="ghost">Ghost</Button>
@@ -23,6 +24,7 @@ export const ButtonDocs: React.FC = () => (
 <Button variant="link">Lihat detail</Button>`}
     >
       <Button>Simpan</Button>
+      <Button variant="soft">Soft</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="outline">Batal</Button>
       <Button variant="ghost">Ghost</Button>
@@ -32,16 +34,21 @@ export const ButtonDocs: React.FC = () => (
 
     <DocExample
       title="Ukuran"
+      note="sm 28px (aksi di baris/panel), default 32px, lg 38px (aksi utama layar penuh, mis. POS). Semua dalam rem, jadi ikut membesar di mode Besar."
       code={`
-<Button size="sm">Kecil</Button>
-<Button>Default</Button>
-<Button size="lg">Besar</Button>
+<Button size="sm">Kecil · 28px</Button>
+<Button>Default · 32px</Button>
+<Button size="lg">Besar · 38px</Button>
+<Button size="icon-sm" aria-label="Tambah"><Plus /></Button>
 <Button size="icon" aria-label="Tambah"><Plus /></Button>`}
     >
-      <Button size="sm">Kecil</Button>
-      <Button>Default</Button>
-      <Button size="lg">Besar</Button>
-      <Button size="icon" aria-label="Tambah">
+      <Button size="sm">Kecil · 28px</Button>
+      <Button>Default · 32px</Button>
+      <Button size="lg">Besar · 38px</Button>
+      <Button size="icon-sm" variant="outline" aria-label="Tambah">
+        <Plus aria-hidden />
+      </Button>
+      <Button size="icon" variant="outline" aria-label="Tambah">
         <Plus aria-hidden />
       </Button>
     </DocExample>
@@ -74,9 +81,28 @@ export const BadgeDocs: React.FC = () => (
   <DocSection
     id="badge"
     title="Badge"
-    description="Label kecil untuk status atau kategori, misalnya status transaksi atau role user."
+    description="Label kecil (tinggi 20px, teks 11px) untuk status atau kategori, misalnya status transaksi atau role user."
     importPath="import { Badge } from '@/components/ui/badge';"
   >
+    <DocExample
+      title="Status"
+      note="Warna status dari token ok/warn/bad/info. Selalu tulis teksnya; warna saja tidak cukup untuk pengguna buta warna."
+      code={`
+<Badge variant="ok"><CircleCheck /> Selesai</Badge>
+<Badge variant="warn">Menunggu</Badge>
+<Badge variant="bad">Stok Habis</Badge>
+<Badge variant="info">Dijadwalkan</Badge>
+<Badge variant="neutral">Draft</Badge>`}
+    >
+      <Badge variant="ok">
+        <CircleCheck aria-hidden /> Selesai
+      </Badge>
+      <Badge variant="warn">Menunggu</Badge>
+      <Badge variant="bad">Stok Habis</Badge>
+      <Badge variant="info">Dijadwalkan</Badge>
+      <Badge variant="neutral">Draft</Badge>
+    </DocExample>
+
     <DocExample
       title="Variant"
       code={`

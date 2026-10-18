@@ -57,7 +57,7 @@ export const CardDocs: React.FC = () => (
           <CardTitle>Jadwal Opname</CardTitle>
           <CardDescription>Setiap akhir bulan</CardDescription>
         </CardHeader>
-        <CardContent className="text-sm text-text-secondary-light">
+        <CardContent className="text-sm text-muted-foreground">
           32 produk akan dihitung.
         </CardContent>
         <CardFooter>
@@ -94,10 +94,10 @@ export const TabsDocs: React.FC = () => {
             <TabsTrigger value="transaksi">Transaksi</TabsTrigger>
             <TabsTrigger value="mutasi">Mutasi Stok</TabsTrigger>
           </TabsList>
-          <TabsContent value="transaksi" className="text-sm text-text-secondary-light">
+          <TabsContent value="transaksi" className="text-sm text-muted-foreground">
             Isi tab Transaksi.
           </TabsContent>
-          <TabsContent value="mutasi" className="text-sm text-text-secondary-light">
+          <TabsContent value="mutasi" className="text-sm text-muted-foreground">
             Isi tab Mutasi Stok.
           </TabsContent>
         </Tabs>

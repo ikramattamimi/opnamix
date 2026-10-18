@@ -5,26 +5,25 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.98]',
+  'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default:
-          'bg-gradient-to-r from-primary to-blue-600 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 border-none',
-        destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-        outline:
-          'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-primary/50',
-        secondary:
-          'bg-white dark:bg-card-dark text-text-primary-light dark:text-white shadow-soft hover:shadow-lg border border-transparent hover:border-gray-200 dark:hover:border-white/10',
-        ghost:
-          'hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary-light hover:text-primary',
-        link: 'text-primary underline-offset-4 hover:underline',
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'border-input bg-card text-foreground hover:bg-surface-2 hover:border-primary/50',
+        secondary: 'bg-surface-2 text-foreground border-border hover:bg-muted hover:border-input',
+        soft: 'bg-primary-soft text-primary-ink hover:border-primary/30',
+        ghost: 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
+        link: 'text-primary-ink underline-offset-4 hover:underline',
       },
+      // sm 28px, default 32px, lg 38px
       size: {
-        default: 'h-11 px-6 py-2.5',
-        sm: 'h-9 rounded-lg px-3 text-xs',
-        lg: 'h-14 rounded-2xl px-8 text-base',
-        icon: 'h-11 w-11 rounded-xl',
+        default: 'h-8 px-3 text-meta',
+        sm: 'h-7 px-2.5 text-xs [&_svg]:size-3.5',
+        lg: 'h-9.5 px-4 text-sm',
+        icon: 'size-8',
+        'icon-sm': 'size-7 [&_svg]:size-3.5',
       },
     },
     defaultVariants: {
