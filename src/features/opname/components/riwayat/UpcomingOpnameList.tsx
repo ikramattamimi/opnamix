@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState } from '@/components/common/QueryState';
 import { filterOpnames, formatDate, OpnameCard, stepLabel } from './format';
 import { ListStateCard, OpnameSearchInput, SectionHeader } from './shared';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface UpcomingOpnameListProps {
   drafts: OpnameCard[];
@@ -44,31 +46,24 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
       {filteredDrafts.length > 0 && (
         <div className="space-y-3 mb-4">
           {filteredDrafts.map((opname) => (
-            <div
-              key={opname.id}
-              className="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-soft border-l-4 border-blue-500"
-            >
+            <Card key={opname.id} className="p-5 border-l-4 border-blue-500">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 rounded-lg">
-                      Sedang Dilaksanakan
-                    </span>
-                    <span className="text-xs text-text-secondary-light">
+                    <Badge variant="info">Sedang Dilaksanakan</Badge>
+                    <span className="text-xs text-muted-foreground">
                       Tahap {opname.currentStep}: {stepLabel[opname.currentStep || 1]}
                     </span>
                   </div>
-                  <p className="font-bold text-text-primary-light dark:text-white">
-                    {opname.scheduleName}
-                  </p>
-                  <p className="text-xs text-text-secondary-light">
+                  <p className="font-bold text-foreground">{opname.scheduleName}</p>
+                  <p className="text-xs text-muted-foreground">
                     Jadwal: {formatDate(opname.scheduleDate)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => openPelaksanaan(opname.id)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl px-6 h-auto py-2.5 shadow-lg shadow-blue-600/20"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 shadow-lg shadow-primary/20"
                   >
                     <Play className="mr-1.5" aria-hidden />
                     Lanjutkan
@@ -76,7 +71,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                   <Button
                     variant="ghost"
                     onClick={() => onDelete(opname.id)}
-                    className="px-4 p-2.5 font-bold h-auto text-sm rounded-xl text-red-400 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="px-4 p-2.5 font-bold text-sm text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                   >
                     <Trash2 className="mr-1.5" aria-hidden />
@@ -84,7 +79,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                   </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
@@ -92,26 +87,19 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
       {filteredUpcoming.length > 0 ? (
         <div className="space-y-3">
           {filteredUpcoming.map((opname) => (
-            <div
-              key={opname.id}
-              className="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-soft border-l-4 border-amber-400"
-            >
+            <Card key={opname.id} className="p-5 border-l-4 border-amber-400">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <span className="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 rounded-lg">
-                    Belum Dilaksanakan
-                  </span>
-                  <p className="font-bold text-text-primary-light dark:text-white">
-                    {opname.scheduleName}
-                  </p>
-                  <p className="text-xs text-text-secondary-light">
+                  <Badge variant="warn">Belum Dilaksanakan</Badge>
+                  <p className="font-bold text-foreground">{opname.scheduleName}</p>
+                  <p className="text-xs text-muted-foreground">
                     Target: {formatDate(opname.scheduleDate)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => openPelaksanaan(opname.id)}
-                    className="bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-auto py-2.5 shadow-lg shadow-primary/20"
+                    className="bg-primary hover:bg-primary/90 text-white font-bold px-6 shadow-lg shadow-primary/20"
                   >
                     <Zap className="mr-1.5" aria-hidden />
                     Mulai Opname
@@ -120,7 +108,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(opname.id)}
-                    className="h-auto w-auto p-2.5 rounded-xl text-red-400 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    className="w-auto p-2.5 text-red-700 hover:text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                     title="Hapus Opname"
                     aria-label="Hapus Opname"
                   >
@@ -128,7 +116,7 @@ const UpcomingOpnameList: React.FC<UpcomingOpnameListProps> = ({
                   </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       ) : isError ? (

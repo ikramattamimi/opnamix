@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { pageItems, pageRange } from './pagination';
+import { pageItems, pageRange } from './pageMath';
 
 // "Menampilkan a–b dari n", nomor halaman dengan elipsis, dan catatan opsional
 // (mis. ukuran halaman mengikuti lebar layar).

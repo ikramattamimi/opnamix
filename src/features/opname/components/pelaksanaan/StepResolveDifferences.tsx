@@ -6,7 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import type { StockInputs } from './useOpnameExecution';
+import { Card } from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface StepResolveDifferencesProps {
   items: OpnameItem[];
@@ -22,7 +32,7 @@ const formatDiff = (diff: number) => (diff > 0 ? `+${diff}` : diff);
 const RequiredMark: React.FC<{ className: string }> = ({ className }) => (
   <span
     className={cn(
-      'absolute right-2 text-[10px] font-bold text-red-400 bg-red-50 px-1.5 py-0.5 rounded uppercase',
+      'absolute right-2 text-[10px] font-bold text-red-700 bg-red-50 px-1.5 py-0.5 rounded uppercase',
       className,
     )}
   >
@@ -31,7 +41,7 @@ const RequiredMark: React.FC<{ className: string }> = ({ className }) => (
 );
 
 const MatchedMark: React.FC = () => (
-  <span className="text-xs font-bold text-emerald-500 flex items-center gap-1">
+  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
     <BadgeCheck className="size-3" aria-hidden /> Sesuai
   </span>
 );
@@ -60,65 +70,56 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
   });
 
   return (
-    <div className="bg-card-light dark:bg-card-dark rounded-3xl p-6 shadow-soft">
+    <Card className="p-6">
       <div className="mb-6">
         <h3 className="text-lg font-bold">Tahap 3: Penyesuaian Stok</h3>
-        <p className="text-sm text-text-secondary-light">
+        <p className="text-sm text-muted-foreground">
           Review selisih dan tentukan stok final. Alasan wajib diisi jika ada selisih.
         </p>
       </div>
 
       {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto mb-6">
-        <table className="w-full text-left">
-          <thead className="border-b border-gray-100 dark:border-gray-800">
-            <tr className="text-xs uppercase font-bold text-text-secondary-light tracking-wider">
-              <th className="px-3 py-3">Nama Produk</th>
-              <th className="px-3 py-3 text-center">Stok Sistem</th>
-              <th className="px-3 py-3 text-center">Stok Fisik</th>
-              <th className="px-3 py-3 text-center">Selisih</th>
-              <th className="px-3 py-3 text-center w-32">Stok Final</th>
-              <th className="px-3 py-3 w-64">Alasan Perbedaan</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+        <Table>
+          <TableHeader>
+            <TableRow className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+              <TableHead>Nama Produk</TableHead>
+              <TableHead className="text-center">Stok Sistem</TableHead>
+              <TableHead className="text-center">Stok Fisik</TableHead>
+              <TableHead className="text-center">Selisih</TableHead>
+              <TableHead className="text-center w-32">Stok Final</TableHead>
+              <TableHead className="w-64">Alasan Perbedaan</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map(({ item, physical, diff, hasDiff }) => (
-              <tr
+              <TableRow
                 key={item.id}
                 className={cn('transition-colors', hasDiff && 'bg-amber-500/[0.03]')}
               >
-                <td className="px-3 py-4">
+                <TableCell>
                   <p className="font-bold text-sm">{item.productName}</p>
-                </td>
-                <td className="px-3 py-4 text-center font-medium text-sm opacity-60">
+                </TableCell>
+                <TableCell className="text-center font-medium text-muted-foreground">
                   {item.systemStock}
-                </td>
-                <td className="px-3 py-4 text-center font-bold text-sm text-primary">{physical}</td>
-                <td className="px-3 py-4 text-center">
-                  <span
-                    className={cn(
-                      'font-bold px-2 py-1 rounded-full text-xs',
-                      diff > 0
-                        ? 'bg-green-100 text-green-600'
-                        : diff < 0
-                          ? 'bg-red-100 text-red-600'
-                          : 'bg-gray-100 text-text-secondary-light',
-                    )}
-                  >
+                </TableCell>
+                <TableCell className="text-center font-bold text-primary">{physical}</TableCell>
+                <TableCell className="text-center">
+                  <Badge variant={diff > 0 ? 'ok' : diff < 0 ? 'bad' : 'neutral'}>
                     {formatDiff(diff)}
-                  </span>
-                </td>
-                <td className="px-3 py-4">
+                  </Badge>
+                </TableCell>
+                <TableCell>
                   <Input
                     type="number"
                     min="0"
                     value={finalValue(item.id)}
                     onChange={(e) => setFinal(item.id, e.target.value)}
                     aria-label={`Stok final ${item.productName}`}
-                    className="h-auto w-full bg-background-light dark:bg-background-dark border-none rounded-xl px-3 py-2 text-center text-sm md:text-sm font-bold"
+                    className="w-full bg-background border-none px-3 text-center text-sm md:text-sm font-bold"
                   />
-                </td>
-                <td className="px-3 py-4">
+                </TableCell>
+                <TableCell>
                   {hasDiff ? (
                     <div className="relative">
                       <Textarea
@@ -127,18 +128,18 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                         onChange={(e) => setReason(item.id, e.target.value)}
                         rows={2}
                         aria-label={`Alasan perbedaan ${item.productName}`}
-                        className="min-h-0 w-full bg-background-light dark:bg-background-dark border-none shadow-none rounded-xl px-3 py-2 text-sm md:text-sm font-medium resize-none"
+                        className="min-h-0 w-full bg-background border-none shadow-none px-3 text-sm md:text-sm font-medium resize-none"
                       />
                       {!reasons[item.id] && <RequiredMark className="top-2" />}
                     </div>
                   ) : (
                     <MatchedMark />
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Mobile cards */}
@@ -147,7 +148,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
           <div
             key={item.id}
             className={cn(
-              'bg-background-light dark:bg-background-dark rounded-2xl p-4 space-y-3',
+              'bg-background rounded-2xl p-4 space-y-3',
               hasDiff && 'ring-1 ring-amber-300/30',
             )}
           >
@@ -155,16 +156,16 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
 
             {/* 3-col mini grid */}
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-card-light dark:bg-card-dark rounded-xl py-2">
-                <p className="text-[10px] font-bold text-text-secondary-light uppercase">Sistem</p>
-                <p className="text-sm font-bold opacity-60">{item.systemStock}</p>
+              <div className="bg-card rounded-xl py-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Sistem</p>
+                <p className="text-sm font-bold text-muted-foreground">{item.systemStock}</p>
               </div>
-              <div className="bg-card-light dark:bg-card-dark rounded-xl py-2">
-                <p className="text-[10px] font-bold text-text-secondary-light uppercase">Fisik</p>
+              <div className="bg-card rounded-xl py-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Fisik</p>
                 <p className="text-sm font-bold text-primary">{physical}</p>
               </div>
-              <div className="bg-card-light dark:bg-card-dark rounded-xl py-2">
-                <p className="text-[10px] font-bold text-text-secondary-light uppercase">Selisih</p>
+              <div className="bg-card rounded-xl py-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Selisih</p>
                 <span
                   className={cn(
                     'text-sm font-bold',
@@ -172,7 +173,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                       ? 'text-green-600'
                       : diff < 0
                         ? 'text-red-600'
-                        : 'text-text-secondary-light',
+                        : 'text-muted-foreground',
                   )}
                 >
                   {formatDiff(diff)}
@@ -183,7 +184,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
             <div>
               <Label
                 htmlFor={`final-${item.id}`}
-                className="text-xs font-bold text-text-secondary-light uppercase tracking-wider mb-1.5 block"
+                className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block"
               >
                 Stok Final
               </Label>
@@ -193,7 +194,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                 min="0"
                 value={finalValue(item.id)}
                 onChange={(e) => setFinal(item.id, e.target.value)}
-                className="h-auto w-full bg-card-light dark:bg-card-dark border-none rounded-xl px-3 py-2.5 text-center text-sm font-bold"
+                className="w-full bg-card border-none px-3 text-center text-sm font-bold"
               />
             </div>
 
@@ -201,7 +202,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
               <div className="relative">
                 <Label
                   htmlFor={`alasan-${item.id}`}
-                  className="text-xs font-bold text-text-secondary-light uppercase tracking-wider mb-1.5 block"
+                  className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block"
                 >
                   Alasan Perbedaan
                 </Label>
@@ -211,7 +212,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
                   value={reasons[item.id] || ''}
                   onChange={(e) => setReason(item.id, e.target.value)}
                   rows={2}
-                  className="min-h-0 w-full bg-card-light dark:bg-card-dark border-none shadow-none rounded-xl px-3 py-2 text-sm font-medium resize-none"
+                  className="min-h-0 w-full bg-card border-none shadow-none px-3 text-sm font-medium resize-none"
                 />
                 {!reasons[item.id] && <RequiredMark className="top-8" />}
               </div>
@@ -221,7 +222,7 @@ const StepResolveDifferences: React.FC<StepResolveDifferencesProps> = ({
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };
 

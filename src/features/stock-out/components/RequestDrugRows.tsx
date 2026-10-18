@@ -7,6 +7,14 @@ import { cn } from '@/lib/utils';
 import ProductLookupModal from '@/features/products/ProductLookupModal';
 import type { Product } from '@/features/products/types';
 import { emptyRequestDrug, type StockOutRequestValues } from '../schemas';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 interface RequestDrugRowsProps {
   products: Product[];
@@ -50,34 +58,37 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
           <Button
             type="button"
             variant="ghost"
+            size="lg"
             onClick={() => append(emptyRequestDrug())}
-            className="w-full h-auto border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-8 flex flex-col items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group [&_svg]:size-8"
+            className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group [&_svg]:size-6"
           >
             <CirclePlus className="group-hover:scale-110 transition-transform" aria-hidden />
             <span className="font-bold text-sm">Tambah Obat / Alkes</span>
-            <span className="text-xs font-normal text-slate-500">Lewati jika hanya ada jasa</span>
           </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Lewati jika hanya ada jasa
+          </p>
         </>
       ) : (
         <>
           {generalErrorMessage}
           <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden mb-5">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 font-medium border-b border-gray-100 dark:border-gray-700">
-                <tr>
-                  <th className="px-5 py-3">
-                    Nama Obat <span className="text-red-500">*</span>
-                  </th>
-                  <th className="px-5 py-3 w-24 text-center">
-                    Jumlah <span className="text-red-500">*</span>
-                  </th>
-                  <th className="px-5 py-3">Satuan</th>
-                  <th className="px-5 py-3 text-right">Harga</th>
-                  <th className="px-5 py-3 text-right">Total Harga</th>
-                  <th className="px-5 py-3 w-16 text-center"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-card-dark">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    Nama Obat <span className="text-red-600 dark:text-red-400">*</span>
+                  </TableHead>
+                  <TableHead className="w-24 text-center">
+                    Jumlah <span className="text-red-600 dark:text-red-400">*</span>
+                  </TableHead>
+                  <TableHead>Satuan</TableHead>
+                  <TableHead className="text-right">Harga</TableHead>
+                  <TableHead className="text-right">Total Harga</TableHead>
+                  <TableHead className="w-16 text-center"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="bg-card">
                 {fields.map((field, index) => {
                   const drug = drugs[index] ?? field;
                   const product = products.find((p) => p.id === drug.productId);
@@ -86,8 +97,8 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                   const drugError = errors.drugs?.[index];
 
                   return (
-                    <tr key={field.id}>
-                      <td className="px-5 py-3">
+                    <TableRow key={field.id}>
+                      <TableCell>
                         <div
                           className={cn(
                             'relative cursor-pointer group',
@@ -96,7 +107,7 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                           onClick={() => setActiveRow(index)}
                         >
                           <input
-                            className="w-full bg-transparent border-none font-bold text-brand-dark dark:text-white focus:ring-0 p-0 cursor-pointer placeholder-gray-400"
+                            className="w-full bg-transparent border-none font-bold text-foreground focus:ring-0 p-0 cursor-pointer placeholder-gray-400"
                             value={drug.productName || ''}
                             placeholder="Pilih Obat..."
                             aria-label="Nama obat"
@@ -115,14 +126,14 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                         <p className="text-[10px] text-slate-500 mt-1">
                           Stok: {product?.stock || 0} {drug.unit}
                         </p>
-                      </td>
-                      <td className="px-5 py-3 text-center">
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Input
                           type="number"
                           aria-label="Jumlah"
                           aria-invalid={!!drugError?.quantity}
                           className={cn(
-                            'w-16 h-auto mx-auto rounded-lg border-gray-200 dark:border-gray-700 bg-background-light dark:bg-background-dark text-sm md:text-sm py-1 px-2 focus:border-primary focus-visible:ring-primary dark:text-white text-center',
+                            'w-16 mx-auto border-gray-200 dark:border-gray-700 bg-background text-sm md:text-sm px-2 focus:border-primary focus-visible:ring-primary dark:text-white text-center',
                             drugError?.quantity && 'border-red-500 focus:border-red-500',
                           )}
                           {...register(`drugs.${index}.quantity`, { valueAsNumber: true })}
@@ -132,37 +143,39 @@ const RequestDrugRows: React.FC<RequestDrugRowsProps> = ({ products }) => {
                             {drugError.quantity.message}
                           </p>
                         )}
-                      </td>
-                      <td className="px-5 py-3 text-slate-600 dark:text-slate-300">{drug.unit}</td>
-                      <td className="px-5 py-3 text-right text-slate-600 dark:text-slate-300">
+                      </TableCell>
+                      <TableCell className="text-slate-600 dark:text-slate-300">
+                        {drug.unit}
+                      </TableCell>
+                      <TableCell className="text-right text-slate-600 dark:text-slate-300">
                         Rp {price.toLocaleString('id-ID')}
-                      </td>
-                      <td className="px-5 py-3 text-right font-bold text-slate-800 dark:text-white">
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-slate-800 dark:text-white">
                         Rp {total.toLocaleString('id-ID')}
-                      </td>
-                      <td className="px-5 py-3 text-center">
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Button
                           type="button"
                           onClick={() => remove(index)}
                           variant="ghost"
-                          size="icon"
+                          size="icon-sm"
                           aria-label="Hapus obat"
-                          className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 h-8 w-8 rounded-lg [&_svg]:size-5"
+                          className="text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 [&_svg]:size-5"
                         >
                           <Trash2 aria-hidden />
                         </Button>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
           <Button
             type="button"
             onClick={() => append(emptyRequestDrug())}
             variant="ghost"
-            className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-6 flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group h-auto [&_svg]:size-6"
+            className="w-full border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary hover:bg-transparent transition-all group [&_svg]:size-6"
           >
             <CirclePlus className="group-hover:scale-110 transition-transform" aria-hidden />
             <span className="font-bold text-sm">Tambah Obat Lain</span>

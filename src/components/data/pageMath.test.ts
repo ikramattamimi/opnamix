@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { gridLayout, pageItems, pageRange } from './pagination';
+import { gridLayout, pageItems, pageRange } from './pageMath';
 
 describe('pageItems', () => {
   it('menampilkan semua halaman bila sedikit', () => {
