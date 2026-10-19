@@ -8,6 +8,7 @@ import { notificationKeys } from './keys';
 import { AppNotification } from './types';
 import { useNotificationRoles } from './useNotifications';
 import { playNotificationSound, showDesktopNotification } from './alerts';
+import { getNotificationPreferences } from './preferences';
 
 /**
  * Dengarkan INSERT di tabel notifications dan masukkan notifikasi yang
@@ -58,8 +59,9 @@ export function useNotificationsRealtime(userId: string) {
             };
           });
 
-          playNotificationSound();
-          showDesktopNotification(newNotification);
+          const prefs = getNotificationPreferences();
+          if (prefs.sound) playNotificationSound();
+          if (prefs.desktop) showDesktopNotification(newNotification);
 
           const toastType =
             newNotification.type === 'STOCK_EMPTY' || newNotification.type === 'STOCK_LOW'

@@ -62,6 +62,14 @@ export const notificationsApi = {
     if (error) throw error;
   },
 
+  markAsUnread: async (notificationId: number): Promise<void> => {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: false })
+      .eq('id', notificationId);
+    if (error) throw error;
+  },
+
   /** Tandai semua notifikasi yang terlihat oleh user sebagai dibaca. */
   markAllAsRead: async (userId: string, roles: string[]): Promise<void> => {
     const { error } = await supabase

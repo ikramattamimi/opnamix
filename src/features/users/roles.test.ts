@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getInitialRoles, isRoleValue, toggleRole } from './roles';
+import { avatarTone, getInitialRoles, getRoleDisplay, isRoleValue, toggleRole } from './roles';
 
 describe('isRoleValue', () => {
   it('mengenali role yang bisa dipilih', () => {
@@ -31,5 +31,20 @@ describe('toggleRole', () => {
 
   it('tidak melepas role terakhir', () => {
     expect(toggleRole(['nakes'], 'nakes', false)).toEqual(['nakes']);
+  });
+});
+
+describe('getRoleDisplay', () => {
+  it('menampilkan role lama dan role tak dikenal', () => {
+    expect(getRoleDisplay('admin')).toMatchObject({ label: 'Admin', tone: 'imun' });
+    expect(getRoleDisplay('apoteker')).toEqual({ label: 'Apoteker', tone: 'obat' });
+    expect(getRoleDisplay('kasir')).toEqual({ label: 'kasir', tone: 'neutral' });
+  });
+});
+
+describe('avatarTone', () => {
+  it('memberi warna yang sama untuk id yang sama', () => {
+    expect(avatarTone('a1b2')).toBe(avatarTone('a1b2'));
+    expect(['obat', 'bhp', 'imun', 'alkes']).toContain(avatarTone('xyz'));
   });
 });

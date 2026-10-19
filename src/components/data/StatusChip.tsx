@@ -2,7 +2,9 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 // Chip status dengan titik. Selalu dengan teks, karena warna saja tidak cukup.
-export type StatusTone = 'ok' | 'warn' | 'bad' | 'info' | 'neutral';
+// Nada kategori (obat/bhp/imun/alkes) untuk label seperti role, biasanya dengan `plain`.
+export type StatusTone =
+  'ok' | 'warn' | 'bad' | 'info' | 'neutral' | 'obat' | 'bhp' | 'imun' | 'alkes';
 
 const TONES: Record<StatusTone, string> = {
   ok: 'bg-ok-soft text-ok',
@@ -10,6 +12,10 @@ const TONES: Record<StatusTone, string> = {
   bad: 'bg-bad-soft text-bad',
   info: 'bg-info-soft text-info',
   neutral: 'bg-surface-2 text-muted-foreground ring-1 ring-inset ring-border',
+  obat: 'bg-cat-obat/15 text-cat-obat',
+  bhp: 'bg-cat-bhp/15 text-cat-bhp',
+  imun: 'bg-cat-imun/15 text-cat-imun',
+  alkes: 'bg-cat-alkes/15 text-cat-alkes',
 };
 
 export const StatusChip: React.FC<{

@@ -60,6 +60,24 @@ export function useMarkNotificationRead(userId: string) {
   });
 }
 
+export function useMarkNotificationUnread(userId: string) {
+  const { apply, rollback } = useOptimisticListUpdate(userId);
+  return useMutation({
+    mutationFn: (notificationId: number) => notificationsApi.markAsUnread(notificationId),
+    onMutate: (notificationId) =>
+      apply((prev) => ({
+        notifications: prev.notifications.map((n) =>
+          n.id === notificationId ? { ...n, is_read: false } : n,
+        ),
+        unreadCount: prev.unreadCount + 1,
+      })),
+    onError: (err, _id, context) => {
+      console.error('Error marking notification as unread:', err);
+      rollback(context);
+    },
+  });
+}
+
 export function useMarkAllNotificationsRead(userId: string) {
   const roles = useNotificationRoles();
   const { apply, rollback } = useOptimisticListUpdate(userId);

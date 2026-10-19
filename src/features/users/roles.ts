@@ -1,34 +1,33 @@
-import { Pill, ShieldCheck, ShieldPlus, type LucideIcon } from 'lucide-react';
+import type { StatusTone } from '@/components/data/StatusChip';
 import type { UserRow } from './types';
 
-// Role yang bisa dipilih di halaman manajemen user. 'apoteker' tidak ditampilkan.
-// color untuk badge, iconBg/iconColor untuk kartu statistik.
+// Role yang bisa dipilih di halaman Kelola Pengguna. 'apoteker' tidak bisa
+// dipilih, tapi tetap ditampilkan kalau masih ada di data lama.
 export const ROLE_OPTIONS = [
   {
     value: 'admin',
     label: 'Admin',
-    icon: ShieldCheck,
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300',
-    iconBg: 'bg-purple-100 dark:bg-purple-500/20',
-    iconColor: 'text-purple-600 dark:text-purple-400',
+    tone: 'imun',
+    description: 'Semua menu, termasuk kelola pengguna.',
   },
   {
     value: 'farmasi',
     label: 'Farmasi',
-    icon: Pill,
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
-    iconBg: 'bg-blue-100 dark:bg-blue-500/20',
-    iconColor: 'text-blue-600 dark:text-blue-400',
+    tone: 'bhp',
+    description: 'Pekerjaan stok harian: master data, stok masuk dan keluar, opname, laporan.',
   },
   {
     value: 'nakes',
     label: 'Nakes',
-    icon: ShieldPlus,
-    color: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
-    iconBg: 'bg-green-100 dark:bg-green-500/20',
-    iconColor: 'text-green-600 dark:text-green-400',
+    tone: 'alkes',
+    description: 'Mengajukan permintaan stok keluar dan melihat sisa stok.',
   },
-] as const;
+] as const satisfies readonly {
+  value: string;
+  label: string;
+  tone: StatusTone;
+  description: string;
+}[];
 
 export type RoleOption = (typeof ROLE_OPTIONS)[number];
 export type RoleValue = RoleOption['value'];
@@ -42,8 +41,22 @@ export const isRoleValue = (role: string): role is RoleValue => {
 export const getRoleOption = (role: string): RoleOption | undefined =>
   ROLE_OPTIONS.find((r) => r.value === role);
 
-// Role yang tidak dikenal (misalnya 'apoteker') memakai ikon role nakes, seperti sebelumnya
-export const getRoleIcon = (role: string): LucideIcon => getRoleOption(role)?.icon ?? ShieldPlus;
+// Label dan warna untuk tampilan, termasuk role lama yang tidak bisa dipilih
+export const getRoleDisplay = (role: string): { label: string; tone: StatusTone } => {
+  const option = getRoleOption(role);
+  if (option) return option;
+  if (role === 'apoteker') return { label: 'Apoteker', tone: 'obat' };
+  return { label: role, tone: 'neutral' };
+};
+
+const AVATAR_TONES = ['obat', 'bhp', 'imun', 'alkes'] as const;
+
+// Warna avatar tetap per pengguna, diturunkan dari id
+export const avatarTone = (id: string): (typeof AVATAR_TONES)[number] => {
+  let hash = 0;
+  for (const ch of id) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return AVATAR_TONES[hash % AVATAR_TONES.length];
+};
 
 // Role awal form edit: role yang dikenal, atau role lama di profil, atau 'nakes'
 export const getInitialRoles = (user: Pick<UserRow, 'roles' | 'role'>): RoleValue[] => {

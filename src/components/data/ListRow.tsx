@@ -4,6 +4,8 @@ import type { ListGroup } from './listGroups';
 
 // Baris daftar: lead (avatar/ikon), judul + sub, kolom tengah, nilai, status.
 // Di HP kolom tengah disembunyikan dan nilai/status bertumpuk di kanan.
+// `compact`: tanpa kolom tengah di semua lebar (mis. notifikasi), jadi judul dan
+// sub mendapat sisa lebar.
 
 export interface ListRowProps {
   lead?: React.ReactNode;
@@ -15,6 +17,7 @@ export interface ListRowProps {
   status?: React.ReactNode;
   selected?: boolean;
   unread?: boolean;
+  compact?: boolean;
   onClick?: () => void;
   className?: string;
 }
@@ -29,6 +32,7 @@ export const ListRow: React.FC<ListRowProps> = ({
   status,
   selected,
   unread,
+  compact,
   onClick,
   className,
 }) => {
@@ -40,7 +44,9 @@ export const ListRow: React.FC<ListRowProps> = ({
       aria-current={selected ? 'true' : undefined}
       className={cn(
         'grid w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 rounded-xl border border-transparent px-2.5 py-2 text-left',
-        'md:grid-cols-[2rem_minmax(0,1.25fr)_minmax(0,1.2fr)_7rem_6rem]',
+        compact
+          ? 'md:grid-cols-[2rem_minmax(0,1fr)_auto_auto]'
+          : 'md:grid-cols-[2rem_minmax(0,1.25fr)_minmax(0,1.2fr)_7rem_6rem]',
         onClick &&
           'transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         selected && 'border-primary/35 bg-primary-soft hover:bg-primary-soft',
@@ -53,10 +59,14 @@ export const ListRow: React.FC<ListRowProps> = ({
         <b className={cn('truncate text-label', unread ? 'font-bold' : 'font-semibold')}>{title}</b>
         {subtitle && <small className="truncate text-xs text-muted-foreground">{subtitle}</small>}
       </span>
-      <span className="hidden min-w-0 flex-col md:flex">
-        {middle && <span className="truncate text-meta">{middle}</span>}
-        {middleSub && <small className="truncate text-xs text-muted-foreground">{middleSub}</small>}
-      </span>
+      {!compact && (
+        <span className="hidden min-w-0 flex-col md:flex">
+          {middle && <span className="truncate text-meta">{middle}</span>}
+          {middleSub && (
+            <small className="truncate text-xs text-muted-foreground">{middleSub}</small>
+          )}
+        </span>
+      )}
       <span className="col-start-3 row-start-1 whitespace-nowrap text-right text-meta font-bold tabular-nums md:col-start-auto md:row-start-auto">
         {value}
       </span>

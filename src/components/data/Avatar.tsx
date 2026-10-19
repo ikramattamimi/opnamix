@@ -14,8 +14,10 @@ const avatarVariants = cva(
         ok: 'bg-ok-soft text-ok',
         warn: 'bg-warn-soft text-warn',
         bad: 'bg-bad-soft text-bad',
+        obat: 'bg-cat-obat/15 text-cat-obat',
         imun: 'bg-cat-imun/15 text-cat-imun',
         bhp: 'bg-cat-bhp/15 text-cat-bhp',
+        alkes: 'bg-cat-alkes/15 text-cat-alkes',
         neutral: 'bg-surface-2 text-muted-foreground',
       },
       size: {

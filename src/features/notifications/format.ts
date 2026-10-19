@@ -127,3 +127,55 @@ const NOTIFICATION_TARGETS: Partial<Record<string, string>> = {
 export function getNotificationTarget(type: string): string {
   return NOTIFICATION_TARGETS[type] ?? ROUTES.NOTIFICATIONS;
 }
+
+const TARGET_LABELS: Record<string, string> = {
+  [ROUTES.STOK_KELUAR]: 'Buka Stok Keluar',
+  [ROUTES.STOK_MASUK]: 'Buka Stok Masuk',
+  [ROUTES.MASTER_DATA_PRODUK]: 'Buka Data Produk',
+  [ROUTES.MASTER_DATA_JASA]: 'Buka Data Jasa',
+  [ROUTES.STOK_OPNAME]: 'Buka Stok Opname',
+};
+
+/** Teks tombol menuju halaman tujuan notifikasi, atau null kalau tidak ada tujuan. */
+export function getNotificationTargetLabel(type: string): string | null {
+  return TARGET_LABELS[getNotificationTarget(type)] ?? null;
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  STOCK_OUT_REQUEST: 'Permintaan stok keluar',
+  STOCK_OUT_PROCESSED: 'Permintaan diproses',
+  STOCK_OUT_DIRECT: 'Stok keluar manual',
+  STOCK_IN: 'Stok masuk',
+  STOCK_LOW: 'Stok menipis',
+  STOCK_EMPTY: 'Stok habis',
+  OPNAME_CREATED: 'Jadwal opname',
+  OPNAME_STARTED: 'Opname dimulai',
+  OPNAME_STEP_CHANGED: 'Tahap opname berubah',
+  OPNAME_DISCREPANCY: 'Selisih opname',
+  OPNAME_COMPLETED: 'Opname selesai',
+  PRODUCT_ADDED: 'Produk baru',
+  PRODUCT_DELETED: 'Produk dihapus',
+  SERVICE_ADDED: 'Jasa baru',
+};
+
+/** Nama jenis notifikasi; tipe tak dikenal ditampilkan apa adanya. */
+export function getNotificationTypeLabel(type: string): string {
+  return TYPE_LABELS[type] ?? type;
+}
+
+export const NOTIFICATION_GROUPS = ['Transaksi', 'Stok', 'Opname', 'Master data'] as const;
+export type NotificationGroup = (typeof NOTIFICATION_GROUPS)[number];
+
+/** Kelompok jenis notifikasi untuk filter. Tipe tak dikenal masuk null. */
+export function getNotificationGroup(type: string): NotificationGroup | null {
+  if (type.startsWith('STOCK_OUT') || type === 'STOCK_IN') return 'Transaksi';
+  if (type === 'STOCK_LOW' || type === 'STOCK_EMPTY') return 'Stok';
+  if (type.startsWith('OPNAME_')) return 'Opname';
+  if (type.startsWith('PRODUCT_') || type.startsWith('SERVICE_')) return 'Master data';
+  return null;
+}
+
+/** Jam saja, contoh "14.30". */
+export function formatNotificationClock(dateString: string): string {
+  return new Date(dateString).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+}

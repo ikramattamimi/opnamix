@@ -1,195 +1,135 @@
-import React, { useState, useEffect } from 'react';
-import { CircleAlert, CircleCheck } from 'lucide-react';
+import React from 'react';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
-import { useProfile, useUpdateProfile, useUploadAvatar, useUpdatePassword } from './useProfile';
-import { useAuth } from '@/features/auth/useAuth';
-import { getErrorMessage } from '@/lib/utils';
-import { getRoleIconColor, getRoleInfo } from './components/profileUi';
-import ProfileHeaderCard from './components/ProfileHeaderCard';
-import ProfileInfoSection from './components/ProfileInfoSection';
-import PasswordSection from './components/PasswordSection';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { useToast } from '@/components/ui/toast';
+import { useAuth } from '@/features/auth/useAuth';
+import { getRoleDisplay } from '@/features/users/roles';
+import { formatDateForDisplay } from '@/lib/format';
+import { getErrorMessage } from '@/lib/utils';
+import { useProfile, useUpdatePassword, useUpdateProfile, useUploadAvatar } from './useProfile';
+import {
+  DisplaySection,
+  PasswordSection,
+  ProfileCard,
+  ProfileInfoSection,
+} from './components/ProfileSections';
+
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
 const ProfilePage: React.FC = () => {
-  const { userProfile } = useAuth();
-  const {
-    data: profile,
-    isLoading: isProfileLoading,
-    isError: isProfileError,
-    refetch: refetchProfile,
-  } = useProfile(userProfile?.id, userProfile);
+  const { userProfile, logout } = useAuth();
+  const { showToast } = useToast();
+  const { data: profile, isLoading, isError, refetch } = useProfile(userProfile?.id, userProfile);
   const updateProfile = useUpdateProfile();
   const uploadAvatar = useUploadAvatar();
   const updatePassword = useUpdatePassword();
-  const [editMode, setEditMode] = useState(false);
-  const [formName, setFormName] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    if (profile) {
-      setFormName(profile.full_name || '');
-    }
-  }, [profile]);
+  if (isLoading || !profile) {
+    return (
+      <>
+        <PageHeader />
+        {isLoading ? (
+          <LoadingState label="Memuat profil..." />
+        ) : isError ? (
+          <ErrorState title="Gagal memuat profil" onRetry={() => void refetch()} />
+        ) : (
+          <EmptyState title="Profil tidak ditemukan." />
+        )}
+      </>
+    );
+  }
 
-  useEffect(() => {
-    if (error || success) {
-      const timer = setTimeout(() => {
-        setError(null);
-        setSuccess(null);
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, success]);
+  const roles = profile.roles?.length ? profile.roles : profile.role ? [profile.role] : [];
 
-  const handleSaveProfile = async () => {
-    if (!profile || !formName.trim()) {
-      setError('Nama tidak boleh kosong.');
-      return;
-    }
-    setIsSubmitting(true);
+  const handleSaveProfile = async (fullName: string) => {
     try {
-      await updateProfile.mutateAsync({
-        userId: profile.id,
-        updates: { full_name: formName.trim() },
-      });
-      setEditMode(false);
-      setSuccess('Profil berhasil diperbarui!');
-    } catch (err) {
-      setError('Gagal menyimpan: ' + getErrorMessage(err));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleAvatarSelected = async (file: File): Promise<boolean> => {
-    if (!profile) return false;
-
-    // Validate
-    if (!file.type.startsWith('image/')) {
-      setError('File harus berupa gambar (JPG, PNG, dll).');
-      return false;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      setError('Ukuran foto maksimal 2MB.');
-      return false;
-    }
-
-    setIsUploading(true);
-    try {
-      await uploadAvatar.mutateAsync({ userId: profile.id, file });
-      setSuccess('Foto profil berhasil diperbarui!');
-    } catch (err) {
-      setError('Gagal upload foto: ' + getErrorMessage(err));
-    } finally {
-      setIsUploading(false);
-    }
-    return true;
-  };
-
-  const handleChangePassword = async (
-    newPassword: string,
-    confirmPassword: string,
-  ): Promise<boolean> => {
-    if (!newPassword || !confirmPassword) {
-      setError('Semua field password wajib diisi.');
-      return false;
-    }
-    if (newPassword.length < 6) {
-      setError('Password baru minimal 6 karakter.');
-      return false;
-    }
-    if (newPassword !== confirmPassword) {
-      setError('Password baru dan konfirmasi tidak cocok.');
-      return false;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await updatePassword.mutateAsync(newPassword);
-      setSuccess('Password berhasil diubah!');
+      await updateProfile.mutateAsync({ userId: profile.id, updates: { full_name: fullName } });
+      showToast('Profil disimpan.', 'success');
       return true;
     } catch (err) {
-      setError('Gagal mengubah password: ' + getErrorMessage(err));
+      showToast('Gagal menyimpan profil: ' + getErrorMessage(err), 'error');
       return false;
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-  if (isProfileLoading) {
-    return (
-      <>
-        <PageHeader />
-        <LoadingState label="Memuat profil..." className="min-h-[400px]" />
-      </>
-    );
-  }
-
-  if (!profile) {
-    if (isProfileError) {
-      return (
-        <>
-          <PageHeader />
-          <ErrorState
-            title="Gagal memuat profil"
-            onRetry={() => void refetchProfile()}
-            className="min-h-[400px]"
-          />
-        </>
-      );
+  const handleAvatarSelected = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      showToast('Berkas harus berupa gambar (JPG, PNG, dll.).', 'error');
+      return;
     }
-    return (
-      <>
-        <PageHeader />
-        <EmptyState title="Profil tidak ditemukan." className="min-h-[400px]" />
-      </>
-    );
-  }
+    if (file.size > MAX_AVATAR_BYTES) {
+      showToast('Ukuran foto maksimal 2 MB.', 'error');
+      return;
+    }
+    try {
+      await uploadAvatar.mutateAsync({ userId: profile.id, file });
+      showToast('Foto profil diperbarui.', 'success');
+    } catch (err) {
+      showToast('Gagal mengunggah foto: ' + getErrorMessage(err), 'error');
+    }
+  };
 
-  const userRoles = profile?.roles ?? (profile?.role ? [profile.role] : []);
-  const roleInfo = getRoleInfo(userRoles);
+  const handleChangePassword = async (password: string, confirm: string) => {
+    if (!password || !confirm) return 'Isi password baru dua kali.';
+    if (password.length < 6) return 'Password baru minimal 6 karakter.';
+    if (password !== confirm) return 'Password baru dan ulangannya tidak sama.';
+    try {
+      await updatePassword.mutateAsync(password);
+      showToast('Password diganti.', 'success');
+      return null;
+    } catch (err) {
+      return 'Gagal mengganti password: ' + getErrorMessage(err);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (err) {
+      showToast('Gagal keluar: ' + getErrorMessage(err), 'error');
+    }
+  };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <PageHeader />
-      {/* Messages */}
-      {error && (
-        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
-          <CircleAlert className="size-5" aria-hidden />
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-2 animate-[fadeIn_0.3s]">
-          <CircleCheck className="size-5" aria-hidden />
-          {success}
-        </div>
-      )}
-
-      <ProfileHeaderCard
-        profile={profile}
-        roleInfo={roleInfo}
-        isUploading={isUploading}
-        onAvatarSelected={handleAvatarSelected}
+    <>
+      <PageHeader
+        stats={[
+          {
+            id: 'role',
+            label: 'Role',
+            value: roles.map((r) => getRoleDisplay(r).label).join(', '),
+          },
+          {
+            id: 'updated',
+            label: 'Diperbarui',
+            value: formatDateForDisplay(profile.updated_at ?? undefined),
+          },
+        ]}
       />
 
-      <ProfileInfoSection
-        profile={profile}
-        roleInfo={roleInfo}
-        roleIconColor={getRoleIconColor(userRoles)}
-        editMode={editMode}
-        onEditModeChange={setEditMode}
-        formName={formName}
-        onFormNameChange={setFormName}
-        isSubmitting={isSubmitting}
-        onSave={() => void handleSaveProfile()}
-      />
-
-      <PasswordSection isSubmitting={isSubmitting} onChangePassword={handleChangePassword} />
-    </div>
+      <div className="mx-auto grid max-w-5xl items-start gap-3 md:grid-cols-[17rem_minmax(0,1fr)]">
+        <ProfileCard
+          profile={profile}
+          roles={roles}
+          uploading={uploadAvatar.isPending}
+          onAvatarSelected={(file) => void handleAvatarSelected(file)}
+          onLogout={() => void handleLogout()}
+        />
+        <div className="flex min-w-0 flex-col gap-3">
+          <ProfileInfoSection
+            key={profile.full_name ?? ''}
+            profile={profile}
+            saving={updateProfile.isPending}
+            onSave={handleSaveProfile}
+          />
+          <PasswordSection
+            saving={updatePassword.isPending}
+            onChangePassword={handleChangePassword}
+          />
+          <DisplaySection />
+        </div>
+      </div>
+    </>
   );
 };
 

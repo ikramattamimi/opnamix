@@ -1,209 +1,345 @@
-import React, { useState } from 'react';
-import { BellOff, CheckCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  ArrowRight,
+  Bell,
+  BellOff,
+  Check,
+  CheckCheck,
+  Mail,
+  SearchX,
+  Settings,
+} from 'lucide-react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { ListWithPanel } from '@/components/layout/ListWithPanel';
+import { Toolbar, ToolbarSpacer } from '@/components/data/Toolbar';
+import { SearchInput } from '@/components/data/SearchInput';
+import { SegmentedControl } from '@/components/data/SegmentedControl';
+import { GroupedList, ListRow } from '@/components/data/ListRow';
+import { groupByDay } from '@/components/data/listGroups';
+import { Pagination } from '@/components/data/Pagination';
+import { ToneIcon } from '@/components/data/ToneIcon';
+import { OptionSelect } from '@/components/form/OptionSelect';
+import { SidePanel, PanelSection } from '@/components/panel/SidePanel';
+import { DefinitionList } from '@/components/panel/DefinitionList';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { useToast } from '@/components/ui/toast';
+import { useListSelection } from '@/hooks/useListSelection';
+import { dayLabel, formatDateTimeForDisplay } from '@/lib/format';
 import { useAuth } from '@/features/auth/useAuth';
 import {
-  useNotifications,
-  useMarkNotificationRead,
   useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useMarkNotificationUnread,
+  useNotifications,
 } from './useNotifications';
-import { getNotificationLucideIcon, getNotificationColor, formatNotificationTime } from './format';
-import { AppNotification } from './types';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Card } from '@/components/ui/card';
+import {
+  NOTIFICATION_GROUPS,
+  formatNotificationClock,
+  formatNotificationTime,
+  getNotificationGroup,
+  getNotificationLucideIcon,
+  getNotificationTarget,
+  getNotificationTargetLabel,
+  getNotificationTone,
+  getNotificationTypeLabel,
+  type NotificationGroup,
+} from './format';
+import { NotificationSettingRows } from './components/NotificationSettingRows';
+import type { AppNotification } from './types';
 
-const TYPE_LABELS: Record<string, string> = {
-  STOCK_OUT_REQUEST: 'Permintaan Stok Keluar',
-  STOCK_OUT_PROCESSED: 'Stok Keluar Diproses',
-  STOCK_LOW: 'Stok Menipis',
-  STOCK_EMPTY: 'Stok Habis',
-  OPNAME_STARTED: 'Opname Dimulai',
-  OPNAME_COMPLETED: 'Opname Selesai',
-  OPNAME_CREATED: 'Opname Dibuat',
-  OPNAME_STEP_CHANGED: 'Tahap Opname Berubah',
-  STOCK_IN: 'Stok Masuk',
-  STOCK_OUT_DIRECT: 'Stok Keluar Langsung',
-  OPNAME_DISCREPANCY: 'Selisih Opname',
-  PRODUCT_ADDED: 'Produk Ditambahkan',
-  PRODUCT_DELETED: 'Produk Dihapus',
-  SERVICE_ADDED: 'Jasa Ditambahkan',
+type ReadFilter = 'Semua' | 'Belum' | 'Sudah';
+type GroupFilter = 'Semua' | NotificationGroup;
+
+const PAGE_SIZE = 10;
+
+const GROUP_OPTIONS: { value: GroupFilter; label: string }[] = [
+  { value: 'Semua', label: 'Semua jenis' },
+  ...NOTIFICATION_GROUPS.map((g) => ({ value: g, label: g })),
+];
+
+const matchesRead = (n: AppNotification, read: ReadFilter) =>
+  read === 'Semua' || (read === 'Belum') === !n.is_read;
+
+const matchesQuery = (n: AppNotification, query: string) => {
+  const q = query.trim().toLocaleLowerCase('id-ID');
+  return !q || `${n.title} ${n.message}`.toLocaleLowerCase('id-ID').includes(q);
 };
 
-const ALL_TYPES = ['Semua', ...Object.keys(TYPE_LABELS)];
-
-const FILTER_CHIP_CLASS = 'px-3 text-xs font-bold transition-colors';
-const FILTER_CHIP_IDLE_CLASS =
-  'bg-background text-muted-foreground hover:bg-background dark:hover:bg-background hover:text-foreground dark:hover:text-white';
-
 const NotificationsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { showToast } = useToast();
   const { user } = useAuth();
-  const userId = user?.id || '';
-  const { data, isLoading, isError, refetch } = useNotifications(userId);
-  const notifications = data?.notifications ?? [];
-  const unreadCount = data?.unreadCount ?? 0;
-  const { mutate: markAsRead } = useMarkNotificationRead(userId);
+  const userId = user?.id ?? '';
+  const { data, isPending, isError, refetch } = useNotifications(userId);
+  const { mutate: markRead } = useMarkNotificationRead(userId);
+  const { mutate: markUnread } = useMarkNotificationUnread(userId);
   const { mutate: markAll } = useMarkAllNotificationsRead(userId);
-  const markAllAsRead = () => markAll();
-  const [filterType, setFilterType] = useState('Semua');
-  const [filterRead, setFilterRead] = useState<'all' | 'unread' | 'read'>('all');
 
-  const filtered = notifications.filter((n) => {
-    const typeMatch = filterType === 'Semua' || n.type === filterType;
-    const readMatch =
-      filterRead === 'all' ||
-      (filterRead === 'unread' && !n.is_read) ||
-      (filterRead === 'read' && n.is_read);
-    return typeMatch && readMatch;
-  });
+  const notifications = useMemo(() => data?.notifications ?? [], [data]);
+  const unreadCount = data?.unreadCount ?? 0;
 
-  const handleMarkRead = (notif: AppNotification) => {
-    if (!notif.is_read) markAsRead(notif.id);
+  const [query, setQuery] = useState('');
+  const [read, setRead] = useState<ReadFilter>('Semua');
+  const [group, setGroup] = useState<GroupFilter>('Semua');
+  const [page, setPage] = useState(1);
+  const [showSettings, setShowSettings] = useState(false);
+
+  const { selectedId, select, panelOpen, openPanel, closePanel } = useListSelection<number>();
+  const selected = notifications.find((n) => n.id === selectedId);
+
+  const byGroupAndQuery = notifications.filter(
+    (n) => (group === 'Semua' || getNotificationGroup(n.type) === group) && matchesQuery(n, query),
+  );
+  const filtered = byGroupAndQuery.filter((n) => matchesRead(n, read));
+  const readCount = (r: ReadFilter) => byGroupAndQuery.filter((n) => matchesRead(n, r)).length;
+  const todayKey = new Date().toDateString();
+  const todayCount = notifications.filter(
+    (n) => new Date(n.created_at).toDateString() === todayKey,
+  ).length;
+
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, pages);
+  const visible = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const groups = groupByDay(
+    visible,
+    (n) => new Date(n.created_at),
+    (d) => dayLabel(d),
+  );
+
+  const resetPage =
+    <T,>(setter: (v: T) => void) =>
+    (v: T) => {
+      setter(v);
+      setPage(1);
+    };
+
+  const open = (n: AppNotification) => {
+    setShowSettings(false);
+    select(n.id);
+    if (!n.is_read) markRead(n.id);
   };
 
+  const markAllRead = () => {
+    markAll();
+    showToast('Semua notifikasi ditandai sudah dibaca.', 'success');
+  };
+
+  const isFiltered = !!query.trim() || read !== 'Semua' || group !== 'Semua';
+
+  const list = (
+    <Card className="flex flex-col gap-3 p-3">
+      <Toolbar>
+        <SearchInput
+          value={query}
+          onChange={resetPage(setQuery)}
+          placeholder="Cari notifikasi"
+          label="Cari notifikasi"
+        />
+        <SegmentedControl<ReadFilter>
+          label="Status baca"
+          options={[
+            { value: 'Semua', label: 'Semua', count: readCount('Semua') },
+            { value: 'Belum', label: 'Belum dibaca', count: readCount('Belum') },
+            { value: 'Sudah', label: 'Sudah dibaca', count: readCount('Sudah') },
+          ]}
+          value={read}
+          onChange={resetPage(setRead)}
+        />
+        <ToolbarSpacer />
+        <OptionSelect
+          aria-label="Jenis notifikasi"
+          className="w-auto"
+          value={group}
+          onValueChange={resetPage(setGroup)}
+          options={GROUP_OPTIONS}
+        />
+      </Toolbar>
+
+      {isPending && !!userId ? (
+        <LoadingState label="Memuat notifikasi..." />
+      ) : isError && !data ? (
+        <ErrorState title="Gagal memuat notifikasi" onRetry={() => void refetch()} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon={isFiltered ? SearchX : BellOff}
+          title="Tidak ada notifikasi"
+          description={
+            isFiltered
+              ? 'Coba ubah filter untuk melihat notifikasi lain.'
+              : 'Belum ada notifikasi yang masuk.'
+          }
+        />
+      ) : (
+        <>
+          <GroupedList
+            groups={groups}
+            getKey={(n) => n.id}
+            renderItem={(n) => (
+              <ListRow
+                compact
+                lead={
+                  <ToneIcon
+                    icon={getNotificationLucideIcon(n.type)}
+                    tone={getNotificationTone(n.type)}
+                  />
+                }
+                title={n.title}
+                subtitle={n.message}
+                value={
+                  <span className="text-xs font-normal text-faint">
+                    {formatNotificationClock(n.created_at)}
+                  </span>
+                }
+                status={
+                  n.is_read ? (
+                    <span className="size-2" aria-hidden />
+                  ) : (
+                    <span className="size-2 rounded-full bg-primary">
+                      <span className="sr-only">Belum dibaca</span>
+                    </span>
+                  )
+                }
+                unread={!n.is_read}
+                selected={!showSettings && n.id === selectedId}
+                onClick={() => open(n)}
+              />
+            )}
+          />
+          <Pagination
+            page={current}
+            pageSize={PAGE_SIZE}
+            total={filtered.length}
+            onPageChange={setPage}
+            note={`${PAGE_SIZE} per halaman`}
+          />
+        </>
+      )}
+    </Card>
+  );
+
+  let panel: React.ReactNode;
+  if (showSettings) {
+    panel = (
+      <SidePanel
+        icon={Settings}
+        eyebrow="Notifikasi"
+        title="Pengaturan"
+        onClose={() => {
+          setShowSettings(false);
+          closePanel();
+        }}
+        footer={
+          <Button
+            className="sm:ml-auto"
+            onClick={() => {
+              setShowSettings(false);
+              closePanel();
+            }}
+          >
+            <Check aria-hidden />
+            Selesai
+          </Button>
+        }
+      >
+        <PanelSection title="Berlaku di perangkat ini">
+          <div>
+            <NotificationSettingRows />
+          </div>
+        </PanelSection>
+      </SidePanel>
+    );
+  } else if (selected) {
+    const targetLabel = getNotificationTargetLabel(selected.type);
+    panel = (
+      <SidePanel
+        icon={getNotificationLucideIcon(selected.type)}
+        tone={getNotificationTone(selected.type)}
+        eyebrow={`${getNotificationTypeLabel(selected.type)} · ${formatNotificationTime(selected.created_at)}`}
+        title={selected.title}
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              disabled={!selected.is_read}
+              onClick={() => markUnread(selected.id)}
+            >
+              <Mail aria-hidden />
+              Tandai belum dibaca
+            </Button>
+            {targetLabel && (
+              <Button
+                className="sm:ml-auto"
+                onClick={() => navigate(getNotificationTarget(selected.type))}
+              >
+                {targetLabel}
+                <ArrowRight aria-hidden />
+              </Button>
+            )}
+          </>
+        }
+      >
+        <p className="text-label leading-relaxed">{selected.message}</p>
+        <DefinitionList
+          items={[
+            { label: 'Jenis', value: getNotificationTypeLabel(selected.type) },
+            { label: 'Waktu', value: formatDateTimeForDisplay(selected.created_at) },
+          ]}
+        />
+      </SidePanel>
+    );
+  } else {
+    panel = (
+      <SidePanel icon={Bell} eyebrow="Notifikasi" title="Detail notifikasi">
+        <EmptyState
+          icon={Bell}
+          title="Pilih notifikasi"
+          description="Klik salah satu notifikasi untuk melihat isinya dan membuka halaman terkait."
+        />
+      </SidePanel>
+    );
+  }
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <>
       <PageHeader
         stats={[
-          { label: 'Belum dibaca', value: unreadCount, tone: unreadCount > 0 ? 'warn' : 'ok' },
+          {
+            id: 'unread',
+            label: 'Belum dibaca',
+            value: unreadCount,
+            tone: unreadCount > 0 ? 'warn' : 'ok',
+            pressed: read === 'Belum',
+            onClick: () => resetPage(setRead)(read === 'Belum' ? 'Semua' : 'Belum'),
+          },
+          { id: 'today', label: 'Hari ini', value: todayCount },
         ]}
         actions={
-          unreadCount > 0 && (
-            <Button variant="glass" onClick={markAllAsRead}>
+          <>
+            <Button
+              variant="glass"
+              aria-pressed={showSettings}
+              onClick={() => {
+                setShowSettings((v) => !v);
+                openPanel();
+              }}
+            >
+              <Settings aria-hidden />
+              Pengaturan
+            </Button>
+            <Button variant="light" onClick={markAllRead} disabled={unreadCount === 0}>
               <CheckCheck aria-hidden />
               Tandai semua dibaca
             </Button>
-          )
+          </>
         }
       />
 
-      {/* Filters */}
-      <Card className="p-4 space-y-3">
-        {/* Read filter */}
-        <div className="flex gap-2 flex-wrap">
-          {(['all', 'unread', 'read'] as const).map((opt) => (
-            <Button
-              key={opt}
-              variant="ghost"
-              size="sm"
-              aria-pressed={filterRead === opt}
-              onClick={() => setFilterRead(opt)}
-              className={cn(
-                FILTER_CHIP_CLASS,
-                filterRead === opt
-                  ? 'bg-primary text-white hover:bg-primary hover:text-white dark:hover:bg-primary'
-                  : FILTER_CHIP_IDLE_CLASS,
-              )}
-            >
-              {opt === 'all' ? 'Semua' : opt === 'unread' ? 'Belum Dibaca' : 'Sudah Dibaca'}
-            </Button>
-          ))}
-        </div>
-
-        {/* Type filter */}
-        <div className="flex gap-2 flex-wrap">
-          {ALL_TYPES.map((type) => (
-            <Button
-              key={type}
-              variant="ghost"
-              size="sm"
-              aria-pressed={filterType === type}
-              onClick={() => setFilterType(type)}
-              className={cn(
-                FILTER_CHIP_CLASS,
-                filterType === type
-                  ? 'bg-primary/10 text-primary border border-primary/30 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10'
-                  : FILTER_CHIP_IDLE_CLASS,
-              )}
-            >
-              {type === 'Semua' ? 'Semua Tipe' : TYPE_LABELS[type] || type}
-            </Button>
-          ))}
-        </div>
-      </Card>
-
-      {/* Notification List */}
-      <Card className="overflow-hidden">
-        {isLoading ? (
-          <LoadingState label="Memuat notifikasi..." className="py-16" />
-        ) : isError && !data ? (
-          <ErrorState
-            title="Gagal memuat notifikasi"
-            onRetry={() => void refetch()}
-            className="py-16 px-4"
-          />
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            icon={BellOff}
-            title="Tidak ada notifikasi"
-            description={
-              filterType !== 'Semua' || filterRead !== 'all'
-                ? 'Coba ubah filter untuk melihat notifikasi lain.'
-                : 'Belum ada notifikasi yang masuk.'
-            }
-            className="py-16 px-4"
-          />
-        ) : (
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {filtered.map((notif) => (
-              <button
-                key={notif.id}
-                onClick={() => handleMarkRead(notif)}
-                className={`w-full text-left px-5 py-4 flex gap-4 items-start transition-colors hover:bg-gray-50 dark:hover:bg-white/5 ${
-                  !notif.is_read ? 'bg-purple-50/40 dark:bg-purple-900/10' : ''
-                }`}
-              >
-                {/* Icon */}
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-white/5`}
-                >
-                  <NotificationIcon type={notif.type} />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm leading-snug ${!notif.is_read ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}`}
-                      >
-                        {notif.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      {!notif.is_read && <span className="w-2.5 h-2.5 bg-primary rounded-full" />}
-                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                        {formatNotificationTime(notif.created_at)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Type badge */}
-                  <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-white/5 text-muted-foreground uppercase tracking-wide">
-                    {TYPE_LABELS[notif.type] || notif.type}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {/* Footer count */}
-      {filtered.length > 0 && (
-        <p className="text-center text-xs text-muted-foreground">
-          Menampilkan {filtered.length} dari {notifications.length} notifikasi
-        </p>
-      )}
-    </div>
+      <ListWithPanel list={list} panel={panel} panelOpen={panelOpen} onPanelClose={closePanel} />
+    </>
   );
-};
-
-const NotificationIcon: React.FC<{ type: string }> = ({ type }) => {
-  const Icon = getNotificationLucideIcon(type);
-  return <Icon className={`size-5 ${getNotificationColor(type)}`} aria-hidden />;
 };
 
 export default NotificationsPage;

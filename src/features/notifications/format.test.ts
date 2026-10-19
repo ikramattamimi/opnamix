@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ROUTES } from '@/types/routes';
-import { getNotificationColor, getNotificationTarget, getNotificationTone } from './format';
+import {
+  getNotificationColor,
+  getNotificationGroup,
+  getNotificationTarget,
+  getNotificationTargetLabel,
+  getNotificationTone,
+} from './format';
 
 describe('getNotificationTone', () => {
   it('memetakan tipe ke token status', () => {
@@ -25,5 +31,23 @@ describe('getNotificationTarget', () => {
 
   it('tipe tak dikenal ke halaman Notifikasi', () => {
     expect(getNotificationTarget('TIDAK_DIKENAL')).toBe(ROUTES.NOTIFICATIONS);
+  });
+});
+
+describe('getNotificationGroup', () => {
+  it('mengelompokkan tipe untuk filter', () => {
+    expect(getNotificationGroup('STOCK_OUT_DIRECT')).toBe('Transaksi');
+    expect(getNotificationGroup('STOCK_IN')).toBe('Transaksi');
+    expect(getNotificationGroup('STOCK_LOW')).toBe('Stok');
+    expect(getNotificationGroup('OPNAME_DISCREPANCY')).toBe('Opname');
+    expect(getNotificationGroup('SERVICE_ADDED')).toBe('Master data');
+    expect(getNotificationGroup('TIDAK_DIKENAL')).toBeNull();
+  });
+});
+
+describe('getNotificationTargetLabel', () => {
+  it('memberi teks tombol sesuai halaman tujuan', () => {
+    expect(getNotificationTargetLabel('STOCK_IN')).toBe('Buka Stok Masuk');
+    expect(getNotificationTargetLabel('TIDAK_DIKENAL')).toBeNull();
   });
 });
