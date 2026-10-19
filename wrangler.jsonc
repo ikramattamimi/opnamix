@@ -5,6 +5,7 @@
 {
   "name": "opnamix",
   "compatibility_date": "2026-10-01",
+  "vars": {},
   "assets": {
     "directory": "./dist",
     // Rute React Router (mis. /audit/stok-opname/3/hitung) disajikan index.html
