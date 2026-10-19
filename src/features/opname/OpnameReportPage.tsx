@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/toast';
 import { formatDateTimeForDisplay } from '@/lib/format';
 import { ROUTES, opnamePath } from '@/types/routes';
 import { CATEGORY_META, productMatches } from '@/features/products/catalog';
-import { diffOf, finalOf, reasonLabel, runStats, valueOf, type RunItem } from './catalog';
+import { diffOf, diffReasonLabel, finalOf, runStats, valueOf, type RunItem } from './catalog';
 import { useOpnameRun } from './useOpname';
 import { exportOpnameToExcel } from './export';
 
@@ -68,9 +68,9 @@ const COLUMNS: ColumnDef<RunItem>[] = [
   {
     id: 'alasan',
     header: 'Alasan',
-    accessorFn: (i) => reasonLabel(i) ?? '',
+    accessorFn: (i) => diffReasonLabel(i) ?? '',
     cell: ({ row }) => {
-      const label = reasonLabel(row.original);
+      const label = diffReasonLabel(row.original);
       return label ? (
         <span title={row.original.note ?? undefined}>
           {label}

@@ -3,6 +3,7 @@ import { Category, Unit, type Product } from '@/features/products/types';
 import {
   daysUntil,
   diffOf,
+  diffReasonLabel,
   nextRun,
   runName,
   runStats,
@@ -128,5 +129,12 @@ describe('runName', () => {
     expect(runName({ name: 'Cek obat oral', scheduleName: 'Bulanan' })).toBe('Cek obat oral');
     expect(runName({ name: null, scheduleName: 'Bulanan' })).toBe('Bulanan');
     expect(runName({})).toBe('Opname cepat');
+  });
+});
+
+describe('diffReasonLabel', () => {
+  it('menyembunyikan alasan kalau hitung ulang membuat selisih 0', () => {
+    expect(diffReasonLabel(item({ physicalStock: 8, reasonCode: 'rusak' }))).toBe('Rusak');
+    expect(diffReasonLabel(item({ physicalStock: 10, reasonCode: 'rusak' }))).toBeNull();
   });
 });

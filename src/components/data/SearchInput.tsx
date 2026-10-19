@@ -51,7 +51,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <label
       className={cn(
-        'flex h-8 min-w-0 max-w-[22.5rem] flex-[1_1_13.75rem] items-center gap-2 rounded-lg border border-input bg-card px-2.5 text-faint focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/25',
+        'flex h-8 max-h-8 min-w-0 max-w-[22.5rem] flex-[1_1_13.75rem] items-center gap-2 rounded-lg border border-input bg-card px-2.5 text-faint focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/25',
         className,
       )}
     >

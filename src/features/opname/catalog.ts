@@ -176,3 +176,6 @@ export const opnameCode = (id: string | number) => `OPN-${id}`;
 /** Nama sesi: nama opname cepat, nama jadwal, atau "Opname cepat" */
 export const runName = (r: { name?: string | null; scheduleName?: string | null }) =>
   r.name?.trim() || r.scheduleName?.trim() || 'Opname cepat';
+
+/** Alasan untuk tampilan laporan: hanya untuk produk yang masih berselisih */
+export const diffReasonLabel = (i: RunItem) => ((diffOf(i) ?? 0) !== 0 ? reasonLabel(i) : null);

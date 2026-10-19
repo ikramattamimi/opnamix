@@ -1,5 +1,5 @@
 import { CATEGORY_META } from '@/features/products/catalog';
-import { diffOf, finalOf, reasonLabel, runStats, valueOf } from './catalog';
+import { diffOf, diffReasonLabel, finalOf, runStats, valueOf } from './catalog';
 import type { OpnameRun } from './types';
 
 // Ekspor laporan satu sesi opname ke Excel: lembar ringkasan dan lembar produk.
@@ -31,7 +31,7 @@ export async function exportOpnameToExcel(run: OpnameRun) {
     Selisih: diffOf(i) ?? '',
     'Harga beli': i.product.purchasePrice,
     Nilai: valueOf(i),
-    Alasan: reasonLabel(i) ?? '',
+    Alasan: diffReasonLabel(i) ?? '',
     Catatan: i.note ?? '',
   }));
 
