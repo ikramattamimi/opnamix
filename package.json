@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "deploy": "vite build && npx wrangler@4 deploy",
     "db:types": "npx supabase gen types typescript --linked --schema public > src/lib/database.types.ts",
     "test": "vitest run"
   },

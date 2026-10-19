@@ -1,0 +1,13 @@
+// Deploy ke Cloudflare Workers sebagai aset statis (SPA, tanpa kode server).
+// `pnpm run deploy` = build lalu `wrangler deploy` (login sekali: `npx wrangler login`).
+// VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY dibaca saat build: isi di
+// .env.production.local atau di pengaturan build Workers Builds, bukan di sini.
+{
+  "name": "opnamix",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Rute React Router (mis. /audit/stok-opname/3/hitung) disajikan index.html
+    "not_found_handling": "single-page-application",
+  },
+}
