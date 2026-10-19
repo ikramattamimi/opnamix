@@ -176,7 +176,7 @@ export const APP_ROUTES: readonly AppRoute[] = [
   })),
   {
     path: ROUTES.LAPORAN_STOK,
-    title: 'Analisis & Laporan Stok',
+    title: 'Laporan Stok',
     roles: STAFF_ROLES,
     element: StockReport,
     errorName: 'Laporan Stok',

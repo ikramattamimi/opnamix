@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Download, Inbox, NotebookPen, Plus, SearchX } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { ListWithPanel } from '@/components/layout/ListWithPanel';
@@ -76,13 +76,18 @@ const StockOutManagement: React.FC = () => {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
 
-  // Farmasi dan admin membuka antrean "Menunggu" lebih dulu (sekali saja)
+  // ?sel=<nomor> dari Dashboard, Laporan, atau Notifikasi membuka transaksi itu
+  const [searchParams] = useSearchParams();
+  const initialSel = searchParams.get('sel');
+
+  // Farmasi dan admin membuka antrean "Menunggu" lebih dulu (sekali saja),
+  // kecuali halaman dibuka untuk transaksi tertentu
   const queueInitialized = useRef(false);
   useEffect(() => {
     if (queueInitialized.current || !userProfile) return;
     queueInitialized.current = true;
-    if (isAdmin || isFarmasi) setStatus('Menunggu');
-  }, [userProfile, isAdmin, isFarmasi]);
+    if ((isAdmin || isFarmasi) && !initialSel) setStatus('Menunggu');
+  }, [userProfile, isAdmin, isFarmasi, initialSel]);
 
   const stats = useMemo(() => stockOutStats(requests), [requests]);
   const statusCounts = useMemo(() => {
@@ -103,7 +108,10 @@ const StockOutManagement: React.FC = () => {
   const visible = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
   const groups = groupByDay(visible, requestTime, (d) => dayLabel(d));
 
-  const { selectedId, select, panelOpen, closePanel } = useListSelection<string>();
+  const { selectedId, select, panelOpen, closePanel } = useListSelection<string>(initialSel);
+  useEffect(() => {
+    if (initialSel) select(initialSel);
+  }, [initialSel, select]);
   const selected = requests.find((r) => r.id === selectedId) ?? visible[0];
 
   const resetPage =

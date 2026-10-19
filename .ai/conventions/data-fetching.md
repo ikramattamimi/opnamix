@@ -39,8 +39,7 @@ export const productKeys = {
 | services | `features/services/keys.ts` | `serviceKeys.all`, `.list(params)`, `serviceCategoryKeys.all` |
 | stock-in | `features/stock-in/keys.ts` | `stockInKeys.all`, `.list(params)` |
 | stock-out | `features/stock-out/keys.ts` | `stockOutKeys.all`, `.list(params)`, `.recent(limit)`, `.nakesProfiles()` |
-| dashboard | `features/dashboard/keys.ts` | `dashboardKeys.all`, `.stats()`, `.recentTransactions(page, perPage)` |
-| reports | `features/reports/keys.ts` | `reportKeys.all`, `.transactions(start, end, params)`, `.stockMutations(start, end, params)` |
+| reports | `features/reports/keys.ts` | `reportKeys.all`, `.mutations(from, to)`, `.transactions(from, to)`, `.expiring(months)` (juga dipakai Dashboard) |
 | opname | `features/opname/keys.ts` | `opnameKeys.all`, `.schedules()`, `.runs()`, `.active()`, `.history()`, `.run(id)` |
 | users | `features/users/keys.ts` | `userKeys.all`, `.list()` |
 | profile | `features/profile/keys.ts` | `profileKeys.all`, `.detail(userId)` |
@@ -48,7 +47,7 @@ export const productKeys = {
 
 ## Nama hook
 
-- Query: `use<Nama>` (contoh `useProducts`, `useOpnameRun(id)`, `useDashboardStats`)
+- Query: `use<Nama>` (contoh `useProducts`, `useOpnameRun(id)`, `useStockMutations`)
 - Mutasi: `use<Aksi><Nama>` (contoh `useCreateProduct`, `useFinishOpname`)
 - Realtime: `use<Nama>Realtime` (contoh `useStockOutRealtime`)
 - File: `use<Nama>.ts`, boleh berisi beberapa hook untuk satu sumber data.
@@ -62,9 +61,9 @@ supaya daftarnya ada di satu tempat:
 
 | Kejadian | Helper | Yang di-refresh |
 |---|---|---|
-| Stok obat berubah (stok masuk, stok keluar manual, proses permintaan) | `invalidateStockChange` | products, stockIn, stockOut, dashboard, reports |
+| Stok obat berubah (stok masuk, stok keluar manual, proses permintaan) | `invalidateStockChange` | products, stockIn, stockOut, reports |
 | Opname berubah (mulai, selesai, batal) | `invalidateOpnameChange` | opname + semua yang di atas |
-| Permintaan stok keluar diajukan/diedit (stok belum berubah) | langsung di hook | stockOut (+ dashboard untuk hitungan tertunda) |
+| Permintaan stok keluar diajukan/diedit (stok belum berubah) | langsung di hook | stockOut (Dashboard membaca daftar yang sama) |
 | Master produk/jasa diubah | langsung di hook | products / services |
 | User atau profil diubah | langsung di hook (+ `refreshProfile()` dari `useAuth` untuk Header) | users, profile |
 | Notifikasi masuk / ditandai dibaca | `setQueryData` (realtime, optimistic update) | notifications |

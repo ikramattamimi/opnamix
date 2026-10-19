@@ -1,79 +1,71 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import StockAnalytics from './components/StockAnalytics';
-import StockMutationReport from './components/StockMutationReport';
-import TransactionReport from './components/TransactionReport';
+import React, { useCallback, useState } from 'react';
+import { Clock, Download } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { SegmentedControl } from '@/components/data/SegmentedControl';
+import { DateRangeControl } from '@/components/form/DateRangeControl';
+import { Button } from '@/components/ui/button';
+import { useDateRange } from '@/hooks/useDateRange';
+import { usePersistentState } from '@/hooks/usePersistentState';
+import { formatDateTimeForDisplay } from '@/lib/format';
+import { PositionReport } from './components/PositionReport';
+import { MutationReport } from './components/MutationReport';
+import { TransactionReport } from './components/TransactionReport';
 
-type ReportTab = 'analysis' | 'transactions' | 'mutation';
+type ReportTab = 'posisi' | 'mutasi' | 'transaksi';
 
-const isReportTab = (value: string): value is ReportTab =>
-  value === 'analysis' || value === 'transactions' || value === 'mutation';
+const TABS: { value: ReportTab; label: string }[] = [
+  { value: 'posisi', label: 'Posisi stok' },
+  { value: 'mutasi', label: 'Mutasi stok' },
+  { value: 'transaksi', label: 'Transaksi keluar' },
+];
 
-const reportTabClass = (active: boolean) =>
-  `px-6 text-sm font-bold transition-all shadow-none ${
-    active
-      ? 'bg-primary text-white shadow-md hover:bg-primary/90'
-      : 'text-muted-foreground hover:bg-white dark:hover:bg-white/5 bg-transparent'
-  }`;
+const isTab = (v: unknown): v is ReportTab => v === 'posisi' || v === 'mutasi' || v === 'transaksi';
 
-// Halaman laporan dengan tiga tab. Isi tab tetap ter-mount (forceMount) supaya
-// filter tiap tab tidak hilang saat berpindah tab; query laporan hanya jalan
-// saat tab-nya aktif.
+// Laporan Stok: pilihan laporan dan periode di header; tiap laporan punya
+// grafik yang bisa diciutkan, angka ringkas, dan tabel. Ekspor mengikuti
+// filter laporan yang sedang tampil.
 const StockReport: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ReportTab>('analysis');
+  const [tab, setTab] = usePersistentState<ReportTab>('opnamix.report.tab', 'posisi', isTab);
+  const range = useDateRange('30');
+  const [exporter, setExporter] = useState<(() => void) | null>(null);
+  // Fungsi disimpan sebagai nilai state, jadi dibungkus supaya tidak dipanggil oleh setState
+  const registerExport = useCallback((fn: (() => void) | null) => setExporter(() => fn), []);
 
   return (
     <>
-      <PageHeader />
-      <Tabs
-        value={activeTab}
-        onValueChange={(value) => isReportTab(value) && setActiveTab(value)}
-        className="space-y-6"
-      >
-        {/* Top Action Bar */}
-        <div className="flex flex-col md:flex-row justify-end items-start md:items-center gap-4">
-          <div className="flex min-w-0 max-w-full gap-3">
-            <TabsList className="flex h-auto max-w-full items-stretch justify-start overflow-x-auto bg-gray-100 dark:bg-card-dark rounded-xl p-1 text-inherit">
-              <TabsTrigger value="analysis" asChild>
-                <Button
-                  variant={activeTab === 'analysis' ? 'default' : 'ghost'}
-                  className={reportTabClass(activeTab === 'analysis')}
-                >
-                  Analisis
-                </Button>
-              </TabsTrigger>
-              <TabsTrigger value="transactions" asChild>
-                <Button
-                  variant={activeTab === 'transactions' ? 'default' : 'ghost'}
-                  className={reportTabClass(activeTab === 'transactions')}
-                >
-                  Laporan Transaksi
-                </Button>
-              </TabsTrigger>
-              <TabsTrigger value="mutation" asChild>
-                <Button
-                  variant={activeTab === 'mutation' ? 'default' : 'ghost'}
-                  className={reportTabClass(activeTab === 'mutation')}
-                >
-                  Mutasi Stok
-                </Button>
-              </TabsTrigger>
-            </TabsList>
+      <PageHeader>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <SegmentedControl<ReportTab>
+            label="Jenis laporan"
+            variant="glass"
+            value={tab}
+            onChange={setTab}
+            options={TABS}
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            {tab === 'posisi' ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-on-grad-2">
+                <Clock className="size-3.5" aria-hidden />
+                Posisi per {formatDateTimeForDisplay(new Date().toISOString())}
+              </span>
+            ) : (
+              <DateRangeControl
+                state={range}
+                variant="glass"
+                presets={['today', '7', '30', 'month', 'custom']}
+              />
+            )}
+            <Button variant="light" onClick={() => exporter?.()} disabled={!exporter}>
+              <Download aria-hidden />
+              Ekspor Excel
+            </Button>
           </div>
         </div>
+      </PageHeader>
 
-        <TabsContent value="analysis" forceMount className="mt-0 space-y-6">
-          <StockAnalytics />
-        </TabsContent>
-        <TabsContent value="transactions" forceMount className="mt-0 space-y-4">
-          <TransactionReport active={activeTab === 'transactions'} />
-        </TabsContent>
-        <TabsContent value="mutation" forceMount className="mt-0 space-y-4">
-          <StockMutationReport active={activeTab === 'mutation'} />
-        </TabsContent>
-      </Tabs>
+      {tab === 'posisi' && <PositionReport registerExport={registerExport} />}
+      {tab === 'mutasi' && <MutationReport range={range} registerExport={registerExport} />}
+      {tab === 'transaksi' && <TransactionReport range={range} registerExport={registerExport} />}
     </>
   );
 };

@@ -1,253 +1,253 @@
 import { supabase } from '@/lib/supabaseClient';
-import { PaginationParams, PaginatedResponse } from '@/types/pagination';
-import type { ApiResult } from '@/types/api';
+import type { Tables } from '@/lib/database.types';
 import { toDate } from '@/lib/utils';
 import { getProfileNames } from '@/lib/profiles';
-import { getDisplayNameFromMasterObat } from '@/features/products/productDisplay';
+import { mapProductFromDB, type ProductRow } from '@/features/products/mappers';
 import { extractTransactionNoteAndMeta } from '@/features/stock-out/mappers';
-import type { StockMutationRow } from './types';
+import { isExpiringSoon } from '@/features/stock-in/expiry';
+import type { ExpiringBatch, MutationRow, TransactionRow } from './types';
 
-const getTransactionEventTimestamp = (transaction: {
-  processed_at?: string | null;
-  created_at?: string | null;
-  tanggal?: string | null;
-}) => transaction?.processed_at || transaction?.created_at || transaction?.tanggal;
+// Data Laporan Stok dan Dashboard. Semua baris dalam rentang dikembalikan
+// sekaligus: grafik butuh seluruh baris, tabel memaginasi di client.
+
+const PRODUCT_JOIN = 'master_obat(*, product_ingredients(nama_zat, kekuatan, urutan))';
+
+type DetailRow = Pick<
+  Tables<'transaksi_detail'>,
+  'qty' | 'batch' | 'expire_date' | 'harga' | 'subtotal' | 'obat_id' | 'id'
+> & {
+  master_obat: ProductRow | null;
+};
+
+type TrxRow = Pick<
+  Tables<'transaksi'>,
+  | 'id'
+  | 'nomor'
+  | 'tipe'
+  | 'tipe_sumber'
+  | 'status'
+  | 'nama_pasien'
+  | 'nama_nakes'
+  | 'keterangan'
+  | 'created_at'
+  | 'processed_at'
+  | 'tanggal'
+  | 'created_by'
+  | 'processed_by'
+  | 'total'
+  | 'diskon'
+  | 'biaya_layanan'
+> & {
+  transaksi_detail: DetailRow[] | null;
+  transaksi_jasa?: (Pick<Tables<'transaksi_jasa'>, 'id' | 'qty' | 'harga_jasa' | 'subtotal'> & {
+    master_jasa: { nama: string } | null;
+  })[];
+};
+
+const eventTime = (t: Pick<TrxRow, 'processed_at' | 'created_at' | 'tanggal'>) =>
+  t.processed_at || t.created_at || t.tanggal || new Date().toISOString();
+
+const invoiceOf = (keterangan: string | null) =>
+  keterangan?.startsWith('Invoice: ') ? keterangan.replace('Invoice: ', '').trim() : null;
 
 export const reportsApi = {
-  // REPORTING
-  getTransactionReport: async (startDate: string, endDate: string, params?: PaginationParams) => {
-    const { page = 1, perPage = 10, status } = params || {};
+  /** Mutasi stok: item stok masuk, stok keluar selesai, dan penyesuaian opname */
+  getStockMutations: async (from: Date, to: Date): Promise<MutationRow[]> => {
+    const [trxRes, opnameRes] = await Promise.all([
+      supabase
+        .from('transaksi')
+        .select(
+          `id, nomor, tipe, tipe_sumber, status, nama_pasien, keterangan, created_at, processed_at, tanggal, created_by, processed_by,
+           transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (id, qty, batch, expire_date, harga, subtotal, obat_id, ${PRODUCT_JOIN})`,
+        )
+        .eq('status', 'selesai')
+        .is('deleted_at', null)
+        .gte('created_at', from.toISOString())
+        .lte('created_at', to.toISOString()),
+      supabase
+        .from('opname')
+        .select(
+          `id, completed_at, created_by,
+           opname_detail (id, stok_sistem, stok_fisik, stok_final, alasan, ${PRODUCT_JOIN})`,
+        )
+        .eq('status', 'selesai')
+        .is('deleted_at', null)
+        .gte('completed_at', from.toISOString())
+        .lte('completed_at', to.toISOString()),
+    ]);
+    if (trxRes.error) throw trxRes.error;
+    if (opnameRes.error) throw opnameRes.error;
 
-    let query = supabase
-      .from('transaksi')
-      .select(
-        `
-        *,
-        transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (*, master_obat(nama, jenis, merek, kandungan, harga)),
-        transaksi_jasa:transaksi_jasa!transaksi_jasa_transaksi_id_fkey (*, master_jasa(nama))
-      `,
-      )
-      .gte('tanggal', `${startDate}T00:00:00Z`)
-      .lte('tanggal', `${endDate}T23:59:59Z`)
-      .order('created_at', { ascending: false });
+    const trx = (trxRes.data ?? []) as unknown as TrxRow[];
+    const opnames = opnameRes.data ?? [];
+    const names = await getProfileNames([
+      ...trx.flatMap((t) => [t.created_by, t.processed_by]),
+      ...opnames.map((o) => o.created_by),
+    ]);
+    const nameOf = (id: string | null) => (id && names[id]) || '-';
 
-    if (status && status !== 'Semua') {
-      const dbStatus = status === 'Menunggu' ? 'diajukan' : 'selesai';
-      query = query.eq('status', dbStatus);
+    const rows: MutationRow[] = [];
+    for (const t of trx) {
+      const isIn = t.tipe === 'masuk';
+      for (const d of t.transaksi_detail ?? []) {
+        if (!d.master_obat) continue;
+        const product = mapProductFromDB(d.master_obat);
+        const qty = isIn ? d.qty : -d.qty;
+        rows.push({
+          key: `t${d.id}`,
+          date: eventTime(t),
+          code: t.nomor ?? `TRX-${t.id}`,
+          type: isIn ? 'Masuk' : 'Keluar',
+          product,
+          qty,
+          value: Math.abs(qty) * product.purchasePrice,
+          by: nameOf(isIn ? t.created_by : t.processed_by || t.created_by),
+          note: isIn
+            ? [t.nama_pasien || 'Pemasok', d.batch && `batch ${d.batch}`, invoiceOf(t.keterangan)]
+                .filter(Boolean)
+                .join(' · ')
+            : `${t.tipe_sumber === 'KASIR_LANGSUNG' ? 'Manual' : 'Permintaan'} · ${t.nama_pasien || '-'}`,
+          link: isIn ? { kind: 'stock-in' } : { kind: 'stock-out', id: t.nomor ?? '' },
+        });
+      }
     }
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    const profileMap = await getProfileNames((data || []).map((t) => t.created_by));
-
-    const mappedData = (data || [])
-      .map((t) => {
-        const transactionMeta = extractTransactionNoteAndMeta(t.keterangan);
-        const drugDetails =
-          t.transaksi_detail?.map((d) => {
-            const unitPrice =
-              Number(d.harga || 0) > 0 ? Number(d.harga || 0) : Number(d.master_obat?.harga || 0);
-            const subtotal =
-              Number(d.subtotal || 0) > 0 ? Number(d.subtotal || 0) : (d.qty || 0) * unitPrice;
-
-            return {
-              id: d.id?.toString?.() || `${t.nomor}-${d.obat_id}`,
-              name: getDisplayNameFromMasterObat(d.master_obat),
-              quantity: d.qty || 0,
-              price: unitPrice,
-              subtotal,
-            };
-          }) || [];
-
-        const serviceDetails =
-          t.transaksi_jasa?.map((j) => ({
-            id: j.id?.toString?.() || `${t.nomor}-${j.jasa_id}`,
-            name: j.master_jasa?.nama || 'Unknown Service',
-            quantity: j.qty || 1,
-            price: j.harga_jasa || 0,
-            subtotal: j.subtotal || (j.qty || 1) * (j.harga_jasa || 0),
-          })) || [];
-
-        const computedDrugTotal = drugDetails.reduce(
-          (sum: number, item) => sum + Number(item.subtotal || 0),
-          0,
-        );
-        const computedServiceTotal = serviceDetails.reduce(
-          (sum: number, item) => sum + Number(item.subtotal || 0),
-          0,
-        );
-        const serviceFee = Number(t.biaya_layanan ?? transactionMeta.meta.serviceFee ?? 0);
-        const discount = Number(t.diskon || 0);
-        const headerTotal = Number(t.total || 0);
-        const normalizedTotal =
-          headerTotal > 0
-            ? headerTotal
-            : computedDrugTotal + computedServiceTotal + serviceFee - discount;
-
-        return {
-          id: t.nomor,
-          date: getTransactionEventTimestamp(t),
-          type: t.tipe,
-          source: t.tipe_sumber,
-          status: t.status === 'diajukan' ? 'Menunggu' : 'Selesai',
-          patient: t.nama_pasien,
-          birthDate: t.tanggal_lahir_pasien,
-          nakes: t.nama_nakes || (t.created_by && profileMap[t.created_by]) || '-',
-          items:
-            t.transaksi_detail
-              ?.map((d) => `${getDisplayNameFromMasterObat(d.master_obat)} (${d.qty})`)
-              .join(', ') || '',
-          services:
-            t.transaksi_jasa
-              ?.map((j) => j.master_jasa?.nama)
-              .filter(Boolean)
-              .join(', ') || '-',
-          serviceFee,
-          discount,
-          total: normalizedTotal,
-          drugDetails,
-          serviceDetails,
-        };
-      })
-      .sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
-
-    // Pagination applied AFTER all filtering and mapping so that totalPages
-    // reflects the actual number of filtered records, not the raw DB count.
-    const totalFiltered = mappedData.length;
-    const from = (page - 1) * perPage;
-    const to = from + perPage;
-    const paginatedData = mappedData.slice(from, to);
-
-    return {
-      data: paginatedData,
-      total: totalFiltered,
-      page,
-      perPage,
-      totalPages: Math.ceil(totalFiltered / perPage),
-    };
+    for (const o of opnames) {
+      for (const d of o.opname_detail ?? []) {
+        const final = d.stok_final ?? d.stok_fisik;
+        const master = (d as unknown as { master_obat: ProductRow | null }).master_obat;
+        if (final === null || d.stok_sistem === null || final === d.stok_sistem || !master)
+          continue;
+        const product = mapProductFromDB(master);
+        const qty = final - d.stok_sistem;
+        rows.push({
+          key: `o${d.id}`,
+          date: o.completed_at ?? new Date().toISOString(),
+          code: `OPN-${o.id}`,
+          type: 'Penyesuaian',
+          product,
+          qty,
+          value: Math.abs(qty) * product.purchasePrice,
+          by: nameOf(o.created_by),
+          note: `Opname${d.alasan ? ` · ${d.alasan}` : ''}`,
+          link: { kind: 'opname', id: o.id.toString() },
+        });
+      }
+    }
+    return rows.sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
   },
 
-  getStockMutationReport: async (
-    startDate: string,
-    endDate: string,
-    params?: PaginationParams,
-  ): Promise<PaginatedResponse<StockMutationRow>> => {
-    const { page = 1, perPage = 10 } = params || {};
-
-    // 1. Get transaction data (stok masuk/keluar)
+  /** Transaksi stok keluar (permintaan dan manual) dalam rentang */
+  getTransactions: async (from: Date, to: Date): Promise<TransactionRow[]> => {
     const { data, error } = await supabase
       .from('transaksi')
       .select(
-        `
-        created_at,
-        processed_at,
-        nomor,
-        tipe,
-        tipe_sumber,
-        status,
-        transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (qty, master_obat(nama, jenis, merek, kandungan))
-      `,
+        `id, nomor, tipe, tipe_sumber, status, nama_pasien, nama_nakes, keterangan, created_at, processed_at, tanggal, created_by, processed_by, total, diskon, biaya_layanan,
+         transaksi_detail:transaksi_detail!transaksi_detail_transaksi_id_fkey (id, qty, batch, expire_date, harga, subtotal, obat_id, ${PRODUCT_JOIN}),
+         transaksi_jasa:transaksi_jasa!transaksi_jasa_transaksi_id_fkey (id, qty, harga_jasa, subtotal, master_jasa(nama))`,
       )
-      .gte('created_at', `${startDate}T00:00:00Z`)
-      .lte('created_at', `${endDate}T23:59:59Z`)
-      .eq('status', 'selesai')
-      .order('created_at', { ascending: false });
-
+      .eq('tipe', 'keluar')
+      .is('deleted_at', null)
+      .gte('created_at', from.toISOString())
+      .lte('created_at', to.toISOString());
     if (error) throw error;
 
-    // 2. Get completed opname data (penyesuaian stok)
-    const { data: opnameData, error: opnameError } = await supabase
-      .from('opname')
+    const rows = (data ?? []) as unknown as TrxRow[];
+    const names = await getProfileNames(rows.flatMap((t) => [t.created_by, t.processed_by]));
+
+    return rows
+      .map((t): TransactionRow => {
+        const meta = extractTransactionNoteAndMeta(t.keterangan);
+        const drugs = (t.transaksi_detail ?? []).map((d) => {
+          const product = d.master_obat ? mapProductFromDB(d.master_obat) : null;
+          const price = Number(d.harga || 0) > 0 ? Number(d.harga) : (product?.sellingPrice ?? 0);
+          return {
+            id: d.id.toString(),
+            productId: product?.id ?? String(d.obat_id ?? ''),
+            name: product?.name ?? 'Produk dihapus',
+            brand: product?.brand ?? '',
+            unit: product?.unit ?? '',
+            quantity: d.qty,
+            price,
+            subtotal: Number(d.subtotal || 0) > 0 ? Number(d.subtotal) : d.qty * price,
+          };
+        });
+        const services = (t.transaksi_jasa ?? []).map((j) => ({
+          id: j.id.toString(),
+          name: j.master_jasa?.nama ?? 'Jasa',
+          quantity: j.qty || 1,
+          price: j.harga_jasa || 0,
+          subtotal: j.subtotal || (j.qty || 1) * (j.harga_jasa || 0),
+        }));
+        const drugTotal = drugs.reduce((s, d) => s + d.subtotal, 0);
+        const serviceTotal = services.reduce((s, d) => s + d.subtotal, 0);
+        const serviceFee = Number(t.biaya_layanan ?? meta.meta.serviceFee ?? 0);
+        const discount = Number(t.diskon || 0);
+        const total =
+          Number(t.total || 0) > 0
+            ? Number(t.total)
+            : drugTotal + serviceTotal + serviceFee - discount;
+        return {
+          id: t.id.toString(),
+          code: t.nomor ?? `TRX-${t.id}`,
+          date: t.created_at || t.tanggal || new Date().toISOString(),
+          processedAt: t.processed_at,
+          kind: t.tipe_sumber === 'KASIR_LANGSUNG' ? 'Manual' : 'Permintaan',
+          status: t.status === 'diajukan' ? 'Menunggu' : 'Selesai',
+          patient: t.nama_pasien || '-',
+          requestedBy: t.nama_nakes || (t.created_by && names[t.created_by]) || '-',
+          processedBy: (t.processed_by && names[t.processed_by]) || null,
+          note: meta.note,
+          drugs,
+          services,
+          drugTotal,
+          serviceTotal,
+          serviceFee,
+          discount,
+          total,
+        };
+      })
+      .sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
+  },
+
+  /** Batch dari stok masuk yang kedaluwarsa dalam `months` bulan (termasuk yang sudah lewat) */
+  getExpiringBatches: async (months: number): Promise<ExpiringBatch[]> => {
+    const limit = new Date();
+    limit.setMonth(limit.getMonth() + months);
+    const { data, error } = await supabase
+      .from('transaksi_detail')
       .select(
-        `
-        id,
-        completed_at,
-        status,
-        opname_detail (
-          obat_id,
-          stok_sistem,
-          stok_fisik,
-          selisih,
-          stok_final,
-          status,
-          alasan,
-          master_obat (nama, jenis, merek, kandungan)
-        )
-      `,
+        `id, qty, batch, expire_date, obat_id, ${PRODUCT_JOIN},
+         transaksi!transaksi_detail_transaksi_id_fkey!inner(id, tipe, status, nama_pasien, deleted_at)`,
       )
-      .eq('status', 'selesai')
-      .is('deleted_at', null)
-      .gte('completed_at', `${startDate}T00:00:00Z`)
-      .lte('completed_at', `${endDate}T23:59:59Z`)
-      .order('completed_at', { ascending: false });
+      .not('expire_date', 'is', null)
+      .lte('expire_date', limit.toISOString().slice(0, 10))
+      .eq('transaksi.tipe', 'masuk')
+      .eq('transaksi.status', 'selesai')
+      .is('transaksi.deleted_at', null)
+      .order('expire_date', { ascending: true });
+    if (error) throw error;
 
-    if (opnameError) throw opnameError;
-
-    // Flatten transaction rows: one row per item
-    const allRows: StockMutationRow[] = [];
-    data.forEach((t) => {
-      if (t.transaksi_detail && Array.isArray(t.transaksi_detail)) {
-        t.transaksi_detail.forEach((d) => {
-          allRows.push({
-            date: getTransactionEventTimestamp(t),
-            trxNumber: t.nomor,
-            type: t.tipe,
-            source: t.tipe_sumber,
-            itemName: getDisplayNameFromMasterObat(d.master_obat),
-            qty: d.qty,
-            status: t.status,
-            // Opname-specific fields (empty for transactions)
-            systemStock: null,
-            physicalStock: null,
-            finalStock: null,
-            reason: null,
-          });
-        });
-      }
-    });
-
-    // Flatten opname rows: one row per adjusted item
-    (opnameData || []).forEach((o) => {
-      if (o.opname_detail && Array.isArray(o.opname_detail)) {
-        o.opname_detail.forEach((d) => {
-          allRows.push({
-            date: o.completed_at,
-            trxNumber: `OPN-${o.id}`,
-            type: 'penyesuaian',
-            source: 'OPNAME',
-            itemName: getDisplayNameFromMasterObat(d.master_obat),
-            qty: d.selisih || 0,
-            status: 'selesai',
-            // Opname-specific fields
-            systemStock: d.stok_sistem,
-            physicalStock: d.stok_fisik,
-            finalStock: d.stok_final,
-            reason: d.alasan || null,
-          });
-        });
-      }
-    });
-
-    // Sort all rows by date descending
-    allRows.sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
-
-    // Apply pagination to flattened data
-    const from = (page - 1) * perPage;
-    const to = from + perPage;
-    const paginatedRows = allRows.slice(from, to);
-
-    return {
-      data: paginatedRows,
-      total: allRows.length,
-      page,
-      perPage,
-      totalPages: Math.ceil(allRows.length / perPage),
-    };
+    const seen = new Set<string>();
+    const out: ExpiringBatch[] = [];
+    for (const row of (data ?? []) as unknown as (DetailRow & {
+      transaksi: { nama_pasien: string | null };
+    })[]) {
+      if (!row.master_obat || !isExpiringSoon(row.expire_date, new Date(), months)) continue;
+      const product = mapProductFromDB(row.master_obat);
+      // Produk yang sudah habis tidak perlu diingatkan
+      if (product.stock <= 0) continue;
+      const key = `${product.id}|${row.batch ?? ''}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({
+        key,
+        product,
+        batch: row.batch,
+        expireDate: row.expire_date!,
+        quantity: row.qty,
+        supplier: row.transaksi?.nama_pasien ?? null,
+      });
+    }
+    return out;
   },
 };
-
-export type TransactionReportRow = ApiResult<
-  typeof reportsApi.getTransactionReport
->['data'][number];

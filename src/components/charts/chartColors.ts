@@ -1,8 +1,26 @@
-// Warna seri grafik, hanya dari token chart-*. Kelas ditulis utuh supaya
-// terbaca oleh Tailwind.
+// Warna seri grafik, hanya dari token: chart-* untuk seri dan alasan, status
+// (ok/warn/bad) untuk kesehatan stok, dan cat-* untuk kategori produk. Kelas
+// ditulis utuh supaya terbaca oleh Tailwind.
 
 export type ChartColor =
-  'ser1' | 'ser2' | 'minus' | 'plus' | 'r1' | 'r2' | 'r3' | 'r4' | 'r5' | 'r6';
+  | 'ser1'
+  | 'ser2'
+  | 'minus'
+  | 'plus'
+  | 'r1'
+  | 'r2'
+  | 'r3'
+  | 'r4'
+  | 'r5'
+  | 'r6'
+  | 'ok'
+  | 'warn'
+  | 'bad'
+  | 'obat'
+  | 'bhp'
+  | 'imun'
+  | 'alkes'
+  | 'neutral';
 
 export const CHART_FILL: Record<ChartColor, string> = {
   ser1: 'fill-chart-ser1',
@@ -15,6 +33,14 @@ export const CHART_FILL: Record<ChartColor, string> = {
   r4: 'fill-chart-r4',
   r5: 'fill-chart-r5',
   r6: 'fill-chart-r6',
+  ok: 'fill-ok',
+  warn: 'fill-warn',
+  bad: 'fill-bad',
+  obat: 'fill-cat-obat',
+  bhp: 'fill-cat-bhp',
+  imun: 'fill-cat-imun',
+  alkes: 'fill-cat-alkes',
+  neutral: 'fill-faint',
 };
 
 export const CHART_BG: Record<ChartColor, string> = {
@@ -28,6 +54,14 @@ export const CHART_BG: Record<ChartColor, string> = {
   r4: 'bg-chart-r4',
   r5: 'bg-chart-r5',
   r6: 'bg-chart-r6',
+  ok: 'bg-ok',
+  warn: 'bg-warn',
+  bad: 'bg-bad',
+  obat: 'bg-cat-obat',
+  bhp: 'bg-cat-bhp',
+  imun: 'bg-cat-imun',
+  alkes: 'bg-cat-alkes',
+  neutral: 'bg-faint',
 };
 
 /** Warna alasan/kategori ke-i (r1..r6, berulang) */

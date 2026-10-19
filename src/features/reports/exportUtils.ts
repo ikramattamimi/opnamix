@@ -3,129 +3,13 @@ import type { Service } from '@/features/services/types';
 import type { StockInReceipt } from '@/features/stock-in/types';
 import type { StockOutRequest } from '@/features/stock-out/types';
 import { toDate } from '@/lib/utils';
-import type { RecentTransaction } from '@/features/dashboard/api';
-import type { TransactionReportRow } from './api';
-import type { StockMutationRow } from './types';
+import { CATEGORY_META } from '@/features/products/catalog';
+import type { MutationRow, TransactionRow } from './types';
 
 type XLSXModule = typeof import('xlsx');
 type ExcelRow = Record<string, string | number>;
 
 const loadXLSX = async (): Promise<XLSXModule> => import('xlsx');
-
-export const exportTransactionReportToExcel = async (
-  data: TransactionReportRow[],
-  startDate: string,
-  endDate: string,
-) => {
-  try {
-    const XLSX = await loadXLSX();
-    const excelData = data.map((row) => ({
-      Tanggal: toDate(row.date).toLocaleString('id-ID'),
-      'Nomor Referensi': row.id,
-      Tipe: row.type === 'masuk' ? 'Masuk' : 'Keluar',
-      'Atas Nama': row.patient || '-',
-      Nakes: row.nakes || '-',
-      Sumber: row.source || '-',
-      Obat: row.items || '-',
-      'Detail Obat': row.drugDetails?.length
-        ? row.drugDetails
-            .map(
-              (drug) =>
-                `${drug.name} | qty ${drug.quantity} | harga Rp ${Number(drug.price || 0).toLocaleString('id-ID')} | subtotal Rp ${Number(drug.subtotal || 0).toLocaleString('id-ID')}`,
-            )
-            .join(' ; ')
-        : '-',
-      Jasa: row.services || '-',
-      'Detail Jasa': row.serviceDetails?.length
-        ? row.serviceDetails
-            .map(
-              (service) =>
-                `${service.name} | qty ${service.quantity} | harga Rp ${Number(service.price || 0).toLocaleString('id-ID')} | subtotal Rp ${Number(service.subtotal || 0).toLocaleString('id-ID')}`,
-            )
-            .join(' ; ')
-        : '-',
-      'Biaya Layanan': `Rp ${Number(row.serviceFee || 0).toLocaleString('id-ID')}`,
-      Diskon: row.discount ? `Rp ${Number(row.discount || 0).toLocaleString('id-ID')}` : '-',
-      Total: `Rp ${row.total?.toLocaleString('id-ID') || 0}`,
-      Status: row.status,
-    }));
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(excelData);
-
-    ws['!cols'] = [
-      { wch: 20 },
-      { wch: 25 },
-      { wch: 10 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 40 },
-      { wch: 60 },
-      { wch: 35 },
-      { wch: 60 },
-      { wch: 15 },
-      { wch: 10 },
-    ];
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Laporan Transaksi');
-    const filename = `Laporan_Transaksi_${startDate}_to_${endDate}.xlsx`;
-    XLSX.writeFile(wb, filename);
-  } catch (error) {
-    console.error('Error exporting transaction report:', error);
-  }
-};
-
-export const exportStockMutationToExcel = async (
-  data: StockMutationRow[],
-  startDate: string,
-  endDate: string,
-) => {
-  try {
-    const XLSX = await loadXLSX();
-    const excelData = data.map((row) => ({
-      Tanggal: toDate(row.date).toLocaleString('id-ID'),
-      'Nomor Transaksi': row.trxNumber,
-      Tipe:
-        row.type === 'masuk'
-          ? 'Masuk'
-          : row.type === 'keluar'
-            ? 'Keluar'
-            : row.type === 'penyesuaian'
-              ? 'Penyesuaian (Opname)'
-              : row.type,
-      Sumber: row.source || '-',
-      'Item Obat': row.itemName || '-',
-      'Qty/Selisih': row.qty,
-      'Stok Sistem': row.systemStock ?? '-',
-      'Stok Fisik': row.physicalStock ?? '-',
-      'Stok Final': row.finalStock ?? '-',
-      Status: row.status,
-    }));
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(excelData);
-
-    ws['!cols'] = [
-      { wch: 20 },
-      { wch: 25 },
-      { wch: 22 },
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 10 },
-    ];
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Mutasi Stok');
-    const filename = `Mutasi_Stok_${startDate}_to_${endDate}.xlsx`;
-    XLSX.writeFile(wb, filename);
-  } catch (error) {
-    console.error('Error exporting stock mutation report:', error);
-  }
-};
 
 export const exportStockInToExcel = async (data: StockInReceipt[]) => {
   try {
@@ -253,30 +137,6 @@ export const exportStockOutToExcel = async (data: StockOutRequest[]) => {
   }
 };
 
-export const exportRecentTransactionsToExcel = async (data: RecentTransaction[]) => {
-  try {
-    const XLSX = await loadXLSX();
-    const excelData = data.map((row) => ({
-      Tanggal: row.date,
-      'ID Transaksi': row.id,
-      Item: row.name,
-      Kategori: row.category,
-      Tipe: row.status,
-      Jumlah: row.amount,
-    }));
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(excelData);
-
-    ws['!cols'] = [{ wch: 15 }, { wch: 20 }, { wch: 35 }, { wch: 20 }, { wch: 15 }, { wch: 10 }];
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Transaksi Terbaru');
-    XLSX.writeFile(wb, `Transaksi_Terbaru_${new Date().toISOString().split('T')[0]}.xlsx`);
-  } catch (error) {
-    console.error('Error exporting recent transactions:', error);
-  }
-};
-
 export const exportProductsToExcel = async (data: Product[]) => {
   try {
     const XLSX = await loadXLSX();
@@ -329,3 +189,81 @@ export const exportServicesToExcel = async (data: Service[]) => {
     console.error('Error exporting services:', error);
   }
 };
+
+const writeSheet = async (rows: ExcelRow[], sheet: string, file: string, widths: number[]) => {
+  const XLSX = await loadXLSX();
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = widths.map((wch) => ({ wch }));
+  XLSX.utils.book_append_sheet(wb, ws, sheet);
+  XLSX.writeFile(wb, file);
+};
+
+const today = () => new Date().toISOString().split('T')[0];
+
+// Laporan Stok · Posisi stok per hari ini
+export const exportStockPositionToExcel = (
+  products: Product[],
+  lastOpname: ReadonlyMap<string, Date>,
+) =>
+  writeSheet(
+    products.map((p) => ({
+      Produk: p.name,
+      Merek: p.brand || 'Generik',
+      Kategori: CATEGORY_META[p.category]?.short ?? p.category,
+      Sediaan: p.dosageForm || '-',
+      Stok: p.stock,
+      Satuan: p.unit,
+      Minimum: p.minStock,
+      'Harga beli': p.purchasePrice,
+      Nilai: Math.max(0, p.stock) * p.purchasePrice,
+      'Opname terakhir': lastOpname.get(p.id)?.toLocaleDateString('id-ID') ?? 'Belum pernah',
+    })),
+    'Posisi stok',
+    `Posisi_Stok_${today()}.xlsx`,
+    [32, 16, 12, 14, 8, 10, 9, 12, 14, 16],
+  );
+
+// Laporan Stok · Mutasi stok dalam periode
+export const exportMutationsToExcel = (rows: MutationRow[], label: string) =>
+  writeSheet(
+    rows.map((m) => ({
+      Waktu: toDate(m.date).toLocaleString('id-ID'),
+      'No. transaksi': m.code,
+      Tipe: m.type,
+      Produk: m.product.name,
+      Merek: m.product.brand || 'Generik',
+      Jumlah: m.qty,
+      Satuan: m.product.unit,
+      'Nilai (harga beli)': m.value,
+      Oleh: m.by,
+      Keterangan: m.note,
+    })),
+    'Mutasi stok',
+    `Mutasi_Stok_${label.replace(/[^\w-]+/g, '_')}.xlsx`,
+    [20, 22, 12, 32, 16, 9, 10, 16, 18, 36],
+  );
+
+// Laporan Stok · Transaksi keluar dalam periode
+export const exportTransactionsToExcel = (rows: TransactionRow[], label: string) =>
+  writeSheet(
+    rows.map((t) => ({
+      Waktu: toDate(t.date).toLocaleString('id-ID'),
+      Kode: t.code,
+      Jenis: t.kind,
+      Status: t.status,
+      Pasien: t.patient,
+      'Diajukan oleh': t.requestedBy,
+      'Diproses oleh': t.processedBy ?? '-',
+      'Obat & BHP': t.drugs.map((d) => `${d.name} (${d.quantity})`).join(', ') || '-',
+      Jasa: t.services.map((s) => s.name).join(', ') || '-',
+      'Nilai obat': t.drugTotal,
+      'Nilai jasa': t.serviceTotal,
+      'Biaya layanan': t.serviceFee,
+      Diskon: t.discount,
+      Total: t.total,
+    })),
+    'Transaksi keluar',
+    `Transaksi_Keluar_${label.replace(/[^\w-]+/g, '_')}.xlsx`,
+    [20, 22, 11, 10, 22, 18, 18, 40, 24, 12, 12, 12, 10, 12],
+  );

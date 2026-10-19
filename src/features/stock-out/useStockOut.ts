@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { transactionsApi, CreateTransactionPayload } from '@/features/transactions/api';
 import { stockOutApi } from './api';
 import { stockOutKeys } from './keys';
-import { dashboardKeys } from '@/features/dashboard/keys';
 import { invalidateStockChange } from '@/lib/invalidate';
 import { supabase } from '@/lib/supabaseClient';
 import { PaginationParams } from '@/types/pagination';
@@ -59,12 +58,9 @@ export function useCreateStockOutRequest() {
     },
     onSuccess: (_data, payload) => {
       // Stok keluar manual langsung selesai (stok berubah); permintaan nakes
-      // masih diajukan (hanya daftar dan hitungan tertunda di dashboard).
+      // masih diajukan: cukup daftar permintaan (dibaca juga oleh Dashboard).
       if (payload.status === 'selesai') return invalidateStockChange(queryClient);
-      return Promise.all([
-        queryClient.invalidateQueries({ queryKey: stockOutKeys.all }),
-        queryClient.invalidateQueries({ queryKey: dashboardKeys.all }),
-      ]);
+      return Promise.all([queryClient.invalidateQueries({ queryKey: stockOutKeys.all })]);
     },
   });
 }

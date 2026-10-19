@@ -1,5 +1,4 @@
 import { QueryClient } from '@tanstack/react-query';
-import { dashboardKeys } from '@/features/dashboard/keys';
 import { opnameKeys } from '@/features/opname/keys';
 import { productKeys } from '@/features/products/keys';
 import { reportKeys } from '@/features/reports/keys';
@@ -15,7 +14,6 @@ export const invalidateStockChange = (queryClient: QueryClient) =>
     queryClient.invalidateQueries({ queryKey: productKeys.all }),
     queryClient.invalidateQueries({ queryKey: stockInKeys.all }),
     queryClient.invalidateQueries({ queryKey: stockOutKeys.all }),
-    queryClient.invalidateQueries({ queryKey: dashboardKeys.all }),
     queryClient.invalidateQueries({ queryKey: reportKeys.all }),
   ]);
 

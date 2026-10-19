@@ -1,9 +1,7 @@
-import { PaginationParams } from '@/types/pagination';
-
 export const reportKeys = {
   all: ['reports'] as const,
-  transactions: (startDate: string, endDate: string, params?: PaginationParams) =>
-    [...reportKeys.all, 'transactions', startDate, endDate, params] as const,
-  stockMutations: (startDate: string, endDate: string, params?: PaginationParams) =>
-    [...reportKeys.all, 'stockMutations', startDate, endDate, params] as const,
+  mutations: (from: string, to: string) => [...reportKeys.all, 'mutations', from, to] as const,
+  transactions: (from: string, to: string) =>
+    [...reportKeys.all, 'transactions', from, to] as const,
+  expiring: (months: number) => [...reportKeys.all, 'expiring', months] as const,
 };
