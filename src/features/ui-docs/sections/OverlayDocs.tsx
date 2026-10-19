@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import ConfirmationModal from '@/components/common/ConfirmationModal';
+
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,27 +11,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useToast } from '@/components/ui/toast';
 import { DocExample, DocSection } from '../components/DocSection';
 
 export const DialogDocs: React.FC = () => {
-  const [confirmType, setConfirmType] = useState<'danger' | 'warning' | 'info' | 'success'>();
+  const [confirmType, setConfirmType] = useState<'danger' | 'warn' | 'primary'>();
   const { showToast } = useToast();
 
   return (
     <DocSection
       id="dialog"
-      title="Dialog dan ConfirmationModal"
-      description="Dialog untuk form atau detail di atas halaman. ConfirmationModal untuk konfirmasi aksi (dibangun di atas AlertDialog), dengan tipe danger, warning, info, atau success."
-      importPath="import { Dialog, DialogContent, ... } from '@/components/ui/dialog'; import ConfirmationModal from '@/components/common/ConfirmationModal';"
+      title="Dialog dan ConfirmDialog"
+      description="Dialog untuk form atau detail di atas halaman. ConfirmDialog untuk konfirmasi kecil di tengah layar (dibangun di atas AlertDialog), nada danger, warn, atau primary. Konfirmasi di dalam panel kanan memakai InlineConfirm."
+      importPath="import { Dialog, DialogContent, ... } from '@/components/ui/dialog'; import { ConfirmDialog } from '@/components/common/ConfirmDialog';"
     >
       <DocExample
         title="Dialog"
@@ -70,30 +62,31 @@ export const DialogDocs: React.FC = () => {
       </DocExample>
 
       <DocExample
-        title="ConfirmationModal"
-        note="Pakai type danger untuk aksi yang tidak bisa dibatalkan (hapus)."
+        title="ConfirmDialog"
+        note="Pakai tone danger untuk aksi yang tidak bisa dibatalkan (hapus). Selama busy, dialog tidak bisa ditutup."
         code={`
-<ConfirmationModal
-  isOpen={isOpen}
-  type="danger"
+<ConfirmDialog
+  open={!!toDelete}
+  tone="danger"
   title="Hapus produk?"
   message="Produk yang dihapus tidak bisa dipakai di transaksi baru."
-  confirmText="Hapus"
+  confirmLabel="Ya, hapus"
+  busy={deleteProduct.isPending}
   onConfirm={handleDelete}
-  onCancel={() => setIsOpen(false)}
+  onCancel={() => setToDelete(null)}
 />`}
       >
-        {(['danger', 'warning', 'info', 'success'] as const).map((type) => (
+        {(['danger', 'warn', 'primary'] as const).map((type) => (
           <Button key={type} variant="outline" size="sm" onClick={() => setConfirmType(type)}>
             {type}
           </Button>
         ))}
-        <ConfirmationModal
-          isOpen={confirmType !== undefined}
-          type={confirmType}
+        <ConfirmDialog
+          open={confirmType !== undefined}
+          tone={confirmType}
           title="Contoh konfirmasi"
-          message={`Ini ConfirmationModal dengan type "${confirmType}".`}
-          confirmText="Lanjutkan"
+          message={`Ini ConfirmDialog dengan tone "${confirmType}".`}
+          confirmLabel="Lanjutkan"
           onConfirm={() => {
             showToast('Dikonfirmasi', 'success');
             setConfirmType(undefined);
@@ -104,46 +97,3 @@ export const DialogDocs: React.FC = () => {
     </DocSection>
   );
 };
-
-export const DropdownDocs: React.FC = () => (
-  <DocSection
-    id="dropdown"
-    title="Dropdown Menu"
-    description="Menu aksi per baris tabel atau menu akun. Aksi berbahaya diletakkan terakhir, dipisah separator."
-    importPath="import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';"
-  >
-    <DocExample
-      title="Menu aksi baris"
-      code={`
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="ghost" size="icon" aria-label="Aksi"><MoreHorizontal /></Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent align="end">
-    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-    <DropdownMenuItem onSelect={onEdit}><Pencil /> Edit</DropdownMenuItem>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem className="text-red-600" onSelect={onDelete}><Trash2 /> Hapus</DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>`}
-    >
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Aksi">
-            <MoreHorizontal aria-hidden />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-          <DropdownMenuItem>
-            <Pencil className="size-4" aria-hidden /> Edit
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-red-600">
-            <Trash2 className="size-4" aria-hidden /> Hapus
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </DocExample>
-  </DocSection>
-);

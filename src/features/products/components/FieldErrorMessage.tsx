@@ -10,7 +10,7 @@ interface FieldErrorTextProps {
 }
 
 export const FieldErrorText: React.FC<FieldErrorTextProps> = ({ id, children }) => (
-  <p id={id} className="mt-1 text-xs text-red-500 flex items-center gap-1">
+  <p id={id} className="mt-1 flex items-center gap-1 text-xs text-bad">
     <CircleAlert className="size-4" aria-hidden />
     {children}
   </p>

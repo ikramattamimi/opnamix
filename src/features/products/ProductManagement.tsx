@@ -13,7 +13,7 @@ import { StatusChip } from '@/components/data/StatusChip';
 import { Meter } from '@/components/data/Meter';
 import { OptionSelect } from '@/components/form/OptionSelect';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
-import ConfirmationModal from '@/components/common/ConfirmationModal';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
@@ -319,13 +319,13 @@ const ProductManagement: React.FC = () => {
         }
       />
 
-      <ConfirmationModal
-        isOpen={!!toDelete}
+      <ConfirmDialog
+        open={!!toDelete}
         title="Hapus produk?"
         message={`${toDelete?.name ?? 'Produk ini'} akan dihapus dari daftar. Riwayat transaksi tetap tersimpan.`}
-        confirmText="Ya, hapus"
-        cancelText="Batal"
-        type="danger"
+        confirmLabel="Ya, hapus"
+        tone="danger"
+        busy={deleteProduct.isPending}
         onConfirm={() => void confirmDelete()}
         onCancel={() => setToDelete(null)}
       />

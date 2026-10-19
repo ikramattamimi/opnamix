@@ -45,7 +45,7 @@ const NotFoundPage = () => {
 const AuthenticatedApp: React.FC<AuthenticatedAppProps> = () => {
   return (
     <AppShell>
-      <Suspense fallback={<LoadingState label="Memuat modul..." className="min-h-[400px]" />}>
+      <Suspense fallback={<LoadingState label="Memuat modul..." className="min-h-96" />}>
         <Routes>
           {APP_ROUTES.map((route) => {
             const Page = route.element;

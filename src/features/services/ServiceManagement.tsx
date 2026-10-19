@@ -11,7 +11,7 @@ import { StatusChip } from '@/components/data/StatusChip';
 import { ToneIcon } from '@/components/data/ToneIcon';
 import { OptionSelect } from '@/components/form/OptionSelect';
 import { EmptyState, ErrorState, LoadingState } from '@/components/common/QueryState';
-import ConfirmationModal from '@/components/common/ConfirmationModal';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
@@ -291,13 +291,13 @@ const ServiceManagement: React.FC = () => {
 
       <ListWithPanel list={list} panel={panel} panelOpen={panelOpen} onPanelClose={closePanel} />
 
-      <ConfirmationModal
-        isOpen={!!toDelete}
+      <ConfirmDialog
+        open={!!toDelete}
         title="Hapus jasa?"
         message={`${toDelete?.name ?? 'Jasa ini'} akan dihapus dari daftar. Riwayat transaksi tetap tersimpan.`}
-        confirmText="Ya, hapus"
-        cancelText="Batal"
-        type="danger"
+        confirmLabel="Ya, hapus"
+        tone="danger"
+        busy={deleteService.isPending}
         onConfirm={() => void confirmDelete()}
         onCancel={() => setToDelete(null)}
       />

@@ -1,6 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { CircleAlert } from 'lucide-react';
+import { CircleAlert, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ToneIcon } from '@/components/data/ToneIcon';
 
 interface Props {
   children?: ReactNode;
@@ -40,25 +42,24 @@ class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
       return (
-        <div className="p-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl text-center">
-          <div className="mb-3 bg-red-100 dark:bg-red-500/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
-            <CircleAlert className="text-red-500 size-6" aria-hidden />
+        <Card className="flex flex-col items-center gap-3 p-6 text-center">
+          <ToneIcon icon={CircleAlert} tone="bad" size="xl" />
+          <div>
+            <h3 className="text-panel font-bold">Terjadi kesalahan</h3>
+            <p className="mt-1 text-meta text-muted-foreground">
+              Halaman {this.props.name || 'ini'} mengalami masalah dan tidak dapat ditampilkan.
+            </p>
           </div>
-          <h3 className="font-bold text-red-700 dark:text-red-400 mb-2">Terjadi Kesalahan</h3>
-          <p className="text-sm text-red-600 dark:text-red-300 mb-4 px-4">
-            Komponen {this.props.name || 'ini'} mengalami masalah dan tidak dapat ditampilkan.
-          </p>
-          <div className="max-h-32 overflow-y-auto text-left bg-white dark:bg-black/20 p-3 rounded-lg border border-red-100 dark:border-white/5 mx-auto max-w-md">
-            <p className="font-mono text-[10px] text-red-500">{this.state.error?.message}</p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => this.setState({ hasError: false, error: null })}
-            className="mt-4 px-4 bg-white dark:bg-red-500/20 border-red-200 dark:border-red-500/20 text-xs font-bold text-red-700 dark:text-white shadow-none hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
-          >
-            Coba Muat Ulang
+          {this.state.error?.message && (
+            <pre className="max-h-32 w-full max-w-md overflow-y-auto whitespace-pre-wrap rounded-lg border bg-surface-2 p-3 text-left font-mono text-2xs text-bad">
+              {this.state.error.message}
+            </pre>
+          )}
+          <Button variant="outline" onClick={() => this.setState({ hasError: false, error: null })}>
+            <RotateCcw aria-hidden />
+            Coba muat ulang
           </Button>
-        </div>
+        </Card>
       );
     }
 

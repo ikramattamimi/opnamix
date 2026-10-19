@@ -2,8 +2,8 @@ import React from 'react';
 import { BadgeDocs, ButtonDocs } from './sections/ButtonBadgeDocs';
 import { InputDocs } from './sections/InputDocs';
 import { FormDocs } from './sections/FormDocs';
-import { DialogDocs, DropdownDocs } from './sections/OverlayDocs';
-import { CardDocs, TabsDocs } from './sections/LayoutDocs';
+import { DialogDocs } from './sections/OverlayDocs';
+import { CardDocs } from './sections/LayoutDocs';
 import { FeedbackDocs, TableDocs } from './sections/DataDocs';
 import { IconDocs } from './sections/IconDocs';
 import { TokenDocs } from './sections/TokenDocs';
@@ -35,11 +35,9 @@ const SECTIONS: { id: string; label: string; Component: React.FC }[] = [
   { id: 'charts', label: 'Grafik', Component: ChartDocs },
   { id: 'opname-primitives', label: 'Layar kerja & opname', Component: OpnameDocs },
   { id: 'dialog', label: 'Dialog', Component: DialogDocs },
-  { id: 'dropdown', label: 'Dropdown', Component: DropdownDocs },
   { id: 'segmented', label: 'SegmentedControl', Component: SegmentedDocs },
   { id: 'tone-icon', label: 'ToneIcon', Component: ToneIconDocs },
   { id: 'card', label: 'Card', Component: CardDocs },
-  { id: 'tabs', label: 'Tabs', Component: TabsDocs },
   { id: 'table', label: 'Tabel', Component: TableDocs },
   { id: 'feedback', label: 'Toast & Status', Component: FeedbackDocs },
   { id: 'icons', label: 'Ikon', Component: IconDocs },

@@ -81,17 +81,6 @@ export default {
         border: { DEFAULT: solid('border'), strong: solid('border-strong') },
         input: solid('input'),
         ring: solid('ring'),
-
-        // Nama lama dari desain sebelumnya, sekarang menunjuk ke token baru supaya
-        // halaman yang belum dirombak ikut memakai palet baru. Dihapus di Fase 8.
-        'background-light': solid('background'),
-        'background-dark': solid('background'),
-        'card-light': solid('card'),
-        'card-dark': solid('card'),
-        'text-primary-light': solid('foreground'),
-        'text-primary-dark': solid('foreground'),
-        'text-secondary-light': solid('muted-foreground'),
-        'text-secondary-dark': solid('muted-foreground'),
       },
       textColor: { primary: primaryOnSurface, destructive: destructiveOnSurface },
       borderColor: { primary: primaryOnSurface, destructive: destructiveOnSurface },
