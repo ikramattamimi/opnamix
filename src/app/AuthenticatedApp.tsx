@@ -1,20 +1,17 @@
 import React, { Suspense } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { ROUTES } from '@/types/routes';
 import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/common/QueryState';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { UserProfile } from '@/features/auth/api';
-import { useActiveOpnameLock, useOpnameLockRealtime } from '@/features/opname/useActiveOpnameLock';
 import { useAuth } from '@/features/auth/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/common/QueryState';
 import { APP_ROUTES, type AppRoute } from './routes';
 import { canAccessRoute, getUserRoles } from './routeUtils';
-
-const OpnameLockPage = React.lazy(() => import('@/features/opname/OpnameLockPage'));
 
 interface AuthenticatedAppProps {
   userProfile: UserProfile | null;
@@ -45,27 +42,7 @@ const NotFoundPage = () => {
   );
 };
 
-const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({ userProfile }) => {
-  const location = useLocation();
-  const { data: lock, isLoading } = useActiveOpnameLock();
-  useOpnameLockRealtime();
-  const isLocked = lock?.isLocked ?? false;
-  const opname = lock?.opname ?? null;
-
-  const userRoles = getUserRoles(userProfile);
-  const isOpnameRoute = location.pathname.startsWith('/audit/stok-opname');
-  const canAccessOpname = userRoles.some((r) => ['admin', 'apoteker', 'farmasi'].includes(r));
-
-  if (isLocked && opname && !isLoading) {
-    if (!(isOpnameRoute && canAccessOpname)) {
-      return (
-        <Suspense fallback={<LoadingState fullScreen />}>
-          <OpnameLockPage opname={opname} />
-        </Suspense>
-      );
-    }
-  }
-
+const AuthenticatedApp: React.FC<AuthenticatedAppProps> = () => {
   return (
     <AppShell>
       <Suspense fallback={<LoadingState label="Memuat modul..." className="min-h-[400px]" />}>

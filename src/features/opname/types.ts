@@ -1,31 +1,7 @@
+import type { Category } from '@/features/products/types';
+import type { RunItem } from './catalog';
+
 export type OpnameStatus = 'belum_dilaksanakan' | 'sedang_dilaksanakan' | 'selesai';
-
-export interface OpnameItem {
-  id: string;
-  productId: string;
-  productName: string;
-  category: string;
-  unit: string;
-  systemStock: number | null;
-  physicalStock?: number | null;
-  difference?: number | null;
-  stokFinal?: number | null;
-  reason?: string | null;
-  detailStatus?: 'pending' | 'sesuai' | 'disesuaikan';
-}
-
-export interface StockOpname {
-  id: string;
-  opnameNumber: string;
-  scheduleDate: string; // tanggal_jadwal
-  status: OpnameStatus;
-  auditor: string;
-  currentStep: number; // 1, 2, or 3
-  selectedObatIds?: string[];
-  completedAt?: string;
-  scheduleName?: string; // from opname_schedule.nama
-  items: OpnameItem[];
-}
 
 export type PengulanganOpname = 'BULANAN' | 'TRIWULAN' | 'TAHUNAN';
 
@@ -36,17 +12,47 @@ export interface OpnameSchedule {
   waktuJam: number | null;
   waktuMenit: number | null;
   pengulangan: PengulanganOpname;
-  obatIds: string[] | null; // null = semua obat
+  /** null = tidak dipilih manual */
+  obatIds: string[] | null;
+  /** null = tidak dibatasi kategori; keduanya null = semua produk */
+  kategori: Category[] | null;
   durasiPengerjaan: number | null;
   isActive: boolean | null;
 }
 
 export interface OpnameScheduleConfig {
-  nama?: string;
+  nama: string;
   pengulangan: PengulanganOpname;
   dayOfMonth: number; // tanggal_audit
   waktuJam: number;
   waktuMenit: number;
-  durasiPengerjaan?: number;
-  obatIds?: string[] | null;
+  durasiPengerjaan?: number | null;
+  obatIds: string[] | null;
+  kategori: Category[] | null;
+}
+
+/** Satu sesi opname (berjalan atau selesai) beserta produknya */
+export interface OpnameRun {
+  id: string;
+  code: string;
+  /** Nama tampil: nama opname cepat, nama jadwal, atau "Opname cepat" */
+  name: string;
+  status: OpnameStatus;
+  scheduleId: string | null;
+  scheduleName: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  /** 2 = menghitung, 3 = tinjau selisih */
+  step: number;
+  auditor: string;
+  items: RunItem[];
+}
+
+/** Perubahan satu baris hitung. Key yang tidak diisi tidak diubah. */
+export interface RunItemUpdate {
+  detailId: string;
+  physicalStock?: number | null;
+  finalStock?: number | null;
+  reasonCode?: RunItem['reasonCode'];
+  note?: string | null;
 }

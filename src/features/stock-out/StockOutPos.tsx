@@ -32,6 +32,7 @@ import {
   stockStatus,
 } from '@/features/products/catalog';
 import { ProductTile } from '@/features/products/components/ProductTile';
+import { useOpnameLockedProducts } from '@/features/opname/useOpname';
 import { ProductTitle } from '@/features/products/components/ProductTitle';
 import { Category, type Product } from '@/features/products/types';
 import { NO_CATEGORY, serviceCategoryMeta, serviceMatches } from '@/features/services/catalog';
@@ -94,6 +95,7 @@ const StockOutPos: React.FC = () => {
   const manual = mode === 'manual';
 
   const { data: products = [], isPending, isError, refetch } = useAllProducts();
+  const lockedBy = useOpnameLockedProducts();
   const { data: allServices = [] } = useAllServices();
   const services = useMemo(() => allServices.filter((s) => s.isActive !== false), [allServices]);
   const { data: nakesList = [], isPending: nakesPending } = useNakesProfiles();
@@ -358,18 +360,23 @@ const StockOutPos: React.FC = () => {
   const renderProduct = (p: Product) => {
     const qty = quantityOf(p.id);
     const status = stockStatus(p);
+    const opname = lockedBy.get(p.id);
     return (
       <ProductTile
         product={p}
         price={p.sellingPrice}
         stockText={
-          status === 'habis'
-            ? 'stok habis'
-            : `sisa ${p.stock.toLocaleString('id-ID')} ${p.unit.toLowerCase()}`
+          opname
+            ? `sedang dihitung di ${opname}`
+            : status === 'habis'
+              ? 'stok habis'
+              : `sisa ${p.stock.toLocaleString('id-ID')} ${p.unit.toLowerCase()}`
         }
         stockTone={status === 'habis' ? 'bad' : status === 'menipis' ? 'warn' : undefined}
         badge={
-          qty > 0 ? (
+          opname ? (
+            <StatusChip tone="warn">Diopname</StatusChip>
+          ) : qty > 0 ? (
             <StatusChip tone="info" plain>
               × {qty}
             </StatusChip>
@@ -378,7 +385,7 @@ const StockOutPos: React.FC = () => {
           )
         }
         selected={qty > 0}
-        disabled={status === 'habis'}
+        disabled={status === 'habis' || !!opname}
         onClick={() => addProduct(p)}
       />
     );

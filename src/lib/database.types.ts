@@ -267,6 +267,7 @@ export type Database = {
           current_step: number | null
           deleted_at: string | null
           id: number
+          nama: string | null
           obat_ids: Json | null
           schedule_id: number | null
           selected_obat_ids: Json | null
@@ -283,6 +284,7 @@ export type Database = {
           current_step?: number | null
           deleted_at?: string | null
           id?: never
+          nama?: string | null
           obat_ids?: Json | null
           schedule_id?: number | null
           selected_obat_ids?: Json | null
@@ -299,6 +301,7 @@ export type Database = {
           current_step?: number | null
           deleted_at?: string | null
           id?: never
+          nama?: string | null
           obat_ids?: Json | null
           schedule_id?: number | null
           selected_obat_ids?: Json | null
@@ -321,6 +324,8 @@ export type Database = {
       opname_detail: {
         Row: {
           alasan: string | null
+          alasan_kode: string | null
+          catatan: string | null
           created_at: string | null
           created_by: string | null
           deleted_at: string | null
@@ -337,6 +342,8 @@ export type Database = {
         }
         Insert: {
           alasan?: string | null
+          alasan_kode?: string | null
+          catatan?: string | null
           created_at?: string | null
           created_by?: string | null
           deleted_at?: string | null
@@ -353,6 +360,8 @@ export type Database = {
         }
         Update: {
           alasan?: string | null
+          alasan_kode?: string | null
+          catatan?: string | null
           created_at?: string | null
           created_by?: string | null
           deleted_at?: string | null
@@ -392,6 +401,7 @@ export type Database = {
           durasi_pengerjaan: number | null
           id: number
           is_active: boolean | null
+          kategori: Json | null
           nama: string
           obat_ids: Json | null
           pengulangan: string | null
@@ -408,6 +418,7 @@ export type Database = {
           durasi_pengerjaan?: number | null
           id?: never
           is_active?: boolean | null
+          kategori?: Json | null
           nama: string
           obat_ids?: Json | null
           pengulangan?: string | null
@@ -424,6 +435,7 @@ export type Database = {
           durasi_pengerjaan?: number | null
           id?: never
           is_active?: boolean | null
+          kategori?: Json | null
           nama?: string
           obat_ids?: Json | null
           pengulangan?: string | null
@@ -827,6 +839,11 @@ export type Database = {
         Args: { p_opname_id: number; p_step: number; p_updates: Json }
         Returns: undefined
       }
+      start_opname: {
+        Args: { p_nama: string; p_obat_ids: Json; p_schedule_id: number | null }
+        Returns: number
+      }
+      active_opname_for_product: { Args: { p_obat_id: number }; Returns: number }
       save_product_ingredients: {
         Args: { p_items: Json; p_product_id: number }
         Returns: undefined

@@ -40,6 +40,7 @@ import {
   stockStatus,
 } from '@/features/products/catalog';
 import { ProductTile } from '@/features/products/components/ProductTile';
+import { useOpnameLockedProducts } from '@/features/opname/useOpname';
 import { ProductTitle } from '@/features/products/components/ProductTitle';
 import { ProductFormPanel } from '@/features/products/components/ProductFormPanel';
 import type { Category, Product } from '@/features/products/types';
@@ -71,6 +72,7 @@ const StockInPos: React.FC = () => {
   const { showToast } = useToast();
   const supplierListId = useId();
   const { data: products = [], isPending, isError, refetch } = useAllProducts();
+  const lockedBy = useOpnameLockedProducts();
   const { data: suppliers = [] } = useSupplierSuggestions();
   const createStockIn = useCreateStockIn();
   const createProduct = useCreateProduct();
@@ -295,14 +297,22 @@ const StockInPos: React.FC = () => {
       renderItem={(p) => {
         const qty = lines.find((l) => l.productId === p.id)?.quantity ?? 0;
         const status = stockStatus(p);
+        const opname = lockedBy.get(p.id);
         return (
           <ProductTile
             product={p}
             price={p.purchasePrice}
-            stockText={`stok ${p.stock.toLocaleString('id-ID')} · min ${p.minStock}`}
+            stockText={
+              opname
+                ? `sedang dihitung di ${opname}`
+                : `stok ${p.stock.toLocaleString('id-ID')} · min ${p.minStock}`
+            }
             stockTone={status === 'habis' ? 'bad' : status === 'menipis' ? 'warn' : undefined}
+            disabled={!!opname}
             badge={
-              qty > 0 ? (
+              opname ? (
+                <StatusChip tone="warn">Diopname</StatusChip>
+              ) : qty > 0 ? (
                 <StatusChip tone="info" plain>
                   + {qty}
                 </StatusChip>

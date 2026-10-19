@@ -41,14 +41,14 @@ export const productKeys = {
 | stock-out | `features/stock-out/keys.ts` | `stockOutKeys.all`, `.list(params)`, `.recent(limit)`, `.nakesProfiles()` |
 | dashboard | `features/dashboard/keys.ts` | `dashboardKeys.all`, `.stats()`, `.recentTransactions(page, perPage)` |
 | reports | `features/reports/keys.ts` | `reportKeys.all`, `.transactions(start, end, params)`, `.stockMutations(start, end, params)` |
-| opname | `features/opname/keys.ts` | `opnameKeys.all`, `.schedules()`, `.activeSchedules()`, `.upcoming()`, `.drafts()`, `.detail(id)`, `.detailView(id)`, `.history()`, `.lock()` |
+| opname | `features/opname/keys.ts` | `opnameKeys.all`, `.schedules()`, `.runs()`, `.active()`, `.history()`, `.run(id)` |
 | users | `features/users/keys.ts` | `userKeys.all`, `.list()` |
 | profile | `features/profile/keys.ts` | `profileKeys.all`, `.detail(userId)` |
 | notifications | `features/notifications/keys.ts` | `notificationKeys.all`, `.list(userId)` |
 
 ## Nama hook
 
-- Query: `use<Nama>` (contoh `useProducts`, `useOpname(id)`, `useDashboardStats`)
+- Query: `use<Nama>` (contoh `useProducts`, `useOpnameRun(id)`, `useDashboardStats`)
 - Mutasi: `use<Aksi><Nama>` (contoh `useCreateProduct`, `useFinishOpname`)
 - Realtime: `use<Nama>Realtime` (contoh `useStockOutRealtime`)
 - File: `use<Nama>.ts`, boleh berisi beberapa hook untuk satu sumber data.
@@ -63,7 +63,7 @@ supaya daftarnya ada di satu tempat:
 | Kejadian | Helper | Yang di-refresh |
 |---|---|---|
 | Stok obat berubah (stok masuk, stok keluar manual, proses permintaan) | `invalidateStockChange` | products, stockIn, stockOut, dashboard, reports |
-| Opname berubah (mulai, pindah langkah, selesai, hapus) | `invalidateOpnameChange` | opname + semua yang di atas |
+| Opname berubah (mulai, selesai, batal) | `invalidateOpnameChange` | opname + semua yang di atas |
 | Permintaan stok keluar diajukan/diedit (stok belum berubah) | langsung di hook | stockOut (+ dashboard untuk hitungan tertunda) |
 | Master produk/jasa diubah | langsung di hook | products / services |
 | User atau profil diubah | langsung di hook (+ `refreshProfile()` dari `useAuth` untuk Header) | users, profile |
@@ -94,7 +94,7 @@ kosong sendiri per halaman.
 
 Default `QueryClient` ada di `src/app/App.tsx`: `staleTime` 60 detik,
 `refetchOnWindowFocus: false`, `retry: 1`. Override per query hanya kalau ada
-alasannya (misalnya master data 1 jam, kunci opname `refetchOnWindowFocus:
+alasannya (misalnya master data 1 jam, opname berjalan `refetchOnWindowFocus:
 'always'`, karena dengan `true` cek ulang dilewati selama data belum basi).
 
 ## Pembuatan channel realtime

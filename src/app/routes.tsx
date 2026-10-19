@@ -9,9 +9,7 @@ import {
   CircleArrowUp,
   ClipboardCheck,
   Component,
-  History,
   LayoutDashboard,
-  Settings,
   UserCog,
   type LucideIcon,
 } from 'lucide-react';
@@ -62,10 +60,10 @@ const StockInManagement = React.lazy(() => import('@/features/stock-in/StockInMa
 const StockInPos = React.lazy(() => import('@/features/stock-in/StockInPos'));
 const StockOutManagement = React.lazy(() => import('@/features/stock-out/StockOutManagement'));
 const StockOutPos = React.lazy(() => import('@/features/stock-out/StockOutPos'));
-const RiwayatOpnamePage = React.lazy(() => import('@/features/opname/RiwayatOpnamePage'));
-const KonfigurasiOpnamePage = React.lazy(() => import('@/features/opname/KonfigurasiOpnamePage'));
-const PelaksanaanOpnamePage = React.lazy(() => import('@/features/opname/PelaksanaanOpnamePage'));
-const DetailOpnamePage = React.lazy(() => import('@/features/opname/DetailOpnamePage'));
+const StokOpnamePage = React.lazy(() => import('@/features/opname/StokOpnamePage'));
+const OpnameRunPage = React.lazy(() => import('@/features/opname/OpnameRunPage'));
+const OpnameReportPage = React.lazy(() => import('@/features/opname/OpnameReportPage'));
+const OpnameRedirect = React.lazy(() => import('@/features/opname/OpnameRedirect'));
 const StockReport = React.lazy(() => import('@/features/reports/StockReport'));
 const UserManagement = React.lazy(() => import('@/features/users/UserManagement'));
 const ProfilePage = React.lazy(() => import('@/features/profile/ProfilePage'));
@@ -74,12 +72,6 @@ const UiDocsPage = React.lazy(() => import('@/features/ui-docs/UiDocsPage'));
 
 // Role staf yang boleh mengelola master data, stok masuk, opname, dan laporan
 export const STAFF_ROLES: readonly AppRole[] = ['admin', 'farmasi', 'apoteker'];
-
-const OPNAME_PARENT: SidebarParent = {
-  label: 'Stok Opname',
-  icon: ClipboardCheck,
-  pathPrefix: ROUTES.STOK_OPNAME,
-};
 
 // Urutan entri = urutan menu di sidebar
 export const APP_ROUTES: readonly AppRoute[] = [
@@ -144,56 +136,44 @@ export const APP_ROUTES: readonly AppRoute[] = [
   },
   {
     path: ROUTES.STOK_OPNAME,
-    title: 'Audit Stok (Opname)',
+    title: 'Stok Opname',
     roles: STAFF_ROLES,
-    element: RiwayatOpnamePage,
-    errorName: 'Riwayat Opname',
-    showInSidebar: false,
-  },
-  {
-    path: ROUTES.RIWAYAT_OPNAME,
-    title: 'Riwayat Opname',
-    roles: STAFF_ROLES,
-    element: RiwayatOpnamePage,
-    errorName: 'Riwayat Opname',
+    element: StokOpnamePage,
+    errorName: 'Stok Opname',
     showInSidebar: true,
-    sidebar: {
-      label: 'Riwayat Opname',
-      icon: History,
-      group: 'Audit & Kontrol',
-      parent: OPNAME_PARENT,
-    },
+    sidebar: { label: 'Stok Opname', icon: ClipboardCheck, group: 'Audit & Kontrol' },
   },
   {
-    path: ROUTES.KONFIGURASI_OPNAME,
-    title: 'Konfigurasi Opname',
+    // Judul diganti nama sesi oleh halaman
+    path: ROUTES.OPNAME_HITUNG,
+    title: 'Hitung opname',
     roles: STAFF_ROLES,
-    element: KonfigurasiOpnamePage,
-    errorName: 'Konfigurasi Opname',
-    showInSidebar: true,
-    sidebar: {
-      label: 'Konfigurasi Opname',
-      icon: Settings,
-      group: 'Audit & Kontrol',
-      parent: OPNAME_PARENT,
-    },
-  },
-  {
-    path: ROUTES.PELAKSANAAN_OPNAME,
-    title: 'Pelaksanaan Opname',
-    roles: STAFF_ROLES,
-    element: PelaksanaanOpnamePage,
-    errorName: 'Pelaksanaan Opname',
+    element: OpnameRunPage,
+    errorName: 'Layar kerja opname',
     showInSidebar: false,
   },
   {
-    path: ROUTES.DETAIL_OPNAME,
-    title: 'Detail Opname',
+    path: ROUTES.OPNAME_LAPORAN,
+    title: 'Laporan opname',
     roles: STAFF_ROLES,
-    element: DetailOpnamePage,
-    errorName: 'Detail Opname',
+    element: OpnameReportPage,
+    errorName: 'Laporan opname',
     showInSidebar: false,
   },
+  // Rute lama, dialihkan ke halaman baru
+  ...[
+    ROUTES.RIWAYAT_OPNAME,
+    ROUTES.KONFIGURASI_OPNAME,
+    ROUTES.PELAKSANAAN_OPNAME,
+    ROUTES.DETAIL_OPNAME,
+  ].map((path) => ({
+    path,
+    title: 'Stok Opname',
+    roles: STAFF_ROLES,
+    element: OpnameRedirect,
+    errorName: 'Stok Opname',
+    showInSidebar: false,
+  })),
   {
     path: ROUTES.LAPORAN_STOK,
     title: 'Analisis & Laporan Stok',

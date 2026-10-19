@@ -1,42 +1,87 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
-import { opnameApi } from './api';
-import { opnameKeys } from './keys';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidateOpnameChange } from '@/lib/invalidate';
 import { createNotification } from '@/features/notifications/api';
+import { opnameApi } from './api';
+import { opnameKeys } from './keys';
+import { runStats } from './catalog';
+import type { OpnameRun, OpnameScheduleConfig, RunItemUpdate } from './types';
 
-type OpnameDetailUpdates = NonNullable<Parameters<typeof opnameApi.saveDraft>[2]>;
+// ---- Jadwal ----
 
-const opnameDetailQuery = (id: string) =>
-  queryOptions({
-    queryKey: opnameKeys.detail(id),
-    queryFn: () => opnameApi.getOpnameById(id),
-  });
-
-export function useOpname(id: string | undefined) {
-  return useQuery({ ...opnameDetailQuery(id ?? ''), enabled: !!id });
+export function useOpnameSchedules() {
+  return useQuery({ queryKey: opnameKeys.schedules(), queryFn: opnameApi.getSchedules });
 }
 
-// Untuk handler yang butuh data opname terbaru setelah mutasi. Mutasi di
-// bawah menunggu invalidasi selesai, jadi biasanya ini langsung dari cache.
-export function useFetchOpname() {
+// Jadwal tidak mengubah status opname maupun stok, jadi cukup refresh jadwal
+function useScheduleMutation<T>(fn: (input: T) => Promise<void>) {
   const queryClient = useQueryClient();
-  return useCallback((id: string) => queryClient.fetchQuery(opnameDetailQuery(id)), [queryClient]);
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: opnameKeys.schedules() }),
+  });
 }
 
-// Baris jurnal penyesuaian untuk halaman detail opname yang sudah selesai
-export function useOpnameDetailView(id: string | undefined) {
+export const useSaveOpnameSchedule = () =>
+  useScheduleMutation(({ id, config }: { id?: string; config: OpnameScheduleConfig }) =>
+    id ? opnameApi.updateSchedule(id, config) : opnameApi.createSchedule(config),
+  );
+export const useDeleteOpnameSchedule = () => useScheduleMutation(opnameApi.deleteSchedule);
+export const useToggleOpnameSchedule = () =>
+  useScheduleMutation(({ id, isActive }: { id: string; isActive: boolean }) =>
+    opnameApi.toggleSchedule(id, isActive),
+  );
+
+// ---- Sesi ----
+
+export function useActiveOpnames() {
   return useQuery({
-    queryKey: opnameKeys.detailView(id ?? ''),
-    queryFn: () => opnameApi.getOpnameDetailView(id!),
+    queryKey: opnameKeys.active(),
+    queryFn: () => opnameApi.listRuns('sedang_dilaksanakan'),
+    // Opname bisa dimulai/selesai dari perangkat lain
+    refetchOnWindowFocus: 'always',
+  });
+}
+
+export function useOpnameHistory() {
+  return useQuery({
+    queryKey: opnameKeys.history(),
+    queryFn: () => opnameApi.listRuns('selesai'),
+  });
+}
+
+export function useOpnameRun(id: string | undefined) {
+  return useQuery({
+    queryKey: opnameKeys.run(id ?? ''),
+    queryFn: () => opnameApi.getRun(id!),
     enabled: !!id,
   });
 }
 
+// Perubahan tabel opname dari perangkat lain → refresh daftar sesi.
+// Hitungan di layar kerja tidak ikut di-refresh supaya isian tidak tertimpa.
+export function useOpnameRealtime() {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const refresh = () => {
+      void queryClient.invalidateQueries({ queryKey: opnameKeys.active() });
+      void queryClient.invalidateQueries({ queryKey: opnameKeys.history() });
+    };
+    let subscribed = false;
+    return opnameApi.subscribeToOpnameChanges({
+      onChange: refresh,
+      onSubscribed: () => {
+        // SUBSCRIBED berikutnya berarti reconnect: event selama putus hilang
+        if (subscribed) refresh();
+        subscribed = true;
+      },
+    });
+  }, [queryClient]);
+}
+
 const OPNAME_NOTIFICATION_ROLES = ['admin', 'apoteker', 'farmasi'];
 
-// Notifikasi perubahan langkah opname untuk role yang mengelola opname.
-// Gagal mengirim notifikasi tidak menggagalkan mutasi yang sudah berhasil.
+// Gagal mengirim notifikasi tidak menggagalkan mutasi yang sudah berhasil
 const notifyOpname = async (
   notification: Omit<Parameters<typeof createNotification>[0], 'target_roles'>,
 ) => {
@@ -47,142 +92,141 @@ const notifyOpname = async (
   }
 };
 
-// Semua mutasi yang mengubah status/langkah opname atau stok memakai
-// invalidateOpnameChange. onSuccess mengembalikan promise, jadi mutateAsync
-// baru selesai setelah query aktif ter-refresh.
-
 export function useStartOpname() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ scheduleId, date }: { scheduleId: string | null; date: string }) =>
-      opnameApi.startOpname(scheduleId, date),
-    onSuccess: () => invalidateOpnameChange(queryClient),
-  });
-}
-
-// Langkah 1 → 2: detail dibuat dan opname menjadi sedang_dilaksanakan (stok terkunci)
-export function useCompleteOpnameStepOne() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ opnameId, productIds }: { opnameId: string; productIds: string[] }) =>
-      opnameApi.completeStepOne(opnameId, productIds),
-    onSuccess: () => invalidateOpnameChange(queryClient),
-  });
-}
-
-// Langkah 2 → 1: detail dihapus dan kunci stok dilepas
-export function useBackwardOpnameToStepOne() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      opnameId,
-      scheduleObatIds,
-    }: {
-      opnameId: string;
-      scheduleObatIds: string[];
-      opnameNumber?: string;
-    }) => opnameApi.backwardToStepOne(opnameId, scheduleObatIds),
-    onSuccess: async (_data, { opnameId, opnameNumber }) => {
+    mutationFn: opnameApi.startRun,
+    onSuccess: async (id, input) => {
       await invalidateOpnameChange(queryClient);
       await notifyOpname({
-        type: 'OPNAME_STEP_CHANGED',
-        title: 'Opname Kembali ke Tahap 1',
-        message: `Opname ${opnameNumber} kembali ke tahap 1: Pemilihan Obat. Progress tahap 2 telah dihapus.`,
-        data: {
-          opname_id: parseInt(opnameId),
-          opname_number: opnameNumber,
-          step: 1,
-          action: 'backward',
-        },
+        type: 'OPNAME_STARTED',
+        title: 'Opname dimulai',
+        message: `${input.name || 'Opname cepat'}: ${input.productIds.length} produk dikunci dari transaksi sementara.`,
+        data: { opname_id: Number(id), opname_number: `OPN-${id}` },
       });
     },
   });
 }
 
-// Simpan detail sekaligus pindah ke langkah `step`. Masuk langkah 3 dikabarkan
-// lewat notifikasi.
-export function useMoveOpnameStep() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      opnameId,
-      step,
-      updates,
-    }: {
-      opnameId: string;
-      step: number;
-      updates: OpnameDetailUpdates;
-      opnameNumber?: string;
-    }) => opnameApi.saveDraft(opnameId, step, updates),
-    onSuccess: async (_data, { opnameId, step, opnameNumber }) => {
-      await invalidateOpnameChange(queryClient);
-      if (step !== 3) return;
-      await notifyOpname({
-        type: 'OPNAME_STEP_CHANGED',
-        title: 'Opname Memasuki Tahap 3',
-        message: `Opname ${opnameNumber} telah memasuki tahap 3: Penyesuaian Stok.`,
-        data: { opname_id: parseInt(opnameId), opname_number: opnameNumber, step: 3 },
-      });
-    },
-  });
-}
-
-// Simpan draft: detail saja, current_step tidak berubah
-export function useSaveOpnameDraft() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ opnameId, updates }: { opnameId: string; updates: OpnameDetailUpdates }) =>
-      opnameApi.saveDetailOnly(opnameId, updates),
-    onSuccess: (_data, { opnameId }) =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: opnameKeys.detail(opnameId) }),
-        queryClient.invalidateQueries({ queryKey: opnameKeys.detailView(opnameId) }),
-      ]),
-  });
-}
-
-// Hanya mengisi alasan di detail; status opname dan stok tidak berubah
-export function useResolveOpnameDifference() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ detailId, reason }: { detailId: string; reason: string }) =>
-      opnameApi.resolveOpnameDifference(detailId, reason),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: opnameKeys.all }),
-  });
-}
-
-// Langkah 3 selesai: detail final disimpan, lalu stok master_obat diperbarui
-// dan kunci dilepas. Invalidasi sekali setelah keduanya.
 export function useFinishOpname() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      opnameId,
-      updates,
-    }: {
-      opnameId: string;
-      updates: OpnameDetailUpdates;
-      opnameNumber?: string;
-    }) => {
-      await opnameApi.saveDraft(opnameId, 3, updates);
-      await opnameApi.finishOpname(opnameId);
-    },
-    onSuccess: async (_data, { opnameId, opnameNumber }) => {
+    mutationFn: (run: OpnameRun) => opnameApi.finishRun(run.id),
+    onSuccess: async (_data, run) => {
       await invalidateOpnameChange(queryClient);
+      const s = runStats(run.items);
       await notifyOpname({
         type: 'OPNAME_COMPLETED',
-        title: 'Opname Selesai',
-        message: `Opname ${opnameNumber} telah selesai. Stok telah diperbarui sesuai hasil opname.`,
-        data: { opname_id: parseInt(opnameId), opname_number: opnameNumber },
+        title: `${run.name} selesai`,
+        message: `${s.n} produk dihitung, ${s.diff} produk selisih. Stok sudah disesuaikan.`,
+        data: { opname_id: Number(run.id), opname_number: run.code },
       });
     },
   });
 }
 
-export function useDeleteOpname() {
+export function useCancelOpname() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (opnameId: string) => opnameApi.deleteOpname(opnameId),
+    mutationFn: (id: string) => opnameApi.cancelRun(id),
     onSuccess: () => invalidateOpnameChange(queryClient),
   });
+}
+
+/** Pindah antara hitung (2) dan tinjau (3) */
+export function useSetOpnameStep() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, step }: { id: string; step: 2 | 3 }) => opnameApi.saveItems(id, [], step),
+    onSuccess: (_d, { id }) => queryClient.invalidateQueries({ queryKey: opnameKeys.run(id) }),
+  });
+}
+
+// ---- Simpan otomatis ----
+
+const applyUpdate = (run: OpnameRun, u: RunItemUpdate): OpnameRun => ({
+  ...run,
+  items: run.items.map((i) =>
+    i.detailId !== u.detailId
+      ? i
+      : {
+          ...i,
+          ...(u.physicalStock !== undefined && {
+            physicalStock: u.physicalStock,
+            // Hitung ulang membuang stok final lanjutan (sama seperti di database)
+            finalStock: u.finalStock !== undefined ? u.finalStock : null,
+          }),
+          ...(u.physicalStock === undefined &&
+            u.finalStock !== undefined && { finalStock: u.finalStock }),
+          ...(u.reasonCode !== undefined && { reasonCode: u.reasonCode, reasonText: null }),
+          ...(u.note !== undefined && { note: u.note }),
+        },
+  ),
+});
+
+/**
+ * Perubahan hitungan langsung tampil (cache diubah), lalu dikirim sekaligus
+ * setelah jeda pengetikan. Perubahan beruntun di baris yang sama digabung.
+ */
+export function useAutosaveRun(runId: string | undefined, delay = 700) {
+  const queryClient = useQueryClient();
+  const pending = useRef(new Map<string, RunItemUpdate>());
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [saving, setSaving] = useState(false);
+  const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const flush = useCallback(async () => {
+    if (!runId || pending.current.size === 0) return;
+    const batch = [...pending.current.values()];
+    pending.current.clear();
+    setSaving(true);
+    try {
+      await opnameApi.saveItems(runId, batch);
+      setSavedAt(new Date());
+      setError(null);
+    } catch (err) {
+      // Kembalikan ke antrean supaya dicoba lagi pada perubahan berikutnya
+      for (const u of batch)
+        pending.current.set(u.detailId, { ...u, ...pending.current.get(u.detailId) });
+      setError(err instanceof Error ? err.message : 'Gagal menyimpan');
+    } finally {
+      setSaving(false);
+    }
+  }, [runId]);
+
+  const queue = useCallback(
+    (update: RunItemUpdate) => {
+      if (!runId) return;
+      queryClient.setQueryData<OpnameRun>(opnameKeys.run(runId), (prev) =>
+        prev ? applyUpdate(prev, update) : prev,
+      );
+      const prevUpdate = pending.current.get(update.detailId);
+      pending.current.set(update.detailId, { ...prevUpdate, ...update });
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => void flush(), delay);
+    },
+    [runId, queryClient, flush, delay],
+  );
+
+  // Kirim sisa perubahan saat keluar dari layar kerja
+  useEffect(
+    () => () => {
+      clearTimeout(timer.current);
+      void flush();
+    },
+    [flush],
+  );
+
+  return { queue, flush, saving, savedAt, error, hasPending: () => pending.current.size > 0 };
+}
+
+/** id produk → nama opname yang sedang menghitungnya (dikunci dari transaksi) */
+export function useOpnameLockedProducts(): ReadonlyMap<string, string> {
+  const { data } = useActiveOpnames();
+  return useMemo(() => {
+    const map = new Map<string, string>();
+    for (const run of data ?? []) for (const i of run.items) map.set(i.product.id, run.name);
+    return map;
+  }, [data]);
 }

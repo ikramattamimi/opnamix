@@ -50,11 +50,10 @@ describe('canAccessRoute', () => {
 describe('getRouteTitle', () => {
   it('mencocokkan path statis dan path dengan parameter', () => {
     expect(getRouteTitle('/', APP_ROUTES)).toBe('Dasbor Utama');
-    expect(getRouteTitle(ROUTES.STOK_OPNAME, APP_ROUTES)).toBe('Audit Stok (Opname)');
-    expect(getRouteTitle('/audit/stok-opname/pelaksanaan/abc', APP_ROUTES)).toBe(
-      'Pelaksanaan Opname',
-    );
-    expect(getRouteTitle('/audit/stok-opname/detail/abc', APP_ROUTES)).toBe('Detail Opname');
+    expect(getRouteTitle(ROUTES.STOK_OPNAME, APP_ROUTES)).toBe('Stok Opname');
+    expect(getRouteTitle('/audit/stok-opname/12/hitung', APP_ROUTES)).toBe('Hitung opname');
+    expect(getRouteTitle('/audit/stok-opname/12/laporan', APP_ROUTES)).toBe('Laporan opname');
+    expect(getRouteTitle('/audit/stok-opname/detail/abc', APP_ROUTES)).toBe('Stok Opname');
   });
 
   it('memakai judul bawaan untuk path yang tidak dikenal', () => {
@@ -73,7 +72,7 @@ describe('buildSidebarNodes', () => {
       'Stok Masuk',
       'Stok Keluar',
       '# Audit & Kontrol',
-      'Stok Opname > Riwayat Opname, Konfigurasi Opname',
+      'Stok Opname',
       '# Laporan',
       'Laporan Stok',
       '# Lainnya',

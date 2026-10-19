@@ -12,6 +12,8 @@ import { DataPrimitiveDocs, FormPrimitiveDocs, ListPanelDocs } from './sections/
 import { ProductDomainDocs, TagInputDocs } from './sections/ProductDocs';
 import { PosDocs } from './sections/PosDocs';
 import { AccountDocs } from './sections/AccountDocs';
+import { ChartDocs } from './sections/ChartDocs';
+import { OpnameDocs } from './sections/OpnameDocs';
 import { DocsTocInline, DocsTocSidebar } from './components/DocsToc';
 import { PageHeader } from '@/components/layout/PageHeader';
 
@@ -30,6 +32,8 @@ const SECTIONS: { id: string; label: string; Component: React.FC }[] = [
   { id: 'product-domain', label: 'Komponen produk', Component: ProductDomainDocs },
   { id: 'pos', label: 'PosLayout & POS', Component: PosDocs },
   { id: 'account', label: 'Akun & notifikasi', Component: AccountDocs },
+  { id: 'charts', label: 'Grafik', Component: ChartDocs },
+  { id: 'opname-primitives', label: 'Layar kerja & opname', Component: OpnameDocs },
   { id: 'dialog', label: 'Dialog', Component: DialogDocs },
   { id: 'dropdown', label: 'Dropdown', Component: DropdownDocs },
   { id: 'segmented', label: 'SegmentedControl', Component: SegmentedDocs },

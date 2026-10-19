@@ -21,9 +21,15 @@ export const ROUTES = {
   KONFIGURASI_OPNAME: '/audit/stok-opname/konfigurasi',
   PELAKSANAAN_OPNAME: '/audit/stok-opname/pelaksanaan/:opnameId',
   DETAIL_OPNAME: '/audit/stok-opname/detail/:opnameId',
+  OPNAME_HITUNG: '/audit/stok-opname/:opnameId/hitung',
+  OPNAME_LAPORAN: '/audit/stok-opname/:opnameId/laporan',
   LAPORAN_STOK: '/laporan/stok',
   USER_MANAGEMENT: '/pengaturan/user-management',
   PROFIL: '/pengaturan/profil',
   UI_DOCS: '/pengaturan/komponen-ui',
   NOTIFICATIONS: '/notifikasi',
 } as const;
+
+// Layar kerja (hitung) atau laporan satu sesi opname
+export const opnamePath = (id: string, view: 'hitung' | 'laporan') =>
+  `${ROUTES.STOK_OPNAME}/${id}/${view}`;

@@ -225,8 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             );
           }
-          // Menu bertingkat lama (Riwayat/Konfigurasi Opname) ditampilkan rata;
-          // keduanya digabung jadi satu menu Stok Opname di Fase 6.
+          // Menu bertingkat (parent) ditampilkan rata di sidebar ini
           if (node.kind === 'parent') return node.children.map(renderItem);
           return renderItem(node.route);
         })}
